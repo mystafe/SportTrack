@@ -168,8 +168,12 @@ const translations: Translations = {
     en: 'Name cannot be empty.'
   },
   'settings.errors.targetPositive': {
-    tr: 'Hedef pozitif bir sayı olmalı.',
-    en: 'Goal must be a positive number.'
+    tr: '0\'dan büyük bir sayı girmelisiniz.',
+    en: 'You must enter a number greater than 0.'
+  },
+  'settings.errors.targetRange': {
+    tr: 'Hedef 1.000 ile 100.000 arasında olmalıdır.',
+    en: 'Goal must be between 1,000 and 100,000.'
   },
 
   'footer.byName': { tr: 'Mustafa Evleksiz', en: 'Mustafa Evleksiz' }

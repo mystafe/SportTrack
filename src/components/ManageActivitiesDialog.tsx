@@ -183,23 +183,23 @@ export function ManageActivitiesDialog() {
         {t('activities.custom.manageButton')}
       </button>
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-2xl rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl">
-            <div className="flex items-start justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-3 sm:px-4 py-4 overflow-y-auto">
+          <div className="w-full max-w-2xl rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl my-auto max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-800">
               <div>
-                <h2 className="text-lg font-semibold">{t('activities.custom.title')}</h2>
+                <h2 className="text-base sm:text-lg font-semibold">{t('activities.custom.title')}</h2>
                 <p className="text-xs text-gray-500 mt-1">
                   {t('activities.custom.subtitle')}
                 </p>
               </div>
               <button
-                className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-100"
+                className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 text-lg sm:text-xl"
                 onClick={closeDialog}
               >
                 ✕
               </button>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-5 py-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 px-4 sm:px-5 py-4">
               <form className="space-y-4" onSubmit={submit}>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">

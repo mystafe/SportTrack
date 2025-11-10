@@ -12,11 +12,11 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="tr" suppressHydrationWarning>
-      <body className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-950">
+    <html lang="tr" suppressHydrationWarning className="overflow-x-hidden">
+      <body className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-950 overflow-x-hidden">
         <Providers>
           <Header />
-          <main className="container py-6">{children}</main>
+          <main className="container py-4 sm:py-6">{children}</main>
           <Footer />
         </Providers>
       </body>
