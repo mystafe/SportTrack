@@ -1,55 +1,19 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
-import { DAILY_TARGET_POINTS } from '@/lib/activityConfig';
 import { useI18n } from '@/lib/i18n';
-
-type Summary = {
-  todayPoints: number;
-  targetPoints: number;
-  totalPoints: number;
-  totalActivities: number;
-  streakDays: number;
-  lastSevenDays: Array<{ date: string; points: number }>;
-  breakdownToday: Array<{
-    key: string;
-    label: string;
-    amount: number;
-    unit: string;
-    points: number;
-  }>;
-};
+import { useActivitiesSummary } from '@/lib/activityStore';
 
 export function StatsCards() {
-  const [summary, setSummary] = useState<Summary | null>(null);
-  const [loading, setLoading] = useState(true);
   const { t, lang } = useI18n();
+  const summary = useActivitiesSummary();
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
     [lang]
   );
   const dateLocale = lang === 'tr' ? tr : enUS;
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch('/api/summary', { cache: 'no-store' });
-        const data = await res.json();
-        setSummary(data);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
-
-  if (loading) return <div>...</div>;
-
-  if (!summary) {
-    return <div>{t('stats.noData')}</div>;
-  }
 
   const pct =
     summary.targetPoints > 0
@@ -130,7 +94,7 @@ export function StatsCards() {
                     {format(new Date(day.date), 'd MMMM EEEE', { locale: dateLocale })}
                   </div>
                   <div className="text-sm font-semibold">
-                    {numberFormatter.format(day.points)} / {numberFormatter.format(DAILY_TARGET_POINTS)}
+                    {numberFormatter.format(day.points)} / {numberFormatter.format(summary.targetPoints)}
                   </div>
                 </li>
               ))}

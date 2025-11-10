@@ -8,6 +8,7 @@ import {
   listActivities
 } from '@/lib/activityConfig';
 import { useI18n } from '@/lib/i18n';
+import { ActivityRecord, useActivities } from '@/lib/activityStore';
 
 function toLocalInputValue(date: Date) {
   const year = date.getFullYear();
@@ -18,13 +19,10 @@ function toLocalInputValue(date: Date) {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
-type ActivityFormInitial = {
-  id?: string;
-  activityKey: ActivityKey;
-  amount: number;
-  performedAt: string;
-  note?: string | null;
-};
+type ActivityFormInitial = Pick<
+  ActivityRecord,
+  'id' | 'activityKey' | 'amount' | 'performedAt' | 'note'
+>;
 
 type ActivityFormProps = {
   onCreated?: () => void;
@@ -35,6 +33,7 @@ type ActivityFormProps = {
 
 export function ActivityForm({ onCreated, onSaved, onCancel, initial }: ActivityFormProps) {
   const activities = useMemo(() => listActivities(), []);
+  const { addActivity, updateActivity } = useActivities();
   const { t, lang } = useI18n();
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
@@ -80,26 +79,25 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const payload = {
-      activityKey,
-      amount,
-      note: note || undefined,
-      performedAt: performedAt ? new Date(performedAt).toISOString() : undefined
-    };
+    const performedAtISO = performedAt
+      ? new Date(performedAt).toISOString()
+      : new Date().toISOString();
     try {
       if (initial?.id) {
-        await fetch(`/api/activities/${initial.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+        updateActivity(initial.id, {
+          activityKey,
+          amount,
+          note: note || undefined,
+          performedAt: performedAtISO
         });
         onSaved?.();
         onCancel?.();
       } else {
-        await fetch('/api/activities', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+        addActivity({
+          activityKey,
+          amount,
+          note: note || undefined,
+          performedAt: performedAtISO
         });
         setAmount(ACTIVITY_DEFINITIONS[activityKey].defaultAmount);
         setNote('');

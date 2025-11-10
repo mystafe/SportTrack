@@ -1,22 +1,12 @@
 'use client';
 
 import { ActivityForm } from '@/components/ActivityForm';
-import { ACTIVITY_DEFINITIONS, ActivityKey } from '@/lib/activityConfig';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ACTIVITY_DEFINITIONS } from '@/lib/activityConfig';
+import { useMemo, useState } from 'react';
 import { format, startOfDay } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
-
-type Activity = {
-  id: string;
-  activityKey: ActivityKey;
-  amount: number;
-  points: number;
-  performedAt: string;
-  note?: string | null;
-};
-
-type ActivityResponse = Omit<Activity, 'activityKey'> & { activityKey: string };
+import { ActivityRecord, useActivities } from '@/lib/activityStore';
 
 export default function ActivitiesPage() {
   const { t } = useI18n();
@@ -30,9 +20,8 @@ export default function ActivitiesPage() {
 
 function ActivitiesClient() {
   const { t, lang } = useI18n();
-  const [items, setItems] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<Activity | null>(null);
+  const { activities, deleteActivity, hydrated } = useActivities();
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
@@ -48,29 +37,14 @@ function ActivitiesClient() {
   );
   const dateLocale = lang === 'tr' ? tr : enUS;
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/activities', { cache: 'no-store' });
-      const data: ActivityResponse[] = await res.json();
-      setItems(
-        data.map((item) => ({
-          ...item,
-          activityKey: item.activityKey as ActivityKey
-        }))
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const editing = useMemo(
+    () => (editingId ? activities.find((activity) => activity.id === editingId) ?? null : null),
+    [activities, editingId]
+  );
 
   const groups = useMemo(() => {
-    const grouped = new Map<string, Activity[]>();
-    for (const activity of items) {
+    const grouped = new Map<string, ActivityRecord[]>();
+    for (const activity of activities) {
       const key = startOfDay(new Date(activity.performedAt)).toISOString();
       grouped.set(key, [...(grouped.get(key) ?? []), activity]);
     }
@@ -82,14 +56,14 @@ function ActivitiesClient() {
         )
       }))
       .sort((a, b) => +new Date(b.day) - +new Date(a.day));
-  }, [items]);
+  }, [activities]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="space-y-3">
         <div className="text-sm font-medium">{t('list.newActivity')}</div>
         <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card">
-          <ActivityForm onCreated={load} />
+          <ActivityForm />
         </div>
       </div>
       <div className="space-y-3">
@@ -101,7 +75,7 @@ function ActivitiesClient() {
                 <span>{t('list.editingTitle')}</span>
                 <button
                   className="text-xs underline-offset-2 hover:underline"
-                  onClick={() => setEditing(null)}
+                  onClick={() => setEditingId(null)}
                 >
                   {t('form.cancel')}
                 </button>
@@ -115,20 +89,20 @@ function ActivitiesClient() {
                     note: editing.note ?? '',
                     performedAt: editing.performedAt
                   }}
-                  onSaved={load}
-                  onCancel={() => setEditing(null)}
+                  onSaved={() => setEditingId(null)}
+                  onCancel={() => setEditingId(null)}
                 />
               </div>
             </div>
           ) : null}
-          {loading ? (
+          {!hydrated ? (
             <div className="p-4 space-y-3">
               <div className="h-6 w-40 rounded skeleton" />
               <div className="h-12 rounded skeleton" />
               <div className="h-12 rounded skeleton" />
               <div className="h-12 rounded skeleton" />
             </div>
-          ) : items.length === 0 ? (
+          ) : activities.length === 0 ? (
             <div className="p-4 text-sm text-gray-600 dark:text-gray-400">{t('list.empty')}</div>
           ) : (
             <div className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -162,7 +136,7 @@ function ActivitiesClient() {
                           <div className="flex items-center gap-2 text-xs">
                             <button
                               className="text-brand hover:underline"
-                              onClick={() => setEditing(activity)}
+                              onClick={() => setEditingId(activity.id)}
                             >
                               {t('list.edit')}
                             </button>
@@ -170,8 +144,10 @@ function ActivitiesClient() {
                               className="text-red-600 hover:underline"
                               onClick={async () => {
                                 if (!confirm(t('list.deleteConfirm'))) return;
-                                await fetch(`/api/activities/${activity.id}`, { method: 'DELETE' });
-                                load();
+                                deleteActivity(activity.id);
+                                if (editingId === activity.id) {
+                                  setEditingId(null);
+                                }
                               }}
                             >
                               {t('list.delete')}
