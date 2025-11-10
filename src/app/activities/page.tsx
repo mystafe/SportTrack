@@ -1,7 +1,7 @@
 'use client';
 
 import { ActivityForm } from '@/components/ActivityForm';
-import { ACTIVITY_DEFINITIONS } from '@/lib/activityConfig';
+import { ManageActivitiesDialog } from '@/components/ManageActivitiesDialog';
 import { useMemo, useState } from 'react';
 import { format, startOfDay } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
@@ -61,7 +61,10 @@ function ActivitiesClient() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="space-y-3">
-        <div className="text-sm font-medium">{t('list.newActivity')}</div>
+        <div className="flex items-center justify-between text-sm font-medium">
+          <span>{t('list.newActivity')}</span>
+          <ManageActivitiesDialog />
+        </div>
         <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card">
           <ActivityForm />
         </div>
@@ -85,6 +88,10 @@ function ActivitiesClient() {
                   initial={{
                     id: editing.id,
                     activityKey: editing.activityKey,
+                    label: editing.label,
+                    icon: editing.icon,
+                    unit: editing.unit,
+                    multiplier: editing.multiplier,
                     amount: editing.amount,
                     note: editing.note ?? '',
                     performedAt: editing.performedAt
@@ -113,27 +120,28 @@ function ActivitiesClient() {
                   </div>
                   <ul className="divide-y divide-gray-200 dark:divide-gray-800">
                     {acts.map((activity) => {
-                      const def = ACTIVITY_DEFINITIONS[activity.activityKey];
-                      if (!def) return null;
                       return (
-                        <li key={activity.id} className="p-3 flex items-start justify-between gap-3">
+                        <li
+                          key={activity.id}
+                          className="group p-3 flex items-start justify-between gap-3 rounded transition hover:bg-gray-50 dark:hover:bg-gray-900/30"
+                        >
                           <div>
                             <div className="text-sm font-medium flex items-center gap-2 flex-wrap">
-                              <span className="text-lg">{def.icon}</span>
-                              <span>{def.label}</span>
+                              <span className="text-lg">{activity.icon}</span>
+                              <span>{activity.label}</span>
                               <span className="inline-flex items-center rounded-full bg-brand/10 text-brand px-2 py-0.5 text-xs font-medium">
                                 {`${numberFormatter.format(activity.points)} ${t('list.pointsUnit')}`}
                               </span>
                             </div>
                             <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {timeFormatter.format(new Date(activity.performedAt))} •{' '}
-                              {activity.amount} {def.unit} • {def.multiplier}x
+                              {timeFormatter.format(new Date(activity.performedAt))} • {activity.amount}{' '}
+                              {activity.unit} • {activity.multiplier}x
                             </div>
                             {activity.note ? (
                               <div className="text-sm mt-1 text-gray-700 dark:text-gray-300">{activity.note}</div>
                             ) : null}
                           </div>
-                          <div className="flex items-center gap-2 text-xs">
+                          <div className="flex items-center gap-2 text-xs opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                             <button
                               className="text-brand hover:underline"
                               onClick={() => setEditingId(activity.id)}

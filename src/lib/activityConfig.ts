@@ -1,11 +1,6 @@
-export type ActivityKey =
-  | 'WALKING'
-  | 'STAIRS'
-  | 'SIT_UP'
-  | 'PUSH_UP'
-  | 'WEIGHT_LIFTING';
+export type ActivityKey = string;
 
-type ActivityDefinition = {
+export type ActivityDefinition = {
   key: ActivityKey;
   label: string;
   icon: string;
@@ -13,10 +8,11 @@ type ActivityDefinition = {
   unit: string;
   defaultAmount: number;
   description?: string;
+  isCustom?: boolean;
 };
 
-export const ACTIVITY_DEFINITIONS: Record<ActivityKey, ActivityDefinition> = {
-  WALKING: {
+export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
+  {
     key: 'WALKING',
     label: 'Yürüme',
     icon: '🚶‍♂️',
@@ -25,7 +21,7 @@ export const ACTIVITY_DEFINITIONS: Record<ActivityKey, ActivityDefinition> = {
     defaultAmount: 1000,
     description: 'Adım sayınızı girin'
   },
-  STAIRS: {
+  {
     key: 'STAIRS',
     label: 'Merdiven Çıkma',
     icon: '🧗',
@@ -34,23 +30,23 @@ export const ACTIVITY_DEFINITIONS: Record<ActivityKey, ActivityDefinition> = {
     defaultAmount: 50,
     description: 'Çıktığınız toplam basamak sayısı'
   },
-  SIT_UP: {
+  {
     key: 'SIT_UP',
     label: 'Mekik',
-    icon: '💪',
+    icon: '🪢',
     multiplier: 10,
     unit: 'tekrar',
     defaultAmount: 20
   },
-  PUSH_UP: {
+  {
     key: 'PUSH_UP',
     label: 'Şınav',
-    icon: '🤸',
+    icon: '🧎‍♂️',
     multiplier: 20,
     unit: 'tekrar',
     defaultAmount: 20
   },
-  WEIGHT_LIFTING: {
+  {
     key: 'WEIGHT_LIFTING',
     label: 'Ağırlık Çalışması',
     icon: '🏋️',
@@ -59,16 +55,11 @@ export const ACTIVITY_DEFINITIONS: Record<ActivityKey, ActivityDefinition> = {
     defaultAmount: 30,
     description: 'Toplam süreyi dakika olarak girin'
   }
-};
+];
 
-export const DAILY_TARGET_POINTS = 10_000;
+export const BASE_ACTIVITY_MAP: Record<string, ActivityDefinition> = Object.fromEntries(
+  BASE_ACTIVITY_DEFINITIONS.map((def) => [def.key, def])
+);
 
-export function calculatePoints(activityKey: ActivityKey, amount: number) {
-  const def = ACTIVITY_DEFINITIONS[activityKey];
-  return Math.max(0, Math.round(amount * def.multiplier));
-}
-
-export function listActivities() {
-  return Object.values(ACTIVITY_DEFINITIONS);
-}
+export const DEFAULT_DAILY_TARGET = 10_000;
 

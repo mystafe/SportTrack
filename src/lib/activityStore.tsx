@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import {
   createContext,
@@ -9,10 +9,10 @@ import {
   useState
 } from 'react';
 import {
-  ACTIVITY_DEFINITIONS,
+  ActivityDefinition,
   ActivityKey,
-  calculatePoints,
-  DAILY_TARGET_POINTS
+  BASE_ACTIVITY_DEFINITIONS,
+  BASE_ACTIVITY_MAP
 } from '@/lib/activityConfig';
 import { startOfDay, subDays } from 'date-fns';
 
@@ -21,25 +21,25 @@ const STORAGE_KEY = 'sporttrack.activities.v1';
 export type ActivityRecord = {
   id: string;
   activityKey: ActivityKey;
+  label: string;
+  icon: string;
+  unit: string;
+  multiplier: number;
   amount: number;
   points: number;
   performedAt: string;
   note?: string | null;
+  isCustom?: boolean;
 };
 
 type AddActivityInput = {
-  activityKey: ActivityKey;
+  definition: ActivityDefinition;
   amount: number;
   performedAt?: string;
   note?: string | null;
 };
 
-type UpdateActivityInput = {
-  activityKey: ActivityKey;
-  amount: number;
-  performedAt?: string;
-  note?: string | null;
-};
+type UpdateActivityInput = AddActivityInput;
 
 type ActivitiesContextValue = {
   activities: ActivityRecord[];
@@ -51,6 +51,8 @@ type ActivitiesContextValue = {
 
 const ActivitiesContext = createContext<ActivitiesContextValue | null>(null);
 
+const BASE_DEFINITION_MAP = BASE_ACTIVITY_MAP;
+
 function generateId() {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
@@ -58,47 +60,91 @@ function generateId() {
   return Math.random().toString(36).slice(2);
 }
 
+function computePoints(multiplier: number, amount: number) {
+  return Math.max(0, Math.round(amount * multiplier));
+}
+
+function buildRecord(
+  definition: ActivityDefinition,
+  amount: number,
+  performedAt?: string,
+  note?: string | null
+): ActivityRecord {
+  const iso = performedAt ? new Date(performedAt).toISOString() : new Date().toISOString();
+  const multiplier = definition.multiplier;
+  return {
+    id: generateId(),
+    activityKey: definition.key,
+    label: definition.label,
+    icon: definition.icon,
+    unit: definition.unit,
+    multiplier,
+    amount,
+    points: computePoints(multiplier, amount),
+    performedAt: iso,
+    note: note ?? null,
+    isCustom: definition.isCustom ?? false
+  };
+}
+
+function normalizeRecord(record: Partial<ActivityRecord>): ActivityRecord {
+  const fallback = BASE_DEFINITION_MAP[record.activityKey ?? ''];
+  const multiplier =
+    typeof record.multiplier === 'number'
+      ? record.multiplier
+      : fallback?.multiplier ?? 1;
+  const amount = record.amount ?? 0;
+
+  return {
+    id: record.id ?? generateId(),
+    activityKey: record.activityKey ?? fallback?.key ?? 'CUSTOM',
+    label: record.label ?? fallback?.label ?? record.activityKey ?? 'Bilinmeyen Aktivite',
+    icon: record.icon ?? fallback?.icon ?? '🏃',
+    unit: record.unit ?? fallback?.unit ?? '',
+    multiplier,
+    amount,
+    points:
+      typeof record.points === 'number'
+        ? record.points
+        : computePoints(multiplier, amount),
+    performedAt: record.performedAt ?? new Date().toISOString(),
+    note: record.note ?? null,
+    isCustom: record.isCustom ?? !fallback
+  };
+}
+
 export function ActivitiesProvider({ children }: { children: React.ReactNode }) {
   const [activities, setActivities] = useState<ActivityRecord[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
+    if (typeof window === 'undefined') return;
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
-        const parsed = JSON.parse(raw) as ActivityRecord[];
-        setActivities(parsed);
-      } catch (err) {
-        console.error('Failed to parse activities from storage', err);
+        const parsed = JSON.parse(raw) as Partial<ActivityRecord>[];
+        const normalized = parsed.map((record) => normalizeRecord(record));
+        setActivities(normalized);
+      } catch (error) {
+        console.error('Failed to parse activities from storage', error);
       }
     }
     setHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (!hydrated || typeof window === 'undefined') {
-      return;
-    }
+    if (!hydrated || typeof window === 'undefined') return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(activities));
   }, [activities, hydrated]);
 
   const addActivity = useCallback(
     (input: AddActivityInput) => {
-      const performedAt = input.performedAt
-        ? new Date(input.performedAt).toISOString()
-        : new Date().toISOString();
-      const points = calculatePoints(input.activityKey, input.amount);
-      const record: ActivityRecord = {
-        id: generateId(),
-        activityKey: input.activityKey,
-        amount: input.amount,
-        points,
-        performedAt,
-        note: input.note ?? null
-      };
+      const record = buildRecord(
+        input.definition,
+        input.amount,
+        input.performedAt,
+        input.note
+      );
       setActivities((prev) => [record, ...prev]);
       return record;
     },
@@ -107,28 +153,33 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
 
   const updateActivity = useCallback(
     (id: string, input: UpdateActivityInput) => {
-      let updatedRecord: ActivityRecord | null = null;
+      let updated: ActivityRecord | null = null;
       setActivities((prev) =>
         prev.map((record) => {
           if (record.id !== id) {
             return record;
           }
-          const performedAt = input.performedAt
+          const iso = input.performedAt
             ? new Date(input.performedAt).toISOString()
             : record.performedAt;
-          const next: ActivityRecord = {
+          const multiplier = input.definition.multiplier;
+          updated = {
             ...record,
-            activityKey: input.activityKey,
+            activityKey: input.definition.key,
+            label: input.definition.label,
+            icon: input.definition.icon,
+            unit: input.definition.unit,
+            multiplier,
             amount: input.amount,
+            performedAt: iso,
             note: input.note ?? null,
-            performedAt,
-            points: calculatePoints(input.activityKey, input.amount)
+            points: computePoints(multiplier, input.amount),
+            isCustom: input.definition.isCustom ?? false
           };
-          updatedRecord = next;
-          return next;
+          return updated;
         })
       );
-      return updatedRecord;
+      return updated;
     },
     []
   );
@@ -173,6 +224,7 @@ export type ActivitiesSummary = {
   breakdownToday: Array<{
     key: ActivityKey;
     label: string;
+    icon: string;
     amount: number;
     unit: string;
     points: number;
@@ -181,28 +233,37 @@ export type ActivitiesSummary = {
 
 export function computeSummary(
   activities: ActivityRecord[],
+  targetPoints: number,
   now: Date = new Date()
 ): ActivitiesSummary {
   const startToday = startOfDay(now);
   const startForStreak = subDays(startToday, 30);
 
   const pointsPerDay = new Map<string, number>();
-  const breakdownTodayMap = new Map<ActivityKey, { amount: number; points: number }>();
+  const breakdownTodayMap = new Map<
+    ActivityKey,
+    { label: string; icon: string; unit: string; amount: number; points: number }
+  >();
 
   for (const activity of activities) {
     const performedAt = new Date(activity.performedAt);
-    if (Number.isNaN(performedAt.valueOf())) {
-      continue;
-    }
+    if (Number.isNaN(performedAt.valueOf())) continue;
+
     const dayKey = startOfDay(performedAt).toISOString();
     pointsPerDay.set(dayKey, (pointsPerDay.get(dayKey) ?? 0) + activity.points);
 
     if (performedAt >= startToday) {
-      const key = activity.activityKey;
-      const existing = breakdownTodayMap.get(key) ?? { amount: 0, points: 0 };
-      existing.amount += activity.amount;
-      existing.points += activity.points;
-      breakdownTodayMap.set(key, existing);
+      const bucket =
+        breakdownTodayMap.get(activity.activityKey) ?? {
+          label: activity.label,
+          icon: activity.icon,
+          unit: activity.unit,
+          amount: 0,
+          points: 0
+        };
+      bucket.amount += activity.amount;
+      bucket.points += activity.points;
+      breakdownTodayMap.set(activity.activityKey, bucket);
     }
   }
 
@@ -211,7 +272,7 @@ export function computeSummary(
     const day = subDays(startToday, 6 - idx);
     const key = day.toISOString();
     return {
-      date: day.toISOString(),
+      date: key,
       points: pointsPerDay.get(key) ?? 0
     };
   });
@@ -219,13 +280,13 @@ export function computeSummary(
   let streakDays = 0;
   for (let offset = 0; offset < 30; offset += 1) {
     const day = subDays(startToday, offset);
-    if (day < startForStreak) {
-      break;
-    }
+    if (day < startForStreak) break;
     const key = day.toISOString();
     const dailyPoints = pointsPerDay.get(key) ?? 0;
-    if (dailyPoints >= DAILY_TARGET_POINTS) {
+    if (dailyPoints >= targetPoints) {
       streakDays += 1;
+    } else if (offset === 0) {
+      continue;
     } else {
       break;
     }
@@ -234,9 +295,10 @@ export function computeSummary(
   const breakdownToday = Array.from(breakdownTodayMap.entries())
     .map(([key, value]) => ({
       key,
-      label: ACTIVITY_DEFINITIONS[key].label,
+      label: value.label,
+      icon: value.icon,
       amount: value.amount,
-      unit: ACTIVITY_DEFINITIONS[key].unit,
+      unit: value.unit,
       points: value.points
     }))
     .sort((a, b) => b.points - a.points);
@@ -245,7 +307,7 @@ export function computeSummary(
 
   return {
     todayPoints,
-    targetPoints: DAILY_TARGET_POINTS,
+    targetPoints,
     totalPoints,
     totalActivities: activities.length,
     streakDays,
@@ -254,8 +316,15 @@ export function computeSummary(
   };
 }
 
-export function useActivitiesSummary() {
+export function useActivitiesSummary(targetPoints: number) {
   const { activities } = useActivities();
-  return useMemo(() => computeSummary(activities), [activities]);
+  return useMemo(
+    () => computeSummary(activities, targetPoints),
+    [activities, targetPoints]
+  );
+}
+
+export function getBaseActivityDefinitions(): ActivityDefinition[] {
+  return BASE_ACTIVITY_DEFINITIONS;
 }
 

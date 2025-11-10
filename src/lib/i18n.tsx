@@ -10,9 +10,10 @@ const translations: Translations = {
   'nav.activities': { tr: 'Aktiviteler', en: 'Activities' },
   'header.overviewTitle': { tr: 'Genel Bakış', en: 'Overview' },
   'header.overviewSubtitle': {
-    tr: 'Günlük 10.000 puan hedefine ne kadar yakın olduğunu takip et.',
-    en: 'Track your progress toward the 10,000 daily points goal.'
+    tr: 'Günlük puan hedefin doğrultusunda ilerlemeni takip et.',
+    en: 'Keep track of your progress toward your daily points goal.'
   },
+  'header.greeting': { tr: 'Merhaba, {name}!', en: 'Hello, {name}!' },
   'actions.addActivity': { tr: 'Aktivite Ekle', en: 'Add Activity' },
 
   'form.selectActivity': { tr: 'Aktivite Seç', en: 'Select Activity' },
@@ -39,6 +40,54 @@ const translations: Translations = {
   'list.editingTitle': { tr: 'Aktiviteyi Düzenle', en: 'Edit Activity' },
   'list.pointsUnit': { tr: 'puan', en: 'pts' },
 
+  'activities.custom.manageButton': { tr: 'Aktiviteleri Özelleştir', en: 'Manage Activities' },
+  'activities.custom.title': { tr: 'Aktivite Listesini Özelleştir', en: 'Customize Activities' },
+  'activities.custom.subtitle': {
+    tr: 'Standart aktivitelerin yanı sıra kendine özel aktiviteler ekleyebilir, düzenleyebilir veya kaldırabilirsin.',
+    en: 'Add, edit or remove personalised activities alongside the defaults.'
+  },
+  'activities.custom.fields.label': { tr: 'Aktivite adı', en: 'Activity name' },
+  'activities.custom.fields.icon': { tr: 'Emoji/Sembol', en: 'Emoji / icon' },
+  'activities.custom.fields.unit': { tr: 'Birim', en: 'Unit' },
+  'activities.custom.fields.multiplier': { tr: 'Çarpan', en: 'Multiplier' },
+  'activities.custom.fields.defaultAmount': { tr: 'Varsayılan miktar', en: 'Default amount' },
+  'activities.custom.fields.description': { tr: 'Açıklama', en: 'Description' },
+  'activities.custom.placeholders.label': { tr: 'Örn. Yüzme', en: 'e.g. Swimming' },
+  'activities.custom.placeholders.unit': { tr: 'Örn. dakika', en: 'e.g. minutes' },
+  'activities.custom.placeholders.description': {
+    tr: 'Kısa bir açıklama (opsiyonel)',
+    en: 'Optional short description'
+  },
+  'activities.custom.errors.label': { tr: 'Aktivite adı gerekli.', en: 'Activity name is required.' },
+  'activities.custom.errors.icon': { tr: 'Emoji alanı boş olamaz.', en: 'Emoji cannot be empty.' },
+  'activities.custom.errors.unit': { tr: 'Birim alanı boş olamaz.', en: 'Unit cannot be empty.' },
+  'activities.custom.errors.multiplier': {
+    tr: 'Çarpan pozitif bir sayı olmalı.',
+    en: 'Multiplier must be a positive number.'
+  },
+  'activities.custom.errors.defaultAmount': {
+    tr: 'Varsayılan miktar pozitif bir tam sayı olmalı.',
+    en: 'Default amount must be a positive integer.'
+  },
+  'activities.custom.errors.duplicate': {
+    tr: 'Bu isimle başka bir aktivite zaten var.',
+    en: 'Another activity already uses this identifier.'
+  },
+  'activities.custom.add': { tr: 'Aktiviteyi Ekle', en: 'Add Activity' },
+  'activities.custom.save': { tr: 'Aktiviteyi Kaydet', en: 'Save Activity' },
+  'activities.custom.customList': { tr: 'Senin Aktivitelerin', en: 'Your Activities' },
+  'activities.custom.baseList': { tr: 'Hazır Aktiviteler', en: 'Default Activities' },
+  'activities.custom.empty': {
+    tr: 'Henüz özel aktivite eklemedin.',
+    en: 'You have not added any custom activities yet.'
+  },
+  'activities.custom.edit': { tr: 'Düzenle', en: 'Edit' },
+  'activities.custom.remove': { tr: 'Sil', en: 'Remove' },
+  'activities.custom.confirmDelete': {
+    tr: 'Bu aktiviteyi silmek istediğine emin misin?',
+    en: 'Are you sure you want to remove this activity?'
+  },
+
   'stats.todayPoints': { tr: 'Bugünkü Puan', en: 'Today’s Points' },
   'stats.totalPoints': { tr: 'Toplam Kazanılan Puan', en: 'Total Points Earned' },
   'stats.totalActivities': {
@@ -58,6 +107,45 @@ const translations: Translations = {
   'stats.lastSeven': { tr: 'Son 7 Gün', en: 'Last 7 Days' },
   'stats.noData': { tr: 'Henüz veri yok.', en: 'No data yet.' },
   'stats.target': { tr: 'Hedef', en: 'Target' },
+  'stats.highlightsTitle': { tr: 'İstatistikler', en: 'Highlights' },
+  'stats.highlight.bestDay': { tr: 'En yüksek puanlı gün', en: 'Best scoring day' },
+  'stats.highlight.bestDayFallback': {
+    tr: 'Henüz bir gün kaydı yok.',
+    en: 'No day recorded yet.'
+  },
+  'stats.highlight.bestActivity': {
+    tr: 'En çok puan getiren aktivite',
+    en: 'Top scoring activity'
+  },
+  'stats.highlight.bestActivityFallback': {
+    tr: 'Henüz aktivite yok.',
+    en: 'No activities yet.'
+  },
+  'stats.highlight.sessions': { tr: 'seans', en: 'sessions' },
+  'stats.highlight.currentStreak': { tr: 'Aktif seri', en: 'Current streak' },
+  'stats.highlight.totalActivities': {
+    tr: '{count} toplam aktivite',
+    en: '{count} total activities'
+  },
+
+  'settings.setProfile': { tr: 'Profil Ayarla', en: 'Set Profile' },
+  'settings.title': { tr: 'Seni Tanıyalım', en: 'Tell Us About You' },
+  'settings.subtitle': {
+    tr: 'İsmini ve günlük puan hedefini belirle, motivasyonun artsın.',
+    en: 'Set your name and daily points goal to stay motivated.'
+  },
+  'settings.nameLabel': { tr: 'İsmin', en: 'Your name' },
+  'settings.namePlaceholder': { tr: 'Örn. Mustafa', en: 'e.g. Alex' },
+  'settings.goalLabel': { tr: 'Günlük hedef (puan)', en: 'Daily goal (points)' },
+  'settings.save': { tr: 'Kaydet', en: 'Save' },
+  'settings.errors.nameRequired': {
+    tr: 'İsim boş olamaz.',
+    en: 'Name cannot be empty.'
+  },
+  'settings.errors.targetPositive': {
+    tr: 'Hedef pozitif bir sayı olmalı.',
+    en: 'Goal must be a positive number.'
+  },
 
   'footer.byName': { tr: 'Mustafa Evleksiz', en: 'Mustafa Evleksiz' }
 };

@@ -5,10 +5,13 @@ import { format } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
 import { useActivitiesSummary } from '@/lib/activityStore';
+import { useSettings } from '@/lib/settingsStore';
 
 export function StatsCards() {
   const { t, lang } = useI18n();
-  const summary = useActivitiesSummary();
+  const { settings } = useSettings();
+  const dailyTarget = settings?.dailyTarget && settings.dailyTarget > 0 ? settings.dailyTarget : 10_000;
+  const summary = useActivitiesSummary(dailyTarget);
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
     [lang]
@@ -65,10 +68,13 @@ export function StatsCards() {
                   key={item.key}
                   className="flex items-center justify-between gap-3 border rounded px-3 py-2 border-gray-200 dark:border-gray-800"
                 >
-                  <div>
-                    <div className="text-sm font-medium">{item.label}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {item.amount} {item.unit}
+                  <div className="flex items-center gap-3">
+                    <div className="text-lg">{item.icon}</div>
+                    <div>
+                      <div className="text-sm font-medium">{item.label}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {item.amount} {item.unit}
+                      </div>
                     </div>
                   </div>
                   <div className="text-sm font-semibold text-brand">

@@ -1,14 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import {
-  ACTIVITY_DEFINITIONS,
-  ActivityKey,
-  calculatePoints,
-  listActivities
-} from '@/lib/activityConfig';
+import { ActivityDefinition, ActivityKey } from '@/lib/activityConfig';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
+import { useActivityDefinitions } from '@/lib/settingsStore';
 
 function toLocalInputValue(date: Date) {
   const year = date.getFullYear();
@@ -21,7 +17,16 @@ function toLocalInputValue(date: Date) {
 
 type ActivityFormInitial = Pick<
   ActivityRecord,
-  'id' | 'activityKey' | 'amount' | 'performedAt' | 'note'
+  | 'id'
+  | 'activityKey'
+  | 'label'
+  | 'icon'
+  | 'unit'
+  | 'multiplier'
+  | 'amount'
+  | 'performedAt'
+  | 'note'
+  | 'isCustom'
 >;
 
 type ActivityFormProps = {
@@ -31,29 +36,69 @@ type ActivityFormProps = {
   initial?: ActivityFormInitial | null;
 };
 
+function asDefinitionFromRecord(record: ActivityFormInitial): ActivityDefinition {
+  return {
+    key: record.activityKey,
+    label: record.label ?? record.activityKey,
+    icon: record.icon ?? '🏃',
+    unit: record.unit ?? '',
+    multiplier: record.multiplier ?? 1,
+    defaultAmount: record.amount ?? 10,
+    isCustom: record.isCustom ?? true
+  };
+}
+
 export function ActivityForm({ onCreated, onSaved, onCancel, initial }: ActivityFormProps) {
-  const activities = useMemo(() => listActivities(), []);
+  const baseDefinitions = useActivityDefinitions();
+  const fallbackDefinition = initial ? asDefinitionFromRecord(initial) : undefined;
+  const definitions: ActivityDefinition[] = useMemo(() => {
+    if (!fallbackDefinition) return baseDefinitions;
+    const exists = baseDefinitions.some((def) => def.key === fallbackDefinition.key);
+    return exists ? baseDefinitions : [...baseDefinitions, fallbackDefinition];
+  }, [baseDefinitions, fallbackDefinition]);
+
+  const definitionMap = useMemo(
+    () =>
+      Object.fromEntries<ActivityDefinition>(
+        definitions.map((definition) => [definition.key, definition])
+      ),
+    [definitions]
+  );
+
   const { addActivity, updateActivity } = useActivities();
   const { t, lang } = useI18n();
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
     [lang]
   );
+
   const [activityKey, setActivityKey] = useState<ActivityKey>(
-    initial?.activityKey ?? 'WALKING'
+    initial?.activityKey ?? definitions[0]?.key ?? 'WALKING'
   );
   const [performedAt, setPerformedAt] = useState<string>(
     initial?.performedAt ? toLocalInputValue(new Date(initial.performedAt)) : ''
   );
   const [amount, setAmount] = useState<number>(
-    initial?.amount ?? ACTIVITY_DEFINITIONS.WALKING.defaultAmount
+    initial?.amount ?? fallbackDefinition?.defaultAmount ?? definitions[0]?.defaultAmount ?? 10
   );
   const [note, setNote] = useState<string>(initial?.note ?? '');
   const [loading, setLoading] = useState(false);
 
-  const definition = ACTIVITY_DEFINITIONS[activityKey];
-  const points = calculatePoints(activityKey, Number.isFinite(amount) ? amount : 0);
-  const pointsDisplay = numberFormatter.format(points);
+  const definition =
+    definitionMap[activityKey] ??
+    fallbackDefinition ??
+    definitions.find((def) => def.key === activityKey) ??
+    definitions[0];
+
+  if (!definition) {
+    return null;
+  }
+
+  const pointsNumeric = Math.max(
+    0,
+    Math.round(amount * definition.multiplier)
+  );
+  const pointsDisplay = numberFormatter.format(pointsNumeric);
   const isEditing = Boolean(initial?.id);
 
   useEffect(() => {
@@ -63,12 +108,13 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       setNote(initial.note ?? '');
       setPerformedAt(toLocalInputValue(new Date(initial.performedAt)));
     } else {
-      setActivityKey('WALKING');
-      setAmount(ACTIVITY_DEFINITIONS.WALKING.defaultAmount);
+      const first = definitions[0];
+      setActivityKey(first?.key ?? 'WALKING');
+      setAmount(first?.defaultAmount ?? 10);
       setNote('');
       setPerformedAt('');
     }
-  }, [initial]);
+  }, [initial, definitions]);
 
   useEffect(() => {
     if (!initial && !performedAt) {
@@ -83,9 +129,12 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       ? new Date(performedAt).toISOString()
       : new Date().toISOString();
     try {
+      if (!definition) {
+        throw new Error('Aktivite tanımı bulunamadı');
+      }
       if (initial?.id) {
         updateActivity(initial.id, {
-          activityKey,
+          definition,
           amount,
           note: note || undefined,
           performedAt: performedAtISO
@@ -94,12 +143,12 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         onCancel?.();
       } else {
         addActivity({
-          activityKey,
+          definition,
           amount,
           note: note || undefined,
           performedAt: performedAtISO
         });
-        setAmount(ACTIVITY_DEFINITIONS[activityKey].defaultAmount);
+        setAmount(definition.defaultAmount);
         setNote('');
         setPerformedAt(toLocalInputValue(new Date()));
         onCreated?.();
@@ -114,35 +163,37 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       <div className="space-y-2">
         <div className="text-sm text-gray-700 dark:text-gray-200">{t('form.selectActivity')}</div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {activities.map((a) => {
-            const active = a.key === activityKey;
+          {definitions.map((def) => {
+            const active = def.key === activityKey;
             return (
               <button
                 type="button"
-                key={a.key}
+                key={def.key}
                 onClick={() => {
-                  setActivityKey(a.key);
+                  setActivityKey(def.key);
                   setAmount((current) => {
-                    if (isEditing && initial?.activityKey === a.key) {
+                    if (isEditing && initial?.activityKey === def.key) {
                       return current;
                     }
-                    return ACTIVITY_DEFINITIONS[a.key].defaultAmount;
+                    return def.defaultAmount;
                   });
                 }}
-                className={`text-left rounded-lg border px-3 py-2 shadow-card transition
-                ${active ? 'border-brand ring-2 ring-brand/30 bg-brand/5' : 'border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900'}
-                `}
+                className={`text-left rounded-lg border px-3 py-2 shadow-card transition ${
+                  active
+                    ? 'border-brand ring-2 ring-brand/30 bg-brand/5'
+                    : 'border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900'
+                }`}
                 aria-pressed={active}
               >
                 <div className="flex items-center justify-between">
-                  <div className="text-xl">{a.icon}</div>
+                  <div className="text-xl">{def.icon}</div>
                   <div className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800">
-                    {a.multiplier}x
+                    {def.multiplier}x
                   </div>
                 </div>
-                <div className="mt-2 text-sm font-medium">{a.label}</div>
+                <div className="mt-2 text-sm font-medium">{def.label}</div>
                 <div className="text-xs text-gray-500">
-                  {a.defaultAmount} {a.unit}
+                  {def.defaultAmount} {def.unit}
                 </div>
               </button>
             );
@@ -163,7 +214,9 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <label className="space-y-1">
-          <div className="text-sm text-gray-700">{t('form.amount')} ({definition.unit})</div>
+          <div className="text-sm text-gray-700">
+            {t('form.amount')} ({definition?.unit ?? ''})
+          </div>
           <input
             type="number"
             min={1}
@@ -176,13 +229,13 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
             required
           />
-          {definition.description ? (
+          {definition?.description ? (
             <div className="text-xs text-gray-500">{definition.description}</div>
           ) : null}
         </label>
         <div className="space-y-1 flex flex-col justify-end">
           <div className="text-sm text-gray-700">{t('form.multiplier')}</div>
-          <div className="text-lg font-semibold">{definition.multiplier}x</div>
+          <div className="text-lg font-semibold">{definition?.multiplier ?? 1}x</div>
         </div>
         <div className="space-y-1 flex flex-col justify-end">
           <div className="text-sm text-gray-700">{t('form.points')}</div>
@@ -220,3 +273,4 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
     </form>
   );
 }
+
