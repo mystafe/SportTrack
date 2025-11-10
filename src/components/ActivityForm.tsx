@@ -51,11 +51,22 @@ function asDefinitionFromRecord(record: ActivityFormInitial): ActivityDefinition
 export function ActivityForm({ onCreated, onSaved, onCancel, initial }: ActivityFormProps) {
   const baseDefinitions = useActivityDefinitions();
   const fallbackDefinition = initial ? asDefinitionFromRecord(initial) : undefined;
-  const definitions: ActivityDefinition[] = useMemo(() => {
+  const mergedDefinitions: ActivityDefinition[] = useMemo(() => {
     if (!fallbackDefinition) return baseDefinitions;
     const exists = baseDefinitions.some((def) => def.key === fallbackDefinition.key);
     return exists ? baseDefinitions : [...baseDefinitions, fallbackDefinition];
   }, [baseDefinitions, fallbackDefinition]);
+
+  const definitions = useMemo(() => {
+    const seen = new Set<ActivityKey>();
+    const unique: ActivityDefinition[] = [];
+    for (const definition of mergedDefinitions) {
+      if (seen.has(definition.key)) continue;
+      seen.add(definition.key);
+      unique.push(definition);
+    }
+    return unique;
+  }, [mergedDefinitions]);
 
   const definitionMap = useMemo(
     () =>

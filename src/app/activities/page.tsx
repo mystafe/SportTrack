@@ -36,6 +36,7 @@ function ActivitiesClient() {
     [lang]
   );
   const dateLocale = lang === 'tr' ? tr : enUS;
+  const todayKey = useMemo(() => startOfDay(new Date()).toISOString(), []);
 
   const editing = useMemo(
     () => (editingId ? activities.find((activity) => activity.id === editingId) ?? null : null),
@@ -120,6 +121,8 @@ function ActivitiesClient() {
                   </div>
                   <ul className="divide-y divide-gray-200 dark:divide-gray-800">
                     {acts.map((activity) => {
+                      const isToday =
+                        startOfDay(new Date(activity.performedAt)).toISOString() === todayKey;
                       return (
                         <li
                           key={activity.id}
@@ -149,8 +152,11 @@ function ActivitiesClient() {
                               {t('list.edit')}
                             </button>
                             <button
-                              className="text-red-600 hover:underline"
+                              className="text-red-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed"
+                              disabled={!isToday}
+                              title={!isToday ? t('list.deleteDisabled') : undefined}
                               onClick={async () => {
+                                if (!isToday) return;
                                 if (!confirm(t('list.deleteConfirm'))) return;
                                 deleteActivity(activity.id);
                                 if (editingId === activity.id) {

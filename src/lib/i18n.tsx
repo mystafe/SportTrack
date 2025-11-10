@@ -36,6 +36,10 @@ const translations: Translations = {
     tr: 'Silmek istediğine emin misin?',
     en: 'Are you sure you want to delete?'
   },
+  'list.deleteDisabled': {
+    tr: 'Geçmiş tarihli aktiviteleri silemezsin.',
+    en: 'You cannot delete activities logged on previous days.'
+  },
   'list.edit': { tr: 'Düzenle', en: 'Edit' },
   'list.editingTitle': { tr: 'Aktiviteyi Düzenle', en: 'Edit Activity' },
   'list.pointsUnit': { tr: 'puan', en: 'pts' },
@@ -73,6 +77,10 @@ const translations: Translations = {
     tr: 'Bu isimle başka bir aktivite zaten var.',
     en: 'Another activity already uses this identifier.'
   },
+  'activities.custom.errors.inUse': {
+    tr: 'Bu aktivite geçmiş kayıtlarda kullanıldığı için silinemez.',
+    en: 'This activity already has records and cannot be removed.'
+  },
   'activities.custom.add': { tr: 'Aktiviteyi Ekle', en: 'Add Activity' },
   'activities.custom.save': { tr: 'Aktiviteyi Kaydet', en: 'Save Activity' },
   'activities.custom.customList': { tr: 'Senin Aktivitelerin', en: 'Your Activities' },
@@ -105,6 +113,10 @@ const translations: Translations = {
     en: 'No activity added today.'
   },
   'stats.lastSeven': { tr: 'Son 7 Gün', en: 'Last 7 Days' },
+  'stats.sectionToggle': {
+    tr: '{section} bölümünün görünürlüğünü değiştir',
+    en: 'Toggle {section} section visibility'
+  },
   'stats.noData': { tr: 'Henüz veri yok.', en: 'No data yet.' },
   'stats.target': { tr: 'Hedef', en: 'Target' },
   'stats.highlightsTitle': { tr: 'İstatistikler', en: 'Highlights' },

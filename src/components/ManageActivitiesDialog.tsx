@@ -8,6 +8,7 @@ import {
   useActivityDefinitions
 } from '@/lib/settingsStore';
 import { ActivityDefinition } from '@/lib/activityConfig';
+import { useActivities } from '@/lib/activityStore';
 
 function slugify(value: string) {
   return value
@@ -41,12 +42,25 @@ export function ManageActivitiesDialog() {
   const { t } = useI18n();
   const { settings, addCustomActivity, updateCustomActivity, removeCustomActivity } =
     useSettings();
+  const { activities } = useActivities();
   const definitions = useActivityDefinitions();
-  const customActivities = settings?.customActivities ?? [];
+  const customActivities = useMemo(() => {
+    const seen = new Set<string>();
+    return (settings?.customActivities ?? []).filter((activity) => {
+      if (seen.has(activity.id)) return false;
+      seen.add(activity.id);
+      return true;
+    });
+  }, [settings?.customActivities]);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [error, setError] = useState<string | null>(null);
+
+  const usedActivityKeys = useMemo(
+    () => new Set(activities.map((activity) => activity.activityKey)),
+    [activities]
+  );
 
   const baseDefinitions = useMemo(
     () => definitions.filter((definition) => !definition.isCustom),
@@ -86,6 +100,10 @@ export function ManageActivitiesDialog() {
   }
 
   function handleDelete(id: string) {
+    if (usedActivityKeys.has(id)) {
+      alert(t('activities.custom.errors.inUse'));
+      return;
+    }
     if (!confirm(t('activities.custom.confirmDelete'))) return;
     removeCustomActivity(id);
     if (editingId === id) {

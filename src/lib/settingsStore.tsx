@@ -34,6 +34,21 @@ export type UserSettings = {
   customActivities: CustomActivityDefinition[];
 };
 
+function dedupeCustomActivities(
+  list?: CustomActivityDefinition[]
+): CustomActivityDefinition[] {
+  if (!Array.isArray(list)) return [];
+  const seen = new Set<string>();
+  const result: CustomActivityDefinition[] = [];
+  for (const activity of list) {
+    if (!activity || typeof activity.id !== 'string') continue;
+    if (seen.has(activity.id)) continue;
+    seen.add(activity.id);
+    result.push(activity);
+  }
+  return result;
+}
+
 type SettingsContextValue = {
   settings: UserSettings | null;
   hydrated: boolean;
@@ -69,9 +84,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           setSettings({
             name: parsed.name,
             dailyTarget: parsed.dailyTarget,
-            customActivities: Array.isArray(parsed.customActivities)
-              ? parsed.customActivities
-              : []
+            customActivities: dedupeCustomActivities(parsed.customActivities as CustomActivityDefinition[])
           });
         }
       }
@@ -83,9 +96,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const persist = useCallback((next: UserSettings) => {
-    setSettings(next);
+    const normalized: UserSettings = {
+      ...next,
+      customActivities: dedupeCustomActivities(next.customActivities)
+    };
+    setSettings(normalized);
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
     }
   }, []);
 
@@ -93,7 +110,9 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     (next: UserSettings) =>
       persist({
         ...next,
-        customActivities: next.customActivities ?? settings?.customActivities ?? []
+        customActivities:
+          next.customActivities ??
+          dedupeCustomActivities(settings?.customActivities)
       }),
     [persist, settings]
   );
@@ -108,7 +127,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         };
         const next: UserSettings = {
           ...base,
-          customActivities: [activity, ...base.customActivities]
+          customActivities: [activity, ...base.customActivities.filter((existing) => existing.id !== activity.id)]
         };
         persist(next);
         return next;
@@ -175,13 +194,22 @@ export function useSettings() {
 export function useActivityDefinitions(): ActivityDefinition[] {
   const { settings } = useSettings();
   return useMemo(() => {
-    const custom = settings?.customActivities ?? [];
-    const customDefs: ActivityDefinition[] = custom.map((activity) => ({
-      ...activity,
-      key: activity.id,
-      isCustom: true
-    }));
-    return [...BASE_ACTIVITY_DEFINITIONS, ...customDefs];
+    const custom = dedupeCustomActivities(settings?.customActivities);
+    const ordered = new Map<ActivityKey, ActivityDefinition>();
+
+    for (const definition of BASE_ACTIVITY_DEFINITIONS) {
+      ordered.set(definition.key, definition);
+    }
+
+    for (const activity of custom) {
+      ordered.set(activity.id, {
+        ...activity,
+        key: activity.id,
+        isCustom: true
+      });
+    }
+
+    return Array.from(ordered.values());
   }, [settings]);
 }
 
