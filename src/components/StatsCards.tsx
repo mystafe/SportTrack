@@ -6,6 +6,7 @@ import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
 import { useActivitiesSummary } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
+import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 
 export function StatsCards() {
   const { t, lang } = useI18n();
@@ -123,9 +124,9 @@ export function StatsCards() {
                       <div className="flex items-center gap-3">
                         <div className="text-lg">{item.icon}</div>
                         <div>
-                          <div className="text-sm font-medium">{item.label}</div>
+                          <div className="text-sm font-medium">{getActivityLabel(item, lang)}</div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {item.amount} {item.unit}
+                            {item.amount} {getActivityUnit(item, lang)}
                           </div>
                         </div>
                       </div>

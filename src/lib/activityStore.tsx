@@ -22,8 +22,10 @@ export type ActivityRecord = {
   id: string;
   activityKey: ActivityKey;
   label: string;
+  labelEn?: string;
   icon: string;
   unit: string;
+  unitEn?: string;
   multiplier: number;
   amount: number;
   points: number;
@@ -76,8 +78,10 @@ function buildRecord(
     id: generateId(),
     activityKey: definition.key,
     label: definition.label,
+    labelEn: definition.labelEn,
     icon: definition.icon,
     unit: definition.unit,
+    unitEn: definition.unitEn,
     multiplier,
     amount,
     points: computePoints(multiplier, amount),
@@ -167,8 +171,10 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
             ...record,
             activityKey: input.definition.key,
             label: input.definition.label,
+            labelEn: input.definition.labelEn,
             icon: input.definition.icon,
             unit: input.definition.unit,
+            unitEn: input.definition.unitEn,
             multiplier,
             amount: input.amount,
             performedAt: iso,
@@ -224,9 +230,11 @@ export type ActivitiesSummary = {
   breakdownToday: Array<{
     key: ActivityKey;
     label: string;
+    labelEn?: string;
     icon: string;
     amount: number;
     unit: string;
+    unitEn?: string;
     points: number;
   }>;
 };
@@ -240,9 +248,9 @@ export function computeSummary(
   const startForStreak = subDays(startToday, 30);
 
   const pointsPerDay = new Map<string, number>();
-  const breakdownTodayMap = new Map<
+    const breakdownTodayMap = new Map<
     ActivityKey,
-    { label: string; icon: string; unit: string; amount: number; points: number }
+    { label: string; labelEn?: string; icon: string; unit: string; unitEn?: string; amount: number; points: number }
   >();
 
   for (const activity of activities) {
@@ -256,8 +264,10 @@ export function computeSummary(
       const bucket =
         breakdownTodayMap.get(activity.activityKey) ?? {
           label: activity.label,
+          labelEn: activity.labelEn,
           icon: activity.icon,
           unit: activity.unit,
+          unitEn: activity.unitEn,
           amount: 0,
           points: 0
         };
@@ -296,9 +306,11 @@ export function computeSummary(
     .map(([key, value]) => ({
       key,
       label: value.label,
+      labelEn: value.labelEn,
       icon: value.icon,
       amount: value.amount,
       unit: value.unit,
+      unitEn: value.unitEn,
       points: value.points
     }))
     .sort((a, b) => b.points - a.points);

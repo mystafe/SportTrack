@@ -9,6 +9,7 @@ import {
 } from '@/lib/settingsStore';
 import { ActivityDefinition } from '@/lib/activityConfig';
 import { useActivities } from '@/lib/activityStore';
+import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 
 function slugify(value: string) {
   return value
@@ -21,8 +22,10 @@ function slugify(value: string) {
 type FormState = {
   id: string;
   label: string;
+  labelEn: string;
   icon: string;
   unit: string;
+  unitEn: string;
   multiplier: number;
   defaultAmount: number;
   description: string;
@@ -31,15 +34,17 @@ type FormState = {
 const INITIAL_FORM: FormState = {
   id: '',
   label: '',
+  labelEn: '',
   icon: '🏃',
   unit: '',
+  unitEn: '',
   multiplier: 1,
   defaultAmount: 10,
   description: ''
 };
 
 export function ManageActivitiesDialog() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { settings, addCustomActivity, updateCustomActivity, removeCustomActivity } =
     useSettings();
   const { activities } = useActivities();
@@ -90,8 +95,10 @@ export function ManageActivitiesDialog() {
     setForm({
       id: activity.id,
       label: activity.label,
+      labelEn: activity.labelEn ?? '',
       icon: activity.icon,
       unit: activity.unit,
+      unitEn: activity.unitEn ?? '',
       multiplier: activity.multiplier,
       defaultAmount: activity.defaultAmount,
       description: activity.description ?? ''
@@ -148,8 +155,10 @@ export function ManageActivitiesDialog() {
     const payload: CustomActivityDefinition = {
       id,
       label: trimmedLabel,
+      labelEn: form.labelEn.trim() || undefined,
       icon: form.icon,
       unit: form.unit.trim(),
+      unitEn: form.unitEn.trim() || undefined,
       multiplier: Math.round(form.multiplier * 10) / 10,
       defaultAmount: Math.round(form.defaultAmount),
       description: form.description.trim() || undefined
@@ -205,6 +214,23 @@ export function ManageActivitiesDialog() {
                     required
                   />
                 </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
+                    {t('activities.custom.fields.labelEn')} <span className="text-gray-400 text-[10px]">({t('activities.custom.fields.optional')})</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.labelEn}
+                    onChange={(e) => setForm((prev) => ({ ...prev, labelEn: e.target.value }))}
+                    className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                    placeholder={t('activities.custom.placeholders.labelEn')}
+                  />
+                  {form.labelEn.trim() === '' && form.label.trim() !== '' && (
+                    <p className="mt-1 text-[10px] text-gray-500">
+                      {t('activities.custom.fields.labelEnHint')}
+                    </p>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
                     {t('activities.custom.fields.icon')}
@@ -229,6 +255,23 @@ export function ManageActivitiesDialog() {
                       required
                     />
                   </label>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
+                    {t('activities.custom.fields.unitEn')} <span className="text-gray-400 text-[10px]">({t('activities.custom.fields.optional')})</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.unitEn}
+                    onChange={(e) => setForm((prev) => ({ ...prev, unitEn: e.target.value }))}
+                    className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                    placeholder={t('activities.custom.placeholders.unitEn')}
+                  />
+                  {form.unitEn.trim() === '' && form.unit.trim() !== '' && (
+                    <p className="mt-1 text-[10px] text-gray-500">
+                      {t('activities.custom.fields.unitEnHint')}
+                    </p>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
@@ -316,10 +359,10 @@ export function ManageActivitiesDialog() {
                           <div>
                             <div className="text-sm font-medium flex items-center gap-2">
                               <span>{activity.icon}</span>
-                              <span>{activity.label}</span>
+                              <span>{getActivityLabel(activity, lang)}</span>
                             </div>
                             <div className="text-xs text-gray-500">
-                              {activity.multiplier}x • {activity.defaultAmount} {activity.unit}
+                              {activity.multiplier}x • {activity.defaultAmount} {getActivityUnit(activity, lang)}
                             </div>
                           </div>
                           <div className="flex items-center gap-2 text-xs">
@@ -353,10 +396,10 @@ export function ManageActivitiesDialog() {
                       >
                         <div className="font-medium text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
                           <span>{activity.icon}</span>
-                          <span>{activity.label}</span>
+                          <span>{getActivityLabel(activity, lang)}</span>
                         </div>
                         <div>
-                          {activity.multiplier}x • {activity.defaultAmount} {activity.unit}
+                          {activity.multiplier}x • {activity.defaultAmount} {getActivityUnit(activity, lang)}
                         </div>
                         {activity.description ? (
                           <div className="mt-1 text-[11px]">{activity.description}</div>

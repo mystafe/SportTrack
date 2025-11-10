@@ -5,6 +5,7 @@ import { ActivityDefinition, ActivityKey } from '@/lib/activityConfig';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
 import { useActivityDefinitions } from '@/lib/settingsStore';
+import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 
 function toLocalInputValue(date: Date) {
   const year = date.getFullYear();
@@ -20,8 +21,10 @@ type ActivityFormInitial = Pick<
   | 'id'
   | 'activityKey'
   | 'label'
+  | 'labelEn'
   | 'icon'
   | 'unit'
+  | 'unitEn'
   | 'multiplier'
   | 'amount'
   | 'performedAt'
@@ -40,8 +43,10 @@ function asDefinitionFromRecord(record: ActivityFormInitial): ActivityDefinition
   return {
     key: record.activityKey,
     label: record.label ?? record.activityKey,
+    labelEn: record.labelEn,
     icon: record.icon ?? '🏃',
     unit: record.unit ?? '',
+    unitEn: record.unitEn,
     multiplier: record.multiplier ?? 1,
     defaultAmount: record.amount ?? 10,
     isCustom: record.isCustom ?? true
@@ -202,9 +207,9 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     {def.multiplier}x
                   </div>
                 </div>
-                <div className="mt-2 text-sm font-medium">{def.label}</div>
+                <div className="mt-2 text-sm font-medium">{getActivityLabel(def, lang)}</div>
                 <div className="text-xs text-gray-500">
-                  {def.defaultAmount} {def.unit}
+                  {def.defaultAmount} {getActivityUnit(def, lang)}
                 </div>
               </button>
             );
@@ -226,7 +231,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <label className="space-y-1">
           <div className="text-sm text-gray-700">
-            {t('form.amount')} ({definition?.unit ?? ''})
+            {t('form.amount')} ({getActivityUnit(definition, lang)})
           </div>
           <input
             type="number"

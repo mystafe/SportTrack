@@ -21,9 +21,11 @@ const STORAGE_KEY = 'sporttrack.settings.v1';
 export type CustomActivityDefinition = {
   id: ActivityKey;
   label: string;
+  labelEn?: string;
   icon: string;
   multiplier: number;
   unit: string;
+  unitEn?: string;
   defaultAmount: number;
   description?: string;
 };

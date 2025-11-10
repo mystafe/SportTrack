@@ -51,13 +51,26 @@ const translations: Translations = {
     en: 'Add, edit or remove personalised activities alongside the defaults.'
   },
   'activities.custom.fields.label': { tr: 'Aktivite adı', en: 'Activity name' },
+  'activities.custom.fields.labelEn': { tr: 'Aktivite adı (İngilizce)', en: 'Activity name (English)' },
+  'activities.custom.fields.optional': { tr: 'opsiyonel', en: 'optional' },
+  'activities.custom.fields.labelEnHint': {
+    tr: 'Boş bırakılırsa Türkçe adı kullanılacak.',
+    en: 'If left empty, the Turkish name will be used.'
+  },
   'activities.custom.fields.icon': { tr: 'Emoji/Sembol', en: 'Emoji / icon' },
   'activities.custom.fields.unit': { tr: 'Birim', en: 'Unit' },
+  'activities.custom.fields.unitEn': { tr: 'Birim (İngilizce)', en: 'Unit (English)' },
+  'activities.custom.fields.unitEnHint': {
+    tr: 'Boş bırakılırsa Türkçe birimi kullanılacak.',
+    en: 'If left empty, the Turkish unit will be used.'
+  },
   'activities.custom.fields.multiplier': { tr: 'Çarpan', en: 'Multiplier' },
   'activities.custom.fields.defaultAmount': { tr: 'Varsayılan miktar', en: 'Default amount' },
   'activities.custom.fields.description': { tr: 'Açıklama', en: 'Description' },
   'activities.custom.placeholders.label': { tr: 'Örn. Yüzme', en: 'e.g. Swimming' },
+  'activities.custom.placeholders.labelEn': { tr: 'Örn. Swimming', en: 'e.g. Swimming' },
   'activities.custom.placeholders.unit': { tr: 'Örn. dakika', en: 'e.g. minutes' },
+  'activities.custom.placeholders.unitEn': { tr: 'Örn. minutes', en: 'e.g. minutes' },
   'activities.custom.placeholders.description': {
     tr: 'Kısa bir açıklama (opsiyonel)',
     en: 'Optional short description'

@@ -7,6 +7,7 @@ import { useI18n } from '@/lib/i18n';
 import { useActivities, useActivitiesSummary } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
+import { getActivityLabel } from '@/lib/activityUtils';
 
 export function StatsHighlights() {
   const { activities } = useActivities();
@@ -51,7 +52,7 @@ export function StatsHighlights() {
     for (const activity of activities) {
       const bucket =
         totals.get(activity.activityKey) ?? {
-          label: activity.label,
+          label: getActivityLabel(activity, lang),
           icon: activity.icon,
           points: 0,
           count: 0

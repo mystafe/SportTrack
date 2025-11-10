@@ -7,6 +7,7 @@ import { format, startOfDay } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
+import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 
 export default function ActivitiesPage() {
   const { t } = useI18n();
@@ -90,8 +91,10 @@ function ActivitiesClient() {
                     id: editing.id,
                     activityKey: editing.activityKey,
                     label: editing.label,
+                    labelEn: editing.labelEn,
                     icon: editing.icon,
                     unit: editing.unit,
+                    unitEn: editing.unitEn,
                     multiplier: editing.multiplier,
                     amount: editing.amount,
                     note: editing.note ?? '',
@@ -131,14 +134,14 @@ function ActivitiesClient() {
                           <div>
                             <div className="text-sm font-medium flex items-center gap-2 flex-wrap">
                               <span className="text-lg">{activity.icon}</span>
-                              <span>{activity.label}</span>
+                              <span>{getActivityLabel(activity, lang)}</span>
                               <span className="inline-flex items-center rounded-full bg-brand/10 text-brand px-2 py-0.5 text-xs font-medium">
                                 {`${numberFormatter.format(activity.points)} ${t('list.pointsUnit')}`}
                               </span>
                             </div>
                             <div className="text-xs text-gray-500 dark:text-gray-400">
                               {timeFormatter.format(new Date(activity.performedAt))} • {activity.amount}{' '}
-                              {activity.unit} • {activity.multiplier}x
+                              {getActivityUnit(activity, lang)} • {activity.multiplier}x
                             </div>
                             {activity.note ? (
                               <div className="text-sm mt-1 text-gray-700 dark:text-gray-300">{activity.note}</div>
