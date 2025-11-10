@@ -14,7 +14,7 @@ export function Header() {
         <Link href="/" className="font-semibold text-base sm:text-lg">
           SportTrack
         </Link>
-        <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+        <div className="flex items-center gap-1.5 sm:gap-3 text-xs sm:text-sm">
           <Link href="/activities" className="hover:text-brand hidden sm:inline">
             {t('nav.activities')}
           </Link>

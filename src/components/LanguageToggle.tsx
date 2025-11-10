@@ -10,12 +10,12 @@ export function LanguageToggle() {
   ];
 
   return (
-    <div className="inline-flex items-center gap-1 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-1">
+    <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5 sm:p-1">
       {options.map((opt) => (
         <button
           key={opt.code}
           type="button"
-          className={`px-2 py-1 text-xs rounded ${lang === opt.code ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200'}`}
+          className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded transition-colors ${lang === opt.code ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
           onClick={() => setLang(opt.code)}
           aria-pressed={lang === opt.code}
         >

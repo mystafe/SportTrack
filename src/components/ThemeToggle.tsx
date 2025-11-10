@@ -31,28 +31,31 @@ export function ThemeToggle() {
   }
 
   return (
-    <div className="inline-flex items-center gap-1 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-1">
+    <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5 sm:p-1">
       <button
         type="button"
-        className={`px-2 py-1 text-xs rounded ${theme === 'light' ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200'}`}
+        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded transition-colors ${theme === 'light' ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
         onClick={() => update('light')}
         aria-pressed={theme === 'light'}
+        title="Light"
       >
         ☀️
       </button>
       <button
         type="button"
-        className={`px-2 py-1 text-xs rounded ${theme === 'system' ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200'}`}
+        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded transition-colors ${theme === 'system' ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
         onClick={() => update('system')}
         aria-pressed={theme === 'system'}
+        title="System"
       >
         🖥️
       </button>
       <button
         type="button"
-        className={`px-2 py-1 text-xs rounded ${theme === 'dark' ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200'}`}
+        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded transition-colors ${theme === 'dark' ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
         onClick={() => update('dark')}
         aria-pressed={theme === 'dark'}
+        title="Dark"
       >
         🌙
       </button>

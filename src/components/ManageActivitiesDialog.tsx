@@ -27,7 +27,7 @@ type FormState = {
   unit: string;
   unitEn: string;
   multiplier: number;
-  defaultAmount: number;
+  defaultAmount: string;
   description: string;
 };
 
@@ -39,7 +39,7 @@ const INITIAL_FORM: FormState = {
   unit: '',
   unitEn: '',
   multiplier: 1,
-  defaultAmount: 10,
+  defaultAmount: '10',
   description: ''
 };
 
@@ -100,7 +100,7 @@ export function ManageActivitiesDialog() {
       unit: activity.unit,
       unitEn: activity.unitEn ?? '',
       multiplier: activity.multiplier,
-      defaultAmount: activity.defaultAmount,
+      defaultAmount: String(activity.defaultAmount),
       description: activity.description ?? ''
     });
     setOpen(true);
@@ -137,7 +137,8 @@ export function ManageActivitiesDialog() {
       setError(t('activities.custom.errors.multiplier'));
       return;
     }
-    if (!Number.isFinite(form.defaultAmount) || form.defaultAmount <= 0) {
+    const defaultAmountValue = Number(form.defaultAmount);
+    if (!Number.isFinite(defaultAmountValue) || defaultAmountValue <= 0) {
       setError(t('activities.custom.errors.defaultAmount'));
       return;
     }
@@ -160,7 +161,7 @@ export function ManageActivitiesDialog() {
       unit: form.unit.trim(),
       unitEn: form.unitEn.trim() || undefined,
       multiplier: Math.round(form.multiplier * 10) / 10,
-      defaultAmount: Math.round(form.defaultAmount),
+      defaultAmount: Math.round(defaultAmountValue),
       description: form.description.trim() || undefined
     };
 
@@ -203,29 +204,41 @@ export function ManageActivitiesDialog() {
               <form className="space-y-4" onSubmit={submit}>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
-                    {t('activities.custom.fields.label')}
+                    {lang === 'tr' ? t('activities.custom.fields.label') : t('activities.custom.fields.labelEn')}
                   </label>
                   <input
                     type="text"
-                    value={form.label}
-                    onChange={(e) => setForm((prev) => ({ ...prev, label: e.target.value }))}
+                    value={lang === 'tr' ? form.label : form.labelEn}
+                    onChange={(e) => {
+                      if (lang === 'tr') {
+                        setForm((prev) => ({ ...prev, label: e.target.value }));
+                      } else {
+                        setForm((prev) => ({ ...prev, labelEn: e.target.value }));
+                      }
+                    }}
                     className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
-                    placeholder={t('activities.custom.placeholders.label')}
+                    placeholder={lang === 'tr' ? t('activities.custom.placeholders.label') : t('activities.custom.placeholders.labelEn')}
                     required
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
-                    {t('activities.custom.fields.labelEn')} <span className="text-gray-400 text-[10px]">({t('activities.custom.fields.optional')})</span>
+                    {lang === 'tr' ? t('activities.custom.fields.labelEn') : t('activities.custom.fields.label')} <span className="text-gray-400 text-[10px]">({t('activities.custom.fields.optional')})</span>
                   </label>
                   <input
                     type="text"
-                    value={form.labelEn}
-                    onChange={(e) => setForm((prev) => ({ ...prev, labelEn: e.target.value }))}
+                    value={lang === 'tr' ? form.labelEn : form.label}
+                    onChange={(e) => {
+                      if (lang === 'tr') {
+                        setForm((prev) => ({ ...prev, labelEn: e.target.value }));
+                      } else {
+                        setForm((prev) => ({ ...prev, label: e.target.value }));
+                      }
+                    }}
                     className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
-                    placeholder={t('activities.custom.placeholders.labelEn')}
+                    placeholder={lang === 'tr' ? t('activities.custom.placeholders.labelEn') : t('activities.custom.placeholders.label')}
                   />
-                  {form.labelEn.trim() === '' && form.label.trim() !== '' && (
+                  {(lang === 'tr' ? form.labelEn.trim() === '' : form.label.trim() === '') && (lang === 'tr' ? form.label.trim() !== '' : form.labelEn.trim() !== '') && (
                     <p className="mt-1 text-[10px] text-gray-500">
                       {t('activities.custom.fields.labelEnHint')}
                     </p>
@@ -301,7 +314,7 @@ export function ManageActivitiesDialog() {
                       onChange={(e) =>
                         setForm((prev) => ({
                           ...prev,
-                          defaultAmount: Number(e.target.value)
+                          defaultAmount: e.target.value
                         }))
                       }
                       className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"

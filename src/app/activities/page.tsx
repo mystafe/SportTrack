@@ -8,6 +8,7 @@ import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
+import { useToaster } from '@/components/Toaster';
 
 export default function ActivitiesPage() {
   const { t } = useI18n();
@@ -22,6 +23,7 @@ export default function ActivitiesPage() {
 function ActivitiesClient() {
   const { t, lang } = useI18n();
   const { activities, deleteActivity, hydrated } = useActivities();
+  const { showToast } = useToaster();
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const numberFormatter = useMemo(
@@ -100,7 +102,9 @@ function ActivitiesClient() {
                     note: editing.note ?? '',
                     performedAt: editing.performedAt
                   }}
-                  onSaved={() => setEditingId(null)}
+                  onSaved={() => {
+                    setEditingId(null);
+                  }}
                   onCancel={() => setEditingId(null)}
                 />
               </div>
@@ -162,6 +166,7 @@ function ActivitiesClient() {
                                 if (!isToday) return;
                                 if (!confirm(t('list.deleteConfirm'))) return;
                                 deleteActivity(activity.id);
+                                showToast(t('toast.activityDeleted'), 'success');
                                 if (editingId === activity.id) {
                                   setEditingId(null);
                                 }

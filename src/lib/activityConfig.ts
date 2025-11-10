@@ -26,25 +26,26 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     description: 'Adım sayınızı girin'
   },
   {
-    key: 'STAIRS',
-    label: 'Merdiven Çıkma',
-    labelEn: 'Stairs',
-    icon: '🧗',
-    multiplier: 20,
-    unit: 'basamak',
+    key: 'RUNNING',
+    label: 'Koşma',
+    labelEn: 'Running',
+    icon: '🏃',
+    multiplier: 2,
+    unit: 'adım',
     unitEn: 'steps',
-    defaultAmount: 50,
-    description: 'Çıktığınız toplam basamak sayısı'
+    defaultAmount: 500,
+    description: 'Koşu adım sayınızı girin'
   },
   {
-    key: 'SIT_UP',
-    label: 'Mekik',
-    labelEn: 'Sit-up',
-    icon: '🆎',
-    multiplier: 10,
-    unit: 'tekrar',
-    unitEn: 'reps',
-    defaultAmount: 20
+    key: 'SWIMMING',
+    label: 'Yüzme',
+    labelEn: 'Swimming',
+    icon: '🏊',
+    multiplier: 5,
+    unit: 'dakika',
+    unitEn: 'minutes',
+    defaultAmount: 20,
+    description: 'Yüzme süresini dakika olarak girin'
   },
   {
     key: 'PUSH_UP',
@@ -52,6 +53,16 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     labelEn: 'Push-up',
     icon: '💪',
     multiplier: 20,
+    unit: 'tekrar',
+    unitEn: 'reps',
+    defaultAmount: 20
+  },
+  {
+    key: 'SIT_UP',
+    label: 'Mekik',
+    labelEn: 'Sit-up',
+    icon: '🆎',
+    multiplier: 10,
     unit: 'tekrar',
     unitEn: 'reps',
     defaultAmount: 20
@@ -66,6 +77,17 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unitEn: 'minutes',
     defaultAmount: 30,
     description: 'Toplam süreyi dakika olarak girin'
+  },
+  {
+    key: 'STAIRS',
+    label: 'Merdiven Çıkma',
+    labelEn: 'Stairs',
+    icon: '🪜',
+    multiplier: 20,
+    unit: 'basamak',
+    unitEn: 'steps',
+    defaultAmount: 50,
+    description: 'Çıktığınız toplam basamak sayısı'
   }
 ];
 

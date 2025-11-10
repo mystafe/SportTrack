@@ -6,6 +6,7 @@ import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
 import { useActivityDefinitions } from '@/lib/settingsStore';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
+import { useToaster } from '@/components/Toaster';
 
 function toLocalInputValue(date: Date) {
   const year = date.getFullYear();
@@ -83,6 +84,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
 
   const { addActivity, updateActivity } = useActivities();
   const { t, lang } = useI18n();
+  const { showToast } = useToaster();
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
     [lang]
@@ -94,8 +96,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   const [performedAt, setPerformedAt] = useState<string>(
     initial?.performedAt ? toLocalInputValue(new Date(initial.performedAt)) : ''
   );
-  const [amount, setAmount] = useState<number>(
-    initial?.amount ?? fallbackDefinition?.defaultAmount ?? definitions[0]?.defaultAmount ?? 10
+  const [amount, setAmount] = useState<string>(
+    initial?.amount ? String(initial.amount) : String(fallbackDefinition?.defaultAmount ?? definitions[0]?.defaultAmount ?? 10)
   );
   const [note, setNote] = useState<string>(initial?.note ?? '');
   const [loading, setLoading] = useState(false);
@@ -110,9 +112,10 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
     return null;
   }
 
+  const amountNumeric = Number(amount) || 0;
   const pointsNumeric = Math.max(
     0,
-    Math.round(amount * definition.multiplier)
+    Math.round(amountNumeric * definition.multiplier)
   );
   const pointsDisplay = numberFormatter.format(pointsNumeric);
   const isEditing = Boolean(initial?.id);
@@ -120,13 +123,13 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   useEffect(() => {
     if (initial) {
       setActivityKey(initial.activityKey);
-      setAmount(initial.amount);
+      setAmount(String(initial.amount));
       setNote(initial.note ?? '');
       setPerformedAt(toLocalInputValue(new Date(initial.performedAt)));
     } else {
       const first = definitions[0];
       setActivityKey(first?.key ?? 'WALKING');
-      setAmount(first?.defaultAmount ?? 10);
+      setAmount(String(first?.defaultAmount ?? 10));
       setNote('');
       setPerformedAt('');
     }
@@ -148,23 +151,29 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       if (!definition) {
         throw new Error('Aktivite tanımı bulunamadı');
       }
+      const amountValue = Number(amount) || 0;
+      if (amountValue <= 0) {
+        throw new Error('Miktar 0\'dan büyük olmalıdır');
+      }
       if (initial?.id) {
         updateActivity(initial.id, {
           definition,
-          amount,
+          amount: amountValue,
           note: note || undefined,
           performedAt: performedAtISO
         });
+        showToast(t('toast.activityUpdated'), 'success');
         onSaved?.();
         onCancel?.();
       } else {
         addActivity({
           definition,
-          amount,
+          amount: amountValue,
           note: note || undefined,
           performedAt: performedAtISO
         });
-        setAmount(definition.defaultAmount);
+        showToast(t('toast.activityAdded'), 'success');
+        setAmount(String(definition.defaultAmount));
         setNote('');
         setPerformedAt(toLocalInputValue(new Date()));
         onCreated?.();
@@ -191,7 +200,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     if (isEditing && initial?.activityKey === def.key) {
                       return current;
                     }
-                    return def.defaultAmount;
+                    return String(def.defaultAmount);
                   });
                 }}
                 className={`text-left rounded-lg border px-3 py-2 shadow-card transition ${
@@ -238,10 +247,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             min={1}
             step={1}
             value={amount}
-            onChange={(e) => {
-              const next = Number(e.target.value);
-              setAmount(Number.isNaN(next) ? 1 : Math.max(1, next));
-            }}
+            onChange={(e) => setAmount(e.target.value)}
             className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
             required
           />

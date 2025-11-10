@@ -152,6 +152,38 @@ const translations: Translations = {
     tr: '{count} toplam aktivite',
     en: '{count} total activities'
   },
+  'stats.highlight.averageDaily': {
+    tr: 'Ortalama günlük puan',
+    en: 'Average daily points'
+  },
+  'stats.highlight.totalDays': {
+    tr: '{count} gün kayıt',
+    en: '{count} days recorded'
+  },
+  'stats.highlight.totalPoints': {
+    tr: 'Toplam puan',
+    en: 'Total points'
+  },
+  'stats.highlight.todayProgress': {
+    tr: 'Bugünkü ilerleme',
+    en: 'Today\'s progress'
+  },
+  'stats.highlight.complete': {
+    tr: 'tamamlandı',
+    en: 'complete'
+  },
+  'toast.activityAdded': {
+    tr: 'Aktivite başarıyla eklendi',
+    en: 'Activity added successfully'
+  },
+  'toast.activityUpdated': {
+    tr: 'Aktivite başarıyla güncellendi',
+    en: 'Activity updated successfully'
+  },
+  'toast.activityDeleted': {
+    tr: 'Aktivite başarıyla silindi',
+    en: 'Activity deleted successfully'
+  },
 
   'settings.setProfile': { tr: 'Profil Ayarla', en: 'Set Profile' },
   'settings.title': { tr: 'Seni Tanıyalım', en: 'Tell Us About You' },
