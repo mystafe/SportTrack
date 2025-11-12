@@ -21,6 +21,7 @@ export function SettingsDialog() {
   const [dailyTarget, setDailyTarget] = useState<string>(
     String(settings?.dailyTarget ?? DEFAULT_DAILY_TARGET)
   );
+  const [mood, setMood] = useState<string>(settings?.mood ?? '');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -34,6 +35,7 @@ export function SettingsDialog() {
     if (settings) {
       setName(settings.name);
       setDailyTarget(String(settings.dailyTarget));
+      setMood(settings.mood ?? '');
     }
   }, [settings]);
 
@@ -60,7 +62,8 @@ export function SettingsDialog() {
     saveSettings({
       name: trimmedName,
       dailyTarget: Math.round(targetValue),
-      customActivities: settings?.customActivities ?? []
+      customActivities: settings?.customActivities ?? [],
+      mood: mood || undefined
     });
     setOpen(false);
     setError(null);
@@ -162,6 +165,23 @@ export function SettingsDialog() {
               placeholder="10000"
               required
             />
+          </label>
+          <label className="block space-y-1">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+              {t('settings.moodLabel')}
+            </span>
+            <select
+              value={mood}
+              onChange={(e) => setMood(e.target.value)}
+              className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+            >
+              <option value="">{t('settings.moodNone')}</option>
+              <option value="happy">{t('settings.moodHappy')}</option>
+              <option value="cheerful">{t('settings.moodCheerful')}</option>
+              <option value="sad">{t('settings.moodSad')}</option>
+              <option value="unhappy">{t('settings.moodUnhappy')}</option>
+              <option value="tired">{t('settings.moodTired')}</option>
+            </select>
           </label>
           {error ? (
             <p className="text-xs text-red-500">{error}</p>

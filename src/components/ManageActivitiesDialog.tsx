@@ -259,7 +259,7 @@ export function ManageActivitiesDialog() {
                         }
                       }}
                       className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.labelEn') : t('activities.custom.placeholders.label')}
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.labelEn') : 'Örn. Yüzme'}
                     />
                   </div>
                 </div>
@@ -361,7 +361,7 @@ export function ManageActivitiesDialog() {
                         }
                       }}
                       className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.unitEn') : t('activities.custom.placeholders.unit')}
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.unitEn') : 'Örn. dakika'}
                     />
                   </div>
                 </div>
@@ -412,7 +412,7 @@ export function ManageActivitiesDialog() {
                       }}
                       rows={isMobile ? 1 : 2}
                       className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900 resize-none`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.descriptionEn') : t('activities.custom.placeholders.description')}
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.descriptionEn') : 'Açıklama girin'}
                     />
                   </div>
                 </div>

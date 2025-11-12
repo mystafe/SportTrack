@@ -33,10 +33,13 @@ export type CustomActivityDefinition = {
   descriptionEn?: string;
 };
 
+export type Mood = 'happy' | 'cheerful' | 'sad' | 'unhappy' | 'tired' | null;
+
 export type UserSettings = {
   name: string;
   dailyTarget: number;
   customActivities: CustomActivityDefinition[];
+  mood?: Mood;
 };
 
 function dedupeCustomActivities(

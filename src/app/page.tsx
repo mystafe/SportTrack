@@ -38,8 +38,8 @@ export default function HomePage() {
     : 0;
   
   const motivationalMessage = useMemo(() => 
-    getMotivationalMessage(progress, todayActivities.length > 0),
-    [progress, todayActivities.length]
+    getMotivationalMessage(progress, todayActivities.length > 0, settings?.mood ?? null),
+    [progress, todayActivities.length, settings?.mood]
   );
   
   const [showMessage, setShowMessage] = useState(true);

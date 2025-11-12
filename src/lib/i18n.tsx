@@ -286,6 +286,13 @@ const translations: Translations = {
   'settings.nameLabel': { tr: 'İsmin', en: 'Your name' },
   'settings.namePlaceholder': { tr: 'Örn. Mustafa', en: 'e.g. Alex' },
   'settings.goalLabel': { tr: 'Günlük hedef (puan)', en: 'Daily goal (points)' },
+  'settings.moodLabel': { tr: 'Bugün nasıl hissediyorsun?', en: 'How are you feeling today?' },
+  'settings.moodNone': { tr: 'Belirtmek istemiyorum', en: 'Prefer not to say' },
+  'settings.moodHappy': { tr: '😊 Mutlu', en: '😊 Happy' },
+  'settings.moodCheerful': { tr: '😄 Neşeli', en: '😄 Cheerful' },
+  'settings.moodSad': { tr: '😢 Üzgün', en: '😢 Sad' },
+  'settings.moodUnhappy': { tr: '😔 Mutsuz', en: '😔 Unhappy' },
+  'settings.moodTired': { tr: '😴 Yorgun / Hasta', en: '😴 Tired / Sick' },
   'settings.save': { tr: 'Kaydet', en: 'Save' },
   'settings.errors.nameRequired': {
     tr: 'İsim boş olamaz.',
