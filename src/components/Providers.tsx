@@ -5,6 +5,7 @@ import { I18nProvider } from '@/lib/i18n';
 import { ActivitiesProvider } from '@/lib/activityStore';
 import { SettingsProvider } from '@/lib/settingsStore';
 import { ToasterProvider } from '@/components/Toaster';
+import { StorageErrorHandler } from '@/components/StorageErrorHandler';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <SettingsProvider>
         <ActivitiesProvider>
           <ToasterProvider>
+            <StorageErrorHandler />
             {children}
           </ToasterProvider>
         </ActivitiesProvider>

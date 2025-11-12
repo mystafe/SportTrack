@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { TIMEOUTS } from '@/lib/constants';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -30,7 +31,7 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, 3000);
+    }, TIMEOUTS.TOAST_DURATION);
   }, []);
 
   return (
@@ -43,13 +44,16 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
             {toasts.map((toast) => (
               <div
                 key={toast.id}
-                className={`px-4 py-3 rounded-lg shadow-lg text-sm font-medium transition-all duration-300 ${
+                className={`px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-slide-in-right transition-all duration-300 ${
                   toast.type === 'success'
                     ? 'bg-green-500 text-white'
                     : toast.type === 'error'
                     ? 'bg-red-500 text-white'
                     : 'bg-blue-500 text-white'
                 }`}
+                role="alert"
+                aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
+                aria-atomic="true"
               >
                 {toast.message}
               </div>

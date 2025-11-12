@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useSettings } from '@/lib/settingsStore';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
+import { LIMITS } from '@/lib/constants';
 
 export function SettingsDialog() {
   const { settings, hydrated, saveSettings } = useSettings();
@@ -46,7 +47,7 @@ export function SettingsDialog() {
       setError(t('settings.errors.targetPositive'));
       return;
     }
-    if (targetValue < 1000 || targetValue > 100000) {
+    if (targetValue < LIMITS.DAILY_TARGET_MIN || targetValue > LIMITS.DAILY_TARGET_MAX) {
       setError(t('settings.errors.targetRange'));
       return;
     }
@@ -88,8 +89,8 @@ export function SettingsDialog() {
             </span>
             <input
               type="number"
-              min={1000}
-              max={100000}
+                    min={LIMITS.DAILY_TARGET_MIN}
+                    max={LIMITS.DAILY_TARGET_MAX}
               step={100}
               value={dailyTarget}
               onChange={(e) => setDailyTarget(e.target.value)}

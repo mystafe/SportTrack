@@ -10,6 +10,7 @@ export type ActivityDefinition = {
   unitEn?: string;
   defaultAmount: number;
   description?: string;
+  descriptionEn?: string;
   isCustom?: boolean;
 };
 
@@ -23,7 +24,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unit: 'adım',
     unitEn: 'steps',
     defaultAmount: 1000,
-    description: 'Adım sayınızı girin'
+    description: 'Adım sayınızı girin',
+    descriptionEn: 'Enter your step count'
   },
   {
     key: 'RUNNING',
@@ -34,7 +36,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unit: 'adım',
     unitEn: 'steps',
     defaultAmount: 500,
-    description: 'Koşu adım sayınızı girin'
+    description: 'Koşu adım sayınızı girin',
+    descriptionEn: 'Enter your running step count'
   },
   {
     key: 'SWIMMING',
@@ -45,7 +48,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unit: 'dakika',
     unitEn: 'minutes',
     defaultAmount: 20,
-    description: 'Yüzme süresini dakika olarak girin'
+    description: 'Yüzme süresini dakika olarak girin',
+    descriptionEn: 'Enter swimming duration in minutes'
   },
   {
     key: 'PUSH_UP',
@@ -76,7 +80,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unit: 'dakika',
     unitEn: 'minutes',
     defaultAmount: 30,
-    description: 'Toplam süreyi dakika olarak girin'
+    description: 'Toplam süreyi dakika olarak girin',
+    descriptionEn: 'Enter total duration in minutes'
   },
   {
     key: 'STAIRS',
@@ -87,7 +92,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unit: 'basamak',
     unitEn: 'steps',
     defaultAmount: 50,
-    description: 'Çıktığınız toplam basamak sayısı'
+    description: 'Çıktığınız toplam basamak sayısı',
+    descriptionEn: 'Total number of steps climbed'
   }
 ];
 
@@ -95,5 +101,7 @@ export const BASE_ACTIVITY_MAP: Record<string, ActivityDefinition> = Object.from
   BASE_ACTIVITY_DEFINITIONS.map((def) => [def.key, def])
 );
 
-export const DEFAULT_DAILY_TARGET = 10_000;
+import { LIMITS } from '@/lib/constants';
+
+export const DEFAULT_DAILY_TARGET = LIMITS.DEFAULT_DAILY_TARGET;
 

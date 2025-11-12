@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { format } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
@@ -8,9 +9,11 @@ import { useActivities, useActivitiesSummary } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 import { getActivityLabel } from '@/lib/activityUtils';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { StatsHighlightsSkeleton } from '@/components/LoadingSkeleton';
 
 export function StatsHighlights() {
-  const { activities } = useActivities();
+  const { activities, hydrated } = useActivities();
   const { t, lang } = useI18n();
   const { settings } = useSettings();
   const target = settings?.dailyTarget && settings.dailyTarget > 0
@@ -23,20 +26,7 @@ export function StatsHighlights() {
     [lang]
   );
   const [isOpen, setIsOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const query = window.matchMedia('(max-width: 767px)');
-    setIsMobile(query.matches);
-    const handleChange = (event: MediaQueryListEvent) => setIsMobile(event.matches);
-    if (typeof query.addEventListener === 'function') {
-      query.addEventListener('change', handleChange);
-      return () => query.removeEventListener('change', handleChange);
-    }
-    query.addListener(handleChange);
-    return () => query.removeListener(handleChange);
-  }, []);
+  const isMobile = useIsMobile();
 
   const bestDay = useMemo<{ date: string; points: number } | null>(() => {
     if (activities.length === 0) return null;
@@ -116,13 +106,13 @@ export function StatsHighlights() {
     return (
       <button
         type="button"
-        className="flex w-full items-center justify-between px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300"
+        className="flex w-full items-center justify-between px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
         <span>{t('stats.highlightsTitle')}</span>
         <svg
-          className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 transition-transform duration-300 ease-in-out ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -142,7 +132,17 @@ export function StatsHighlights() {
           isMobile && !isOpen ? 'max-h-0 opacity-0' : 'max-h-[2000px] opacity-100'
         }`}
       >
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1">
+        <Link
+          href="/stats"
+          className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-brand/10 to-brand/5 dark:from-brand/20 dark:to-brand/10 p-4 shadow-card hover-lift transition-smooth group"
+        >
+          <div className="text-xs text-gray-500 mb-1">{t('stats.detailed.title')}</div>
+          <div className="text-lg font-semibold group-hover:text-brand transition-colors">
+            {t('stats.detailed.subtitle')}
+          </div>
+          <div className="text-xs text-gray-500 mt-2">→ {t('nav.stats')}</div>
+        </Link>
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1 hover-lift transition-smooth">
             <div className="text-xs text-gray-500">{t('stats.highlight.bestDay')}</div>
             {bestDay ? (
               <>
@@ -160,7 +160,7 @@ export function StatsHighlights() {
             )}
           </div>
 
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1 hover-lift transition-smooth">
             <div className="text-xs text-gray-500">{t('stats.highlight.bestActivity')}</div>
             {topActivity ? (
               <>
@@ -180,7 +180,7 @@ export function StatsHighlights() {
             )}
           </div>
 
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1 hover-lift transition-smooth">
             <div className="text-xs text-gray-500">{t('stats.highlight.currentStreak')}</div>
             <div className="text-lg font-semibold">{summary.streakDays}</div>
             <div className="text-xs text-gray-500">
@@ -190,7 +190,7 @@ export function StatsHighlights() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1 hover-lift transition-smooth">
             <div className="text-xs text-gray-500">{t('stats.highlight.averageDaily')}</div>
             <div className="text-lg font-semibold">
               {numberFormatter.format(averageDailyPoints)} {t('list.pointsUnit')}
@@ -200,7 +200,7 @@ export function StatsHighlights() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1 hover-lift transition-smooth">
             <div className="text-xs text-gray-500">{t('stats.highlight.totalPoints')}</div>
             <div className="text-lg font-semibold">
               {numberFormatter.format(summary.totalPoints)} {t('list.pointsUnit')}
@@ -212,7 +212,7 @@ export function StatsHighlights() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card space-y-1 hover-lift transition-smooth">
             <div className="text-xs text-gray-500">{t('stats.highlight.todayProgress')}</div>
             <div className="text-lg font-semibold">
               {numberFormatter.format(summary.todayPoints)} / {numberFormatter.format(summary.targetPoints)}

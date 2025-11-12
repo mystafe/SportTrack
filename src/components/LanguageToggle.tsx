@@ -15,7 +15,7 @@ export function LanguageToggle() {
         <button
           key={opt.code}
           type="button"
-          className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded transition-colors ${lang === opt.code ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+          className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded transition-all duration-200 hover:scale-110 active:scale-95 ${lang === opt.code ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
           onClick={() => setLang(opt.code)}
           aria-pressed={lang === opt.code}
         >

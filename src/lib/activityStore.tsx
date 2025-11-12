@@ -15,8 +15,10 @@ import {
   BASE_ACTIVITY_MAP
 } from '@/lib/activityConfig';
 import { startOfDay, subDays } from 'date-fns';
+import { STORAGE_KEYS, TIMEOUTS } from '@/lib/constants';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 
-const STORAGE_KEY = 'sporttrack.activities.v1';
+const STORAGE_KEY = STORAGE_KEYS.ACTIVITIES;
 
 export type ActivityRecord = {
   id: string;
@@ -31,6 +33,8 @@ export type ActivityRecord = {
   points: number;
   performedAt: string;
   note?: string | null;
+  description?: string;
+  descriptionEn?: string;
   isCustom?: boolean;
 };
 
@@ -46,6 +50,8 @@ type UpdateActivityInput = AddActivityInput;
 type ActivitiesContextValue = {
   activities: ActivityRecord[];
   hydrated: boolean;
+  storageError: string | null;
+  clearStorageError: () => void;
   addActivity: (input: AddActivityInput) => ActivityRecord;
   updateActivity: (id: string, input: UpdateActivityInput) => ActivityRecord | null;
   deleteActivity: (id: string) => void;
@@ -87,6 +93,8 @@ function buildRecord(
     points: computePoints(multiplier, amount),
     performedAt: iso,
     note: note ?? null,
+    description: definition.description,
+    descriptionEn: definition.descriptionEn,
     isCustom: definition.isCustom ?? false
   };
 }
@@ -103,8 +111,10 @@ function normalizeRecord(record: Partial<ActivityRecord>): ActivityRecord {
     id: record.id ?? generateId(),
     activityKey: record.activityKey ?? fallback?.key ?? 'CUSTOM',
     label: record.label ?? fallback?.label ?? record.activityKey ?? 'Bilinmeyen Aktivite',
+    labelEn: record.labelEn ?? fallback?.labelEn,
     icon: record.icon ?? fallback?.icon ?? '🏃',
     unit: record.unit ?? fallback?.unit ?? '',
+    unitEn: record.unitEn ?? fallback?.unitEn,
     multiplier,
     amount,
     points:
@@ -113,6 +123,8 @@ function normalizeRecord(record: Partial<ActivityRecord>): ActivityRecord {
         : computePoints(multiplier, amount),
     performedAt: record.performedAt ?? new Date().toISOString(),
     note: record.note ?? null,
+    description: record.description ?? fallback?.description,
+    descriptionEn: record.descriptionEn ?? fallback?.descriptionEn,
     isCustom: record.isCustom ?? !fallback
   };
 }
@@ -120,6 +132,8 @@ function normalizeRecord(record: Partial<ActivityRecord>): ActivityRecord {
 export function ActivitiesProvider({ children }: { children: React.ReactNode }) {
   const [activities, setActivities] = useState<ActivityRecord[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [storageError, setStorageError] = useState<string | null>(null);
+  const debouncedActivities = useDebounce(activities, TIMEOUTS.DEBOUNCE_DELAY);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -129,8 +143,10 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
         const parsed = JSON.parse(raw) as Partial<ActivityRecord>[];
         const normalized = parsed.map((record) => normalizeRecord(record));
         setActivities(normalized);
+        setStorageError(null);
       } catch (error) {
         console.error('Failed to parse activities from storage', error);
+        setStorageError('parse');
       }
     }
     setHydrated(true);
@@ -138,8 +154,19 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (!hydrated || typeof window === 'undefined') return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(activities));
-  }, [activities, hydrated]);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(debouncedActivities));
+      setStorageError(null);
+    } catch (error) {
+      const e = error as Error & { name?: string };
+      if (e.name === 'QuotaExceededError') {
+        setStorageError('quota');
+      } else {
+        console.error('Failed to save activities to storage', error);
+        setStorageError('save');
+      }
+    }
+  }, [debouncedActivities, hydrated]);
 
   const addActivity = useCallback(
     (input: AddActivityInput) => {
@@ -194,15 +221,21 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
     setActivities((prev) => prev.filter((record) => record.id !== id));
   }, []);
 
+  const clearStorageError = useCallback(() => {
+    setStorageError(null);
+  }, []);
+
   const value = useMemo<ActivitiesContextValue>(
     () => ({
       activities,
       hydrated,
+      storageError,
+      clearStorageError,
       addActivity,
       updateActivity,
       deleteActivity
     }),
-    [activities, hydrated, addActivity, updateActivity, deleteActivity]
+    [activities, hydrated, storageError, clearStorageError, addActivity, updateActivity, deleteActivity]
   );
 
   return (
@@ -285,7 +318,7 @@ export function computeSummary(
       date: key,
       points: pointsPerDay.get(key) ?? 0
     };
-  });
+  }).reverse();
 
   let streakDays = 0;
   for (let offset = 0; offset < 30; offset += 1) {

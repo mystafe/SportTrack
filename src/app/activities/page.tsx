@@ -9,6 +9,8 @@ import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useToaster } from '@/components/Toaster';
+import { ActivityListSkeleton } from '@/components/LoadingSkeleton';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 
 export default function ActivitiesPage() {
   const { t } = useI18n();
@@ -25,6 +27,7 @@ function ActivitiesClient() {
   const { activities, deleteActivity, hydrated } = useActivities();
   const { showToast } = useToaster();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; activity: ActivityRecord } | null>(null);
 
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
@@ -64,15 +67,17 @@ function ActivitiesClient() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm font-medium">
-          <span>{t('list.newActivity')}</span>
-          <ManageActivitiesDialog />
+      {!editing && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-sm font-medium">
+            <span>{t('list.newActivity')}</span>
+            <ManageActivitiesDialog />
+          </div>
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card">
+            <ActivityForm />
+          </div>
         </div>
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card">
-          <ActivityForm />
-        </div>
-      </div>
+      )}
       <div className="space-y-3">
         <div className="text-sm font-medium">{t('list.records')}</div>
         <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card overflow-hidden">
@@ -110,6 +115,26 @@ function ActivitiesClient() {
               </div>
             </div>
           ) : null}
+          <ConfirmDialog
+            open={!!deleteConfirm}
+            title={t('list.deleteConfirmTitle')}
+            message={deleteConfirm ? t('list.deleteConfirmMessage', {
+              activity: getActivityLabel(deleteConfirm.activity, lang)
+            }) : ''}
+            variant="danger"
+            confirmLabel={t('list.delete')}
+            onConfirm={() => {
+              if (deleteConfirm) {
+                deleteActivity(deleteConfirm.id);
+                showToast(t('toast.activityDeleted'), 'success');
+                if (editingId === deleteConfirm.id) {
+                  setEditingId(null);
+                }
+                setDeleteConfirm(null);
+              }
+            }}
+            onCancel={() => setDeleteConfirm(null)}
+          />
           {!hydrated ? (
             <div className="p-4 space-y-3">
               <div className="h-6 w-40 rounded skeleton" />
@@ -133,7 +158,7 @@ function ActivitiesClient() {
                       return (
                         <li
                           key={activity.id}
-                          className="group p-3 flex items-start justify-between gap-3 rounded transition hover:bg-gray-50 dark:hover:bg-gray-900/30"
+                          className="group p-3 flex items-start justify-between gap-3 rounded transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900/30 hover:shadow-sm"
                         >
                           <div>
                             <div className="text-sm font-medium flex items-center gap-2 flex-wrap">
@@ -153,23 +178,18 @@ function ActivitiesClient() {
                           </div>
                           <div className="flex items-center gap-2 text-xs opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                             <button
-                              className="text-brand hover:underline"
+                              className="text-brand hover:underline transition-all duration-200 hover:scale-105 active:scale-95"
                               onClick={() => setEditingId(activity.id)}
                             >
                               {t('list.edit')}
                             </button>
                             <button
-                              className="text-red-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed"
+                              className="text-red-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95 disabled:hover:scale-100"
                               disabled={!isToday}
                               title={!isToday ? t('list.deleteDisabled') : undefined}
-                              onClick={async () => {
+                              onClick={() => {
                                 if (!isToday) return;
-                                if (!confirm(t('list.deleteConfirm'))) return;
-                                deleteActivity(activity.id);
-                                showToast(t('toast.activityDeleted'), 'success');
-                                if (editingId === activity.id) {
-                                  setEditingId(null);
-                                }
+                                setDeleteConfirm({ id: activity.id, activity });
                               }}
                             >
                               {t('list.delete')}

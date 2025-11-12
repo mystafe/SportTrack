@@ -21,3 +21,13 @@ export function getActivityUnit(
   return definition.unit;
 }
 
+export function getActivityDescription(
+  definition: ActivityDefinition | { description?: string; descriptionEn?: string },
+  lang: Language
+): string | undefined {
+  if (lang === 'en' && definition.descriptionEn) {
+    return definition.descriptionEn;
+  }
+  return definition.description;
+}
+

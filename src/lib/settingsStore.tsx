@@ -16,7 +16,9 @@ import {
   DEFAULT_DAILY_TARGET
 } from '@/lib/activityConfig';
 
-const STORAGE_KEY = 'sporttrack.settings.v1';
+import { STORAGE_KEYS } from '@/lib/constants';
+
+const STORAGE_KEY = STORAGE_KEYS.SETTINGS;
 
 export type CustomActivityDefinition = {
   id: ActivityKey;
@@ -28,6 +30,7 @@ export type CustomActivityDefinition = {
   unitEn?: string;
   defaultAmount: number;
   description?: string;
+  descriptionEn?: string;
 };
 
 export type UserSettings = {

@@ -29,18 +29,20 @@ type FormState = {
   multiplier: number;
   defaultAmount: string;
   description: string;
+  descriptionEn: string;
 };
 
 const INITIAL_FORM: FormState = {
   id: '',
   label: '',
   labelEn: '',
-  icon: '🏃',
+  icon: '',
   unit: '',
   unitEn: '',
   multiplier: 1,
   defaultAmount: '10',
-  description: ''
+  description: '',
+  descriptionEn: ''
 };
 
 export function ManageActivitiesDialog() {
@@ -101,7 +103,8 @@ export function ManageActivitiesDialog() {
       unitEn: activity.unitEn ?? '',
       multiplier: activity.multiplier,
       defaultAmount: String(activity.defaultAmount),
-      description: activity.description ?? ''
+      description: activity.description ?? '',
+      descriptionEn: activity.descriptionEn ?? ''
     });
     setOpen(true);
   }
@@ -162,7 +165,8 @@ export function ManageActivitiesDialog() {
       unitEn: form.unitEn.trim() || undefined,
       multiplier: Math.round(form.multiplier * 10) / 10,
       defaultAmount: Math.round(defaultAmountValue),
-      description: form.description.trim() || undefined
+      description: form.description.trim() || undefined,
+      descriptionEn: form.descriptionEn.trim() || undefined
     };
 
     if (isEditing) {
@@ -186,108 +190,84 @@ export function ManageActivitiesDialog() {
       {open ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-3 sm:px-4 py-4 overflow-y-auto">
           <div className="w-full max-w-2xl rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl my-auto max-h-[90vh] overflow-y-auto">
-            <div className="flex items-start justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-800">
+            <div className="flex items-start justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-b border-gray-200 dark:border-gray-800">
               <div>
-                <h2 className="text-base sm:text-lg font-semibold">{t('activities.custom.title')}</h2>
-                <p className="text-xs text-gray-500 mt-1">
+                <h2 className="text-sm sm:text-base font-semibold">{t('activities.custom.title')}</h2>
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
                   {t('activities.custom.subtitle')}
                 </p>
               </div>
               <button
-                className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 text-lg sm:text-xl"
+                className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 text-lg sm:text-xl flex-shrink-0 ml-2"
                 onClick={closeDialog}
+                aria-label={t('form.cancel')}
               >
                 ✕
               </button>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 px-4 sm:px-5 py-4">
-              <form className="space-y-4" onSubmit={submit}>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
-                    {lang === 'tr' ? t('activities.custom.fields.label') : t('activities.custom.fields.labelEn')}
-                  </label>
-                  <input
-                    type="text"
-                    value={lang === 'tr' ? form.label : form.labelEn}
-                    onChange={(e) => {
-                      if (lang === 'tr') {
-                        setForm((prev) => ({ ...prev, label: e.target.value }));
-                      } else {
-                        setForm((prev) => ({ ...prev, labelEn: e.target.value }));
-                      }
-                    }}
-                    className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
-                    placeholder={lang === 'tr' ? t('activities.custom.placeholders.label') : t('activities.custom.placeholders.labelEn')}
-                    required
-                  />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 px-3 sm:px-4 py-3">
+              <form className="space-y-3" onSubmit={submit}>
+                {/* Activity Name - Turkish and English side by side */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+                      {t('activities.custom.fields.label')}
+                    </label>
+                    <input
+                      type="text"
+                      value={lang === 'tr' ? form.label : form.labelEn}
+                      onChange={(e) => {
+                        if (lang === 'tr') {
+                          setForm((prev) => ({ ...prev, label: e.target.value }));
+                        } else {
+                          setForm((prev) => ({ ...prev, labelEn: e.target.value }));
+                        }
+                      }}
+                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.label') : t('activities.custom.placeholders.labelEn')}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+                      {t('activities.custom.fields.labelEn')}
+                    </label>
+                    <input
+                      type="text"
+                      value={lang === 'tr' ? form.labelEn : form.label}
+                      onChange={(e) => {
+                        if (lang === 'tr') {
+                          setForm((prev) => ({ ...prev, labelEn: e.target.value }));
+                        } else {
+                          setForm((prev) => ({ ...prev, label: e.target.value }));
+                        }
+                      }}
+                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.labelEn') : t('activities.custom.placeholders.label')}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
-                    {lang === 'tr' ? t('activities.custom.fields.labelEn') : t('activities.custom.fields.label')} <span className="text-gray-400 text-[10px]">({t('activities.custom.fields.optional')})</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={lang === 'tr' ? form.labelEn : form.label}
-                    onChange={(e) => {
-                      if (lang === 'tr') {
-                        setForm((prev) => ({ ...prev, labelEn: e.target.value }));
-                      } else {
-                        setForm((prev) => ({ ...prev, label: e.target.value }));
-                      }
-                    }}
-                    className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
-                    placeholder={lang === 'tr' ? t('activities.custom.placeholders.labelEn') : t('activities.custom.placeholders.label')}
-                  />
-                  {(lang === 'tr' ? form.labelEn.trim() === '' : form.label.trim() === '') && (lang === 'tr' ? form.label.trim() !== '' : form.labelEn.trim() !== '') && (
-                    <p className="mt-1 text-[10px] text-gray-500">
-                      {t('activities.custom.fields.labelEnHint')}
-                    </p>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
+                {(lang === 'tr' ? form.labelEn.trim() === '' : form.label.trim() === '') && (lang === 'tr' ? form.label.trim() !== '' : form.labelEn.trim() !== '') && (
+                  <p className="text-[10px] text-gray-500 -mt-1">
+                    {t('activities.custom.fields.labelEnHint')}
+                  </p>
+                )}
+
+                {/* Emoji, Multiplier, DefaultAmount in one row */}
+                <div className="grid grid-cols-3 gap-2">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     {t('activities.custom.fields.icon')}
                     <input
                       type="text"
                       maxLength={4}
                       value={form.icon}
                       onChange={(e) => setForm((prev) => ({ ...prev, icon: e.target.value }))}
-                      className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                      className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
                       placeholder="🏊"
                       required
                     />
                   </label>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
-                    {t('activities.custom.fields.unit')}
-                    <input
-                      type="text"
-                      value={form.unit}
-                      onChange={(e) => setForm((prev) => ({ ...prev, unit: e.target.value }))}
-                      className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
-                      placeholder={t('activities.custom.placeholders.unit')}
-                      required
-                    />
-                  </label>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
-                    {t('activities.custom.fields.unitEn')} <span className="text-gray-400 text-[10px]">({t('activities.custom.fields.optional')})</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={form.unitEn}
-                    onChange={(e) => setForm((prev) => ({ ...prev, unitEn: e.target.value }))}
-                    className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
-                    placeholder={t('activities.custom.placeholders.unitEn')}
-                  />
-                  {form.unitEn.trim() === '' && form.unit.trim() !== '' && (
-                    <p className="mt-1 text-[10px] text-gray-500">
-                      {t('activities.custom.fields.unitEnHint')}
-                    </p>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     {t('activities.custom.fields.multiplier')}
                     <input
                       type="number"
@@ -300,11 +280,11 @@ export function ManageActivitiesDialog() {
                           multiplier: Number(e.target.value)
                         }))
                       }
-                      className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                      className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
                       required
                     />
                   </label>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     {t('activities.custom.fields.defaultAmount')}
                     <input
                       type="number"
@@ -317,76 +297,153 @@ export function ManageActivitiesDialog() {
                           defaultAmount: e.target.value
                         }))
                       }
-                      className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                      className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
                       required
                     />
                   </label>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300">
-                    {t('activities.custom.fields.description')}
-                  </label>
-                  <textarea
-                    value={form.description}
-                    onChange={(e) =>
-                      setForm((prev) => ({ ...prev, description: e.target.value }))
-                    }
-                    rows={3}
-                    className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
-                    placeholder={t('activities.custom.placeholders.description')}
-                  />
+
+                {/* Unit - Turkish and English side by side */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+                      {t('activities.custom.fields.unit')}
+                    </label>
+                    <input
+                      type="text"
+                      value={lang === 'tr' ? form.unit : form.unitEn}
+                      onChange={(e) => {
+                        if (lang === 'tr') {
+                          setForm((prev) => ({ ...prev, unit: e.target.value }));
+                        } else {
+                          setForm((prev) => ({ ...prev, unitEn: e.target.value }));
+                        }
+                      }}
+                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.unit') : t('activities.custom.placeholders.unitEn')}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+                      {t('activities.custom.fields.unitEn')}
+                    </label>
+                    <input
+                      type="text"
+                      value={lang === 'tr' ? form.unitEn : form.unit}
+                      onChange={(e) => {
+                        if (lang === 'tr') {
+                          setForm((prev) => ({ ...prev, unitEn: e.target.value }));
+                        } else {
+                          setForm((prev) => ({ ...prev, unit: e.target.value }));
+                        }
+                      }}
+                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.unitEn') : t('activities.custom.placeholders.unit')}
+                    />
+                  </div>
                 </div>
+                {form.unitEn.trim() === '' && form.unit.trim() !== '' && (
+                  <p className="text-[10px] text-gray-500 -mt-1">
+                    {t('activities.custom.fields.unitEnHint')}
+                  </p>
+                )}
+
+                {/* Description - Turkish and English side by side */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+                      {t('activities.custom.fields.description')}
+                    </label>
+                    <textarea
+                      value={lang === 'tr' ? form.description : form.descriptionEn}
+                      onChange={(e) => {
+                        if (lang === 'tr') {
+                          setForm((prev) => ({ ...prev, description: e.target.value }));
+                        } else {
+                          setForm((prev) => ({ ...prev, descriptionEn: e.target.value }));
+                        }
+                      }}
+                      rows={2}
+                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900 resize-none"
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.description') : t('activities.custom.placeholders.descriptionEn')}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+                      {t('activities.custom.fields.descriptionEn')}
+                    </label>
+                    <textarea
+                      value={lang === 'tr' ? form.descriptionEn : form.description}
+                      onChange={(e) => {
+                        if (lang === 'tr') {
+                          setForm((prev) => ({ ...prev, descriptionEn: e.target.value }));
+                        } else {
+                          setForm((prev) => ({ ...prev, description: e.target.value }));
+                        }
+                      }}
+                      rows={2}
+                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900 resize-none"
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.descriptionEn') : t('activities.custom.placeholders.description')}
+                    />
+                  </div>
+                </div>
+                {(lang === 'tr' ? form.descriptionEn.trim() === '' : form.description.trim() === '') && (lang === 'tr' ? form.description.trim() !== '' : form.descriptionEn.trim() !== '') && (
+                  <p className="text-[10px] text-gray-500 -mt-1">
+                    {t('activities.custom.fields.descriptionHint')}
+                  </p>
+                )}
                 {error ? <p className="text-xs text-red-500">{error}</p> : null}
-                <div className="flex items-center justify-end gap-2 pt-2">
+                <div className="flex items-center justify-end gap-2 pt-1">
                   <button
                     type="button"
                     onClick={closeDialog}
-                    className="px-3 py-2 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+                    className="px-2.5 py-1.5 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                   >
                     {t('form.cancel')}
                   </button>
                   <button
                     type="submit"
-                    className="px-3 py-2 text-xs rounded bg-brand text-white hover:bg-brand-dark shadow"
+                    className="px-2.5 py-1.5 text-xs rounded bg-brand text-white hover:bg-brand-dark shadow transition-colors"
                   >
                     {isEditing ? t('activities.custom.save') : t('activities.custom.add')}
                   </button>
                 </div>
               </form>
-              <div className="space-y-4">
-                <section className="space-y-2">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <div className="space-y-2.5">
+                <section className="space-y-1.5">
+                  <h3 className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-500">
                     {t('activities.custom.customList')}
                   </h3>
                   {customActivities.length === 0 ? (
-                    <p className="text-xs text-gray-500 border border-dashed border-gray-200 dark:border-gray-700 rounded px-3 py-4">
+                    <p className="text-[10px] sm:text-xs text-gray-500 border border-dashed border-gray-200 dark:border-gray-700 rounded px-2 py-3">
                       {t('activities.custom.empty')}
                     </p>
                   ) : (
-                    <ul className="space-y-2">
+                    <ul className="space-y-1.5">
                       {customActivities.map((activity) => (
                         <li
                           key={activity.id}
-                          className="border border-gray-200 dark:border-gray-700 rounded px-3 py-2 flex items-center justify-between gap-3"
+                          className="border border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 flex items-center justify-between gap-2"
                         >
-                          <div>
-                            <div className="text-sm font-medium flex items-center gap-2">
-                              <span>{activity.icon}</span>
-                              <span>{getActivityLabel(activity, lang)}</span>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs sm:text-sm font-medium flex items-center gap-1.5 truncate">
+                              {activity.icon && <span>{activity.icon}</span>}
+                              <span className="truncate">{getActivityLabel(activity, lang)}</span>
                             </div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-[10px] sm:text-xs text-gray-500">
                               {activity.multiplier}x • {activity.defaultAmount} {getActivityUnit(activity, lang)}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 text-xs">
+                          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs flex-shrink-0">
                             <button
-                              className="text-brand hover:underline"
+                              className="text-brand hover:underline px-1"
                               onClick={() => handleEdit(activity)}
                             >
                               {t('activities.custom.edit')}
                             </button>
                             <button
-                              className="text-red-600 hover:underline"
+                              className="text-red-600 hover:underline px-1"
                               onClick={() => handleDelete(activity.id)}
                             >
                               {t('activities.custom.remove')}
@@ -397,26 +454,23 @@ export function ManageActivitiesDialog() {
                     </ul>
                   )}
                 </section>
-                <section className="space-y-2">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <section className="space-y-1.5">
+                  <h3 className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-500">
                     {t('activities.custom.baseList')}
                   </h3>
-                  <ul className="space-y-2 max-h-48 overflow-auto pr-1">
+                  <ul className="space-y-1.5 max-h-40 sm:max-h-48 overflow-auto pr-1">
                     {baseDefinitions.map((activity: ActivityDefinition) => (
                       <li
                         key={activity.key}
-                        className="border border-dashed border-gray-200 dark:border-gray-700 rounded px-3 py-2 text-xs text-gray-500"
+                        className="border border-dashed border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-gray-500"
                       >
-                        <div className="font-medium text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
-                          <span>{activity.icon}</span>
+                        <div className="font-medium text-xs sm:text-sm text-gray-700 dark:text-gray-200 flex items-center gap-1.5">
+                          {activity.icon && <span>{activity.icon}</span>}
                           <span>{getActivityLabel(activity, lang)}</span>
                         </div>
-                        <div>
+                        <div className="mt-0.5">
                           {activity.multiplier}x • {activity.defaultAmount} {getActivityUnit(activity, lang)}
                         </div>
-                        {activity.description ? (
-                          <div className="mt-1 text-[11px]">{activity.description}</div>
-                        ) : null}
                       </li>
                     ))}
                   </ul>

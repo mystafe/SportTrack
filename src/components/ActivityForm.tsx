@@ -5,7 +5,7 @@ import { ActivityDefinition, ActivityKey } from '@/lib/activityConfig';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
 import { useActivityDefinitions } from '@/lib/settingsStore';
-import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
+import { getActivityLabel, getActivityUnit, getActivityDescription } from '@/lib/activityUtils';
 import { useToaster } from '@/components/Toaster';
 
 function toLocalInputValue(date: Date) {
@@ -203,12 +203,20 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     return String(def.defaultAmount);
                   });
                 }}
-                className={`text-left rounded-lg border px-3 py-2 shadow-card transition ${
+                className={`text-left rounded-lg border px-3 py-2 shadow-card transition-all duration-200 ${
                   active
-                    ? 'border-brand ring-2 ring-brand/30 bg-brand/5'
-                    : 'border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900'
+                    ? 'border-brand ring-2 ring-brand/30 bg-brand/5 scale-105'
+                    : 'border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900 hover:scale-102 hover:shadow-md'
                 }`}
                 aria-pressed={active}
+                aria-label={t('form.selectActivityLabel', { activity: getActivityLabel(def, lang) })}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActivityKey(def.key);
+                    setAmount(String(def.defaultAmount));
+                  }
+                }}
               >
                 <div className="flex items-center justify-between">
                   <div className="text-xl">{def.icon}</div>
@@ -250,9 +258,13 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             onChange={(e) => setAmount(e.target.value)}
             className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
             required
+            aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
+            aria-describedby={getActivityDescription(definition, lang) ? 'amount-description' : undefined}
           />
-          {definition?.description ? (
-            <div className="text-xs text-gray-500">{definition.description}</div>
+          {getActivityDescription(definition, lang) ? (
+            <div id="amount-description" className="text-xs text-gray-500" role="note">
+              {getActivityDescription(definition, lang)}
+            </div>
           ) : null}
         </label>
         <div className="space-y-1 flex flex-col justify-end">
@@ -272,13 +284,16 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
           rows={3}
           placeholder={t('form.notePlaceholder')}
+          aria-label={t('form.noteOptional')}
         />
       </label>
       <div className="flex items-center gap-2">
         <button
           type="submit"
           disabled={loading}
-          className="px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-sm disabled:opacity-50 shadow"
+          className="px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-sm disabled:opacity-50 shadow transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 disabled:hover:scale-100"
+          aria-label={loading ? t('form.loading') : isEditing ? t('form.save') : t('form.add')}
+          aria-busy={loading}
         >
           {loading ? '...' : isEditing ? t('form.save') : t('form.add')}
         </button>
@@ -286,7 +301,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           <button
             type="button"
             onClick={onCancel}
-            className="px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-sm hover:bg-gray-50 dark:hover:bg-gray-900"
+            className="px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-sm hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-200 hover:scale-105 active:scale-95"
           >
             {t('form.cancel')}
           </button>
