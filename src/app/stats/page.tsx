@@ -150,29 +150,29 @@ export default function StatsPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card hover-lift transition-smooth">
-          <div className="text-xs text-gray-500 mb-1">{t('stats.detailed.totalActivities')}</div>
-          <div className="text-2xl font-bold">{numberFormatter.format(activities.length)}</div>
+      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${isMobile ? 'gap-2' : 'gap-4'}`}>
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card hover-lift transition-smooth`}>
+          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.totalActivities')}</div>
+          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>{numberFormatter.format(activities.length)}</div>
         </div>
         
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card hover-lift transition-smooth">
-          <div className="text-xs text-gray-500 mb-1">{t('stats.detailed.totalSessions')}</div>
-          <div className="text-2xl font-bold">{numberFormatter.format(allDays.length)}</div>
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card hover-lift transition-smooth`}>
+          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.totalSessions')}</div>
+          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>{numberFormatter.format(allDays.length)}</div>
         </div>
         
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card hover-lift transition-smooth">
-          <div className="text-xs text-gray-500 mb-1">{t('stats.detailed.averagePerDay')}</div>
-          <div className="text-2xl font-bold">
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card hover-lift transition-smooth`}>
+          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.averagePerDay')}</div>
+          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>
             {allDays.length > 0
               ? numberFormatter.format(Math.round(allDays.reduce((sum, day) => sum + day.points, 0) / allDays.length))
               : '0'} {t('list.pointsUnit')}
           </div>
         </div>
         
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card hover-lift transition-smooth">
-          <div className="text-xs text-gray-500 mb-1">{t('stats.detailed.bestStreak')}</div>
-          <div className="text-2xl font-bold">{bestStreak} {bestStreak === 1 ? t('stats.highlight.sessions') : t('stats.highlight.sessions')}</div>
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card hover-lift transition-smooth`}>
+          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.bestStreak')}</div>
+          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>{bestStreak} {bestStreak === 1 ? t('stats.highlight.sessions') : t('stats.highlight.sessions')}</div>
         </div>
       </div>
 

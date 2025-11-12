@@ -182,7 +182,7 @@ body {
 }
 
 .goal-completed .progress-bar {
-  animation: shimmer-success 2s linear infinite;
+  animation: shimmer-success 2s linear;
   background: linear-gradient(
     90deg,
     #10b981 0%,
@@ -195,7 +195,11 @@ body {
 }
 
 .goal-completed .points-value {
-  animation: pulse 1s ease-in-out infinite;
+  animation: pulse 1s ease-in-out;
+}
+
+.animate-shimmer-success {
+  animation: shimmer-success 2s linear;
 }
 
 .confetti {

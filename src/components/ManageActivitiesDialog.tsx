@@ -10,6 +10,7 @@ import {
 import { ActivityDefinition } from '@/lib/activityConfig';
 import { useActivities } from '@/lib/activityStore';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 function slugify(value: string) {
   return value
@@ -47,6 +48,7 @@ const INITIAL_FORM: FormState = {
 
 export function ManageActivitiesDialog() {
   const { t, lang } = useI18n();
+  const isMobile = useIsMobile();
   const { settings, addCustomActivity, updateCustomActivity, removeCustomActivity } =
     useSettings();
   const { activities } = useActivities();
@@ -208,10 +210,10 @@ export function ManageActivitiesDialog() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 px-3 sm:px-4 py-3">
               <form className="space-y-3" onSubmit={submit}>
                 {/* Activity Name - Turkish and English side by side */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
-                      {t('activities.custom.fields.label')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
+                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
+                      {t('activities.custom.fields.label')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
                     </label>
                     <input
                       type="text"
@@ -223,14 +225,14 @@ export function ManageActivitiesDialog() {
                           setForm((prev) => ({ ...prev, labelEn: e.target.value }));
                         }
                       }}
-                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.label') : t('activities.custom.placeholders.labelEn')}
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
-                      {t('activities.custom.fields.label')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
+                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
+                      {t('activities.custom.fields.label')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
                     </label>
                     <input
                       type="text"
@@ -242,7 +244,7 @@ export function ManageActivitiesDialog() {
                           setForm((prev) => ({ ...prev, label: e.target.value }));
                         }
                       }}
-                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.labelEn') : t('activities.custom.placeholders.label')}
                     />
                   </div>
@@ -304,10 +306,10 @@ export function ManageActivitiesDialog() {
                 </div>
 
                 {/* Unit - Turkish and English side by side */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
-                      {t('activities.custom.fields.unit')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
+                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
+                      {t('activities.custom.fields.unit')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
                     </label>
                     <input
                       type="text"
@@ -319,14 +321,14 @@ export function ManageActivitiesDialog() {
                           setForm((prev) => ({ ...prev, unitEn: e.target.value }));
                         }
                       }}
-                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.unit') : t('activities.custom.placeholders.unitEn')}
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
-                      {t('activities.custom.fields.unit')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
+                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
+                      {t('activities.custom.fields.unit')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
                     </label>
                     <input
                       type="text"
@@ -338,7 +340,7 @@ export function ManageActivitiesDialog() {
                           setForm((prev) => ({ ...prev, unit: e.target.value }));
                         }
                       }}
-                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.unitEn') : t('activities.custom.placeholders.unit')}
                     />
                   </div>
@@ -350,10 +352,10 @@ export function ManageActivitiesDialog() {
                 )}
 
                 {/* Description - Turkish and English side by side */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
-                      {t('activities.custom.fields.description')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
+                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
+                      {t('activities.custom.fields.description')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
                     </label>
                     <textarea
                       value={lang === 'tr' ? form.description : form.descriptionEn}
@@ -364,14 +366,14 @@ export function ManageActivitiesDialog() {
                           setForm((prev) => ({ ...prev, descriptionEn: e.target.value }));
                         }
                       }}
-                      rows={2}
-                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900 resize-none"
+                      rows={isMobile ? 1 : 2}
+                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900 resize-none`}
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.description') : t('activities.custom.placeholders.descriptionEn')}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
-                      {t('activities.custom.fields.description')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
+                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
+                      {t('activities.custom.fields.description')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
                     </label>
                     <textarea
                       value={lang === 'tr' ? form.descriptionEn : form.description}
@@ -382,8 +384,8 @@ export function ManageActivitiesDialog() {
                           setForm((prev) => ({ ...prev, description: e.target.value }));
                         }
                       }}
-                      rows={2}
-                      className="w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900 resize-none"
+                      rows={isMobile ? 1 : 2}
+                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900 resize-none`}
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.descriptionEn') : t('activities.custom.placeholders.description')}
                     />
                   </div>

@@ -177,6 +177,12 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         setNote('');
         setPerformedAt(toLocalInputValue(new Date()));
         onCreated?.();
+        // Redirect to home page after toast notification
+        setTimeout(() => {
+          if (typeof window !== 'undefined') {
+            window.location.href = '/';
+          }
+        }, 2000);
       }
     } finally {
       setLoading(false);

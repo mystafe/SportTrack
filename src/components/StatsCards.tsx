@@ -58,15 +58,22 @@ export function StatsCards() {
   const isGoalCompleted = summary.todayPoints >= summary.targetPoints;
   const [wasCompleted, setWasCompleted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showGoalAnimation, setShowGoalAnimation] = useState(false);
 
   useEffect(() => {
     if (isGoalCompleted && !wasCompleted) {
       setWasCompleted(true);
       setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 3000);
-      return () => clearTimeout(timer);
+      setShowGoalAnimation(true);
+      const confettiTimer = setTimeout(() => setShowConfetti(false), 3000);
+      const animationTimer = setTimeout(() => setShowGoalAnimation(false), 10000);
+      return () => {
+        clearTimeout(confettiTimer);
+        clearTimeout(animationTimer);
+      };
     } else if (!isGoalCompleted) {
       setWasCompleted(false);
+      setShowGoalAnimation(false);
     }
   }, [isGoalCompleted, wasCompleted]);
 
@@ -90,39 +97,39 @@ export function StatsCards() {
           ))}
         </>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-2 shadow-card hover-lift transition-smooth ${isGoalCompleted ? 'goal-completed border-green-500 dark:border-green-500' : ''}`}>
-          <div className="text-sm text-gray-500">{t('stats.todayPoints')}</div>
-          <div className={`text-3xl font-semibold text-brand transition-all duration-300 ${isGoalCompleted ? 'points-value text-green-600 dark:text-green-400' : ''}`}>
+      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} gap-3 ${isMobile ? 'gap-2' : 'gap-4'}`}>
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5 space-y-1' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-500' : ''}`}>
+          <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-500`}>{t('stats.todayPoints')}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400' : ''}`}>
             {numberFormatter.format(summary.todayPoints)}
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">
+          <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>
             {t('stats.target')}: {numberFormatter.format(summary.targetPoints)}
             {isGoalCompleted && (
-              <span className="ml-2 text-green-600 dark:text-green-400 font-semibold">✓ {t('stats.goalCompleted')}</span>
+              <span className="ml-1 text-green-600 dark:text-green-400 font-semibold">✓ {t('stats.goalCompleted')}</span>
             )}
           </div>
-          <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded overflow-hidden relative" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={t('stats.progressLabel', { current: summary.todayPoints, target: summary.targetPoints })}>
+          <div className={`${isMobile ? 'h-1.5' : 'h-2'} bg-gray-200 dark:bg-gray-800 rounded overflow-hidden relative`} role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={t('stats.progressLabel', { current: summary.todayPoints, target: summary.targetPoints })}>
             <div
-              className={`h-2 rounded transition-all duration-500 ease-out animate-progress ${isGoalCompleted ? 'progress-bar' : 'bg-gradient-to-r from-brand to-brand-dark'}`}
+              className={`h-full rounded transition-all duration-500 ease-out animate-progress ${showGoalAnimation ? 'progress-bar' : 'bg-gradient-to-r from-brand to-brand-dark'}`}
               style={{ width: `${pct}%` }}
             />
-            {isGoalCompleted && (
+            {showGoalAnimation && (
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer-success" />
             )}
           </div>
         </div>
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-2 shadow-card hover-lift transition-smooth">
-          <div className="text-sm text-gray-500">{t('stats.totalPoints')}</div>
-          <div className="text-3xl font-semibold transition-all duration-300">
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5 space-y-1' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
+          <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-500`}>{t('stats.totalPoints')}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300`}>
             {numberFormatter.format(summary.totalPoints)}
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">{t('stats.totalActivities', { count: summary.totalActivities })}</div>
+          <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
         </div>
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-2 shadow-card hover-lift transition-smooth">
-          <div className="text-sm text-gray-500">{t('stats.streak')}</div>
-          <div className="text-3xl font-semibold text-brand transition-all duration-300">{summary.streakDays}</div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">{t('stats.streakDesc')}</div>
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5 space-y-1' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
+          <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-500`}>{t('stats.streak')}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand transition-all duration-300`}>{summary.streakDays}</div>
+          <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.streakDesc')}</div>
         </div>
       </div>
 
