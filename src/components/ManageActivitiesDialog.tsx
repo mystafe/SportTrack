@@ -94,10 +94,11 @@ export function ManageActivitiesDialog() {
     resetForm();
   }
 
-  function handleEdit(activity: CustomActivityDefinition) {
-    setEditingId(activity.id);
+  function handleEdit(activity: CustomActivityDefinition | ActivityDefinition) {
+    const activityId = 'id' in activity ? activity.id : activity.key;
+    setEditingId(activityId);
     setForm({
-      id: activity.id,
+      id: activityId,
       label: activity.label,
       labelEn: activity.labelEn ?? '',
       icon: activity.icon,
@@ -112,6 +113,12 @@ export function ManageActivitiesDialog() {
   }
 
   function handleDelete(id: string) {
+    // Prevent deletion of base/default activities
+    const isBaseActivity = baseDefinitions.some(def => def.key === id);
+    if (isBaseActivity) {
+      alert(t('activities.custom.errors.cannotDeleteBase'));
+      return;
+    }
     if (usedActivityKeys.has(id)) {
       alert(t('activities.custom.errors.inUse'));
       return;
@@ -489,14 +496,24 @@ export function ManageActivitiesDialog() {
                     {baseDefinitions.map((activity: ActivityDefinition) => (
                       <li
                         key={activity.key}
-                        className="border border-dashed border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-gray-500"
+                        className="border border-dashed border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 flex items-center justify-between gap-2"
                       >
-                        <div className="font-medium text-xs sm:text-sm text-gray-700 dark:text-gray-200 flex items-center gap-1.5">
-                          {activity.icon && <span>{activity.icon}</span>}
-                          <span>{getActivityLabel(activity, lang)}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-xs sm:text-sm text-gray-700 dark:text-gray-200 flex items-center gap-1.5">
+                            {activity.icon && <span>{activity.icon}</span>}
+                            <span>{getActivityLabel(activity, lang)}</span>
+                          </div>
+                          <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
+                            {activity.multiplier}x • {activity.defaultAmount} {getActivityUnit(activity, lang)}
+                          </div>
                         </div>
-                        <div className="mt-0.5">
-                          {activity.multiplier}x • {activity.defaultAmount} {getActivityUnit(activity, lang)}
+                        <div className="flex items-center gap-1.5 text-[10px] sm:text-xs flex-shrink-0">
+                          <button
+                            className="text-brand hover:underline px-1"
+                            onClick={() => handleEdit(activity)}
+                          >
+                            {t('activities.custom.edit')}
+                          </button>
                         </div>
                       </li>
                     ))}

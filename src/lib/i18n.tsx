@@ -93,9 +93,9 @@ const translations: Translations = {
   'activities.custom.placeholders.description': { tr: 'Açıklama girin', en: 'Açıklama girin' },
   'activities.custom.placeholders.descriptionEn': { tr: 'Enter description', en: 'Enter description' },
   'activities.custom.placeholders.label': { tr: 'Örn. Yüzme', en: 'e.g. Swimming' },
-  'activities.custom.placeholders.labelEn': { tr: 'Örn. Swimming', en: 'e.g. Swimming' },
+  'activities.custom.placeholders.labelEn': { tr: 'Örn. Yüzme', en: 'e.g. Swimming' },
   'activities.custom.placeholders.unit': { tr: 'Örn. dakika', en: 'e.g. minutes' },
-  'activities.custom.placeholders.unitEn': { tr: 'Örn. minutes', en: 'e.g. minutes' },
+  'activities.custom.placeholders.unitEn': { tr: 'Örn. dakika', en: 'e.g. minutes' },
   'activities.custom.errors.label': { tr: 'Aktivite adı gerekli.', en: 'Activity name is required.' },
   'activities.custom.errors.icon': { tr: 'Emoji alanı boş olamaz.', en: 'Emoji cannot be empty.' },
   'activities.custom.errors.unit': { tr: 'Birim alanı boş olamaz.', en: 'Unit cannot be empty.' },
@@ -106,6 +106,10 @@ const translations: Translations = {
   'activities.custom.errors.defaultAmount': {
     tr: 'Varsayılan miktar pozitif bir tam sayı olmalı.',
     en: 'Default amount must be a positive integer.'
+  },
+  'activities.custom.errors.cannotDeleteBase': {
+    tr: 'Varsayılan aktiviteler silinemez, ancak düzenlenebilir.',
+    en: 'Default activities cannot be deleted, but can be edited.'
   },
   'activities.custom.errors.duplicate': {
     tr: 'Bu isimle başka bir aktivite zaten var.',
