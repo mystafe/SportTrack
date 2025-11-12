@@ -117,15 +117,16 @@ export default function StatsPage() {
   // Selected day activities
   const selectedDayActivities = useMemo(() => {
     if (!selectedDate) return [];
-    const date = parseISO(selectedDate);
+    const selected = startOfDay(parseISO(selectedDate + 'T00:00:00'));
     return activities.filter(activity =>
-      isSameDay(parseISO(activity.performedAt), date)
+      isSameDay(startOfDay(parseISO(activity.performedAt)), selected)
     ).sort((a, b) => parseISO(b.performedAt).getTime() - parseISO(a.performedAt).getTime());
   }, [selectedDate, activities]);
 
   const selectedDayData = useMemo(() => {
     if (!selectedDate) return null;
-    return allDays.find(day => day.date.toISOString().slice(0, 10) === selectedDate);
+    const selected = startOfDay(parseISO(selectedDate + 'T00:00:00'));
+    return allDays.find(day => isSameDay(day.date, selected));
   }, [selectedDate, allDays]);
 
   if (!hydrated) {
@@ -275,7 +276,7 @@ export default function StatsPage() {
           ) : (
             <div className="space-y-2">
               {allDays.map((day) => {
-                const dayKey = day.date.toISOString().slice(0, 10);
+                const dayKey = format(day.date, 'yyyy-MM-dd');
                 const isSelected = selectedDate === dayKey;
                 const isCompleted = day.points >= target;
                 

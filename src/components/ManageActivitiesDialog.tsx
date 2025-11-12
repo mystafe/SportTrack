@@ -210,8 +210,8 @@ export function ManageActivitiesDialog() {
                 {/* Activity Name - Turkish and English side by side */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
-                      {t('activities.custom.fields.label')}
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
+                      {t('activities.custom.fields.label')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
                     </label>
                     <input
                       type="text"
@@ -229,8 +229,8 @@ export function ManageActivitiesDialog() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
-                      {t('activities.custom.fields.labelEn')}
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
+                      {t('activities.custom.fields.label')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
                     </label>
                     <input
                       type="text"
@@ -306,8 +306,8 @@ export function ManageActivitiesDialog() {
                 {/* Unit - Turkish and English side by side */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
-                      {t('activities.custom.fields.unit')}
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
+                      {t('activities.custom.fields.unit')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
                     </label>
                     <input
                       type="text"
@@ -325,8 +325,8 @@ export function ManageActivitiesDialog() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
-                      {t('activities.custom.fields.unitEn')}
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
+                      {t('activities.custom.fields.unit')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
                     </label>
                     <input
                       type="text"
@@ -352,8 +352,8 @@ export function ManageActivitiesDialog() {
                 {/* Description - Turkish and English side by side */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
-                      {t('activities.custom.fields.description')}
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
+                      {t('activities.custom.fields.description')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
                     </label>
                     <textarea
                       value={lang === 'tr' ? form.description : form.descriptionEn}
@@ -370,8 +370,8 @@ export function ManageActivitiesDialog() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
-                      {t('activities.custom.fields.descriptionEn')}
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap">
+                      {t('activities.custom.fields.description')} <span className="text-[8px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
                     </label>
                     <textarea
                       value={lang === 'tr' ? form.descriptionEn : form.description}
@@ -388,11 +388,17 @@ export function ManageActivitiesDialog() {
                     />
                   </div>
                 </div>
-                {(lang === 'tr' ? form.descriptionEn.trim() === '' : form.description.trim() === '') && (lang === 'tr' ? form.description.trim() !== '' : form.descriptionEn.trim() !== '') && (
-                  <p className="text-[10px] text-gray-500 -mt-1">
-                    {t('activities.custom.fields.descriptionHint')}
-                  </p>
-                )}
+                {(() => {
+                  const isTr = lang === 'tr';
+                  const trDesc = form.description.trim();
+                  const enDesc = form.descriptionEn.trim();
+                  const showHint = isTr ? (enDesc === '' && trDesc !== '') : (trDesc === '' && enDesc !== '');
+                  return showHint ? (
+                    <p className="text-[10px] text-gray-500 -mt-1">
+                      {t('activities.custom.fields.descriptionHint')}
+                    </p>
+                  ) : null;
+                })()}
                 {error ? <p className="text-xs text-red-500">{error}</p> : null}
                 <div className="flex items-center justify-end gap-2 pt-1">
                   <button

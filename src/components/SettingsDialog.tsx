@@ -6,11 +6,17 @@ import { useI18n } from '@/lib/i18n';
 import { useSettings } from '@/lib/settingsStore';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 import { LIMITS } from '@/lib/constants';
+import { DataExportImport } from '@/components/DataExportImport';
+import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 export function SettingsDialog() {
   const { settings, hydrated, saveSettings } = useSettings();
   const { t } = useI18n();
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  const [showAppSettings, setShowAppSettings] = useState(false);
   const [name, setName] = useState<string>(settings?.name ?? '');
   const [dailyTarget, setDailyTarget] = useState<string>(
     String(settings?.dailyTarget ?? DEFAULT_DAILY_TARGET)
@@ -60,7 +66,48 @@ export function SettingsDialog() {
     setError(null);
   }
 
-  const dialogContent = open ? (
+  // Mobile: Show app settings dialog
+  const appSettingsDialog = isMobile && showAppSettings ? (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-4 overflow-y-auto">
+      <div className="relative w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl p-4 sm:p-6 space-y-4 my-auto">
+        <div>
+          <h2 className="text-lg font-semibold">{t('settings.appSettings')}</h2>
+          <p className="text-xs text-gray-500 mt-1">
+            {t('settings.appSettingsSubtitle')}
+          </p>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+              {t('data.export')} / {t('data.import')}
+            </span>
+            <DataExportImport />
+          </div>
+          <div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+              {t('nav.main')}
+            </span>
+            <div className="flex items-center gap-3">
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-end gap-2 pt-2">
+          <button
+            type="button"
+            className="px-3 py-2 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+            onClick={() => setShowAppSettings(false)}
+          >
+            {t('form.cancel')}
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  // Profile dialog
+  const profileDialog = open ? (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-4 overflow-y-auto">
       <div className="relative w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl p-4 sm:p-6 space-y-4 my-auto">
         <div>
@@ -102,6 +149,28 @@ export function SettingsDialog() {
           {error ? (
             <p className="text-xs text-red-500">{error}</p>
           ) : null}
+          
+          {/* Desktop: Export/Import, Language, Theme */}
+          {!isMobile && (
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
+              <div>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+                  {t('data.export')} / {t('data.import')}
+                </span>
+                <DataExportImport />
+              </div>
+              <div>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+                  {t('nav.main')}
+                </span>
+                <div className="flex items-center gap-3">
+                  <LanguageToggle />
+                  <ThemeToggle />
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div className="flex items-center justify-end gap-2 pt-2">
             {settings ? (
               <button
@@ -131,15 +200,38 @@ export function SettingsDialog() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
-      >
-        {settings?.name ? settings.name : t('settings.setProfile')}
-      </button>
-      {typeof window !== 'undefined' && dialogContent
-        ? createPortal(dialogContent, document.body)
+      {isMobile ? (
+        <>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="px-1.5 py-0.5 text-[11px] rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+          >
+            {settings?.name ? settings.name : t('settings.setProfile')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowAppSettings(true)}
+            className="px-1.5 py-0.5 text-[11px] rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+            title={t('settings.appSettings')}
+          >
+            ⚙️
+          </button>
+        </>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+        >
+          {settings?.name ? settings.name : t('settings.setProfile')}
+        </button>
+      )}
+      {typeof window !== 'undefined' && profileDialog
+        ? createPortal(profileDialog, document.body)
+        : null}
+      {typeof window !== 'undefined' && appSettingsDialog
+        ? createPortal(appSettingsDialog, document.body)
         : null}
     </>
   );

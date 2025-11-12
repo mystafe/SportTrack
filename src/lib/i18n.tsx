@@ -69,7 +69,7 @@ const translations: Translations = {
     en: 'Add, edit or remove personalised activities alongside the defaults.'
   },
   'activities.custom.fields.label': { tr: 'Aktivite Adı', en: 'Activity Name' },
-  'activities.custom.fields.labelEn': { tr: 'Aktivite Adı (English - opsiyonel)', en: 'Activity Name (Turkish - optional)' },
+  'activities.custom.fields.labelEn': { tr: 'Aktivite Adı (EN - opsiyonel)', en: 'Activity Name (TR - optional)' },
   'activities.custom.fields.optional': { tr: 'opsiyonel', en: 'optional' },
   'activities.custom.fields.labelEnHint': {
     tr: 'Boş bırakılırsa Türkçe adı kullanılacak.',
@@ -77,21 +77,21 @@ const translations: Translations = {
   },
   'activities.custom.fields.icon': { tr: 'Emoji/Sembol', en: 'Emoji/Icon' },
   'activities.custom.fields.unit': { tr: 'Birim', en: 'Unit' },
-  'activities.custom.fields.unitEn': { tr: 'Birim (English - opsiyonel)', en: 'Unit (Turkish - optional)' },
+  'activities.custom.fields.unitEn': { tr: 'Birim (EN - opsiyonel)', en: 'Unit (TR - optional)' },
   'activities.custom.fields.unitEnHint': {
     tr: 'Boş bırakılırsa Türkçe birimi kullanılacak.',
     en: 'If left empty, the English unit will be used.'
   },
   'activities.custom.fields.multiplier': { tr: 'Çarpan', en: 'Multiplier' },
-  'activities.custom.fields.defaultAmount': { tr: 'Varsayılan Miktar', en: 'Default Amount' },
+  'activities.custom.fields.defaultAmount': { tr: 'Varsayılan', en: 'Default' },
   'activities.custom.fields.description': { tr: 'Açıklama', en: 'Description' },
-  'activities.custom.fields.descriptionEn': { tr: 'Açıklama (English - opsiyonel)', en: 'Description (Turkish - optional)' },
+  'activities.custom.fields.descriptionEn': { tr: 'Açıklama (EN - opsiyonel)', en: 'Description (TR - optional)' },
   'activities.custom.fields.descriptionHint': {
     tr: 'Boş bırakılırsa Türkçe açıklama kullanılacak.',
     en: 'If left empty, the English description will be used.'
   },
-  'activities.custom.placeholders.description': { tr: 'Açıklama girin', en: 'Enter description' },
-  'activities.custom.placeholders.descriptionEn': { tr: 'Enter description (English)', en: 'Açıklama girin (Türkçe)' },
+  'activities.custom.placeholders.description': { tr: 'Açıklama girin', en: 'Açıklama girin' },
+  'activities.custom.placeholders.descriptionEn': { tr: 'Enter description', en: 'Enter description' },
   'activities.custom.placeholders.label': { tr: 'Örn. Yüzme', en: 'e.g. Swimming' },
   'activities.custom.placeholders.labelEn': { tr: 'Örn. Swimming', en: 'e.g. Swimming' },
   'activities.custom.placeholders.unit': { tr: 'Örn. dakika', en: 'e.g. minutes' },
@@ -273,6 +273,11 @@ const translations: Translations = {
   'settings.subtitle': {
     tr: 'İsmini ve günlük puan hedefini belirle, motivasyonun artsın.',
     en: 'Set your name and daily points goal to stay motivated.'
+  },
+  'settings.appSettings': { tr: 'Uygulama Ayarları', en: 'App Settings' },
+  'settings.appSettingsSubtitle': {
+    tr: 'Dil, tema ve veri yönetimi ayarları',
+    en: 'Language, theme and data management settings'
   },
   'settings.nameLabel': { tr: 'İsmin', en: 'Your name' },
   'settings.namePlaceholder': { tr: 'Örn. Mustafa', en: 'e.g. Alex' },
