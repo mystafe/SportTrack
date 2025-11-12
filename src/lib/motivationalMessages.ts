@@ -12,7 +12,7 @@ type MessageSet = {
   motivational: MotivationalMessage[];
 };
 
-const messagesByMood: Record<Mood, MessageSet> = {
+const messagesByMood: Record<Exclude<Mood, null>, MessageSet> = {
   happy: {
     funny: [
       {
@@ -347,11 +347,6 @@ const messagesByMood: Record<Mood, MessageSet> = {
         emoji: '⚡'
       }
     ]
-  },
-  null: {
-    funny: [],
-    serious: [],
-    motivational: []
   }
 };
 
