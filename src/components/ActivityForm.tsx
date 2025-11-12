@@ -240,13 +240,13 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <label className="space-y-1">
+        <label className="space-y-1 min-w-0">
           <div className="text-sm text-gray-700">{t('form.datetime')}</div>
           <input
             type="datetime-local"
             value={performedAt}
             onChange={(e) => setPerformedAt(e.target.value)}
-            className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
+            className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0 text-sm sm:text-base"
             required
           />
         </label>

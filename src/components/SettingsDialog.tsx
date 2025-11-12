@@ -68,7 +68,14 @@ export function SettingsDialog() {
 
   // Mobile: Show app settings dialog
   const appSettingsDialog = isMobile && showAppSettings ? (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-4 overflow-y-auto">
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-4 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          setShowAppSettings(false);
+        }
+      }}
+    >
       <div className="relative w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl p-4 sm:p-6 space-y-4 my-auto">
         <div>
           <h2 className="text-lg font-semibold">{t('settings.appSettings')}</h2>
@@ -96,10 +103,10 @@ export function SettingsDialog() {
         <div className="flex items-center justify-end gap-2 pt-2">
           <button
             type="button"
-            className="px-3 py-2 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+            className="px-3 py-2 text-xs rounded bg-brand text-white hover:bg-brand-dark shadow"
             onClick={() => setShowAppSettings(false)}
           >
-            {t('form.cancel')}
+            OK
           </button>
         </div>
       </div>
@@ -108,7 +115,17 @@ export function SettingsDialog() {
 
   // Profile dialog
   const profileDialog = open ? (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-4 overflow-y-auto">
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-4 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && settings) {
+          setOpen(false);
+          setError(null);
+          setName(settings.name);
+          setDailyTarget(String(settings.dailyTarget));
+        }
+      }}
+    >
       <div className="relative w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl p-4 sm:p-6 space-y-4 my-auto">
         <div>
           <h2 className="text-lg font-semibold">{t('settings.title')}</h2>

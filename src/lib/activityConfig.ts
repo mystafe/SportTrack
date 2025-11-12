@@ -59,7 +59,9 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     multiplier: 20,
     unit: 'tekrar',
     unitEn: 'reps',
-    defaultAmount: 20
+    defaultAmount: 20,
+    description: 'Tamamlanan şınav tekrar sayısı',
+    descriptionEn: 'Number of push-up repetitions completed'
   },
   {
     key: 'SIT_UP',
@@ -69,7 +71,9 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     multiplier: 10,
     unit: 'tekrar',
     unitEn: 'reps',
-    defaultAmount: 20
+    defaultAmount: 20,
+    description: 'Tamamlanan mekik tekrar sayısı',
+    descriptionEn: 'Number of sit-up repetitions completed'
   },
   {
     key: 'WEIGHT_LIFTING',

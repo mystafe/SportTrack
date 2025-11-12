@@ -73,14 +73,14 @@ const translations: Translations = {
   'activities.custom.fields.optional': { tr: 'opsiyonel', en: 'optional' },
   'activities.custom.fields.labelEnHint': {
     tr: 'Boş bırakılırsa Türkçe adı kullanılacak.',
-    en: 'If left empty, the English name will be used.'
+    en: 'If left empty, the Turkish name will be used.'
   },
   'activities.custom.fields.icon': { tr: 'Emoji/Sembol', en: 'Emoji/Icon' },
   'activities.custom.fields.unit': { tr: 'Birim', en: 'Unit' },
   'activities.custom.fields.unitEn': { tr: 'Birim (EN - opsiyonel)', en: 'Unit (TR - optional)' },
   'activities.custom.fields.unitEnHint': {
     tr: 'Boş bırakılırsa Türkçe birimi kullanılacak.',
-    en: 'If left empty, the English unit will be used.'
+    en: 'If left empty, the Turkish unit will be used.'
   },
   'activities.custom.fields.multiplier': { tr: 'Çarpan', en: 'Multiplier' },
   'activities.custom.fields.defaultAmount': { tr: 'Varsayılan', en: 'Default' },

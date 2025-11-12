@@ -190,7 +190,14 @@ export function ManageActivitiesDialog() {
         {t('activities.custom.manageButton')}
       </button>
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-3 sm:px-4 py-4 overflow-y-auto">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-3 sm:px-4 py-4 overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              closeDialog();
+            }
+          }}
+        >
           <div className="w-full max-w-2xl rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-b border-gray-200 dark:border-gray-800">
               <div>
@@ -249,11 +256,17 @@ export function ManageActivitiesDialog() {
                     />
                   </div>
                 </div>
-                {(lang === 'tr' ? form.labelEn.trim() === '' : form.label.trim() === '') && (lang === 'tr' ? form.label.trim() !== '' : form.labelEn.trim() !== '') && (
-                  <p className="text-[10px] text-gray-500 -mt-1">
-                    {t('activities.custom.fields.labelEnHint')}
-                  </p>
-                )}
+                {(() => {
+                  const isTr = lang === 'tr';
+                  const trLabel = form.label.trim();
+                  const enLabel = form.labelEn.trim();
+                  const showHint = isTr ? (enLabel === '' && trLabel !== '') : (trLabel === '' && enLabel !== '');
+                  return showHint ? (
+                    <p className="text-[10px] text-gray-500 -mt-1">
+                      {t('activities.custom.fields.labelEnHint')}
+                    </p>
+                  ) : null;
+                })()}
 
                 {/* Emoji, Multiplier, DefaultAmount in one row */}
                 <div className="grid grid-cols-3 gap-2">
@@ -345,11 +358,17 @@ export function ManageActivitiesDialog() {
                     />
                   </div>
                 </div>
-                {form.unitEn.trim() === '' && form.unit.trim() !== '' && (
-                  <p className="text-[10px] text-gray-500 -mt-1">
-                    {t('activities.custom.fields.unitEnHint')}
-                  </p>
-                )}
+                {(() => {
+                  const isTr = lang === 'tr';
+                  const trUnit = form.unit.trim();
+                  const enUnit = form.unitEn.trim();
+                  const showHint = isTr ? (enUnit === '' && trUnit !== '') : (trUnit === '' && enUnit !== '');
+                  return showHint ? (
+                    <p className="text-[10px] text-gray-500 -mt-1">
+                      {t('activities.custom.fields.unitEnHint')}
+                    </p>
+                  ) : null;
+                })()}
 
                 {/* Description - Turkish and English side by side */}
                 <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}>
