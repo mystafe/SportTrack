@@ -243,6 +243,12 @@ export function ManageActivitiesDialog() {
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.label') : 'e.g. Swimming'}
                       required
                     />
+                    {/* TR alanı için hint - Türkçe */}
+                    {lang === 'en' && form.label.trim() === '' && form.labelEn.trim() !== '' && (
+                      <p className="text-[10px] text-gray-500 -mt-1">
+                        Boş bırakılırsa Türkçe adı kullanılacak.
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
@@ -259,21 +265,16 @@ export function ManageActivitiesDialog() {
                         }
                       }}
                       className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.labelEn') : 'e.g. Swimming'}
+                      placeholder={lang === 'tr' ? 'e.g. Swimming' : 'Örn. Yüzme'}
                     />
+                    {/* EN alanı için hint - İngilizce */}
+                    {lang === 'tr' && form.labelEn.trim() === '' && form.label.trim() !== '' && (
+                      <p className="text-[10px] text-gray-500 -mt-1">
+                        If left empty, the Turkish name will be used.
+                      </p>
+                    )}
                   </div>
                 </div>
-                {(() => {
-                  const isTr = lang === 'tr';
-                  const trLabel = form.label.trim();
-                  const enLabel = form.labelEn.trim();
-                  const showHint = isTr ? (enLabel === '' && trLabel !== '') : (trLabel === '' && enLabel !== '');
-                  return showHint ? (
-                    <p className="text-[10px] text-gray-500 -mt-1">
-                      {t('activities.custom.fields.labelEnHint')}
-                    </p>
-                  ) : null;
-                })()}
 
                 {/* Emoji, Multiplier, DefaultAmount in one row */}
                 <div className="grid grid-cols-3 gap-2">
@@ -345,6 +346,12 @@ export function ManageActivitiesDialog() {
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.unit') : 'e.g. minutes'}
                       required
                     />
+                    {/* TR alanı için hint - Türkçe */}
+                    {lang === 'en' && form.unit.trim() === '' && form.unitEn.trim() !== '' && (
+                      <p className="text-[10px] text-gray-500 -mt-1">
+                        Boş bırakılırsa Türkçe birimi kullanılacak.
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
@@ -361,21 +368,16 @@ export function ManageActivitiesDialog() {
                         }
                       }}
                       className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.unitEn') : 'e.g. minutes'}
+                      placeholder={lang === 'tr' ? 'e.g. minutes' : 'Örn. dakika'}
                     />
+                    {/* EN alanı için hint - İngilizce */}
+                    {lang === 'tr' && form.unitEn.trim() === '' && form.unit.trim() !== '' && (
+                      <p className="text-[10px] text-gray-500 -mt-1">
+                        If left empty, the Turkish unit will be used.
+                      </p>
+                    )}
                   </div>
                 </div>
-                {(() => {
-                  const isTr = lang === 'tr';
-                  const trUnit = form.unit.trim();
-                  const enUnit = form.unitEn.trim();
-                  const showHint = isTr ? (enUnit === '' && trUnit !== '') : (trUnit === '' && enUnit !== '');
-                  return showHint ? (
-                    <p className="text-[10px] text-gray-500 -mt-1">
-                      {t('activities.custom.fields.unitEnHint')}
-                    </p>
-                  ) : null;
-                })()}
 
                 {/* Description - Turkish and English side by side */}
                 <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}>
