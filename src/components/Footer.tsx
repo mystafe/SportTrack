@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer className="container py-10 text-xs text-gray-500 flex flex-row items-center justify-between gap-2">
       <span>© {new Date().getFullYear()} SportTrack · {t('footer.byName')}</span>
-      <span>v0.5.1 <span className="uppercase tracking-wide">beta</span></span>
+      <span>v0.5.2 <span className="uppercase tracking-wide">beta</span></span>
     </footer>
   );
 }

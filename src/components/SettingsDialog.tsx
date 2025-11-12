@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
-import { useSettings } from '@/lib/settingsStore';
+import { useSettings, Mood } from '@/lib/settingsStore';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 import { LIMITS } from '@/lib/constants';
 import { DataExportImport } from '@/components/DataExportImport';
@@ -21,7 +21,7 @@ export function SettingsDialog() {
   const [dailyTarget, setDailyTarget] = useState<string>(
     String(settings?.dailyTarget ?? DEFAULT_DAILY_TARGET)
   );
-  const [mood, setMood] = useState<string>(settings?.mood ?? '');
+  const [mood, setMood] = useState<Mood>(settings?.mood ?? null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function SettingsDialog() {
     if (settings) {
       setName(settings.name);
       setDailyTarget(String(settings.dailyTarget));
-      setMood(settings.mood ?? '');
+      setMood(settings.mood ?? null);
     }
   }, [settings]);
 
@@ -63,7 +63,7 @@ export function SettingsDialog() {
       name: trimmedName,
       dailyTarget: Math.round(targetValue),
       customActivities: settings?.customActivities ?? [],
-      mood: mood || undefined
+      mood: mood ?? undefined
     });
     setOpen(false);
     setError(null);
@@ -171,8 +171,8 @@ export function SettingsDialog() {
               {t('settings.moodLabel')}
             </span>
             <select
-              value={mood}
-              onChange={(e) => setMood(e.target.value)}
+              value={mood || ''}
+              onChange={(e) => setMood((e.target.value || null) as Mood)}
               className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
             >
               <option value="">{t('settings.moodNone')}</option>
