@@ -259,7 +259,7 @@ export function ManageActivitiesDialog() {
                         }
                       }}
                       className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.labelEn') : 'Örn. Yüzme'}
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.labelEn') : 'e.g. Swimming'}
                     />
                   </div>
                 </div>
@@ -361,7 +361,7 @@ export function ManageActivitiesDialog() {
                         }
                       }}
                       className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.unitEn') : 'Örn. dakika'}
+                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.unitEn') : 'e.g. minutes'}
                     />
                   </div>
                 </div>
