@@ -4,7 +4,7 @@ import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { format, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 
-export type ExportFormat = 'csv' | 'pdf';
+export type ExportFormat = 'csv' | 'pdf' | 'json';
 
 export interface ExportOptions {
   format: ExportFormat;
@@ -214,5 +214,52 @@ export async function exportToPDF(
 
   // Save PDF
   doc.save(`sporttrack-report-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+}
+
+export function exportToJSON(
+  activities: ActivityRecord[],
+  settings: UserSettings | null,
+  options: ExportOptions
+): void {
+  // Filter by date range if provided
+  let filteredActivities = activities;
+  if (options.dateRange) {
+    filteredActivities = activities.filter(activity => {
+      const activityDate = parseISO(activity.performedAt);
+      return activityDate >= options.dateRange!.start && activityDate <= options.dateRange!.end;
+    });
+  }
+
+  // Prepare export data
+  const exportData = {
+    activities: filteredActivities,
+    settings: settings || null,
+    exportDate: new Date().toISOString(),
+    version: '0.14.1', // Will be updated automatically when package.json version changes
+    dateRange: options.dateRange
+      ? {
+          start: options.dateRange.start.toISOString(),
+          end: options.dateRange.end.toISOString()
+        }
+      : null,
+    summary: {
+      totalActivities: filteredActivities.length,
+      totalPoints: filteredActivities.reduce((sum, a) => sum + a.points, 0),
+      averagePoints: filteredActivities.length > 0
+        ? Math.round(filteredActivities.reduce((sum, a) => sum + a.points, 0) / filteredActivities.length)
+        : 0
+    }
+  };
+
+  // Create JSON blob
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sporttrack-backup-${format(new Date(), 'yyyy-MM-dd')}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 

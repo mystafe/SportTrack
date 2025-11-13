@@ -314,6 +314,7 @@ const translations: Translations = {
   'export.export': { tr: 'Dışa Aktar', en: 'Export' },
   'export.csvSuccess': { tr: 'CSV dosyası başarıyla dışa aktarıldı', en: 'CSV file exported successfully' },
   'export.pdfSuccess': { tr: 'PDF raporu başarıyla oluşturuldu', en: 'PDF report created successfully' },
+  'export.jsonSuccess': { tr: 'JSON yedek dosyası başarıyla dışa aktarıldı', en: 'JSON backup file exported successfully' },
   'export.failed': { tr: 'Dışa aktarma başarısız', en: 'Export failed' },
   'export.dateRangeRequired': { tr: 'Lütfen tarih aralığı seçin', en: 'Please select a date range' },
 

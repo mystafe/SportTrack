@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
-import { exportToCSV, exportToPDF, ExportFormat } from '@/lib/exportUtils';
+import { exportToCSV, exportToPDF, exportToJSON, ExportFormat } from '@/lib/exportUtils';
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { format as formatDate, startOfDay, endOfDay, subDays } from 'date-fns';
@@ -65,9 +65,12 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
       if (exportFormat === 'csv') {
         exportToCSV(activities, settings, options);
         showToast(t('export.csvSuccess'), 'success');
-      } else {
+      } else if (exportFormat === 'pdf') {
         await exportToPDF(activities, settings, options);
         showToast(t('export.pdfSuccess'), 'success');
+      } else if (exportFormat === 'json') {
+        exportToJSON(activities, settings, options);
+        showToast(t('export.jsonSuccess'), 'success');
       }
 
       onClose();
@@ -107,7 +110,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
             <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
               {t('export.format')}
             </label>
-            <div className="flex gap-2">
+            <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-2`}>
               <button
                 type="button"
                 onClick={() => setExportFormat('csv')}
@@ -129,6 +132,17 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
                 }`}
               >
                 PDF
+              </button>
+              <button
+                type="button"
+                onClick={() => setExportFormat('json')}
+                className={`flex-1 px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                  exportFormat === 'json'
+                    ? 'bg-gradient-to-r from-brand to-brand-dark text-white border-brand shadow-md'
+                    : 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600'
+                }`}
+              >
+                JSON
               </button>
             </div>
           </div>

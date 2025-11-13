@@ -2,6 +2,27 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.14.2] - 2025-01
+
+### Added
+- **JSON Export Format**:
+  - Added JSON export option to ExportDialog
+  - JSON export includes all activities, settings, export date, version, date range, and summary statistics
+  - Full backup/restore capability for data migration
+  - JSON format compatible with existing import functionality
+  - Export file name: `sporttrack-backup-YYYY-MM-DD.json`
+
+### Changed
+- **ExportDialog**:
+  - Added JSON format button alongside CSV and PDF
+  - Format buttons now stack vertically on mobile for better UX
+  - JSON export respects date range filters (all time, last 7 days, last 30 days, custom range)
+
+### Fixed
+- **Export Functionality**:
+  - JSON export now available through ExportDialog (previously only available through DataExportImport component)
+  - Consistent export experience across all formats
+
 ## [0.14.1] - 2025-01
 
 ### Fixed
