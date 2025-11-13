@@ -17,6 +17,7 @@ import { PersonalRecords } from '@/components/PersonalRecords';
 import { ActivityTimeAnalysis } from '@/components/ActivityTimeAnalysis';
 import { PeriodComparison } from '@/components/PeriodComparison';
 import { DurationStats } from '@/components/DurationStats';
+import { ActivityTypeTrend } from '@/components/ActivityTypeTrend';
 
 export default function StatsPage() {
   const { t, lang } = useI18n();
@@ -399,6 +400,9 @@ export default function StatsPage() {
 
       {/* Duration Stats */}
       <DurationStats />
+
+      {/* Activity Type Trend */}
+      <ActivityTypeTrend />
     </div>
   );
 }

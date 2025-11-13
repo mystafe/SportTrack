@@ -1,0 +1,189 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import { useI18n } from '@/lib/i18n';
+import { useActivities } from '@/lib/activityStore';
+import { calculateActivityTrends, getTopActivityTypes, type ActivityTypeTrend } from '@/lib/activityTrendUtils';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { format, parseISO } from 'date-fns';
+import { enUS, tr } from 'date-fns/locale';
+
+export function ActivityTypeTrend() {
+  const { t, lang } = useI18n();
+  const { activities, hydrated } = useActivities();
+  const isMobile = useIsMobile();
+  const dateLocale = lang === 'tr' ? tr : enUS;
+  const [trendDays, setTrendDays] = useState<7 | 30 | 90>(30);
+
+  const trends = useMemo(() => {
+    if (!hydrated || activities.length === 0) return [];
+    return calculateActivityTrends(activities, trendDays);
+  }, [activities, hydrated, trendDays]);
+
+  const topTrends = useMemo(() => {
+    return getTopActivityTypes(trends, 5);
+  }, [trends]);
+
+  const chartData = useMemo(() => {
+    if (topTrends.length === 0) return [];
+
+    // Create a map of dates to data points
+    const dateMap = new Map<string, Record<string, number | string>>();
+    
+    topTrends.forEach(trend => {
+      trend.dailyData.forEach(day => {
+        if (!dateMap.has(day.date)) {
+          dateMap.set(day.date, { date: day.date });
+        }
+        const dayData = dateMap.get(day.date)!;
+        dayData[trend.activityKey] = day.points;
+      });
+    });
+
+    return Array.from(dateMap.values())
+      .sort((a, b) => (a.date as string).localeCompare(b.date as string))
+      .map(item => ({
+        ...item,
+        dateLabel: format(parseISO(item.date as string), 'd MMM', { locale: dateLocale })
+      }));
+  }, [topTrends, dateLocale]);
+
+  if (!hydrated) {
+    return null;
+  }
+
+  if (trends.length === 0) {
+    return (
+      <section className="mt-8 space-y-4">
+        <div>
+          <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 dark:text-white`}>
+            {t('activityTrend.title')}
+          </h2>
+          <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400 mt-1`}>
+            {t('activityTrend.subtitle')}
+          </p>
+        </div>
+        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-card">
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+            {t('activityTrend.noData')}
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'];
+
+  return (
+    <section className="mt-8 space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 dark:text-white`}>
+            {t('activityTrend.title')}
+          </h2>
+          <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400 mt-1`}>
+            {t('activityTrend.subtitle')}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {([7, 30, 90] as const).map((days) => (
+            <button
+              key={days}
+              onClick={() => setTrendDays(days)}
+              className={`px-2 py-1 text-xs rounded transition-colors ${
+                trendDays === days
+                  ? 'bg-brand text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+              }`}
+            >
+              {days} {lang === 'tr' ? 'gün' : 'days'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
+        {chartData.length === 0 ? (
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+            {t('activityTrend.noData')}
+          </p>
+        ) : (
+          <div className="space-y-4">
+            <ResponsiveContainer width="100%" height={isMobile ? 250 : 350}>
+              <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis
+                  dataKey="dateLabel"
+                  stroke="#6b7280"
+                  fontSize={isMobile ? 10 : 12}
+                  tick={{ fill: '#6b7280' }}
+                />
+                <YAxis
+                  stroke="#6b7280"
+                  fontSize={isMobile ? 10 : 12}
+                  tick={{ fill: '#6b7280' }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: isMobile ? '12px' : '14px'
+                  }}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: isMobile ? '10px' : '12px' }}
+                />
+                {topTrends.map((trend, index) => (
+                  <Line
+                    key={trend.activityKey}
+                    type="monotone"
+                    dataKey={trend.activityKey}
+                    name={`${trend.icon} ${trend.label}`}
+                    stroke={colors[index % colors.length]}
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+
+            {/* Summary Cards */}
+            <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-3 mt-4`}>
+              {topTrends.map((trend, index) => (
+                <div
+                  key={trend.activityKey}
+                  className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-3"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl">{trend.icon}</span>
+                    <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-900 dark:text-white`}>
+                      {trend.label}
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                      <span>{t('activityTrend.totalCount')}</span>
+                      <span className="font-medium">{trend.totalCount}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                      <span>{t('activityTrend.totalPoints')}</span>
+                      <span className="font-medium text-brand">{trend.totalPoints.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                      <span>{t('activityTrend.avgPerDay')}</span>
+                      <span className="font-medium">{trend.averagePerDay}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+

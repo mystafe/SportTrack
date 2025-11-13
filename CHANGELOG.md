@@ -2,6 +2,16 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.9.2] - 2025-01
+
+### Added
+- **Aktivite Türleri Trend Analizi**: Zaman içinde aktivite türlerinin performans analizi
+  - En çok kullanılan 5 aktivite türü için trend grafikleri
+  - 7, 30, 90 günlük trend görünümleri
+  - Line chart ile aktivite türlerinin zaman içindeki puan dağılımı
+  - Her aktivite türü için özet kartları (toplam, toplam puan, günlük ortalama)
+  - ActivityTypeTrend bileşeni ve activityTrendUtils utility fonksiyonları
+
 ## [0.9.1] - 2025-01
 
 ### Changed

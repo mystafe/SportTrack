@@ -593,6 +593,19 @@ const translations: Translations = {
   'timer.running': { tr: 'Çalışıyor...', en: 'Running...' },
   'timer.paused': { tr: 'Duraklatıldı', en: 'Paused' },
 
+  'activityTrend.title': { tr: 'Aktivite Türleri Trend Analizi', en: 'Activity Type Trend Analysis' },
+  'activityTrend.subtitle': {
+    tr: 'Zaman içinde aktivite türlerinizin performansını görüntüleyin.',
+    en: 'View your activity types performance over time.'
+  },
+  'activityTrend.noData': {
+    tr: 'Henüz trend verisi yok.',
+    en: 'No trend data yet.'
+  },
+  'activityTrend.totalCount': { tr: 'Toplam', en: 'Total' },
+  'activityTrend.totalPoints': { tr: 'Toplam Puan', en: 'Total Points' },
+  'activityTrend.avgPerDay': { tr: 'Günlük Ortalama', en: 'Daily Avg' },
+
   'timeAnalysis.title': { tr: 'Zaman Analizi', en: 'Time Analysis' },
   'timeAnalysis.subtitle': { tr: 'En aktif olduğun saatler ve günler', en: 'Your most active hours and days' },
   'timeAnalysis.mostActiveHour': { tr: 'En Aktif Saat', en: 'Most Active Hour' },
