@@ -10,7 +10,7 @@ import { QuickAdd } from '@/components/QuickAdd';
 import { ActivityTemplates } from '@/components/ActivityTemplates';
 import { useActivitiesSummary, useActivities } from '@/lib/activityStore';
 import { getRandomQuote, type Quote } from '@/lib/quotes';
-import { getMotivationalMessage } from '@/lib/motivationalMessages';
+import { getMotivationalMessage, type MotivationalMessage } from '@/lib/motivationalMessages';
 import { startOfDay, isSameDay } from 'date-fns';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
