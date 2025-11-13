@@ -101,7 +101,7 @@ export function QuickAdd() {
             <button
               key={definition.key}
               type="button"
-              onClick={() => handleQuickAdd(definition)}
+              onClick={() => handleQuickAddClick(definition)}
               disabled={isAddingThis}
               className={`
                 relative flex flex-col items-center justify-center gap-1.5
@@ -133,6 +133,26 @@ export function QuickAdd() {
           );
         })}
       </div>
+
+      <ConfirmDialog
+        open={!!confirmActivity}
+        title={t('quickAdd.confirmTitle')}
+        message={
+          confirmActivity
+            ? t('quickAdd.confirmMessage', {
+                activity: getActivityLabel(confirmActivity, lang),
+                amount: String(confirmActivity.defaultAmount),
+                unit: getActivityUnit(confirmActivity, lang),
+                points: String(confirmActivity.defaultAmount * confirmActivity.multiplier)
+              })
+            : ''
+        }
+        variant="default"
+        confirmLabel={t('quickAdd.confirmAdd')}
+        cancelLabel={t('form.cancel')}
+        onConfirm={handleConfirmAdd}
+        onCancel={handleCancelAdd}
+      />
     </div>
   );
 }
