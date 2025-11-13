@@ -2,6 +2,25 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.12.7] - 2025-01
+
+### Fixed
+- **ScrollToTop Button**: Fixed visibility and positioning - button now appears correctly above QuoteTicker
+  - Increased z-index to z-[60] (above QuoteTicker's z-40)
+  - Adjusted bottom positioning (bottom-24 mobile, bottom-20 desktop) to account for QuoteTicker height
+  - Enhanced visual design with gradient background, glow effect, and subtle bounce animation
+  - Improved button size (w-12 h-12 mobile, w-14 h-14 desktop) for better visibility
+  - Added i18n support for button label
+
+### Improved
+- **ScrollToTop Visual Design**:
+  - Added gradient background (from-brand via-brand to-brand-dark)
+  - Added glow effect with pulse animation
+  - Added subtle bounce animation (bounceSubtle)
+  - Enhanced shadow (shadow-2xl)
+  - Better border styling (border-2 border-white/20)
+  - Larger icon size for better visibility
+
 ## [0.12.6] - 2025-01
 
 ### Changed

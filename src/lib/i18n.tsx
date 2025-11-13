@@ -15,6 +15,7 @@ const translations: Translations = {
   'nav.challenges': { tr: 'Hedefler', en: 'Goals' },
   'nav.main': { tr: 'Ana navigasyon', en: 'Main navigation' },
   'nav.home': { tr: 'Ana sayfa', en: 'Home page' },
+  'scrollToTop': { tr: 'Yukarı çık', en: 'Scroll to top' },
   'header.overviewTitle': { tr: 'Genel Bakış', en: 'Overview' },
   'header.overviewSubtitle': {
     tr: 'Günlük puan hedefin doğrultusunda ilerlemeni takip et.',

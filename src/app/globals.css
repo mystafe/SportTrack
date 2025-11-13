@@ -2067,6 +2067,20 @@ html {
   animation: emojiCelebrate 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Subtle bounce animation for scroll to top button */
+@keyframes bounceSubtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounceSubtle 2s ease-in-out infinite;
+}
+
 /* Mobile-specific navbar enhancements */
 @media (max-width: 640px) {
   .nav-icon:active span {
