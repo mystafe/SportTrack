@@ -2,6 +2,41 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.13.5] - 2025-01
+
+### Added
+- **Error Boundary Component**:
+  - Added React Error Boundary for graceful error handling
+  - User-friendly error fallback UI with reload and reset options
+  - Development mode error details display
+  - Prevents entire app crash on component errors
+  - Beautiful error UI with emoji and clear messaging
+- **Typography Scale System**:
+  - Added consistent typography utility classes
+  - `text-heading-1`, `text-heading-2`, `text-heading-3` for headings
+  - `text-body`, `text-body-small` for body text
+  - `text-label` for form labels and small text
+  - Consistent font sizes across the application
+- **Spacing Scale System**:
+  - Added consistent spacing utility classes
+  - `spacing-xs` (gap-2), `spacing-sm` (gap-3), `spacing-md` (gap-4)
+  - `spacing-lg` (gap-6), `spacing-xl` (gap-8)
+  - Better spacing consistency across components
+
+### Changed
+- **Container Padding**:
+  - Increased desktop container padding from `px-4` to `px-6` for better spacing
+  - Mobile padding remains `px-4` for optimal use of space
+- **Component Updates**:
+  - Updated `StatsCards` and `StatsHighlights` to use new spacing utilities
+  - Better visual consistency across stats components
+
+### Fixed
+- **Error Handling**:
+  - App no longer crashes completely on component errors
+  - Better error recovery with reload and reset options
+  - Error messages displayed in development mode for debugging
+
 ## [0.13.4] - 2025-01
 
 ### Added

@@ -123,7 +123,7 @@ export function StatsCards() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="spacing-lg">
       {showConfetti && (
         <>
           {Array.from({ length: 30 }).map((_, i) => (

@@ -30,7 +30,53 @@ body {
 }
 
 .container {
-  @apply max-w-5xl mx-auto px-4 sm:px-4;
+  @apply max-w-5xl mx-auto px-4 sm:px-6;
+}
+
+/* Typography Scale - Consistent font sizes */
+.text-heading-1 {
+  @apply text-2xl sm:text-3xl font-bold;
+}
+
+.text-heading-2 {
+  @apply text-xl sm:text-2xl font-bold;
+}
+
+.text-heading-3 {
+  @apply text-lg sm:text-xl font-semibold;
+}
+
+.text-body {
+  @apply text-sm sm:text-base font-medium;
+}
+
+.text-body-small {
+  @apply text-xs sm:text-sm font-medium;
+}
+
+.text-label {
+  @apply text-xs sm:text-sm font-semibold;
+}
+
+/* Spacing Scale - Consistent spacing */
+.spacing-xs {
+  @apply gap-2;
+}
+
+.spacing-sm {
+  @apply gap-3;
+}
+
+.spacing-md {
+  @apply gap-4;
+}
+
+.spacing-lg {
+  @apply gap-6;
+}
+
+.spacing-xl {
+  @apply gap-8;
 }
 
 /* Safe area support for iOS */

@@ -14,30 +14,33 @@ import { NotificationManager } from '@/components/NotificationManager';
 import { OnboardingManager } from '@/components/OnboardingManager';
 import { KeyboardShortcuts } from '@/components/KeyboardShortcuts';
 import { BadgeUnlockNotification } from '@/components/BadgeUnlockNotification';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <I18nProvider>
-      <SettingsProvider>
-        <ActivitiesProvider>
-          <LevelProvider>
-            <ChallengeProvider>
-              <BadgeProvider>
-                <ToasterProvider>
-                  <StorageErrorHandler />
-                  <InstallPrompt />
-                  <NotificationManager />
-                  <OnboardingManager />
-                  <KeyboardShortcuts />
-                  <BadgeUnlockNotification />
-                  {children}
-                </ToasterProvider>
-              </BadgeProvider>
-            </ChallengeProvider>
-          </LevelProvider>
-        </ActivitiesProvider>
-      </SettingsProvider>
-    </I18nProvider>
+    <ErrorBoundary>
+      <I18nProvider>
+        <SettingsProvider>
+          <ActivitiesProvider>
+            <LevelProvider>
+              <ChallengeProvider>
+                <BadgeProvider>
+                  <ToasterProvider>
+                    <StorageErrorHandler />
+                    <InstallPrompt />
+                    <NotificationManager />
+                    <OnboardingManager />
+                    <KeyboardShortcuts />
+                    <BadgeUnlockNotification />
+                    {children}
+                  </ToasterProvider>
+                </BadgeProvider>
+              </ChallengeProvider>
+            </LevelProvider>
+          </ActivitiesProvider>
+        </SettingsProvider>
+      </I18nProvider>
+    </ErrorBoundary>
   );
 }
 
