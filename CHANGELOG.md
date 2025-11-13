@@ -2,6 +2,22 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.14.1] - 2025-01
+
+### Fixed
+- **Translation Keys**:
+  - Added missing `stats.averageDaily` translation key (TR: "Ortalama Günlük", EN: "Average Daily")
+  - Added missing `stats.perActivity` translation key (TR: "Aktivite Başına", EN: "Per Activity")
+  - Removed fallback strings from `StatsCards` component
+- **Visual Consistency**:
+  - Updated `DurationStats` component to use new typography and spacing scale systems
+  - Updated `PeriodComparison` component to use consistent card design system
+  - Updated `ActivityTimeAnalysis` component to use consistent card design and typography
+  - Updated `ActivityTypeTrend` component to use consistent card design and typography
+  - Replaced old card styles (`rounded-lg border border-`, `shadow-card`, `hover-lift`) with new unified system
+  - Applied `text-heading-3` and `text-body` typography classes throughout
+  - Applied `spacing-md` and `spacing-lg` spacing utilities throughout
+
 ## [0.14.0] - 2025-01
 
 ### Added

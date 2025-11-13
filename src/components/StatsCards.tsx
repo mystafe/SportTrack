@@ -182,11 +182,11 @@ export const StatsCards = memo(function StatsCards() {
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold`}>{t('stats.streakDesc')}</div>
         </div>
         <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.averageDaily') || 'Average Daily'}</div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.averageDaily')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold transition-all duration-300 text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(Math.round(summary.totalPoints / Math.max(1, summary.totalActivities)))}
           </div>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold`}>{t('stats.perActivity') || 'Per Activity'}</div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold`}>{t('stats.perActivity')}</div>
         </div>
           </div>
         )}

@@ -99,21 +99,21 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
   }
 
   return (
-    <div className="space-y-6">
+    <div className="spacing-lg">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h2 className="text-heading-3 text-gray-900 dark:text-white mb-4">
           {t('timeAnalysis.title')}
         </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-body text-gray-600 dark:text-gray-400 mb-4">
           {t('timeAnalysis.subtitle')}
         </p>
       </div>
 
       {/* Summary Cards */}
       {(mostActiveHour || mostActiveDay) && (
-        <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
+        <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} spacing-md`}>
           {mostActiveHour && (
-            <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+            <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300">
               <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                 {t('timeAnalysis.mostActiveHour')}
               </div>
@@ -126,7 +126,7 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
             </div>
           )}
           {mostActiveDay && (
-            <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+            <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300">
               <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                 {t('timeAnalysis.mostActiveDay')}
               </div>

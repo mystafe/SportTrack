@@ -186,6 +186,14 @@ const translations: Translations = {
     tr: 'Ortalama günlük puan',
     en: 'Average daily points'
   },
+  'stats.averageDaily': {
+    tr: 'Ortalama Günlük',
+    en: 'Average Daily'
+  },
+  'stats.perActivity': {
+    tr: 'Aktivite Başına',
+    en: 'Per Activity'
+  },
   'stats.highlight.totalDays': {
     tr: '{count} gün kayıt',
     en: '{count} days recorded'

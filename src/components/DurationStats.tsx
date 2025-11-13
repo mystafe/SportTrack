@@ -27,17 +27,17 @@ export const DurationStats = memo(function DurationStats() {
 
   if (!stats || stats.daysWithDuration === 0) {
     return (
-      <section className="mt-8 space-y-4">
+      <section className="mt-8 spacing-md">
         <div>
-          <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 dark:text-white`}>
+          <h2 className="text-heading-3 text-gray-900 dark:text-white">
             {t('stats.duration.title')}
           </h2>
-          <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400 mt-1`}>
+          <p className="text-body text-gray-600 dark:text-gray-400 mt-1">
             {t('stats.duration.subtitle')}
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-card">
-          <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-6 shadow-md">
+          <p className="text-body text-gray-600 dark:text-gray-400 text-center">
             {t('stats.duration.noDurationData')}
           </p>
         </div>
@@ -46,18 +46,18 @@ export const DurationStats = memo(function DurationStats() {
   }
 
   return (
-    <section className="mt-8 space-y-4">
+    <section className="mt-8 spacing-md">
       <div>
-        <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 dark:text-white`}>
+        <h2 className="text-heading-3 text-gray-900 dark:text-white">
           {t('stats.duration.title')}
         </h2>
-        <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400 mt-1`}>
+        <p className="text-body text-gray-600 dark:text-gray-400 mt-1">
           {t('stats.duration.subtitle')}
         </p>
       </div>
 
-      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-4'} gap-4`}>
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
+      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-4'} spacing-md`}>
+        <div className={`card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300`}>
           <div className="text-label text-gray-700 dark:text-gray-300">
             {t('stats.duration.averageDaily')}
           </div>

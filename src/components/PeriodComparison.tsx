@@ -47,20 +47,20 @@ export const PeriodComparison = memo(function PeriodComparison() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="spacing-lg">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h2 className="text-heading-3 text-gray-900 dark:text-white mb-4">
           {t('comparison.title')}
         </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-body text-gray-600 dark:text-gray-400 mb-4">
           {t('comparison.subtitle')}
         </p>
       </div>
 
       {/* Weekly Comparison */}
       {weekComparison && (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+          <h3 className="text-heading-3 text-gray-900 dark:text-white mb-4">
             {t('comparison.weekly')}
           </h3>
           
@@ -155,8 +155,8 @@ export const PeriodComparison = memo(function PeriodComparison() {
 
       {/* Monthly Comparison */}
       {monthComparison && (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+          <h3 className="text-heading-3 text-gray-900 dark:text-white mb-4">
             {t('comparison.monthly')}
           </h3>
           
