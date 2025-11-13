@@ -250,5 +250,5 @@ export const PeriodComparison = memo(function PeriodComparison() {
       )}
     </div>
   );
-}
+});
 

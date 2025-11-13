@@ -195,5 +195,5 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
       </div>
     </section>
   );
-}
+});
 
