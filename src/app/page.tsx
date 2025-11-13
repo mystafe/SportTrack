@@ -9,7 +9,6 @@ import { StatsHighlights } from '@/components/StatsHighlights';
 import { QuickAdd } from '@/components/QuickAdd';
 import { ActivityTemplates } from '@/components/ActivityTemplates';
 import { useActivitiesSummary, useActivities } from '@/lib/activityStore';
-import { getRandomQuote, type Quote } from '@/lib/quotes';
 import { getMotivationalMessage, type MotivationalMessage } from '@/lib/motivationalMessages';
 import { startOfDay, isSameDay } from 'date-fns';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -26,20 +25,6 @@ export default function HomePage() {
     ? t('header.greeting', { name: settings!.name })
     : t('header.overviewTitle');
   
-  // Random quote on mount and rotate every 10 seconds - client-side only to avoid hydration mismatch
-  const [quote, setQuote] = useState<Quote | null>(null);
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-    setQuote(getRandomQuote());
-    
-    const interval = setInterval(() => {
-      setQuote(getRandomQuote());
-    }, 10000); // Rotate quote every 10 seconds
-    
-    return () => clearInterval(interval);
-  }, []);
   
   // Motivational message based on progress - client-side only to avoid hydration mismatch
   const todayActivities = useMemo(() => {
@@ -91,43 +76,6 @@ export default function HomePage() {
         >
           {t('actions.addActivity')}
         </Link>
-      </div>
-      
-      {/* Motivational Quote - Extraordinary Design */}
-      <div className="quote-card glow-border relative rounded-xl border-2 border-brand/30 dark:border-brand/40 p-6 sm:p-8 shadow-2xl card-entrance quote-card-entrance overflow-hidden">
-        {/* Decorative elements */}
-        <div className="quote-dots"></div>
-        <div className="pattern-overlay"></div>
-        <div className="quote-shimmer"></div>
-        
-        {/* Sparkle particles */}
-        <div className="sparkle sparkle-enhanced"></div>
-        <div className="sparkle sparkle-enhanced"></div>
-        <div className="sparkle sparkle-enhanced"></div>
-        <div className="sparkle sparkle-enhanced"></div>
-        <div className="sparkle sparkle-enhanced"></div>
-        
-        {/* Quote marks */}
-        <span className="quote-mark quote-mark-left">"</span>
-        <span className="quote-mark quote-mark-right">"</span>
-        
-        {/* Quote text */}
-        <div className="relative z-50">
-          {mounted && quote ? (
-            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-bold leading-relaxed`} style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}>
-              {lang === 'tr' ? quote.tr : quote.en}
-            </p>
-          ) : (
-            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-bold leading-relaxed`} style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}>
-              {lang === 'tr' ? 'Her gün biraz daha ileri git.' : 'Every day is an opportunity, make the most of it.'}
-            </p>
-          )}
-        </div>
-        
-        {/* Decorative icon */}
-        <div className="absolute top-4 right-4 text-2xl opacity-15 icon-rotate z-10">
-          ✨
-        </div>
       </div>
       
       {/* Motivational Message - Enhanced Design */}

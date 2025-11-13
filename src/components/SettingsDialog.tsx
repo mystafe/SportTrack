@@ -23,7 +23,7 @@ export function SettingsDialog() {
   const keyboardShortcuts = useKeyboardShortcuts();
   const [open, setOpen] = useState(false);
   const [showAppSettings, setShowAppSettings] = useState(false);
-  const [name, setName] = useState<string>(settings?.name ?? '');
+  const [name, setName] = useState<string>(settings?.name ?? 'user');
   const [dailyTarget, setDailyTarget] = useState<string>(
     String(settings?.dailyTarget ?? DEFAULT_DAILY_TARGET)
   );
@@ -32,8 +32,11 @@ export function SettingsDialog() {
 
   useEffect(() => {
     if (!hydrated) return;
-    if (!settings || !settings.name || !settings.dailyTarget) {
-      setOpen(true);
+    // Only show dialog if onboarding is completed and user hasn't set name/target yet
+    const onboardingCompleted = typeof window !== 'undefined' && localStorage.getItem('onboarding_completed') === 'true';
+    if (onboardingCompleted && (!settings || !settings.name || !settings.dailyTarget)) {
+      // Don't force, just show option
+      // setOpen(true);
     }
   }, [hydrated, settings]);
 
@@ -51,11 +54,7 @@ export function SettingsDialog() {
 
   function submit(e: FormEvent) {
     e.preventDefault();
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      setError(t('settings.errors.nameRequired'));
-      return;
-    }
+    const trimmedName = name.trim() || 'user';
     const targetValue = Number(dailyTarget);
     if (!Number.isFinite(targetValue) || targetValue <= 0) {
       setError(t('settings.errors.targetPositive'));
@@ -180,27 +179,26 @@ export function SettingsDialog() {
     >
       <div className="relative w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl p-4 sm:p-6 space-y-4 my-auto">
         <div>
-          <h2 className="text-lg font-semibold">{t('settings.title')}</h2>
-          <p className="text-xs text-gray-500 mt-1">
+          <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold`}>{t('settings.title')}</h2>
+          <p className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mt-0.5`}>
             {t('settings.subtitle')}
           </p>
         </div>
-        <form className="space-y-4" onSubmit={submit}>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+        <form className={`${isMobile ? 'space-y-2.5' : 'space-y-3'}`} onSubmit={submit}>
+          <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
+            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300`}>
               {t('settings.nameLabel')}
             </span>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+              className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} bg-white dark:bg-gray-900`}
               placeholder={t('settings.namePlaceholder')}
-              required
             />
           </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+          <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
+            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300`}>
               {t('settings.goalLabel')}
             </span>
             <input
@@ -210,19 +208,18 @@ export function SettingsDialog() {
               step={100}
               value={dailyTarget}
               onChange={(e) => setDailyTarget(e.target.value)}
-              className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+              className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} bg-white dark:bg-gray-900`}
               placeholder="10000"
-              required
             />
           </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+          <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
+            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300`}>
               {t('settings.moodLabel')}
             </span>
             <select
               value={mood || ''}
               onChange={(e) => setMood((e.target.value || null) as Mood)}
-              className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+              className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} bg-white dark:bg-gray-900`}
             >
               <option value="">{t('settings.moodNone')}</option>
               <option value="happy">{t('settings.moodHappy')}</option>
@@ -232,12 +229,37 @@ export function SettingsDialog() {
               <option value="tired">{t('settings.moodTired')}</option>
             </select>
           </label>
-          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-            <LevelDisplay />
-          </div>
+          {!isMobile && (
+            <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+              <LevelDisplay />
+            </div>
+          )}
           {error ? (
-            <p className="text-xs text-red-500">{error}</p>
+            <p className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-red-500`}>{error}</p>
           ) : null}
+          
+          <div className={`${isMobile ? 'pt-2' : 'pt-3'} flex ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
+            <button
+              type="submit"
+              className={`flex-1 px-3 py-1.5 ${isMobile ? 'text-xs' : 'text-sm'} rounded bg-brand text-white hover:bg-brand-dark transition-colors`}
+            >
+              {t('settings.save') || 'Save'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                setError(null);
+                if (settings) {
+                  setName(settings.name || 'user');
+                  setDailyTarget(String(settings.dailyTarget || DEFAULT_DAILY_TARGET));
+                }
+              }}
+              className={`px-3 py-1.5 ${isMobile ? 'text-xs' : 'text-sm'} rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors`}
+            >
+              {t('form.cancel')}
+            </button>
+          </div>
           
           {/* Desktop: Export/Import, Language, Theme */}
           {!isMobile && (
@@ -259,29 +281,6 @@ export function SettingsDialog() {
               </div>
             </div>
           )}
-          
-          <div className="flex items-center justify-end gap-2 pt-2">
-            {settings ? (
-              <button
-                type="button"
-                className="px-3 py-2 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
-                  onClick={() => {
-                    setOpen(false);
-                    setError(null);
-                    setName(settings.name);
-                    setDailyTarget(String(settings.dailyTarget));
-                  }}
-              >
-                {t('form.cancel')}
-              </button>
-            ) : null}
-            <button
-              type="submit"
-              className="px-3 py-2 text-xs rounded bg-brand text-white hover:bg-brand-dark shadow"
-            >
-              {t('settings.save')}
-            </button>
-          </div>
         </form>
       </div>
     </div>

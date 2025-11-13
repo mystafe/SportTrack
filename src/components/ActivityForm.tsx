@@ -12,7 +12,6 @@ import { useBadges } from '@/lib/badgeStore';
 import { useLevel } from '@/lib/levelStore';
 import { useChallenges } from '@/lib/challengeStore';
 import { notificationService } from '@/lib/notificationService';
-import { ActivityTimer } from '@/components/ActivityTimer';
 
 function toLocalInputValue(date: Date) {
   const year = date.getFullYear();
@@ -37,7 +36,6 @@ type ActivityFormInitial = Pick<
   | 'performedAt'
   | 'note'
   | 'isCustom'
-  | 'duration'
 >;
 
 type ActivityFormProps = {
@@ -112,7 +110,6 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
     initial?.amount ? String(initial.amount) : String(fallbackDefinition?.defaultAmount ?? definitions[0]?.defaultAmount ?? 10)
   );
   const [note, setNote] = useState<string>(initial?.note ?? '');
-  const [duration, setDuration] = useState<number>(initial?.duration ?? 0);
   const [loading, setLoading] = useState(false);
 
   const definition =
@@ -173,8 +170,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           definition,
           amount: amountValue,
           note: note || undefined,
-          performedAt: performedAtISO,
-          duration: duration > 0 ? duration : undefined
+          performedAt: performedAtISO
         });
         showToast(t('toast.activityUpdated'), 'success');
         onSaved?.();
@@ -184,8 +180,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           definition,
           amount: amountValue,
           note: note || undefined,
-          performedAt: performedAtISO,
-          duration: duration > 0 ? duration : undefined
+          performedAt: performedAtISO
         });
         showToast(t('toast.activityAdded'), 'success');
         
@@ -193,9 +188,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         setTimeout(() => {
           const newBadges = checkNewBadges();
           if (newBadges.length > 0) {
+            // Badge unlock notification will be shown by BadgeUnlockNotification component
             newBadges.forEach(badge => {
-              showToast(`${badge.icon} ${badge.name[lang]}`, 'success');
-              // Show notification for badge unlock
               notificationService.showBadgeUnlocked(lang as 'tr' | 'en', badge.name[lang], badge.icon);
             });
           }
@@ -222,7 +216,6 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         
         setAmount(String(definition.defaultAmount));
         setNote('');
-        setDuration(0);
         setPerformedAt(toLocalInputValue(new Date()));
         onCreated?.();
         // Only redirect if onCreated callback doesn't handle it
@@ -329,27 +322,6 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           </div>
         </label>
       </div>
-      {!isEditing && (
-        <div className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 flex items-center gap-2`}>
-            <span>⏱️</span>
-            <span>{t('timer.title')}</span>
-            {duration > 0 && (
-              <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 ml-auto`}>
-                ({Math.floor(duration / 60)} {lang === 'tr' ? 'dakika' : 'min'})
-              </span>
-            )}
-          </div>
-          <div className={`${isMobile ? 'rounded-lg p-2.5' : 'rounded-xl p-4'} border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm shadow-sm`}>
-            <ActivityTimer
-              onDurationChange={(newDuration) => {
-                setDuration(newDuration);
-              }}
-              initialDuration={duration}
-            />
-          </div>
-        </div>
-      )}
       <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
         <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300`}>{t('form.noteOptional')}</div>
         <textarea

@@ -165,17 +165,23 @@ export function ManageActivitiesDialog() {
         return;
       }
     }
+    
+    // Use first language value if second language is empty
+    const labelEn = form.labelEn.trim() || trimmedLabel;
+    const unitEn = form.unitEn.trim() || form.unit.trim();
+    const descriptionEn = form.descriptionEn.trim() || form.description.trim() || undefined;
+    
     const payload: CustomActivityDefinition = {
       id,
       label: trimmedLabel,
-      labelEn: form.labelEn.trim() || undefined,
+      labelEn: labelEn !== trimmedLabel ? labelEn : undefined,
       icon: form.icon,
       unit: form.unit.trim(),
-      unitEn: form.unitEn.trim() || undefined,
+      unitEn: unitEn !== form.unit.trim() ? unitEn : undefined,
       multiplier: Math.round(form.multiplier * 10) / 10,
       defaultAmount: Math.round(defaultAmountValue),
       description: form.description.trim() || undefined,
-      descriptionEn: form.descriptionEn.trim() || undefined
+      descriptionEn: descriptionEn
     };
 
     if (isEditing) {

@@ -25,6 +25,7 @@ export function StatsCards() {
   const dateLocale = lang === 'tr' ? tr : enUS;
   const isMobile = useIsMobile();
   const [activeMobileSection, setActiveMobileSection] = useState<'breakdown' | 'lastSeven'>('breakdown');
+  const [overviewOpen, setOverviewOpen] = useState(true);
 
   const renderSectionHeader = (
     id: 'breakdown' | 'lastSeven',
@@ -87,6 +88,23 @@ export function StatsCards() {
     }
   }, [isGoalCompleted, wasCompleted, summary.todayPoints, lang]);
 
+  const renderOverviewHeader = () => {
+    return (
+      <button
+        type="button"
+        className="flex w-full items-center justify-between text-sm font-semibold text-gray-900 dark:text-white mb-3 transition-all duration-200 hover:text-brand"
+        onClick={() => setOverviewOpen(!overviewOpen)}
+        aria-expanded={overviewOpen}
+        aria-controls="stats-overview"
+      >
+        <span>{t('stats.overview') || 'Overview'}</span>
+        <span className="ml-2 text-base transition-transform duration-300 ease-in-out" aria-hidden style={{ transform: overviewOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+          ▼
+        </span>
+      </button>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {showConfetti && (
@@ -107,7 +125,12 @@ export function StatsCards() {
           ))}
         </>
       )}
-      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
+      
+      {/* Overview Section */}
+      <div className="card-entrance rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 p-4 shadow-lg">
+        {renderOverviewHeader()}
+        {overviewOpen && (
+          <div id="stats-overview" className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
         <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-400/50 ring-2 ring-green-500/20 dark:ring-green-400/20 pulse-glow-mobile' : ''}`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.todayPoints')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400 number-count-mobile' : ''} ${isMobile ? 'number-count-mobile' : ''}`}>
@@ -141,12 +164,21 @@ export function StatsCards() {
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${isMobile ? 'number-count-mobile' : ''}`}>{summary.streakDays}</div>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.streakDesc')}</div>
         </div>
-      </div>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.averageDaily') || 'Average Daily'}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300 text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : ''}`}>
+            {numberFormatter.format(Math.round(summary.totalPoints / Math.max(1, summary.totalActivities)))}
+          </div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.perActivity') || 'Per Activity'}</div>
+        </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="card-entrance slide-in-left rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  p-4 shadow-lg magnetic-hover gpu-accelerated">
           {renderSectionHeader('breakdown', t('stats.breakdownToday'))}
-          {(!isMobile || activeMobileSection === 'breakdown') && (
+          {(isMobile ? activeMobileSection === 'breakdown' : true) && (
             <div id="stats-section-breakdown">
               {summary.breakdownToday.length === 0 ? (
                 <div className="text-sm text-gray-700 dark:text-gray-300">{t('stats.noActivityToday')}</div>
@@ -178,7 +210,7 @@ export function StatsCards() {
         </div>
         <div className="rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  p-4 shadow-lg hover-lift transition-smooth">
           {renderSectionHeader('lastSeven', t('stats.lastSeven'))}
-          {(!isMobile || activeMobileSection === 'lastSeven') && (
+          {(isMobile ? activeMobileSection === 'lastSeven' : true) && (
             <div id="stats-section-lastSeven">
               {summary.lastSevenDays.length === 0 ? (
                 <div className="text-sm text-gray-700 dark:text-gray-300">{t('stats.noData')}</div>

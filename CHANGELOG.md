@@ -2,6 +2,31 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.11.8] - 2025-01
+
+### Added
+- **Scroll to Top Button**: Added floating scroll-to-top button that appears when scrolling down
+- **Quote Ticker**: Added animated scrolling quote ticker at the bottom of the screen
+- **Badge Unlock Notification**: Replaced toast notifications with animated badge unlock component
+- **Overview Accordion**: Added collapsible Overview section in StatsCards with Today's Points, Total Points, Goal Streak, and Average Daily cards
+- **Add Activity Button**: Added quick "Add Activity" button to Activities page
+
+### Changed
+- **Activities Page**: Added "Add Activity" button for quick navigation
+- **Add Activity Page**: Removed "Manage Activities" button
+- **Activity Duration**: Temporarily hidden/removed Activity Duration feature
+- **Logo Text**: Increased mobile logo text size for better readability
+- **Manage Activities Dialog**: Translation fields (EN/TR) are now optional - if left empty, the first language value is used
+- **Settings Dialog**: 
+  - Tell Us About You dialog now appears after onboarding completion
+  - Default name is "user" instead of empty
+  - Dialog closes when clicking outside
+  - More compact design on mobile
+- **StatsCards**: Today's Breakdown and Last 7 Days accordions now open by default on desktop
+
+### Fixed
+- **Input Cursor Shifting**: Removed transform animations from input focus states (may need further investigation if issue persists)
+
 ## [0.11.7] - 2025-01
 
 ### Fixed

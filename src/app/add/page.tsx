@@ -1,7 +1,6 @@
 'use client';
 
 import { ActivityForm } from '@/components/ActivityForm';
-import { ManageActivitiesDialog } from '@/components/ManageActivitiesDialog';
 import { useI18n } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -18,7 +17,6 @@ export default function AddActivityPage() {
           <span>➕</span>
           <span>{t('actions.addActivity')}</span>
         </h1>
-        <ManageActivitiesDialog />
       </div>
       
       <div className={`${isMobile ? 'rounded-lg p-3' : 'rounded-xl p-4 sm:p-6'} border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm shadow-card`}>

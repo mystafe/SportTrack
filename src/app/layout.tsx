@@ -4,6 +4,8 @@ import { ReactNode } from 'react';
 import { Providers } from '@/components/Providers';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { ScrollToTop } from '@/components/ScrollToTop';
+import { QuoteTicker } from '@/components/QuoteTicker';
 
 export const metadata = {
   title: 'SportTrack',
@@ -39,8 +41,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-screen h-full bg-white dark:bg-gray-950 overflow-x-hidden safe-top safe-bottom" suppressHydrationWarning>
         <Providers>
           <Header />
-          <main className="container py-4 sm:py-6">{children}</main>
+          <main className="container py-4 sm:py-6 pb-20 sm:pb-24">{children}</main>
           <Footer />
+          <ScrollToTop />
+          <QuoteTicker />
         </Providers>
       </body>
     </html>

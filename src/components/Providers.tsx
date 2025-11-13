@@ -13,6 +13,7 @@ import { InstallPrompt } from '@/components/InstallPrompt';
 import { NotificationManager } from '@/components/NotificationManager';
 import { OnboardingManager } from '@/components/OnboardingManager';
 import { KeyboardShortcuts } from '@/components/KeyboardShortcuts';
+import { BadgeUnlockNotification } from '@/components/BadgeUnlockNotification';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -28,6 +29,7 @@ export function Providers({ children }: { children: ReactNode }) {
                   <NotificationManager />
                   <OnboardingManager />
                   <KeyboardShortcuts />
+                  <BadgeUnlockNotification />
                   {children}
                 </ToasterProvider>
               </BadgeProvider>

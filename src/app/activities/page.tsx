@@ -14,6 +14,7 @@ import { useToaster } from '@/components/Toaster';
 import { ActivityListSkeleton } from '@/components/LoadingSkeleton';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import Link from 'next/link';
 
 function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
   const hours = Math.floor(seconds / 3600);
@@ -28,6 +29,7 @@ function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
 
 export default function ActivitiesPage() {
   const { t } = useI18n();
+  const isMobile = useIsMobile();
   return (
     <div className="space-y-4 sm:space-y-5">
       <div className="flex items-center justify-between">
@@ -35,7 +37,16 @@ export default function ActivitiesPage() {
           <span>📝</span>
           <span>{t('nav.activities')}</span>
         </h1>
-        <ManageActivitiesDialog />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/add"
+            className={`px-3 py-1.5 rounded bg-brand text-white hover:bg-brand-dark text-xs sm:text-sm shadow ${isMobile ? 'touch-feedback mobile-press' : ''} transition-all duration-200`}
+            aria-label={t('actions.addActivity')}
+          >
+            {t('actions.addActivity')}
+          </Link>
+          <ManageActivitiesDialog />
+        </div>
       </div>
       <ActivitiesClient />
     </div>
