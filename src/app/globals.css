@@ -366,17 +366,15 @@ body {
 /* Stagger animations for list items */
 @keyframes staggerFadeIn {
   from {
-    opacity: 0;
     transform: translateY(20px) scale(0.95);
   }
   to {
-    opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
 .stagger-item {
-  opacity: 0;
+  opacity: 1 !important; /* Always visible */
   animation: staggerFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
@@ -540,16 +538,15 @@ body {
 /* Card entrance animation */
 @keyframes cardEntrance {
   from {
-    opacity: 0;
     transform: translateY(30px) scale(0.9);
   }
   to {
-    opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
 .card-entrance {
+  opacity: 1 !important; /* Always visible */
   animation: cardEntrance 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
@@ -579,31 +576,29 @@ body {
 /* Slide in from sides */
 @keyframes slideInLeft {
   from {
-    opacity: 0;
     transform: translateX(-30px);
   }
   to {
-    opacity: 1;
     transform: translateX(0);
   }
 }
 
 @keyframes slideInRight {
   from {
-    opacity: 0;
     transform: translateX(30px);
   }
   to {
-    opacity: 1;
     transform: translateX(0);
   }
 }
 
 .slide-in-left {
+  opacity: 1 !important; /* Always visible */
   animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .slide-in-right {
+  opacity: 1 !important; /* Always visible */
   animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -870,18 +865,17 @@ html {
 @keyframes bounceInMobile {
   0% {
     transform: scale(0.8);
-    opacity: 0;
   }
   50% {
     transform: scale(1.05);
   }
   100% {
     transform: scale(1);
-    opacity: 1;
   }
 }
 
 .bounce-in-mobile {
+  opacity: 1 !important; /* Always visible */
   animation: bounceInMobile 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
@@ -889,15 +883,14 @@ html {
 @keyframes slideInBottomMobile {
   from {
     transform: translateY(20px);
-    opacity: 0;
   }
   to {
     transform: translateY(0);
-    opacity: 1;
   }
 }
 
 .slide-in-bottom-mobile {
+  opacity: 1 !important; /* Always visible */
   animation: slideInBottomMobile 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -905,15 +898,14 @@ html {
 @keyframes fadeInScaleMobile {
   from {
     transform: scale(0.95);
-    opacity: 0;
   }
   to {
     transform: scale(1);
-    opacity: 1;
   }
 }
 
 .fade-in-scale-mobile {
+  opacity: 1 !important; /* Always visible */
   animation: fadeInScaleMobile 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
