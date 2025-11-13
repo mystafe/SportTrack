@@ -2,6 +2,40 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.12.0] - 2025-01
+
+### Changed
+- **Activities Page Visual Improvements**:
+  - Updated all cards with new gradient backgrounds and improved shadows
+  - Enhanced typography hierarchy (font-semibold → font-bold)
+  - Improved activity item styling with better contrast
+  - Added emoji animations to activity icons
+  - Enhanced button styles with gradients and better hover effects
+  - Improved filter results card styling
+  - Better sticky header with gradient background
+
+- **Stats Page Visual Improvements**:
+  - Updated all summary cards with new gradient backgrounds
+  - Enhanced chart containers with improved borders and shadows
+  - Better typography hierarchy across all sections
+  - Improved activity breakdown cards with gradient backgrounds
+  - Enhanced date selector input styling
+  - Better selected day card styling
+  - Improved completion rate section
+  - Enhanced trend chart buttons with gradients
+
+- **Enhanced Interactions**:
+  - Improved button hover effects with better shadows
+  - Enhanced input focus states with gradient backgrounds
+  - Better touch feedback on mobile devices
+  - Smoother transitions across all components
+
+### Improved
+- **Consistency**: Unified gradient and shadow system across Activities and Stats pages
+- **Typography**: Better font weights and sizes for improved readability
+- **Animations**: Enhanced emoji animations and hover effects
+- **Mobile Experience**: Better touch feedback and visual hierarchy
+
 ## [0.11.9] - 2025-01
 
 ### Changed

@@ -1406,6 +1406,7 @@ html {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   /* Explicitly no transform to prevent cursor shifting */
   transform: none;
+  background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(249, 250, 251, 1));
 }
 
 .dark .input-enhanced:focus {
@@ -1413,6 +1414,26 @@ html {
   box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
   /* Explicitly no transform to prevent cursor shifting */
   transform: none;
+  background: linear-gradient(to right, rgba(17, 24, 39, 1), rgba(31, 41, 55, 1));
+}
+
+/* Enhanced button hover effects */
+.btn-enhanced:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.btn-enhanced:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.2);
+}
+
+.dark .btn-enhanced:hover {
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.4);
+}
+
+.dark .btn-enhanced:active {
+  box-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
 }
 
 /* Button glow effect */

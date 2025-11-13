@@ -113,7 +113,7 @@ export function QuickAdd() {
                 ${
                   isAddingThis
                     ? 'border-brand dark:border-brand/60 bg-gradient-to-br from-brand/20 to-brand/10 dark:from-brand/25 dark:to-brand/15 cursor-wait shadow-lg shadow-brand/20 dark:shadow-brand/30 pulse-glow-mobile'
-                    : 'border-gray-200 dark:border-gray-700/50 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900/80 dark:to-gray-800/80 hover:border-brand dark:hover:border-brand/60 hover:bg-brand/5 dark:hover:bg-brand/10 hover:shadow-lg hover:shadow-brand/10 dark:hover:shadow-brand/20 scale-on-interact'
+                    : 'border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 hover:border-brand dark:hover:border-brand/60 hover:bg-gradient-to-br hover:from-brand/5 hover:via-brand/3 hover:to-brand/5 dark:hover:from-brand/10 dark:hover:via-brand/8 dark:hover:to-brand/10 hover:shadow-xl hover:shadow-brand/20 dark:hover:shadow-brand/30 scale-on-interact'
                 }
                 disabled:opacity-50 disabled:cursor-not-allowed group
               `}
