@@ -414,6 +414,10 @@ const translations: Translations = {
     tr: '{activity} aktivitesini ekle',
     en: 'Add {activity} activity'
   },
+  'quickAdd.addActivityLabel': {
+    tr: '{activity} aktivitesini ekle',
+    en: 'Add {activity} activity'
+  },
   'quickAdd.confirmTitle': { tr: 'Aktivite Ekle', en: 'Add Activity' },
   'quickAdd.confirmMessage': {
     tr: '{activity} aktivitesini {amount} {unit} olarak eklemek istiyor musunuz? ({points} puan)',
