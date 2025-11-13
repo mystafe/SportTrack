@@ -78,7 +78,7 @@ export function ActivityTemplates() {
   }, [categories]);
 
   return (
-    <div className={`space-y-${isMobile ? '3' : '4'}`}>
+    <div className={isMobile ? 'space-y-3' : 'space-y-4'}>
       <div className="flex items-center justify-between">
         <h3 className={`${isMobile ? 'text-sm' : 'text-base sm:text-lg'} font-semibold text-gray-900 dark:text-white`}>
           {t('templates.title')}
@@ -89,7 +89,7 @@ export function ActivityTemplates() {
       </div>
 
       {templatesByCategory.map(({ category, templates }) => (
-        <div key={category} className={`space-y-${isMobile ? '2' : '3'}`}>
+        <div key={category} className={isMobile ? 'space-y-2' : 'space-y-3'}>
           <h4 className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2`}>
             <span className={`inline-block w-1 ${isMobile ? 'h-3' : 'h-4'} bg-brand rounded-full`}></span>
             {t(`templates.category.${category}`)}

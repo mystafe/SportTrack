@@ -240,8 +240,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   }
 
   return (
-    <form onSubmit={submit} className={`space-y-${isMobile ? '3' : '5'}`}>
-      <div className={`space-y-${isMobile ? '1.5' : '2'}`}>
+    <form onSubmit={submit} className={isMobile ? 'space-y-3' : 'space-y-5'}>
+      <div className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
         <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200`}>{t('form.selectActivity')}</div>
         <div className={`grid grid-cols-2 sm:grid-cols-3 ${isMobile ? 'gap-2' : 'gap-3'}`}>
           {definitions.map((def) => {
@@ -290,7 +290,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         </div>
       </div>
       <div className={`grid grid-cols-1 sm:grid-cols-2 ${isMobile ? 'gap-2' : 'gap-3'}`}>
-        <label className={`space-y-${isMobile ? '0.5' : '1'} min-w-0 max-w-full`}>
+        <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} min-w-0 max-w-full`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300`}>{t('form.datetime')}</div>
           <input
             type="datetime-local"
@@ -301,8 +301,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           />
         </label>
       </div>
-      <div className={`space-y-${isMobile ? '2' : '3'}`}>
-        <label className={`space-y-${isMobile ? '0.5' : '1'} block`}>
+      <div className={isMobile ? 'space-y-2' : 'space-y-3'}>
+        <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300`}>
             {t('form.amount')} ({getActivityUnit(definition, lang)})
           </div>
@@ -330,7 +330,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         </label>
       </div>
       {!isEditing && (
-        <div className={`space-y-${isMobile ? '1.5' : '2'}`}>
+        <div className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 flex items-center gap-2`}>
             <span>⏱️</span>
             <span>{t('timer.title')}</span>
@@ -350,7 +350,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           </div>
         </div>
       )}
-      <label className={`space-y-${isMobile ? '0.5' : '1'} block`}>
+      <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
         <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300`}>{t('form.noteOptional')}</div>
         <textarea
           value={note}
