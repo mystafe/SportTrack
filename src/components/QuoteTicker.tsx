@@ -32,8 +32,8 @@ export function QuoteTicker() {
   if (!mounted || !quote) return null;
 
   return (
-    <div className={`fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-brand/10 via-brand/5 to-brand/10 dark:from-brand/20 dark:via-brand/10 dark:to-brand/20 border-t-2 border-brand/30 dark:border-brand/40 ${isMobile ? 'py-2 px-3' : 'py-3 px-4'} overflow-hidden safe-bottom`}>
-      <div className={`quote-ticker-container ${isMobile ? 'text-xs' : 'text-sm'} text-gray-900 dark:text-white font-medium italic text-center whitespace-nowrap ${isGlowing ? 'quote-ticker-glow' : ''}`}>
+    <div className={`fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-brand/15 via-brand/10 to-brand/15 dark:from-brand/25 dark:via-brand/15 dark:to-brand/25 border-t-2 border-brand/40 dark:border-brand/50 ${isMobile ? 'py-2.5 px-3' : 'py-3.5 px-4'} overflow-hidden safe-bottom shadow-lg`}>
+      <div className={`quote-ticker-container ${isMobile ? 'text-xs' : 'text-sm'} text-gray-950 dark:text-white font-bold italic text-center whitespace-nowrap ${isGlowing ? 'quote-ticker-glow' : ''} drop-shadow-sm`}>
         <div className="animate-scroll-left">
           {lang === 'tr' ? quote.tr : quote.en}
         </div>

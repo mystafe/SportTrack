@@ -10,21 +10,23 @@ html, body {
 
 html {
   background-color: #ffffff;
+  min-height: 100%;
 }
 
 html.dark {
-  background-color: #030712;
+  background-color: #000000;
 }
 
 @media (prefers-color-scheme: dark) {
   html:not(.light) {
-    background-color: #030712;
+    background-color: #000000;
   }
 }
 
 body {
-  @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+  @apply bg-white text-gray-900 dark:bg-black dark:text-gray-100;
   transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100%;
 }
 
 .container {
@@ -1736,7 +1738,7 @@ html {
 
 @keyframes badgeUnlock {
   0% {
-    transform: translate(-50%, -100%) scale(0);
+    transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
   20% {

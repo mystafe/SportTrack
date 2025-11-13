@@ -38,7 +38,7 @@ export const viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="tr" suppressHydrationWarning className="overflow-x-hidden h-full">
-      <body className="min-h-screen h-full bg-white dark:bg-gray-950 overflow-x-hidden safe-top safe-bottom" suppressHydrationWarning>
+      <body className="min-h-screen h-full bg-white dark:bg-black overflow-x-hidden safe-top safe-bottom" suppressHydrationWarning>
         <Providers>
           <Header />
           <main className="container py-4 sm:py-6 pb-20 sm:pb-24">{children}</main>

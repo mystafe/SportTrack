@@ -34,12 +34,14 @@ export function OnboardingManager() {
 
   const handleComplete = () => {
     localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
+    localStorage.setItem('show_profile_dialog', 'true');
     setShowTour(false);
     setHasCompletedOnboarding(true);
   };
 
   const handleSkip = () => {
     localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
+    localStorage.setItem('show_profile_dialog', 'true');
     setShowTour(false);
     setHasCompletedOnboarding(true);
   };
@@ -112,10 +114,10 @@ export function OnboardingManager() {
       {
         id: 'challenges',
         target: 'a[href="/challenges"]',
-        title: lang === 'tr' ? 'Zorluklar 🎯' : 'Challenges 🎯',
+        title: lang === 'tr' ? 'Hedefler 🎯' : 'Goals 🎯',
         content: lang === 'tr'
-          ? 'Günlük, haftalık ve özel zorluklar oluşturup takip edebilirsiniz.'
-          : 'Create and track daily, weekly, and custom challenges.',
+          ? 'Günlük, haftalık ve özel hedefler oluşturup takip edebilirsiniz.'
+          : 'Create and track daily, weekly, and custom goals.',
         position: 'bottom'
       },
       {

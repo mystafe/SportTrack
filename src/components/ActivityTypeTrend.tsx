@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
 import { calculateActivityTrends, getTopActivityTypes, type ActivityTypeTrend } from '@/lib/activityTrendUtils';
+import { useActivityDefinitions } from '@/lib/settingsStore';
+import { getActivityLabel } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, parseISO } from 'date-fns';
@@ -12,6 +14,7 @@ import { enUS, tr } from 'date-fns/locale';
 export function ActivityTypeTrend() {
   const { t, lang } = useI18n();
   const { activities, hydrated } = useActivities();
+  const definitions = useActivityDefinitions();
   const isMobile = useIsMobile();
   const dateLocale = lang === 'tr' ? tr : enUS;
   const [trendDays, setTrendDays] = useState<7 | 30 | 90>(30);
@@ -135,18 +138,22 @@ export function ActivityTypeTrend() {
                 <Legend
                   wrapperStyle={{ fontSize: isMobile ? '10px' : '12px' }}
                 />
-                {topTrends.map((trend, index) => (
-                  <Line
-                    key={trend.activityKey}
-                    type="monotone"
-                    dataKey={trend.activityKey}
-                    name={`${trend.icon} ${trend.label}`}
-                    stroke={colors[index % colors.length]}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                  />
-                ))}
+                {topTrends.map((trend, index) => {
+                  const definition = definitions.find(d => d.key === trend.activityKey);
+                  const label = definition ? getActivityLabel(definition, lang) : trend.label;
+                  return (
+                    <Line
+                      key={trend.activityKey}
+                      type="monotone"
+                      dataKey={trend.activityKey}
+                      name={`${trend.icon} ${label}`}
+                      stroke={colors[index % colors.length]}
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                    />
+                  );
+                })}
               </LineChart>
             </ResponsiveContainer>
 
@@ -160,7 +167,10 @@ export function ActivityTypeTrend() {
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xl">{trend.icon}</span>
                     <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-900 dark:text-white`}>
-                      {trend.label}
+                      {(() => {
+                        const definition = definitions.find(d => d.key === trend.activityKey);
+                        return definition ? getActivityLabel(definition, lang) : trend.label;
+                      })()}
                     </span>
                   </div>
                   <div className="space-y-1">

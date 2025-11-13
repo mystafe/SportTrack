@@ -32,13 +32,17 @@ export function SettingsDialog() {
 
   useEffect(() => {
     if (!hydrated) return;
-    // Only show dialog if onboarding is completed and user hasn't set name/target yet
+    // Show dialog if onboarding tour was just completed
+    const showProfileDialog = typeof window !== 'undefined' && localStorage.getItem('show_profile_dialog') === 'true';
     const onboardingCompleted = typeof window !== 'undefined' && localStorage.getItem('onboarding_completed') === 'true';
-    if (onboardingCompleted && (!settings || !settings.name || !settings.dailyTarget)) {
-      // Don't force, just show option
-      // setOpen(true);
+    if (showProfileDialog && onboardingCompleted) {
+      localStorage.removeItem('show_profile_dialog');
+      // Small delay to ensure tour is fully closed
+      setTimeout(() => {
+        setOpen(true);
+      }, 500);
     }
-  }, [hydrated, settings]);
+  }, [hydrated]);
 
   useEffect(() => {
     if (settings) {

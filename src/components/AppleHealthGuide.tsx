@@ -18,7 +18,7 @@ export function AppleHealthGuide() {
         aria-expanded={isExpanded}
       >
         <div className="flex items-center gap-2">
-          <span className="text-xl">🍎</span>
+          <span className="text-xl">📱</span>
           <span className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold text-gray-900 dark:text-white`}>
             {t('appleHealth.guideTitle')}
           </span>

@@ -12,7 +12,7 @@ const translations: Translations = {
   'nav.stats': { tr: 'İstatistikler', en: 'Statistics' },
   'nav.addActivity': { tr: 'Aktivite Ekle', en: 'Add Activity' },
   'nav.achievements': { tr: 'Başarımlar', en: 'Achievements' },
-  'nav.challenges': { tr: 'Zorluklar', en: 'Challenges' },
+  'nav.challenges': { tr: 'Hedefler', en: 'Goals' },
   'nav.main': { tr: 'Ana navigasyon', en: 'Main navigation' },
   'nav.home': { tr: 'Ana sayfa', en: 'Home page' },
   'header.overviewTitle': { tr: 'Genel Bakış', en: 'Overview' },
@@ -148,7 +148,8 @@ const translations: Translations = {
     tr: 'Günlük 10.000 puan serisi',
     en: 'Daily 10,000 points streak'
   },
-  'stats.breakdownToday': { tr: 'Bugünkü Dağılım', en: 'Today’s Breakdown' },
+  'stats.overview': { tr: 'Genel Bakış', en: 'Overview' },
+  'stats.breakdownToday': { tr: 'Bugünkü Dağılım', en: 'Today's Breakdown' },
   'stats.noActivityToday': {
     tr: 'Bugün henüz aktivite eklenmedi.',
     en: 'No activity added today.'
@@ -447,7 +448,7 @@ const translations: Translations = {
   'filters.activities': { tr: 'aktivite', en: 'activities' },
   'filters.noResults': { tr: 'Filtrelere uygun aktivite bulunamadı', en: 'No activities match the filters' },
 
-  'appleHealth.import': { tr: 'Apple Health', en: 'Apple Health' },
+  'appleHealth.import': { tr: 'Apple Sağlık Verisi', en: 'Apple Health Data' },
   'appleHealth.importLabel': {
     tr: 'Apple Health CSV dosyasını içe aktar',
     en: 'Import Apple Health CSV file'
@@ -556,7 +557,7 @@ const translations: Translations = {
   'level.xpNeeded': { tr: 'Gerekli XP', en: 'XP Needed' },
   'level.title': { tr: 'Başlık', en: 'Title' },
 
-  'challenges.title': { tr: 'Zorluklar ve Hedefler', en: 'Challenges & Goals' },
+  'challenges.title': { tr: 'Hedefler', en: 'Goals' },
   'challenges.subtitle': { tr: 'Hedeflerini belirle ve takip et', en: 'Set and track your goals' },
   'challenges.daily': { tr: 'Günlük', en: 'Daily' },
   'challenges.weekly': { tr: 'Haftalık', en: 'Weekly' },
@@ -570,11 +571,11 @@ const translations: Translations = {
   'challenges.target': { tr: 'Hedef', en: 'Target' },
   'challenges.current': { tr: 'Mevcut', en: 'Current' },
   'challenges.daysRemaining': { tr: 'Kalan Gün', en: 'Days Remaining' },
-  'challenges.addChallenge': { tr: 'Yeni Zorluk Ekle', en: 'Add New Challenge' },
-  'challenges.editChallenge': { tr: 'Zorluğu Düzenle', en: 'Edit Challenge' },
-  'challenges.deleteChallenge': { tr: 'Zorluğu Sil', en: 'Delete Challenge' },
-  'challenges.deleteConfirm': { tr: 'Bu zorluğu silmek istediğinize emin misiniz?', en: 'Are you sure you want to delete this challenge?' },
-  'challenges.completedMessage': { tr: 'Tebrikler! "{name}" zorluğunu tamamladın!', en: 'Congratulations! You completed the "{name}" challenge!' },
+  'challenges.addChallenge': { tr: 'Yeni Hedef Ekle', en: 'Add New Goal' },
+  'challenges.editChallenge': { tr: 'Hedefi Düzenle', en: 'Edit Goal' },
+  'challenges.deleteChallenge': { tr: 'Hedefi Sil', en: 'Delete Goal' },
+  'challenges.deleteConfirm': { tr: 'Bu hedefi silmek istediğinize emin misiniz?', en: 'Are you sure you want to delete this goal?' },
+  'challenges.completedMessage': { tr: 'Tebrikler! "{name}" hedefini tamamladın!', en: 'Congratulations! You completed the "{name}" goal!' },
   'challenges.name': { tr: 'İsim', en: 'Name' },
   'challenges.description': { tr: 'Açıklama', en: 'Description' },
   'challenges.targetPoints': { tr: 'Hedef Puan', en: 'Target Points' },
@@ -582,8 +583,8 @@ const translations: Translations = {
   'challenges.endDate': { tr: 'Bitiş Tarihi', en: 'End Date' },
   'challenges.save': { tr: 'Kaydet', en: 'Save' },
   'challenges.cancel': { tr: 'İptal', en: 'Cancel' },
-  'challenges.noChallenges': { tr: 'Henüz zorluk yok', en: 'No challenges yet' },
-  'challenges.createFirst': { tr: 'İlk zorlukunu oluştur', en: 'Create your first challenge' },
+  'challenges.noChallenges': { tr: 'Henüz hedef yok', en: 'No goals yet' },
+  'challenges.createFirst': { tr: 'İlk hedefini oluştur', en: 'Create your first goal' },
 
   'records.title': { tr: 'Kişisel Rekorlar', en: 'Personal Records' },
   'records.subtitle': { tr: 'En iyi performansların', en: 'Your best performances' },

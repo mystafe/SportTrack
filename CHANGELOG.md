@@ -2,6 +2,43 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.12.6] - 2025-01
+
+### Changed
+- **Onboarding Flow**: "Tell Us About You" dialog now appears after onboarding tour completion
+- **Apple Health Icons**: Replaced Apple logos (🍎) with iPhone-like logos (📱) throughout the app
+- **Badge Unlock Animation**: Fixed positioning issue - animation now starts centered instead of top-left
+- **Stats Overview**: Added missing i18n key for "stats.overview" text
+- **Accordion Improvements**: 
+  - Overview accordion now has +/- toggle button
+  - All accordions (Overview, Today's Breakdown, Last 7 Days) default to open
+  - Desktop accordions can be collapsed/expanded independently
+- **Challenges Renamed to Goals**: 
+  - Navigation: "Zorluklar" → "Hedefler" (Challenges → Goals)
+  - Page title: "Zorluklar ve Hedefler" → "Hedefler"
+  - All challenge-related text updated to use "Hedef" terminology
+- **Apple Health Import**:
+  - Removed duplicate Apple Health button on mobile (from DataExportImport)
+  - Renamed to "Apple Sağlık Verisi" (Apple Health Data)
+- **QuoteTicker Visual Improvements**:
+  - Enhanced gradient backgrounds (more visible)
+  - Improved border styling
+  - Added shadow-lg for depth
+  - Better typography (font-bold, drop-shadow)
+  - Increased padding for better visibility
+- **Dark Mode**: 
+  - Page outer areas (html/body) now completely black (#000000) in dark mode
+  - Removed white space at top and bottom of screen
+
+### Fixed
+- **Activity Trend Analysis Language**: Fixed language issue - activities now display in correct language using getActivityLabel
+- **Badge Unlock Animation**: Fixed initial positioning to be centered instead of appearing top-left
+
+### Improved
+- **Visual Consistency**: Better visual hierarchy and consistency across components
+- **Mobile Experience**: Improved mobile-specific styling and behavior
+- **Accessibility**: Better contrast and readability in dark mode
+
 ## [0.12.5] - 2025-01
 
 ### Changed

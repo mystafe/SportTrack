@@ -192,7 +192,7 @@ export function AppleHealthImport() {
           aria-label={t('appleHealth.importLabel')}
         />
         <span className="flex items-center gap-1">
-          {isImporting ? '⏳' : '🍎'} 
+          {isImporting ? '⏳' : '📱'} 
           <span className={isMobile ? 'text-[9px]' : ''}>{t('appleHealth.import')}</span>
         </span>
       </label>
