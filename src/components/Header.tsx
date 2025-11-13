@@ -13,7 +13,7 @@ export function Header() {
   const { t } = useI18n();
   const isMobile = useIsMobile();
   return (
-    <header className="border-b border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-950/60 backdrop-blur sticky top-0 z-40 safe-top">
+    <header className="border-b-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 backdrop-blur sticky top-0 z-40 safe-top">
       <nav className="container flex items-center justify-between h-16 sm:h-12 min-w-0" role="navigation" aria-label={t('nav.main')}>
         <Link href="/" className="flex-shrink-0" aria-label={t('nav.home')}>
           <Logo />

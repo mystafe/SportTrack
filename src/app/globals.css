@@ -4,10 +4,26 @@
 
 html, body {
   height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: #ffffff;
+}
+
+html.dark {
+  background-color: #030712;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not(.light) {
+    background-color: #030712;
+  }
 }
 
 body {
-  @apply bg-gradient-to-b from-white via-gray-50/50 to-white text-gray-900 dark:from-gray-950 dark:via-gray-900/50 dark:to-gray-950 dark:text-gray-100;
+  @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -18,16 +34,16 @@ body {
 /* Safe area support for iOS */
 @supports (padding: max(0px)) {
   .safe-top {
-    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-top: max(0px, env(safe-area-inset-top));
   }
   .safe-bottom {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
   }
   .safe-left {
-    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-left: max(0px, env(safe-area-inset-left));
   }
   .safe-right {
-    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-right: max(0px, env(safe-area-inset-right));
   }
 }
 

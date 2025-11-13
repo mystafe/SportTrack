@@ -2,6 +2,41 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.11.1] - 2025-01
+
+### Fixed
+- **iPhone Safe Area Issues**:
+  - Fixed white space at top and bottom on iPhone devices
+  - Removed duplicate body background gradients
+  - Added proper safe area insets to body and HTML
+  - Fixed HTML background color for dark mode
+
+- **Card Visibility Improvements**:
+  - Increased border thickness: `border` → `border-2`
+  - Improved border colors: `border-gray-200 dark:border-gray-700/50` → `border-gray-300 dark:border-gray-600`
+  - Enhanced card backgrounds: `bg-white dark:bg-gray-900/80` → `bg-white dark:bg-gray-800/90`
+  - Better shadows: `shadow-card` → `shadow-lg`
+  - Improved breakdown card items: `border-2`, `bg-gray-50 dark:bg-gray-900/50`, better hover states
+
+- **Text Contrast Enhancements**:
+  - Breakdown items: `text-gray-500` → `text-gray-700 dark:text-gray-300` with `font-medium`
+  - Activity labels: Added `font-semibold` and `text-gray-900 dark:text-gray-100`
+  - Points display: `font-semibold` → `font-bold` for better visibility
+  - Date items: Improved font weights and colors
+
+### Changed
+- **Body and HTML Styling**:
+  - Removed conflicting background gradients
+  - Simplified body background to solid colors
+  - Added HTML background color support for dark mode
+  - Improved safe area inset handling
+
+- **Card Styling**:
+  - All cards now use `border-2` for better definition
+  - Enhanced card backgrounds for better contrast
+  - Improved hover states with better shadows
+  - Better padding and spacing in breakdown items
+
 ## [0.11.0] - 2025-01
 
 ### Fixed

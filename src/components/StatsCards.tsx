@@ -108,7 +108,7 @@ export function StatsCards() {
         </>
       )}
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
-        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-400/50 ring-2 ring-green-500/20 dark:ring-green-400/20 pulse-glow-mobile' : ''}`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-400/50 ring-2 ring-green-500/20 dark:ring-green-400/20 pulse-glow-mobile' : ''}`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.todayPoints')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400 number-count-mobile' : ''} ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(summary.todayPoints)}
@@ -129,14 +129,14 @@ export function StatsCards() {
             )}
           </div>
         </div>
-        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.totalPoints')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300 text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(summary.totalPoints)}
           </div>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
         </div>
-        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.streak')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${isMobile ? 'number-count-mobile' : ''}`}>{summary.streakDays}</div>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.streakDesc')}</div>
@@ -144,29 +144,29 @@ export function StatsCards() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="card-entrance slide-in-left rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm p-4 shadow-card magnetic-hover gpu-accelerated">
+        <div className="card-entrance slide-in-left rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm p-4 shadow-lg magnetic-hover gpu-accelerated">
           {renderSectionHeader('breakdown', t('stats.breakdownToday'))}
           {(!isMobile || activeMobileSection === 'breakdown') && (
             <div id="stats-section-breakdown">
               {summary.breakdownToday.length === 0 ? (
-                <div className="text-sm text-gray-600 dark:text-gray-400">{t('stats.noActivityToday')}</div>
+                <div className="text-sm text-gray-700 dark:text-gray-300">{t('stats.noActivityToday')}</div>
               ) : (
                 <ul className="space-y-2">
                   {summary.breakdownToday.map((item) => (
                     <li
                       key={item.key}
-                      className="flex items-center justify-between gap-3 border rounded-lg px-3 py-2 border-gray-200 dark:border-gray-700/50 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-sm backdrop-blur-sm"
+                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-md backdrop-blur-sm"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="text-lg">{item.icon}</div>
+                        <div className="text-xl">{item.icon}</div>
                         <div>
-                          <div className="text-sm font-medium">{getActivityLabel(item, lang)}</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">{getActivityLabel(item, lang)}</div>
+                          <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
                             {item.amount} {getActivityUnit(item, lang)}
                           </div>
                         </div>
                       </div>
-                      <div className="text-sm font-semibold text-brand">
+                      <div className="text-sm font-bold text-brand dark:text-brand-light">
                         +{numberFormatter.format(item.points)} {t('list.pointsUnit')}
                       </div>
                     </li>
@@ -176,23 +176,23 @@ export function StatsCards() {
             </div>
           )}
         </div>
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm p-4 shadow-card hover-lift transition-smooth">
+        <div className="rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm p-4 shadow-lg hover-lift transition-smooth">
           {renderSectionHeader('lastSeven', t('stats.lastSeven'))}
           {(!isMobile || activeMobileSection === 'lastSeven') && (
             <div id="stats-section-lastSeven">
               {summary.lastSevenDays.length === 0 ? (
-                <div className="text-sm text-gray-600 dark:text-gray-400">{t('stats.noData')}</div>
+                <div className="text-sm text-gray-700 dark:text-gray-300">{t('stats.noData')}</div>
               ) : (
                 <ul className="space-y-2">
                   {summary.lastSevenDays.map((day) => (
                     <li
                       key={day.date}
-                      className="flex items-center justify-between gap-3 border rounded-lg px-3 py-2 border-gray-200 dark:border-gray-700/50 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-sm backdrop-blur-sm"
+                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-md backdrop-blur-sm"
                     >
-                      <div className="text-sm font-medium">
+                      <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                         {format(new Date(day.date), 'd MMMM EEEE', { locale: dateLocale })}
                       </div>
-                      <div className="text-sm font-semibold">
+                      <div className="text-sm font-bold text-gray-900 dark:text-gray-100">
                         {numberFormatter.format(day.points)} / {numberFormatter.format(summary.targetPoints)}
                       </div>
                     </li>
