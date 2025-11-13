@@ -3,7 +3,7 @@
 import { useMemo, useState, memo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
-import { calculateActivityTrends, getTopActivityTypes, type ActivityTypeTrend } from '@/lib/activityTrendUtils';
+import { calculateActivityTrends, getTopActivityTypes, type ActivityTypeTrend as ActivityTypeTrendData } from '@/lib/activityTrendUtils';
 import { useActivityDefinitions } from '@/lib/settingsStore';
 import { getActivityLabel } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
