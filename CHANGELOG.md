@@ -2,6 +2,37 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.10.5] - 2025-01
+
+### Fixed
+- **Input Cursor Issue**:
+  - Input alanlarına focus olduğunda imleç kayması sorunu düzeltildi
+  - `transform: scale(1.01)` efekti kaldırıldı (sadece border ve box-shadow animasyonları kaldı)
+  - Daha stabil ve kullanıcı dostu input deneyimi
+
+### Changed
+- **Mobile Compact Design**:
+  - Activity Form mobilde daha compact:
+    - Form spacing azaltıldı (space-y-5 → space-y-3)
+    - Activity selection butonları daha küçük (px-2 py-1.5, rounded-lg)
+    - Input alanları daha küçük (px-2.5 py-2, min-h-[40px], text-xs)
+    - Textarea daha küçük (min-h-[70px], rows={2})
+    - Butonlar daha küçük (px-3 py-2, min-h-[40px], text-xs)
+    - Font size'lar küçültüldü (text-sm → text-xs)
+    - Gap'ler azaltıldı (gap-3 → gap-2)
+  
+  - Activity Templates mobilde daha compact:
+    - Template card'lar daha küçük (p-2.5, gap-2, rounded-lg)
+    - Icon size küçültüldü (text-3xl → text-2xl)
+    - Font size'lar küçültüldü (text-base → text-xs, text-sm → text-[10px])
+    - Gap'ler azaltıldı (gap-3 → gap-2)
+    - Category başlıkları daha küçük (text-xs → text-[9px])
+    - Spacing azaltıldı (space-y-4 → space-y-3)
+  
+  - Add Activity sayfası mobilde daha compact:
+    - Container padding azaltıldı (p-4 sm:p-6 → p-3)
+    - Border radius küçültüldü (rounded-xl → rounded-lg)
+
 ## [0.10.4] - 2025-01
 
 ### Changed

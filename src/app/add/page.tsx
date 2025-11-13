@@ -21,7 +21,7 @@ export default function AddActivityPage() {
         <ManageActivitiesDialog />
       </div>
       
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm p-4 sm:p-6 shadow-card">
+      <div className={`${isMobile ? 'rounded-lg p-3' : 'rounded-xl p-4 sm:p-6'} border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm shadow-card`}>
         <ActivityForm
           onCreated={() => {
             // Redirect to activities page after successful creation

@@ -240,10 +240,10 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5">
-      <div className="space-y-2">
-        <div className="text-sm text-gray-700 dark:text-gray-200">{t('form.selectActivity')}</div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    <form onSubmit={submit} className={`space-y-${isMobile ? '3' : '5'}`}>
+      <div className={`space-y-${isMobile ? '1.5' : '2'}`}>
+        <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200`}>{t('form.selectActivity')}</div>
+        <div className={`grid grid-cols-2 sm:grid-cols-3 ${isMobile ? 'gap-2' : 'gap-3'}`}>
           {definitions.map((def) => {
             const active = def.key === activityKey;
             return (
@@ -259,7 +259,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     return String(def.defaultAmount);
                   });
                 }}
-                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left rounded-xl border px-3 py-2 shadow-card backdrop-blur-sm ${
+                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} border ${isMobile ? 'px-2 py-1.5' : 'px-3 py-2'} shadow-card backdrop-blur-sm ${
                   active
                     ? 'active border-brand dark:border-brand/60 ring-2 ring-brand/30 dark:ring-brand/20 scale-105'
                     : 'border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 scale-on-interact'
@@ -275,13 +275,13 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <div className={`text-xl transition-transform duration-300 ${active ? 'activity-icon-pulse' : ''}`}>{def.icon}</div>
-                  <div className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 font-semibold">
+                  <div className={`${isMobile ? 'text-lg' : 'text-xl'} transition-transform duration-300 ${active ? 'activity-icon-pulse' : ''}`}>{def.icon}</div>
+                  <div className={`${isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-[10px] px-2 py-0.5'} rounded-full bg-gray-100 dark:bg-gray-800 font-semibold`}>
                     {def.multiplier}x
                   </div>
                 </div>
-                <div className="mt-2 text-sm font-medium transition-colors">{getActivityLabel(def, lang)}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className={`${isMobile ? 'mt-1' : 'mt-2'} ${isMobile ? 'text-xs' : 'text-sm'} font-medium transition-colors`}>{getActivityLabel(def, lang)}</div>
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`}>
                   {def.defaultAmount} {getActivityUnit(def, lang)}
                 </div>
               </button>
@@ -289,21 +289,21 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           })}
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <label className="space-y-1 min-w-0 max-w-full">
-          <div className="text-sm text-gray-700 dark:text-gray-300">{t('form.datetime')}</div>
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${isMobile ? 'gap-2' : 'gap-3'}`}>
+        <label className={`space-y-${isMobile ? '0.5' : '1'} min-w-0 max-w-full`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300`}>{t('form.datetime')}</div>
           <input
             type="datetime-local"
             value={performedAt}
             onChange={(e) => setPerformedAt(e.target.value)}
-            className="input-enhanced w-full border rounded-lg px-3 py-3 min-h-[44px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0 max-w-full text-sm transition-all duration-200"
+            className={`input-enhanced w-full border ${isMobile ? 'rounded-md px-2.5 py-2 min-h-[40px] text-xs' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0 max-w-full transition-all duration-200`}
             required
           />
         </label>
       </div>
-      <div className="space-y-3">
-        <label className="space-y-1 block">
-          <div className="text-sm text-gray-700 dark:text-gray-300">
+      <div className={`space-y-${isMobile ? '2' : '3'}`}>
+        <label className={`space-y-${isMobile ? '0.5' : '1'} block`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300`}>
             {t('form.amount')} ({getActivityUnit(definition, lang)})
           </div>
           <input
@@ -312,17 +312,17 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             step={1}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="input-enhanced w-full border rounded-lg px-3 py-3 min-h-[44px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-sm transition-all duration-200"
+            className={`input-enhanced w-full border ${isMobile ? 'rounded-md px-2.5 py-2 min-h-[40px] text-xs' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 transition-all duration-200`}
             required
             aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
             aria-describedby={getActivityDescription(definition, lang) ? 'amount-description' : undefined}
           />
           {getActivityDescription(definition, lang) ? (
-            <div id="amount-description" className="text-xs text-gray-500 dark:text-gray-400" role="note">
+            <div id="amount-description" className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`} role="note">
               {getActivityDescription(definition, lang)}
             </div>
           ) : null}
-          <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+          <div className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-gray-500 dark:text-gray-400 ${isMobile ? 'mt-0.5' : 'mt-1'} flex items-center gap-2`}>
             <span>{definition.multiplier}x</span>
             <span>·</span>
             <span>{t('form.points')}: {pointsDisplay}</span>
@@ -330,17 +330,17 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         </label>
       </div>
       {!isEditing && (
-        <div className="space-y-2">
-          <div className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
+        <div className={`space-y-${isMobile ? '1.5' : '2'}`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 flex items-center gap-2`}>
             <span>⏱️</span>
             <span>{t('timer.title')}</span>
             {duration > 0 && (
-              <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
+              <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 ml-auto`}>
                 ({Math.floor(duration / 60)} {lang === 'tr' ? 'dakika' : 'min'})
               </span>
             )}
           </div>
-          <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm p-4 shadow-sm">
+          <div className={`${isMobile ? 'rounded-lg p-2.5' : 'rounded-xl p-4'} border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm shadow-sm`}>
             <ActivityTimer
               onDurationChange={(newDuration) => {
                 setDuration(newDuration);
@@ -350,22 +350,22 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           </div>
         </div>
       )}
-      <label className="space-y-1 block">
-        <div className="text-sm text-gray-700">{t('form.noteOptional')}</div>
+      <label className={`space-y-${isMobile ? '0.5' : '1'} block`}>
+        <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300`}>{t('form.noteOptional')}</div>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="input-enhanced w-full border rounded-lg px-3 py-3 min-h-[88px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-sm transition-all duration-200"
-          rows={3}
+          className={`input-enhanced w-full border ${isMobile ? 'rounded-md px-2.5 py-2 min-h-[70px] text-xs' : 'rounded-lg px-3 py-3 min-h-[88px] text-sm'} bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 transition-all duration-200`}
+          rows={isMobile ? 2 : 3}
           placeholder={t('form.notePlaceholder')}
           aria-label={t('form.noteOptional')}
         />
       </label>
-      <div className={`flex items-center gap-2 ${isMobile && !isEditing ? 'flex-col' : ''}`}>
+      <div className={`flex items-center ${isMobile ? 'gap-1.5' : 'gap-2'} ${isMobile && !isEditing ? 'flex-col' : ''}`}>
         <button
           type="submit"
           disabled={loading}
-          className={`btn-enhanced ripple-effect button-glow ${isMobile && !isEditing ? 'w-full' : ''} px-4 py-3 min-h-[44px] rounded-lg bg-brand text-white hover:bg-brand-dark text-sm font-medium disabled:opacity-50 shadow transition-all duration-200 scale-on-interact disabled:hover:scale-100`}
+          className={`btn-enhanced ripple-effect button-glow ${isMobile && !isEditing ? 'w-full' : ''} ${isMobile ? 'px-3 py-2 min-h-[40px] text-xs rounded-md' : 'px-4 py-3 min-h-[44px] text-sm rounded-lg'} bg-brand text-white hover:bg-brand-dark font-medium disabled:opacity-50 shadow transition-all duration-200 scale-on-interact disabled:hover:scale-100`}
           aria-label={loading ? t('form.loading') : isEditing ? t('form.save') : t('form.add')}
           aria-busy={loading}
         >
@@ -375,7 +375,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-3 min-h-[44px] rounded-lg border border-gray-200 dark:border-gray-700 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-200 active:scale-95"
+            className={`${isMobile ? 'px-3 py-2 min-h-[40px] text-xs rounded-md' : 'px-4 py-3 min-h-[44px] text-sm rounded-lg'} border border-gray-200 dark:border-gray-700 font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-200 active:scale-95`}
           >
             {t('form.cancel')}
           </button>

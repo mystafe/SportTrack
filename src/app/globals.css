@@ -1070,8 +1070,7 @@ html {
   outline: none;
   border-color: rgba(14, 165, 233, 0.5);
   box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
-  transform: scale(1.01);
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .dark .input-enhanced:focus {
