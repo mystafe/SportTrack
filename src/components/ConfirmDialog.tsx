@@ -83,17 +83,17 @@ export function ConfirmDialog({
       aria-labelledby="confirm-dialog-title"
       aria-describedby="confirm-dialog-message"
     >
-      <div className={`bg-white dark:bg-gray-900 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto slide-up-bottom' : 'rounded-lg shadow-xl max-w-md w-full mx-4 animate-scale-in'} border border-gray-200 dark:border-gray-800`}>
+      <div className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto slide-up-bottom' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4 animate-scale-in'} border-2 border-gray-200 dark:border-gray-700`}>
         <div className={`${isMobile ? 'p-6' : 'p-6'}`}>
           <h2
             id="confirm-dialog-title"
-            className={`${isMobile ? 'text-xl' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 mb-2`}
+            className={`${isMobile ? 'text-xl' : 'text-lg'} font-bold text-gray-950 dark:text-white mb-2`}
           >
             {title}
           </h2>
           <p
             id="confirm-dialog-message"
-            className={`${isMobile ? 'text-base' : 'text-sm'} text-gray-600 dark:text-gray-400 mb-6`}
+            className={`${isMobile ? 'text-base' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300 mb-6 leading-relaxed`}
           >
             {message}
           </p>
@@ -101,7 +101,7 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={handleCancel}
-              className={`${isMobile ? 'w-full min-h-[44px] touch-feedback mobile-press' : 'px-4 py-2'} text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 active:scale-95`}
+              className={`${isMobile ? 'w-full min-h-[44px] touch-feedback mobile-press' : 'px-4 py-2'} text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95`}
               aria-label={cancelLabel || t('form.cancel')}
             >
               {cancelLabel || t('form.cancel')}
@@ -109,10 +109,10 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={handleConfirm}
-              className={`${isMobile ? 'w-full min-h-[44px] touch-feedback mobile-press' : 'px-4 py-2'} text-sm font-medium text-white rounded-lg transition-all duration-200 active:scale-95 hover:shadow-lg ${
+              className={`${isMobile ? 'w-full min-h-[44px] touch-feedback mobile-press' : 'px-4 py-2'} text-sm font-semibold text-white rounded-lg transition-all duration-200 active:scale-95 hover:shadow-xl ${
                 variant === 'danger'
-                  ? 'bg-red-600 hover:bg-red-700'
-                  : 'bg-brand hover:bg-brand-dark'
+                  ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-600'
+                  : 'bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-brand'
               }`}
               aria-label={confirmLabel || t('form.confirm')}
               autoFocus

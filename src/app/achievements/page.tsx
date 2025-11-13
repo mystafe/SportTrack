@@ -92,49 +92,52 @@ export default function AchievementsPage() {
   const progress = totalBadges > 0 ? Math.round((unlockedCount / totalBadges) * 100) : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-transition">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">{t('achievements.title')}</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        <h1 className={`text-2xl sm:text-3xl font-bold flex items-center gap-2 ${isMobile ? 'title-entrance' : ''}`}>
+          <span className={`text-2xl sm:text-3xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>🏆</span>
+          <span className="text-gray-950 dark:text-white">{t('achievements.title')}</span>
+        </h1>
+        <p className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mt-2 leading-relaxed">
           {t('achievements.subtitle')}
         </p>
       </div>
 
       {/* Progress Summary */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-200">
             {t('achievements.progress')}
           </span>
-          <span className="text-lg font-bold">
+          <span className="text-lg sm:text-xl font-bold text-gray-950 dark:text-gray-100">
             {unlockedCount} / {totalBadges}
           </span>
         </div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner">
           <div
-            className="h-full bg-brand transition-all duration-500"
+            className="h-full bg-gradient-to-r from-brand via-brand-light to-brand-dark transition-all duration-500 shadow-sm"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="text-xs text-gray-500 mt-2">
+        <div className="text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-400 mt-2">
           {progress}% {lang === 'tr' ? 'tamamlandı' : 'complete'}
         </div>
       </div>
 
       {/* Badges by Category */}
       {(['streak', 'points', 'activities', 'special'] as const).map(category => (
-        <div key={category} className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
-          <h2 className="text-lg font-semibold mb-4">{categoryLabels[category]}</h2>
+        <div key={category} className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white mb-4">{categoryLabels[category]}</h2>
           <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'} gap-3 sm:gap-4`}>
             {badgesByCategory[category].map(badge => {
               const isUnlocked = !!badge.unlockedAt;
               return (
                 <div
                   key={badge.id}
-                  className={`relative rounded-lg border-2 p-3 sm:p-4 transition-all duration-200 ${
+                  className={`stagger-item relative rounded-xl border-2 p-3 sm:p-4 transition-all duration-300 ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : 'hover:scale-105'} ${
                     isUnlocked
-                      ? `${getRarityColor(badge.rarity)} hover:scale-105`
-                      : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 opacity-60'
+                      ? `${getRarityColor(badge.rarity)} shadow-md hover:shadow-xl`
+                      : 'border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50 via-gray-100/50 to-gray-50 dark:from-gray-800/50 dark:via-gray-800/30 dark:to-gray-800/50 opacity-60'
                   }`}
                 >
                   {!isUnlocked && (
@@ -142,13 +145,13 @@ export default function AchievementsPage() {
                       <div className="text-4xl opacity-30">🔒</div>
                     </div>
                   )}
-                  <div className={`text-4xl mb-2 ${!isUnlocked ? 'opacity-30' : ''}`}>
+                  <div className={`text-4xl sm:text-5xl mb-2 ${!isUnlocked ? 'opacity-30' : isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>
                     {badge.icon}
                   </div>
-                  <div className={`text-sm font-semibold mb-1 ${!isUnlocked ? 'opacity-30' : ''}`}>
+                  <div className={`text-sm sm:text-base font-bold mb-1 text-gray-950 dark:text-gray-100 ${!isUnlocked ? 'opacity-30' : ''}`}>
                     {badge.name[lang]}
                   </div>
-                  <div className={`text-xs text-gray-600 dark:text-gray-400 mb-2 ${!isUnlocked ? 'opacity-30' : ''}`}>
+                  <div className={`text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${!isUnlocked ? 'opacity-30' : ''}`}>
                     {badge.description[lang]}
                   </div>
                   <div className="flex items-center justify-between">

@@ -50,15 +50,15 @@ export function ChallengeCard({ challenge, onEdit, onDelete }: ChallengeCardProp
     : null;
 
   return (
-    <div className={`rounded-lg border-2 p-4 ${getStatusColor()} transition-all duration-200 hover:shadow-lg`}>
+    <div className={`card-entrance rounded-xl border-2 p-4 ${getStatusColor()} transition-all duration-300 hover:shadow-xl shadow-md`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">{getStatusIcon()}</span>
+          <span className="text-2xl sm:text-3xl emoji-bounce">{getStatusIcon()}</span>
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+            <h3 className="font-bold text-gray-950 dark:text-white text-sm sm:text-base">
               {challenge.name[lang]}
             </h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400">
+            <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
               {t(`challenges.${challenge.type}`)}
             </p>
           </div>
@@ -67,7 +67,7 @@ export function ChallengeCard({ challenge, onEdit, onDelete }: ChallengeCardProp
           <button
             type="button"
             onClick={onEdit}
-            className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:scale-110 active:scale-95 transition-all duration-200"
             aria-label={t('challenges.editChallenge')}
           >
             ✏️
@@ -76,7 +76,7 @@ export function ChallengeCard({ challenge, onEdit, onDelete }: ChallengeCardProp
             <button
               type="button"
               onClick={onDelete}
-              className="p-1 text-gray-500 hover:text-red-600 dark:hover:text-red-400"
+              className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:scale-110 active:scale-95 transition-all duration-200"
               aria-label={t('challenges.deleteChallenge')}
             >
               🗑️
@@ -85,41 +85,41 @@ export function ChallengeCard({ challenge, onEdit, onDelete }: ChallengeCardProp
         </div>
       </div>
 
-      <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+      <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">
         {challenge.description[lang]}
       </p>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-600 dark:text-gray-400">
+        <div className="flex items-center justify-between text-xs sm:text-sm">
+          <span className="font-semibold text-gray-700 dark:text-gray-300">
             {t('challenges.progress')}
           </span>
-          <span className="font-semibold text-gray-900 dark:text-white">
+          <span className="font-bold text-gray-950 dark:text-white">
             {progress.current.toLocaleString()} / {progress.target.toLocaleString()} {t('level.xp')}
           </span>
         </div>
 
-        <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+        <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner">
           <div
-            className={`h-full transition-all duration-500 ${
+            className={`h-full transition-all duration-500 shadow-sm ${
               challenge.status === 'completed'
-                ? 'bg-green-500'
+                ? 'bg-gradient-to-r from-green-500 to-emerald-500'
                 : challenge.status === 'expired' || challenge.status === 'failed'
-                ? 'bg-red-500'
-                : 'bg-brand'
+                ? 'bg-gradient-to-r from-red-500 to-rose-500'
+                : 'bg-gradient-to-r from-brand to-brand-dark'
             }`}
             style={{ width: `${Math.min(100, progress.percentage)}%` }}
           />
         </div>
 
-        <div className="flex items-center justify-between text-[10px] text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between text-xs font-semibold text-gray-600 dark:text-gray-400">
           <span>{Math.round(progress.percentage)}%</span>
           {progress.daysRemaining !== undefined && progress.daysRemaining > 0 && (
             <span>{progress.daysRemaining} {t('challenges.daysRemaining')}</span>
           )}
         </div>
 
-        <div className="text-[10px] text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-200 dark:border-gray-700">
+        <div className="text-xs font-medium text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-700">
           {startDate} {endDate && `- ${endDate}`}
         </div>
       </div>

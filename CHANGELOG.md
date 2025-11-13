@@ -2,6 +2,43 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.12.1] - 2025-01
+
+### Changed
+- **Add Activity Page Visual Improvements**:
+  - Updated page header with emoji animations and better typography
+  - Enhanced form container with gradient backgrounds and improved shadows
+  - Better visual hierarchy and spacing
+
+- **Achievements Page Visual Improvements**:
+  - Updated page header with emoji animations
+  - Enhanced progress summary card with gradient backgrounds
+  - Improved badge cards with better gradients and shadows
+  - Better typography hierarchy (font-semibold → font-bold)
+  - Enhanced progress bar with gradient fill
+  - Improved badge icon sizes and animations
+
+- **Challenges Page Visual Improvements**:
+  - Updated page header with emoji animations
+  - Enhanced "Add Challenge" button with gradients
+  - Improved empty state card styling
+  - Better section headings typography
+  - Enhanced ChallengeCard component with gradients and better shadows
+  - Improved progress bars with gradient fills
+  - Better button hover effects
+
+- **Dialog Components Visual Improvements**:
+  - Enhanced ConfirmDialog with gradient backgrounds
+  - Improved button styles with gradients
+  - Better typography hierarchy
+  - Enhanced shadows and transitions
+
+### Improved
+- **Consistency**: Unified gradient and shadow system across Add Activity, Achievements, and Challenges pages
+- **Typography**: Better font weights and sizes for improved readability
+- **Animations**: Enhanced emoji animations and hover effects
+- **Mobile Experience**: Better touch feedback and visual hierarchy
+
 ## [0.12.0] - 2025-01
 
 ### Changed
