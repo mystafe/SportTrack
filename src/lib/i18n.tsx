@@ -632,7 +632,10 @@ const translations: Translations = {
   'onboarding.skip': { tr: 'Turu Atla', en: 'Skip Tour' },
   'onboarding.previous': { tr: 'Önceki', en: 'Previous' },
   'onboarding.next': { tr: 'Sonraki', en: 'Next' },
-  'onboarding.finish': { tr: 'Bitir', en: 'Finish' }
+  'onboarding.finish': { tr: 'Bitir', en: 'Finish' },
+
+  'settings.keyboardShortcuts': { tr: '⌨️ Klavye Kısayolları', en: '⌨️ Keyboard Shortcuts' },
+  'settings.keyboardShortcutsHint': { tr: '? tuşuna basarak kısayolları görebilirsiniz', en: 'Press ? to view keyboard shortcuts' }
 };
 
 type I18nContextValue = {

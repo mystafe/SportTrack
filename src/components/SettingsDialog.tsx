@@ -13,12 +13,14 @@ import { NotificationSettings } from '@/components/NotificationSettings';
 import { LevelDisplay } from '@/components/LevelDisplay';
 import { AppleHealthImport } from '@/components/AppleHealthImport';
 import { AppleHealthGuide } from '@/components/AppleHealthGuide';
+import { useKeyboardShortcuts } from '@/components/KeyboardShortcuts';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 export function SettingsDialog() {
   const { settings, hydrated, saveSettings } = useSettings();
   const { t } = useI18n();
   const isMobile = useIsMobile();
+  const keyboardShortcuts = useKeyboardShortcuts();
   const [open, setOpen] = useState(false);
   const [showAppSettings, setShowAppSettings] = useState(false);
   const [name, setName] = useState<string>(settings?.name ?? '');
@@ -106,6 +108,23 @@ export function SettingsDialog() {
               <ThemeToggle />
             </div>
           </div>
+          {keyboardShortcuts && (
+            <div>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+                {t('settings.keyboardShortcuts')}
+              </span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                {t('settings.keyboardShortcutsHint')}
+              </p>
+              <button
+                type="button"
+                onClick={() => keyboardShortcuts.showHelp()}
+                className="px-3 py-2 text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                {t('settings.keyboardShortcuts')}
+              </button>
+            </div>
+          )}
           <div>
             <NotificationSettings />
           </div>

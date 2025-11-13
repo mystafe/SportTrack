@@ -12,6 +12,7 @@ import { StorageErrorHandler } from '@/components/StorageErrorHandler';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { NotificationManager } from '@/components/NotificationManager';
 import { OnboardingManager } from '@/components/OnboardingManager';
+import { KeyboardShortcuts } from '@/components/KeyboardShortcuts';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -26,6 +27,7 @@ export function Providers({ children }: { children: ReactNode }) {
                   <InstallPrompt />
                   <NotificationManager />
                   <OnboardingManager />
+                  <KeyboardShortcuts />
                   {children}
                 </ToasterProvider>
               </BadgeProvider>

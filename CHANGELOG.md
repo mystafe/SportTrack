@@ -2,6 +2,19 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.10.0] - 2025-01
+
+### Added
+- **Keyboard Shortcuts System**:
+  - GitHub-style navigation shortcuts (`g h`, `g a`, `g s`, `g c`, `g t`)
+  - Quick action shortcuts (`a` for add activity)
+  - General shortcuts (`?` to show/hide help, `Esc` to close dialogs)
+  - Beautiful keyboard shortcuts help dialog
+  - Context API for programmatic access
+  - Settings dialog integration
+  - Mobile devices excluded (desktop only)
+  - Input field detection to prevent conflicts
+
 ## [0.9.9] - 2025-01
 
 ### Changed
