@@ -11,7 +11,23 @@ body {
 }
 
 .container {
-  @apply max-w-5xl mx-auto px-3 sm:px-4;
+  @apply max-w-5xl mx-auto px-4 sm:px-4;
+}
+
+/* Safe area support for iOS */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  .safe-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+  .safe-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
 }
 
 /* Skeleton shimmer */

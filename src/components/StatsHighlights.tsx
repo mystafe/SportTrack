@@ -99,96 +99,96 @@ export function StatsHighlights() {
       <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
         {t('stats.highlightsTitle')}
       </h2>
-      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2' : 'gap-4'}`}>
-          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>{t('stats.highlight.bestDay')}</div>
+      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-3' : 'gap-4'}`}>
+          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500`}>{t('stats.highlight.bestDay')}</div>
             {bestDay ? (
               <>
                 <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold`}>
                   {format(new Date(bestDay.date), 'd MMMM yyyy, EEEE', { locale: dateLocale })}
                 </div>
-                <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-500`}>
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>
                   {numberFormatter.format(bestDay.points)} {t('list.pointsUnit')}
                 </div>
               </>
             ) : (
-              <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-600 dark:text-gray-400`}>
+              <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400`}>
                 {t('stats.highlight.bestDayFallback')}
               </div>
             )}
           </div>
 
-          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>{t('stats.highlight.bestActivity')}</div>
+          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500`}>{t('stats.highlight.bestActivity')}</div>
             {topActivity ? (
               <>
                 <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold flex items-center gap-2`}>
                   <span>{topActivity.icon}</span>
                   <span>{topActivity.label}</span>
                 </div>
-                <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-500`}>
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>
                   {numberFormatter.format(topActivity.points)} {t('list.pointsUnit')} •{' '}
                   {topActivity.count} {t('stats.highlight.sessions')}
                 </div>
               </>
             ) : (
-              <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-600 dark:text-gray-400`}>
+              <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400`}>
                 {t('stats.highlight.bestActivityFallback')}
               </div>
             )}
           </div>
 
-          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>{t('stats.highlight.currentStreak')}</div>
+          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500`}>{t('stats.highlight.currentStreak')}</div>
             <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold`}>{summary.streakDays}</div>
-            <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-500`}>
+            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>
               {t('stats.highlight.totalActivities', {
                 count: summary.totalActivities
               })}
             </div>
           </div>
 
-          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>{t('stats.highlight.averageDaily')}</div>
+          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500`}>{t('stats.highlight.averageDaily')}</div>
             <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold`}>
               {numberFormatter.format(averageDailyPoints)} {t('list.pointsUnit')}
             </div>
-            <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-500`}>
+            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>
               {t('stats.highlight.totalDays', { count: totalDays })}
             </div>
           </div>
 
-          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>{t('stats.highlight.totalPoints')}</div>
+          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500`}>{t('stats.highlight.totalPoints')}</div>
             <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold`}>
               {numberFormatter.format(summary.totalPoints)} {t('list.pointsUnit')}
             </div>
-            <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-500`}>
+            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>
               {t('stats.highlight.totalActivities', {
                 count: summary.totalActivities
               })}
             </div>
           </div>
 
-          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>{t('stats.highlight.todayProgress')}</div>
+          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500`}>{t('stats.highlight.todayProgress')}</div>
             <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold`}>
               {numberFormatter.format(summary.todayPoints)} / {numberFormatter.format(summary.targetPoints)}
             </div>
-            <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-500`}>
+            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>
               {Math.round((summary.todayPoints / summary.targetPoints) * 100)}% {t('stats.highlight.complete')}
             </div>
           </div>
           
           <Link
             href="/stats"
-            className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-brand/10 to-brand/5 dark:from-brand/20 dark:to-brand/10 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card hover-lift transition-smooth group`}
+            className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-brand/10 to-brand/5 dark:from-brand/20 dark:to-brand/10 ${isMobile ? 'p-3' : 'p-4'} shadow-card hover-lift transition-smooth group`}
           >
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.title')}</div>
+            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.title')}</div>
             <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold group-hover:text-brand transition-colors`}>
               {t('stats.detailed.subtitle')}
             </div>
-            <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-500 mt-2`}>→ {t('nav.stats')}</div>
+            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mt-2`}>→ {t('nav.stats')}</div>
           </Link>
         </div>
     </section>

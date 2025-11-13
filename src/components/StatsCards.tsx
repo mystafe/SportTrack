@@ -97,19 +97,19 @@ export function StatsCards() {
           ))}
         </>
       )}
-      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} gap-3 ${isMobile ? 'gap-2' : 'gap-4'}`}>
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5 space-y-1' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-500' : ''}`}>
-          <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-500`}>{t('stats.todayPoints')}</div>
+      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-3' : 'gap-4'}`}>
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-500' : ''}`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>{t('stats.todayPoints')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400' : ''}`}>
             {numberFormatter.format(summary.todayPoints)}
           </div>
-          <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>
+          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>
             {t('stats.target')}: {numberFormatter.format(summary.targetPoints)}
             {isGoalCompleted && (
               <span className="ml-1 text-green-600 dark:text-green-400 font-semibold">✓ {t('stats.goalCompleted')}</span>
             )}
           </div>
-          <div className={`${isMobile ? 'h-1.5' : 'h-2'} bg-gray-200 dark:bg-gray-800 rounded overflow-hidden relative`} role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={t('stats.progressLabel', { current: summary.todayPoints, target: summary.targetPoints })}>
+          <div className={`${isMobile ? 'h-2.5' : 'h-2'} bg-gray-200 dark:bg-gray-800 rounded overflow-hidden relative`} role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={t('stats.progressLabel', { current: summary.todayPoints, target: summary.targetPoints })}>
             <div
               className={`h-full rounded transition-all duration-500 ease-out animate-progress ${showGoalAnimation ? 'progress-bar' : 'bg-gradient-to-r from-brand to-brand-dark'}`}
               style={{ width: `${pct}%` }}
@@ -119,17 +119,17 @@ export function StatsCards() {
             )}
           </div>
         </div>
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5 space-y-1' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
-          <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-500`}>{t('stats.totalPoints')}</div>
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>{t('stats.totalPoints')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300`}>
             {numberFormatter.format(summary.totalPoints)}
           </div>
-          <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
+          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
         </div>
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5 space-y-1' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
-          <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-500`}>{t('stats.streak')}</div>
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>{t('stats.streak')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand transition-all duration-300`}>{summary.streakDays}</div>
-          <div className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.streakDesc')}</div>
+          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.streakDesc')}</div>
         </div>
       </div>
 

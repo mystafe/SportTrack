@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { TIMEOUTS } from '@/lib/constants';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -21,6 +22,7 @@ const ToasterContext = createContext<ToasterContextValue | null>(null);
 export function ToasterProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [mounted, setMounted] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setMounted(true);
@@ -40,11 +42,15 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
       {mounted &&
         typeof window !== 'undefined' &&
         createPortal(
-          <div className="fixed bottom-4 right-4 z-[10000] flex flex-col gap-2">
+          <div className={`fixed z-[10000] flex flex-col gap-2 ${
+            isMobile 
+              ? 'bottom-4 left-4 right-4 safe-bottom' 
+              : 'bottom-4 right-4'
+          }`}>
             {toasts.map((toast) => (
               <div
                 key={toast.id}
-                className={`px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-slide-in-right transition-all duration-300 ${
+                className={`${isMobile ? 'w-full' : ''} px-4 py-4 rounded-lg shadow-lg text-base font-medium animate-slide-in-right transition-all duration-300 ${
                   toast.type === 'success'
                     ? 'bg-green-500 text-white'
                     : toast.type === 'error'

@@ -242,15 +242,16 @@ export function SettingsDialog() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="px-1.5 py-0.5 text-[11px] rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+            className="px-3 py-2 min-h-[44px] text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all"
           >
             {settings?.name ? settings.name : t('settings.setProfile')}
           </button>
           <button
             type="button"
             onClick={() => setShowAppSettings(true)}
-            className="px-1.5 py-0.5 text-[11px] rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+            className="px-3 py-2 min-h-[44px] min-w-[44px] text-base rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center"
             title={t('settings.appSettings')}
+            aria-label={t('settings.appSettings')}
           >
             ⚙️
           </button>

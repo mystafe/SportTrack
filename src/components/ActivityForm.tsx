@@ -7,6 +7,7 @@ import { ActivityRecord, useActivities } from '@/lib/activityStore';
 import { useActivityDefinitions } from '@/lib/settingsStore';
 import { getActivityLabel, getActivityUnit, getActivityDescription } from '@/lib/activityUtils';
 import { useToaster } from '@/components/Toaster';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 function toLocalInputValue(date: Date) {
   const year = date.getFullYear();
@@ -55,6 +56,7 @@ function asDefinitionFromRecord(record: ActivityFormInitial): ActivityDefinition
 }
 
 export function ActivityForm({ onCreated, onSaved, onCancel, initial }: ActivityFormProps) {
+  const isMobile = useIsMobile();
   const baseDefinitions = useActivityDefinitions();
   const fallbackDefinition = initial ? asDefinitionFromRecord(initial) : undefined;
   const mergedDefinitions: ActivityDefinition[] = useMemo(() => {
@@ -246,7 +248,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             type="datetime-local"
             value={performedAt}
             onChange={(e) => setPerformedAt(e.target.value)}
-            className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0 max-w-full text-xs sm:text-sm"
+            className="w-full border rounded-lg px-3 py-3 min-h-[44px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0 max-w-full text-sm"
             required
           />
         </label>
@@ -262,7 +264,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             step={1}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
+            className="w-full border rounded-lg px-3 py-3 min-h-[44px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-sm"
             required
             aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
             aria-describedby={getActivityDescription(definition, lang) ? 'amount-description' : undefined}
@@ -287,17 +289,17 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
+          className="w-full border rounded-lg px-3 py-3 min-h-[88px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-sm"
           rows={3}
           placeholder={t('form.notePlaceholder')}
           aria-label={t('form.noteOptional')}
         />
       </label>
-      <div className="flex items-center gap-2">
+      <div className={`flex items-center gap-2 ${isMobile && !isEditing ? 'flex-col' : ''}`}>
         <button
           type="submit"
           disabled={loading}
-          className="px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-sm disabled:opacity-50 shadow transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 disabled:hover:scale-100"
+          className={`${isMobile && !isEditing ? 'w-full' : ''} px-4 py-3 min-h-[44px] rounded-lg bg-brand text-white hover:bg-brand-dark text-sm font-medium disabled:opacity-50 shadow transition-all duration-200 active:scale-95 disabled:hover:scale-100`}
           aria-label={loading ? t('form.loading') : isEditing ? t('form.save') : t('form.add')}
           aria-busy={loading}
         >
@@ -307,7 +309,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           <button
             type="button"
             onClick={onCancel}
-            className="px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-sm hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-200 hover:scale-105 active:scale-95"
+            className="px-4 py-3 min-h-[44px] rounded-lg border border-gray-200 dark:border-gray-700 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-200 active:scale-95"
           >
             {t('form.cancel')}
           </button>
