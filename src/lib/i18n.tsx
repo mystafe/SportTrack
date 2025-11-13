@@ -466,6 +466,50 @@ const translations: Translations = {
     tr: 'Apple Health verileri içe aktarılamadı',
     en: 'Failed to import Apple Health data'
   },
+  'appleHealth.guideTitle': {
+    tr: 'Apple Health İçe Aktarma Rehberi',
+    en: 'Apple Health Import Guide'
+  },
+  'appleHealth.step1': {
+    tr: '1. Apple Health\'tan Veri Dışa Aktarma',
+    en: '1. Export Data from Apple Health'
+  },
+  'appleHealth.step1a': {
+    tr: 'iPhone\'unuzda Apple Health uygulamasını açın',
+    en: 'Open the Apple Health app on your iPhone'
+  },
+  'appleHealth.step1b': {
+    tr: 'Sağ alt köşedeki "Profil" sekmesine gidin',
+    en: 'Go to the "Profile" tab in the bottom right corner'
+  },
+  'appleHealth.step1c': {
+    tr: '"Verileri Dışa Aktar" seçeneğini bulun ve CSV formatını seçin',
+    en: 'Find "Export Data" option and select CSV format'
+  },
+  'appleHealth.step2': {
+    tr: '2. CSV Dosyasını Hazırlama',
+    en: '2. Prepare CSV File'
+  },
+  'appleHealth.step2a': {
+    tr: 'Dışa aktarılan CSV dosyasında "Step Count" (Adım Sayısı) verilerini içeren satırları bulun. Dosya şu formatta olmalıdır:',
+    en: 'In the exported CSV file, find rows containing "Step Count" data. The file should be in this format:'
+  },
+  'appleHealth.step2b': {
+    tr: 'type,sourceName,unit,value,startDate,endDate\nHKQuantityTypeIdentifierStepCount,Health,count,8500,2024-01-01 00:00:00 +0000,2024-01-01 23:59:59 +0000',
+    en: 'type,sourceName,unit,value,startDate,endDate\nHKQuantityTypeIdentifierStepCount,Health,count,8500,2024-01-01 00:00:00 +0000,2024-01-01 23:59:59 +0000'
+  },
+  'appleHealth.step3': {
+    tr: '3. SportTrack\'e İçe Aktarma',
+    en: '3. Import to SportTrack'
+  },
+  'appleHealth.step3a': {
+    tr: 'Ayarlar menüsünden "Apple Health" butonuna tıklayın ve CSV dosyanızı seçin. Sistem otomatik olarak adım verilerini "Yürüme" aktivitesi olarak içe aktaracaktır.',
+    en: 'Click the "Apple Health" button in the settings menu and select your CSV file. The system will automatically import step data as "Walking" activities.'
+  },
+  'appleHealth.note': {
+    tr: 'Not: Mevcut yürüme aktiviteleri silinip yenileriyle değiştirilecektir. Bu işlem geri alınamaz.',
+    en: 'Note: Existing walking activities will be deleted and replaced. This action cannot be undone.'
+  },
 
   'templates.title': { tr: 'Aktivite Şablonları', en: 'Activity Templates' },
   'templates.subtitle': { tr: 'Hızlı başlangıç için hazır kombinasyonlar', en: 'Ready combinations for quick start' },

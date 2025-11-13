@@ -80,44 +80,58 @@ export function ActivityTemplates() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-white`}>
           {t('templates.title')}
         </h3>
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`}>
           {t('templates.subtitle')}
         </span>
       </div>
 
       {templatesByCategory.map(({ category, templates }) => (
-        <div key={category} className="space-y-2">
-          <h4 className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+        <div key={category} className="space-y-3">
+          <h4 className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2`}>
+            <span className="inline-block w-1 h-4 bg-brand rounded-full"></span>
             {t(`templates.category.${category}`)}
           </h4>
-          <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-4'} gap-2 sm:gap-3`}>
+          <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} gap-3 sm:gap-4`}>
             {templates.map((template) => (
               <button
                 key={template.id}
                 type="button"
                 onClick={() => handleTemplateClick(template)}
                 disabled={isAdding}
-                className="relative flex flex-col items-start gap-2 p-3 rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand hover:bg-brand/5 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="relative flex flex-col items-start gap-3 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 hover:border-brand hover:shadow-lg hover:shadow-brand/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
               >
-                <div className="flex items-center gap-2 w-full">
-                  <span className="text-xl">{template.icon}</span>
-                  <div className="flex-1 text-left">
-                    <div className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+                <div className="flex items-start gap-3 w-full">
+                  <div className="text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300">
+                    {template.icon}
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-brand transition-colors`}>
                       {template.name[lang]}
                     </div>
-                    <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400 leading-relaxed`}>
                       {template.description[lang]}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 w-full text-[10px] text-gray-500 dark:text-gray-400">
-                  <span>{template.activities.length} {t('templates.activities')}</span>
-                  <span>·</span>
-                  <span>~{template.estimatedPoints} {t('templates.points')}</span>
+                <div className="flex items-center gap-3 w-full pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                    <span className="font-medium">{template.activities.length}</span>
+                    <span>{t('templates.activities')}</span>
+                  </div>
+                  <span className="text-gray-300 dark:text-gray-600">•</span>
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="font-semibold text-brand">~{template.estimatedPoints}</span>
+                    <span className="text-gray-600 dark:text-gray-400">{t('templates.points')}</span>
+                  </div>
                 </div>
+                {isAdding && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-xl backdrop-blur-sm">
+                    <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent"></div>
+                  </div>
+                )}
               </button>
             ))}
           </div>

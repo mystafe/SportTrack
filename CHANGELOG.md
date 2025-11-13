@@ -2,6 +2,27 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.8.8] - 2025-01
+
+### Added
+- **Apple Health Import Guide**: Detaylı kullanım rehberi
+  - Apple Health'tan veri dışa aktarma adımları
+  - CSV dosyası hazırlama rehberi
+  - SportTrack'e içe aktarma talimatları
+  - AppleHealthGuide bileşeni eklendi
+
+### Changed
+- **Görsel İyileştirmeler**:
+  - ActivityTemplates bileşeni sayfanın sonuna taşındı
+  - Template kartları modern gradient tasarıma güncellendi
+  - Template kartlarına hover animasyonları ve shadow efektleri eklendi
+  - QuickAdd bileşeni görsel olarak iyileştirildi (gradient, shadow, hover efektleri)
+  - Tüm kartlara daha yumuşak geçişler ve animasyonlar eklendi
+  - Mobil uyumluluk iyileştirildi
+
+### Fixed
+- Template kartlarının responsive tasarımı optimize edildi
+
 ## [0.8.7] - 2025-01
 
 ### Added

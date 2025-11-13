@@ -11,6 +11,8 @@ import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { LevelDisplay } from '@/components/LevelDisplay';
+import { AppleHealthImport } from '@/components/AppleHealthImport';
+import { AppleHealthGuide } from '@/components/AppleHealthGuide';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 export function SettingsDialog() {
@@ -106,6 +108,15 @@ export function SettingsDialog() {
           </div>
           <div>
             <NotificationSettings />
+          </div>
+          <div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+              {t('appleHealth.import')}
+            </span>
+            <div className="space-y-3">
+              <AppleHealthImport />
+              <AppleHealthGuide />
+            </div>
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 pt-2">

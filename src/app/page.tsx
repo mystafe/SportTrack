@@ -95,8 +95,8 @@ export default function HomePage() {
       
       <StatsCards />
       <QuickAdd />
-      <ActivityTemplates />
       <StatsHighlights />
+      <ActivityTemplates />
     </div>
   );
 }

@@ -87,14 +87,14 @@ export function QuickAdd() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-white`}>
           {t('quickAdd.title')}
         </h3>
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`}>
           {t('quickAdd.subtitle')}
         </span>
       </div>
-      <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-6'} gap-2 sm:gap-3`}>
+      <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-6'} gap-3 sm:gap-4`}>
         {mostUsedActivities.map(({ definition }) => {
           const isAddingThis = isAdding === definition.key;
           return (
@@ -104,29 +104,31 @@ export function QuickAdd() {
               onClick={() => handleQuickAddClick(definition)}
               disabled={isAddingThis}
               className={`
-                relative flex flex-col items-center justify-center gap-1.5
-                p-3 sm:p-4 rounded-lg border-2
-                transition-all duration-200
-                min-h-[80px] sm:min-h-[100px]
+                relative flex flex-col items-center justify-center gap-2
+                p-4 sm:p-5 rounded-xl border-2
+                transition-all duration-300
+                min-h-[90px] sm:min-h-[110px]
                 ${
                   isAddingThis
-                    ? 'border-brand bg-brand/10 cursor-wait'
-                    : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand hover:bg-brand/5 hover:scale-105 active:scale-95'
+                    ? 'border-brand bg-gradient-to-br from-brand/20 to-brand/10 cursor-wait shadow-lg shadow-brand/20'
+                    : 'border-gray-200 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 hover:border-brand hover:bg-brand/5 hover:shadow-lg hover:shadow-brand/10 hover:scale-105 active:scale-95'
                 }
-                disabled:opacity-50 disabled:cursor-not-allowed
+                disabled:opacity-50 disabled:cursor-not-allowed group
               `}
               aria-label={t('quickAdd.addActivity', { activity: getActivityLabel(definition, lang) })}
             >
-              <div className="text-2xl sm:text-3xl">{definition.icon}</div>
-              <div className="text-xs sm:text-sm font-medium text-center text-gray-700 dark:text-gray-300 line-clamp-2">
+              <div className="text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300">
+                {definition.icon}
+              </div>
+              <div className="text-xs sm:text-sm font-semibold text-center text-gray-900 dark:text-white line-clamp-2 group-hover:text-brand transition-colors">
                 {getActivityLabel(definition, lang)}
               </div>
-              <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-medium">
                 {definition.defaultAmount} {getActivityUnit(definition, lang)}
               </div>
               {isAddingThis && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 rounded-lg">
-                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-brand border-t-transparent"></div>
+                <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-xl backdrop-blur-sm">
+                  <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent"></div>
                 </div>
               )}
             </button>
