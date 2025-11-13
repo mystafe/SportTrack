@@ -1653,3 +1653,271 @@ html {
   color: #60a5fa;
 }
 
+/* ============================================
+   ENHANCED NAVBAR & HEADER ANIMATIONS
+   ============================================ */
+
+/* Navbar icon enhanced animations */
+.nav-icon {
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.nav-icon::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.1), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.nav-icon:active::after {
+  opacity: 1;
+  animation: touchRipple 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Quote card enhanced entrance */
+@keyframes quoteCardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.quote-card-entrance {
+  animation: quoteCardEntrance 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Motivational message enhanced entrance */
+@keyframes motivationalEntrance {
+  0% {
+    opacity: 0;
+    transform: translateX(30px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.motivational-entrance {
+  animation: motivationalEntrance 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Page title enhanced animation */
+@keyframes titleEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.title-entrance {
+  animation: titleEntrance 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Link hover glow effect */
+@keyframes linkGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(14, 165, 233, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.6), 0 0 25px rgba(14, 165, 233, 0.3);
+  }
+}
+
+.link-glow:hover {
+  animation: linkGlow 2s ease-in-out infinite;
+}
+
+/* Enhanced quote rotation */
+@keyframes quoteRotate {
+  0% {
+    opacity: 0;
+    transform: rotateY(90deg) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateY(0deg) scale(1);
+  }
+}
+
+.quote-rotate {
+  animation: quoteRotate 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Sparkle enhanced animation */
+@keyframes sparkleEnhanced {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+.sparkle-enhanced {
+  animation: sparkleEnhanced 2s ease-in-out infinite;
+}
+
+.sparkle-enhanced:nth-child(1) { animation-delay: 0s; }
+.sparkle-enhanced:nth-child(2) { animation-delay: 0.2s; }
+.sparkle-enhanced:nth-child(3) { animation-delay: 0.4s; }
+.sparkle-enhanced:nth-child(4) { animation-delay: 0.6s; }
+.sparkle-enhanced:nth-child(5) { animation-delay: 0.8s; }
+
+/* Gradient text animation enhanced */
+@keyframes gradientText {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-text-animated {
+  background: linear-gradient(90deg, #0ea5e9, #0284c7, #38bdf8, #0284c7, #0ea5e9);
+  background-size: 300% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientText 4s linear infinite;
+}
+
+/* Card stack effect enhanced */
+@keyframes cardStack {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-stack-entrance {
+  animation: cardStack 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth number increment animation */
+@keyframes numberIncrement {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.number-increment {
+  animation: numberIncrement 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Loading pulse enhanced */
+@keyframes loadingPulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.loading-pulse {
+  animation: loadingPulse 1.5s ease-in-out infinite;
+}
+
+/* Section divider animation */
+@keyframes dividerGrow {
+  0% {
+    width: 0;
+    opacity: 0;
+  }
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+.divider-grow {
+  animation: dividerGrow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Badge shine effect */
+@keyframes badgeShine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.badge-shine {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: badgeShine 2s linear infinite;
+}
+
+/* Enhanced emoji animation */
+@keyframes emojiCelebrate {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.2) rotate(-10deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  75% {
+    transform: scale(1.2) rotate(-10deg);
+  }
+}
+
+.emoji-celebrate {
+  animation: emojiCelebrate 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mobile-specific navbar enhancements */
+@media (max-width: 640px) {
+  .nav-icon:active span {
+    transform: scale(0.85);
+  }
+  
+  .nav-icon:active::after {
+    animation: touchRipple 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+

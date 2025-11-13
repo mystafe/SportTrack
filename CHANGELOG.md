@@ -2,6 +2,54 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.10.7] - 2025-01
+
+### Added
+- **Enhanced Navbar & Header Animations**:
+  - Navbar icons with touch feedback and enhanced animations
+  - Icon wiggle animation on mobile
+  - Active state animations for navbar icons
+  - Enhanced ripple effect on touch
+
+- **Enhanced Quote & Motivational Message Animations**:
+  - Quote card entrance animation with blur effect
+  - Enhanced sparkle particles with staggered animations
+  - Quote rotation animation for mobile
+  - Motivational message entrance animation
+  - Enhanced emoji celebrate animation
+
+- **Enhanced Page Title Animations**:
+  - Title entrance animation
+  - Gradient text animation for mobile
+  - Stats page title with enhanced animations
+
+- **Enhanced Stats Page Animations**:
+  - Summary cards with mobile touch feedback
+  - Number count animations for all stats
+  - Enhanced card entrance animations
+
+- **New CSS Animations**:
+  - `quoteCardEntrance`: Quote card entrance with blur
+  - `motivationalEntrance`: Motivational message entrance
+  - `titleEntrance`: Page title entrance
+  - `quoteRotate`: Quote rotation animation
+  - `sparkleEnhanced`: Enhanced sparkle animation
+  - `gradientText`: Gradient text animation
+  - `cardStack`: Card stack entrance
+  - `numberIncrement`: Number increment animation
+  - `loadingPulse`: Loading pulse animation
+  - `dividerGrow`: Divider grow animation
+  - `badgeShine`: Badge shine effect
+  - `emojiCelebrate`: Enhanced emoji celebration
+
+### Changed
+- **Mobile Enhancements**:
+  - Navbar icons now have touch feedback on mobile
+  - Quote card uses enhanced entrance animation
+  - Motivational message uses mobile-optimized entrance
+  - Page titles use gradient text animation on mobile
+  - Stats cards use mobile-specific number count animations
+
 ## [0.10.6] - 2025-01
 
 ### Added

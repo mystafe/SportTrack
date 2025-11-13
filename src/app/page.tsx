@@ -12,11 +12,13 @@ import { useActivitiesSummary, useActivities } from '@/lib/activityStore';
 import { getRandomQuote } from '@/lib/quotes';
 import { getMotivationalMessage } from '@/lib/motivationalMessages';
 import { startOfDay, isSameDay } from 'date-fns';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 export default function HomePage() {
   const { t, lang } = useI18n();
   const { settings } = useSettings();
   const { activities } = useActivities();
+  const isMobile = useIsMobile();
   const dailyTarget = settings?.dailyTarget && settings.dailyTarget > 0 ? settings.dailyTarget : 10_000;
   const summary = useActivitiesSummary(dailyTarget);
   const hasName = settings?.name;
@@ -67,15 +69,15 @@ export default function HomePage() {
   return (
     <div className="space-y-4 sm:space-y-6 page-transition">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold">{greeting}</h1>
+        <div className={isMobile ? 'title-entrance' : ''}>
+          <h1 className={`text-xl sm:text-2xl font-semibold ${isMobile ? 'gradient-text-animated' : ''}`}>{greeting}</h1>
           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             {t('header.overviewSubtitle')}
           </p>
         </div>
         <Link
           href="/add"
-          className="px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-xs sm:text-sm shadow self-start sm:self-auto btn-enhanced ripple-effect scale-on-interact"
+          className={`px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-xs sm:text-sm shadow self-start sm:self-auto btn-enhanced ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'ripple-effect'} scale-on-interact`}
           aria-label={t('actions.addActivity')}
           data-tour-id="add-activity"
         >
@@ -84,18 +86,18 @@ export default function HomePage() {
       </div>
       
       {/* Motivational Quote - Extraordinary Design */}
-      <div className="quote-card glow-border relative rounded-xl border-2 border-brand/30 dark:border-brand/40 p-6 sm:p-8 shadow-2xl card-entrance backdrop-blur-sm overflow-hidden">
+      <div className="quote-card glow-border relative rounded-xl border-2 border-brand/30 dark:border-brand/40 p-6 sm:p-8 shadow-2xl card-entrance quote-card-entrance backdrop-blur-sm overflow-hidden">
         {/* Decorative elements */}
         <div className="quote-dots"></div>
         <div className="pattern-overlay"></div>
         <div className="quote-shimmer"></div>
         
         {/* Sparkle particles */}
-        <div className="sparkle"></div>
-        <div className="sparkle"></div>
-        <div className="sparkle"></div>
-        <div className="sparkle"></div>
-        <div className="sparkle"></div>
+        <div className="sparkle sparkle-enhanced"></div>
+        <div className="sparkle sparkle-enhanced"></div>
+        <div className="sparkle sparkle-enhanced"></div>
+        <div className="sparkle sparkle-enhanced"></div>
+        <div className="sparkle sparkle-enhanced"></div>
         
         {/* Quote marks */}
         <span className="quote-mark quote-mark-left">"</span>
@@ -103,7 +105,7 @@ export default function HomePage() {
         
         {/* Quote text */}
         <div className="relative z-10">
-          <p className="text-base sm:text-lg md:text-xl text-gray-800 dark:text-gray-100 italic text-center font-medium leading-relaxed text-reveal rotate-quote">
+          <p className={`text-base sm:text-lg md:text-xl text-gray-800 dark:text-gray-100 italic text-center font-medium leading-relaxed text-reveal ${isMobile ? 'quote-rotate' : 'rotate-quote'}`}>
             {lang === 'tr' ? quote.tr : quote.en}
           </p>
         </div>
@@ -116,21 +118,21 @@ export default function HomePage() {
       
       {/* Motivational Message - Enhanced Design */}
       {motivationalMessage && showMessage && (
-        <div className={`motivational-card glow-border rounded-xl border-2 border-brand/40 dark:border-brand/50 p-5 sm:p-6 shadow-2xl animate-slide-in-right transition-all duration-500 backdrop-blur-sm overflow-hidden relative ${showMessage ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
+        <div className={`motivational-card glow-border rounded-xl border-2 border-brand/40 dark:border-brand/50 p-5 sm:p-6 shadow-2xl ${isMobile ? 'motivational-entrance slide-in-bottom-mobile' : 'animate-slide-in-right'} transition-all duration-500 backdrop-blur-sm overflow-hidden relative ${showMessage ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
           {/* Decorative elements */}
           <div className="pattern-overlay"></div>
           <div className="quote-shimmer"></div>
           
           <div className="flex items-center gap-4 relative z-10">
-            <span className="text-3xl sm:text-4xl emoji-bounce flex-shrink-0">{motivationalMessage.emoji}</span>
+            <span className={`text-3xl sm:text-4xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'} flex-shrink-0`}>{motivationalMessage.emoji}</span>
             <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 dark:text-gray-100 flex-1 leading-relaxed">
               {lang === 'tr' ? motivationalMessage.tr : motivationalMessage.en}
             </p>
           </div>
           
           {/* Decorative sparkles */}
-          <div className="sparkle"></div>
-          <div className="sparkle"></div>
+          <div className="sparkle sparkle-enhanced"></div>
+          <div className="sparkle sparkle-enhanced"></div>
         </div>
       )}
       

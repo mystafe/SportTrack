@@ -104,10 +104,10 @@ export function StatsHighlights() {
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.bestDay')}</div>
             {bestDay ? (
               <>
-                <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 number-transition`}>
+                <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
                   {format(new Date(bestDay.date), 'd MMMM yyyy, EEEE', { locale: dateLocale })}
                 </div>
-                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 number-count`}>
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
                   {numberFormatter.format(bestDay.points)} {t('list.pointsUnit')}
                 </div>
               </>
@@ -123,10 +123,10 @@ export function StatsHighlights() {
             {topActivity ? (
               <>
                 <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100`}>
-                  <span className="emoji-bounce">{topActivity.icon}</span>
-                  <span className="number-transition">{topActivity.label}</span>
+                  <span className={isMobile ? 'emoji-celebrate' : 'emoji-bounce'}>{topActivity.icon}</span>
+                  <span className={isMobile ? 'number-count-mobile' : 'number-transition'}>{topActivity.label}</span>
                 </div>
-                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 number-count`}>
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
                   {numberFormatter.format(topActivity.points)} {t('list.pointsUnit')} •{' '}
                   {topActivity.count} {t('stats.highlight.sessions')}
                 </div>
@@ -140,7 +140,7 @@ export function StatsHighlights() {
 
           <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.currentStreak')}</div>
-            <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 number-transition`}>{summary.streakDays}</div>
+            <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>{summary.streakDays}</div>
             <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`}>
               {t('stats.highlight.totalActivities', {
                 count: summary.totalActivities
@@ -150,20 +150,20 @@ export function StatsHighlights() {
 
           <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.averageDaily')}</div>
-            <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 number-transition`}>
+            <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
               {numberFormatter.format(averageDailyPoints)} {t('list.pointsUnit')}
             </div>
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 number-count`}>
+            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
               {t('stats.highlight.totalDays', { count: totalDays })}
             </div>
           </div>
 
           <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.totalPoints')}</div>
-            <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 number-transition`}>
+            <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
               {numberFormatter.format(summary.totalPoints)} {t('list.pointsUnit')}
             </div>
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 number-count`}>
+            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
               {t('stats.highlight.totalActivities', {
                 count: summary.totalActivities
               })}
@@ -172,10 +172,10 @@ export function StatsHighlights() {
 
           <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.todayProgress')}</div>
-            <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 number-transition`}>
+            <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
               {numberFormatter.format(summary.todayPoints)} / {numberFormatter.format(summary.targetPoints)}
             </div>
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 number-count`}>
+            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
               {Math.round((summary.todayPoints / summary.targetPoints) * 100)}% {t('stats.highlight.complete')}
             </div>
           </div>

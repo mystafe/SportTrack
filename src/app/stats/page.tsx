@@ -152,37 +152,37 @@ export default function StatsPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6 page-transition">
-      <h1 className="stats-title text-2xl font-semibold flex items-center gap-2">
-        <span className="icon-rotate">📊</span>
-        <span className="text-gradient-animated">{t('nav.stats')}</span>
+      <h1 className={`stats-title ${isMobile ? 'title-entrance' : ''} text-2xl font-semibold flex items-center gap-2`}>
+        <span className={`icon-rotate ${isMobile ? 'icon-wiggle-mobile' : ''}`}>📊</span>
+        <span className={`${isMobile ? 'gradient-text-animated' : 'text-gradient-animated'}`}>{t('nav.stats')}</span>
       </h1>
 
       {/* Summary Cards */}
-      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${isMobile ? 'gap-2' : 'gap-4'}`}>
-        <div className={`stagger-item card-entrance stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
-          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.totalActivities')}</div>
-          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold number-transition`}>{numberFormatter.format(activities.length)}</div>
-        </div>
-        
-        <div className={`stagger-item card-entrance stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
-          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.totalSessions')}</div>
-          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold number-transition`}>{numberFormatter.format(allDays.length)}</div>
-        </div>
-        
-        <div className={`stagger-item card-entrance stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
-          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.averagePerDay')}</div>
-          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold number-transition`}>
-            {allDays.length > 0
-              ? numberFormatter.format(Math.round(allDays.reduce((sum, day) => sum + day.points, 0) / allDays.length))
-              : '0'} {t('list.pointsUnit')}
-          </div>
-        </div>
-        
-        <div className={`stagger-item card-entrance stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
-          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.bestStreak')}</div>
-          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold number-transition`}>{bestStreak} {bestStreak === 1 ? t('stats.highlight.sessions') : t('stats.highlight.sessions')}</div>
-        </div>
-      </div>
+            <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${isMobile ? 'gap-2' : 'gap-4'}`}>
+              <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.totalActivities')}</div>
+                <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>{numberFormatter.format(activities.length)}</div>
+              </div>
+
+              <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.totalSessions')}</div>
+                <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>{numberFormatter.format(allDays.length)}</div>
+              </div>
+
+              <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.averagePerDay')}</div>
+                <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
+                  {allDays.length > 0
+                    ? numberFormatter.format(Math.round(allDays.reduce((sum, day) => sum + day.points, 0) / allDays.length))
+                    : '0'} {t('list.pointsUnit')}
+                </div>
+              </div>
+
+              <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.bestStreak')}</div>
+                <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>{bestStreak} {bestStreak === 1 ? t('stats.highlight.sessions') : t('stats.highlight.sessions')}</div>
+              </div>
+            </div>
 
       {/* Activity Breakdown */}
       <div className="chart-container card-entrance slide-in-left rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card magnetic-hover gpu-accelerated">
