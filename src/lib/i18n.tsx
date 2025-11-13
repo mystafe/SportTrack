@@ -546,6 +546,10 @@ const translations: Translations = {
   'templates.added': { tr: 'şablonu eklendi', en: 'template added' },
   'templates.failed': { tr: 'Şablon aktiviteleri eklenemedi', en: 'Failed to add template activities' },
   'templates.template': { tr: 'şablon', en: 'template' },
+  'templates.selectTemplate': {
+    tr: '{template} şablonunu seç',
+    en: 'Select {template} template'
+  },
 
   'export.mood': { tr: 'Ruh Hali', en: 'Mood' },
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback, memo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
 import { useActivityDefinitions } from '@/lib/settingsStore';
@@ -10,7 +10,7 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ActivityDefinition } from '@/lib/activityConfig';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 
-export function QuickAdd() {
+export const QuickAdd = memo(function QuickAdd() {
   const { t, lang } = useI18n();
   const { addActivity } = useActivities();
   const { showToast } = useToaster();
@@ -48,11 +48,11 @@ export function QuickAdd() {
       .slice(0, 6);
   }, [definitions, activities]);
 
-  const handleQuickAddClick = (definition: ActivityDefinition) => {
+  const handleQuickAddClick = useCallback((definition: ActivityDefinition) => {
     setConfirmActivity(definition);
-  };
+  }, []);
 
-  const handleConfirmAdd = async () => {
+  const handleConfirmAdd = useCallback(async () => {
     if (!confirmActivity || isAdding) return;
     
     setIsAdding(confirmActivity.key);
@@ -74,11 +74,11 @@ export function QuickAdd() {
     } finally {
       setIsAdding(null);
     }
-  };
+  }, [confirmActivity, isAdding, addActivity, showToast, t, lang]);
 
-  const handleCancelAdd = () => {
+  const handleCancelAdd = useCallback(() => {
     setConfirmActivity(null);
-  };
+  }, []);
 
   if (mostUsedActivities.length === 0) {
     return null;
@@ -108,8 +108,8 @@ export function QuickAdd() {
                 relative flex flex-col items-center justify-center gap-2
                 p-4 sm:p-5 rounded-xl border-2
                 transition-all duration-300
-                min-h-[90px] sm:min-h-[110px]
- gpu-accelerated
+                min-h-[90px] sm:min-h-[110px] min-w-[90px] sm:min-w-[110px]
+                gpu-accelerated
                 ${
                   isAddingThis
                     ? 'border-brand dark:border-brand/60 bg-gradient-to-br from-brand/20 to-brand/10 dark:from-brand/25 dark:to-brand/15 cursor-wait shadow-lg shadow-brand/20 dark:shadow-brand/30 pulse-glow-mobile'
@@ -117,7 +117,17 @@ export function QuickAdd() {
                 }
                 disabled:opacity-50 disabled:cursor-not-allowed group
               `}
-              aria-label={t('quickAdd.addActivity', { activity: getActivityLabel(definition, lang) })}
+              aria-label={t('quickAdd.addActivityLabel', { activity: getActivityLabel(definition, lang) })}
+              aria-busy={isAddingThis}
+              aria-disabled={isAddingThis}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (!isAddingThis) {
+                    handleQuickAddClick(definition);
+                  }
+                }
+              }}
             >
               <div className={`text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300 ${isAddingThis ? 'icon-wiggle-mobile' : ''}`}>
                 {definition.icon}
@@ -159,5 +169,5 @@ export function QuickAdd() {
       />
     </div>
   );
-}
+});
 

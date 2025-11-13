@@ -2,6 +2,37 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.13.4] - 2025-01
+
+### Added
+- **Performance Optimizations**:
+  - Added `React.memo` to `QuickAdd` and `ActivityTemplates` components for better re-render performance
+  - Implemented `useCallback` hooks for event handlers to prevent unnecessary re-renders
+  - Optimized component memoization for better React performance
+- **Accessibility Improvements**:
+  - Added `aria-busy` and `aria-disabled` attributes to interactive buttons
+  - Enhanced keyboard navigation support (Enter and Space key handlers)
+  - Improved ARIA labels for better screen reader support
+  - Added descriptive labels for QuickAdd and ActivityTemplates buttons
+- **Mobile UX Enhancements**:
+  - Increased minimum touch target sizes (`min-w-[90px]` for QuickAdd buttons)
+  - Added minimum height constraints for better touch interaction
+  - Improved spacing and sizing for mobile devices
+
+### Changed
+- **Component Architecture**:
+  - Refactored `QuickAdd` and `ActivityTemplates` to use `memo` wrapper
+  - Converted event handlers to `useCallback` for performance optimization
+  - Better dependency management in callback hooks
+- **i18n Translations**:
+  - Added `quickAdd.addActivityLabel` translation key
+  - Added `templates.selectTemplate` translation key
+
+### Fixed
+- **Performance**:
+  - Reduced unnecessary re-renders in QuickAdd and ActivityTemplates components
+  - Optimized callback dependencies to prevent memory leaks
+
 ## [0.13.3] - 2025-01
 
 ### Added
