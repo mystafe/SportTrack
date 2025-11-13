@@ -34,7 +34,6 @@ export function QuoteTicker() {
   if (!mounted || !quote) return null;
 
   const quoteText = lang === 'tr' ? quote.tr : quote.en;
-  const separator = '  •  ';
 
   return (
     <div 
