@@ -11,6 +11,7 @@ import { ToasterProvider } from '@/components/Toaster';
 import { StorageErrorHandler } from '@/components/StorageErrorHandler';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { NotificationManager } from '@/components/NotificationManager';
+import { OnboardingManager } from '@/components/OnboardingManager';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -24,6 +25,7 @@ export function Providers({ children }: { children: ReactNode }) {
                   <StorageErrorHandler />
                   <InstallPrompt />
                   <NotificationManager />
+                  <OnboardingManager />
                   {children}
                 </ToasterProvider>
               </BadgeProvider>

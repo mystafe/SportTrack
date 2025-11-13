@@ -2,6 +2,28 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.9.8] - 2025-01
+
+### Added
+- **Onboarding Tour System**:
+  - Interactive step-by-step tutorial for new users
+  - Highlights key features and navigation elements
+  - Skip and navigation controls (Previous/Next)
+  - Progress indicator (step X of Y)
+  - Responsive design for mobile and desktop
+  - Automatic detection of new users (no profile or activities)
+  - Completion tracking in localStorage
+  - Beautiful overlay with highlighted elements
+  - Tooltip positioning (top, bottom, left, right, center)
+  - Smooth animations and transitions
+
+### Improved
+- **User Experience**:
+  - New users get guided tour automatically
+  - Better first-time user experience
+  - Feature discovery made easier
+  - Reduces learning curve for new users
+
 ## [0.9.7] - 2025-01
 
 ### Added

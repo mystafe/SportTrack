@@ -627,7 +627,12 @@ const translations: Translations = {
   'comparison.avgDaily': { tr: 'Ortalama Günlük', en: 'Avg Daily' },
   'comparison.completionRate': { tr: 'Tamamlama Oranı', en: 'Completion Rate' },
   'comparison.points': { tr: 'Puan', en: 'Points' },
-  'comparison.activities': { tr: 'Aktiviteler', en: 'Activities' }
+  'comparison.activities': { tr: 'Aktiviteler', en: 'Activities' },
+
+  'onboarding.skip': { tr: 'Turu Atla', en: 'Skip Tour' },
+  'onboarding.previous': { tr: 'Önceki', en: 'Previous' },
+  'onboarding.next': { tr: 'Sonraki', en: 'Next' },
+  'onboarding.finish': { tr: 'Bitir', en: 'Finish' }
 };
 
 type I18nContextValue = {

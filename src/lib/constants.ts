@@ -7,7 +7,8 @@ export const STORAGE_KEYS = {
   BADGES: 'sporttrack.badges.v1',
   NOTIFICATIONS: 'sporttrack.notifications.v1',
   LEVELS: 'sporttrack.levels.v1',
-  CHALLENGES: 'sporttrack.challenges.v1'
+  CHALLENGES: 'sporttrack.challenges.v1',
+  ONBOARDING_COMPLETED: 'sporttrack.onboarding.completed'
 } as const;
 
 export const TIMEOUTS = {
