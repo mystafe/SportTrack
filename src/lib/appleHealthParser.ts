@@ -603,13 +603,46 @@ export async function parseAppleHealthFile(
     } else {
       // CSV parsing requires string
       let csvText: string;
-      if (text instanceof ArrayBuffer) {
-        const decoder = new TextDecoder('utf-8');
-        csvText = decoder.decode(text);
-      } else {
-        csvText = text;
+      try {
+        if (text instanceof ArrayBuffer) {
+          const decoder = new TextDecoder('utf-8');
+          csvText = decoder.decode(text);
+        } else {
+          csvText = text;
+        }
+        
+        // Validate CSV content
+        if (!csvText || csvText.trim().length === 0) {
+          return {
+            success: false,
+            data: [],
+            errors: ['CSV file is empty or contains no data.'],
+            totalRecords: 0,
+            dateRange: null
+          };
+        }
+        
+        return parseAppleHealthCSV(csvText);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        // Check for string length errors
+        if (errorMessage.includes('length') || errorMessage.includes('Invalid string')) {
+          return {
+            success: false,
+            data: [],
+            errors: [`CSV file is too large to process (${Math.round(sizeMB)}MB). Please try exporting a smaller date range from Apple Health.`],
+            totalRecords: 0,
+            dateRange: null
+          };
+        }
+        return {
+          success: false,
+          data: [],
+          errors: [`Failed to read CSV file: ${errorMessage}`],
+          totalRecords: 0,
+          dateRange: null
+        };
       }
-      return parseAppleHealthCSV(csvText);
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

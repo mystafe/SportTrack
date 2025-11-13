@@ -154,17 +154,20 @@ export function AppleHealthImport() {
 
   return (
     <>
-      <label className="px-2 py-1 text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer">
+      <label className={`px-2 py-1 ${isMobile ? 'min-h-[36px] min-w-[80px]' : ''} text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer touch-feedback mobile-press flex items-center justify-center`}>
         <input
           ref={fileInputRef}
           type="file"
-          accept=".csv,.xml,.xml.gz"
+          accept=".csv,.xml,.xml.gz,text/csv,application/csv,application/xml,text/xml,application/gzip"
           onChange={handleFileSelect}
           disabled={isImporting}
           className="hidden"
           aria-label={t('appleHealth.importLabel')}
         />
-        {isImporting ? '⏳' : '🍎'} {t('appleHealth.import')}
+        <span className="flex items-center gap-1">
+          {isImporting ? '⏳' : '🍎'} 
+          <span className={isMobile ? 'text-[9px]' : ''}>{t('appleHealth.import')}</span>
+        </span>
       </label>
       
       {isImporting && parseProgress && parseProgress.total > 0 && (

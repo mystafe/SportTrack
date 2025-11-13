@@ -2,6 +2,35 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.10.9] - 2025-01
+
+### Fixed
+- **CSV File Import on Mobile**:
+  - Fixed CSV file selection not working on mobile devices
+  - Added MIME types to file input accept attribute (`text/csv`, `application/csv`, `application/xml`, `text/xml`, `application/gzip`)
+  - Improved file type validation before processing
+  - Enhanced mobile file input button with better touch targets and sizing
+  - Added better error messages for invalid file types
+
+- **CSV Parsing Improvements**:
+  - Better error handling for CSV parsing failures
+  - Improved empty CSV file detection
+  - Better error messages for large CSV files
+  - Fixed "Invalid string length" error handling for CSV files
+  - Added try-catch around CSV text decoding
+
+### Changed
+- **Mobile File Input**:
+  - File input button now has minimum height and width on mobile (`min-h-[36px] min-w-[80px]`)
+  - Better touch feedback with `touch-feedback mobile-press` classes
+  - Improved text sizing on mobile (`text-[9px]` for mobile)
+  - Better flex layout for icon and text alignment
+
+- **File Type Validation**:
+  - File type is now validated before processing
+  - Checks both file extension and MIME type
+  - More descriptive error messages for invalid file types
+
 ## [0.10.8] - 2025-01
 
 ### Fixed
