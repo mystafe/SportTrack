@@ -8,6 +8,7 @@ import { useToaster } from '@/components/Toaster';
 import { ActivityRecord } from '@/lib/activityStore';
 import { UserSettings } from '@/lib/settingsStore';
 import { STORAGE_KEYS } from '@/lib/constants';
+import { ExportDialog } from '@/components/ExportDialog';
 
 export function DataExportImport() {
   const { activities } = useActivities();
@@ -16,6 +17,7 @@ export function DataExportImport() {
   const { showToast } = useToaster();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   const handleExport = () => {
     try {
@@ -112,16 +114,17 @@ export function DataExportImport() {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <button
-        type="button"
-        onClick={handleExport}
-        className="px-2 py-1 text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300"
-        title={t('data.exportTooltip')}
-        aria-label={t('data.exportTooltip')}
-      >
-        💾 {t('data.export')}
-      </button>
+    <>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setShowExportDialog(true)}
+          className="px-2 py-1 text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300"
+          title={t('data.exportTooltip')}
+          aria-label={t('data.exportTooltip')}
+        >
+          💾 {t('data.export')}
+        </button>
       <label className="px-2 py-1 text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer">
         <input
           ref={fileInputRef}
@@ -134,7 +137,9 @@ export function DataExportImport() {
         />
         {isImporting ? '⏳' : '📥'} {t('data.import')}
       </label>
-    </div>
+      </div>
+      <ExportDialog open={showExportDialog} onClose={() => setShowExportDialog(false)} />
+    </>
   );
 }
 

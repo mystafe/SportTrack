@@ -276,6 +276,21 @@ const translations: Translations = {
     en: 'Data import failed. Please check the file format.'
   },
 
+  'export.title': { tr: 'Veri Dışa Aktar', en: 'Export Data' },
+  'export.format': { tr: 'Format', en: 'Format' },
+  'export.dateRange': { tr: 'Tarih Aralığı', en: 'Date Range' },
+  'export.allTime': { tr: 'Tüm Zamanlar', en: 'All Time' },
+  'export.last7Days': { tr: 'Son 7 Gün', en: 'Last 7 Days' },
+  'export.last30Days': { tr: 'Son 30 Gün', en: 'Last 30 Days' },
+  'export.customRange': { tr: 'Özel Aralık', en: 'Custom Range' },
+  'export.startDate': { tr: 'Başlangıç', en: 'Start Date' },
+  'export.endDate': { tr: 'Bitiş', en: 'End Date' },
+  'export.export': { tr: 'Dışa Aktar', en: 'Export' },
+  'export.csvSuccess': { tr: 'CSV dosyası başarıyla dışa aktarıldı', en: 'CSV file exported successfully' },
+  'export.pdfSuccess': { tr: 'PDF raporu başarıyla oluşturuldu', en: 'PDF report created successfully' },
+  'export.failed': { tr: 'Dışa aktarma başarısız', en: 'Export failed' },
+  'export.dateRangeRequired': { tr: 'Lütfen tarih aralığı seçin', en: 'Please select a date range' },
+
   'settings.setProfile': { tr: 'Profil Ayarla', en: 'Set Profile' },
   'settings.title': { tr: 'Seni Tanıyalım', en: 'Tell Us About You' },
   'settings.subtitle': {
