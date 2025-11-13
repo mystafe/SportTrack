@@ -3,7 +3,8 @@ export const STORAGE_KEYS = {
   ACTIVITIES: 'sporttrack.activities.v1',
   SETTINGS: 'sporttrack.settings.v1',
   THEME: 'theme',
-  LANGUAGE: 'lang'
+  LANGUAGE: 'lang',
+  BADGES: 'sporttrack.badges.v1'
 } as const;
 
 export const TIMEOUTS = {

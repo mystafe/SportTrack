@@ -328,6 +328,13 @@ const translations: Translations = {
 
   'footer.byName': { tr: 'Mustafa Evleksiz', en: 'Mustafa Evleksiz' },
 
+  'achievements.title': { tr: 'Başarımlar', en: 'Achievements' },
+  'achievements.subtitle': {
+    tr: 'Kazandığın rozetleri görüntüle ve yeni hedefler belirle',
+    en: 'View your earned badges and set new goals'
+  },
+  'achievements.progress': { tr: 'İlerleme', en: 'Progress' },
+
   'pwa.installTitle': {
     tr: 'SportTrack\'i Yükle',
     en: 'Install SportTrack'

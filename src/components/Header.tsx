@@ -24,6 +24,9 @@ export function Header() {
           <Link href="/stats" className={`hover:text-brand ${isMobile ? 'inline min-h-[44px] flex items-center px-2' : 'hidden sm:inline'}`}>
             {t('nav.stats')}
           </Link>
+          <Link href="/achievements" className={`hover:text-brand ${isMobile ? 'inline min-h-[44px] flex items-center px-2' : 'hidden sm:inline'}`}>
+            🏆
+          </Link>
           {!isMobile && (
             <>
               <DataExportImport />

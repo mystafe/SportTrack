@@ -8,6 +8,7 @@ import { useActivityDefinitions } from '@/lib/settingsStore';
 import { getActivityLabel, getActivityUnit, getActivityDescription } from '@/lib/activityUtils';
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useBadges } from '@/lib/badgeStore';
 
 function toLocalInputValue(date: Date) {
   const year = date.getFullYear();
@@ -87,6 +88,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   const { addActivity, updateActivity } = useActivities();
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
+  const { checkNewBadges } = useBadges();
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
     [lang]
@@ -175,6 +177,17 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           performedAt: performedAtISO
         });
         showToast(t('toast.activityAdded'), 'success');
+        
+        // Check for new badges
+        setTimeout(() => {
+          const newBadges = checkNewBadges();
+          if (newBadges.length > 0) {
+            newBadges.forEach(badge => {
+              showToast(`${badge.icon} ${badge.name[lang]}`, 'success');
+            });
+          }
+        }, 500);
+        
         setAmount(String(definition.defaultAmount));
         setNote('');
         setPerformedAt(toLocalInputValue(new Date()));
