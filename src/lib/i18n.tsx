@@ -307,7 +307,18 @@ const translations: Translations = {
     en: 'Goal must be between 1,000 and 100,000.'
   },
 
-  'footer.byName': { tr: 'Mustafa Evleksiz', en: 'Mustafa Evleksiz' }
+  'footer.byName': { tr: 'Mustafa Evleksiz', en: 'Mustafa Evleksiz' },
+
+  'pwa.installTitle': {
+    tr: 'SportTrack\'i Yükle',
+    en: 'Install SportTrack'
+  },
+  'pwa.installDescription': {
+    tr: 'Daha hızlı erişim ve offline çalışma için uygulamayı yükle',
+    en: 'Install the app for faster access and offline functionality'
+  },
+  'pwa.install': { tr: 'Yükle', en: 'Install' },
+  'pwa.dismiss': { tr: 'Daha Sonra', en: 'Later' }
 };
 
 type I18nContextValue = {

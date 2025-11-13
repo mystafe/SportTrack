@@ -7,7 +7,26 @@ import { Footer } from '@/components/Footer';
 
 export const metadata = {
   title: 'SportTrack',
-  description: 'Ön tanımlı aktivitelerle günlük 10.000 puan hedefini takip et'
+  description: 'Ön tanımlı aktivitelerle günlük 10.000 puan hedefini takip et',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'SportTrack',
+  },
+  icons: {
+    icon: '/icon-192.png',
+    apple: '/icon-192.png',
+  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#0ea5e9',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
