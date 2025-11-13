@@ -101,7 +101,7 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={handleCancel}
-              className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 active:scale-95`}
+              className={`${isMobile ? 'w-full min-h-[44px] touch-feedback mobile-press' : 'px-4 py-2'} text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 active:scale-95`}
               aria-label={cancelLabel || t('form.cancel')}
             >
               {cancelLabel || t('form.cancel')}
@@ -109,7 +109,7 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={handleConfirm}
-              className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-medium text-white rounded-lg transition-all duration-200 active:scale-95 hover:shadow-lg ${
+              className={`${isMobile ? 'w-full min-h-[44px] touch-feedback mobile-press' : 'px-4 py-2'} text-sm font-medium text-white rounded-lg transition-all duration-200 active:scale-95 hover:shadow-lg ${
                 variant === 'danger'
                   ? 'bg-red-600 hover:bg-red-700'
                   : 'bg-brand hover:bg-brand-dark'
