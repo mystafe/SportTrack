@@ -18,11 +18,11 @@ export function Header() {
           SportTrack
         </Link>
         <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
-          <Link href="/activities" className="hover:text-brand hidden sm:inline min-h-[44px] flex items-center px-2">
-            {t('nav.activities')}
+          <Link href="/activities" className="hover:text-brand hidden sm:inline min-h-[44px] flex items-center px-2 text-xl" aria-label={t('nav.activities')}>
+            📝
           </Link>
-          <Link href="/stats" className={`hover:text-brand ${isMobile ? 'inline min-h-[44px] flex items-center px-2' : 'hidden sm:inline'}`}>
-            {t('nav.stats')}
+          <Link href="/stats" className={`hover:text-brand ${isMobile ? 'inline min-h-[44px] flex items-center px-2 text-xl' : 'hidden sm:inline text-xl'}`} aria-label={t('nav.stats')}>
+            📊
           </Link>
           <Link href="/achievements" className={`hover:text-brand ${isMobile ? 'inline min-h-[44px] flex items-center px-2' : 'hidden sm:inline'}`}>
             🏆

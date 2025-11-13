@@ -263,71 +263,89 @@ export async function parseAppleHealthXML(
     const totalRecords = records.length;
     let processed = 0;
 
-    records.forEach((record) => {
-      try {
-        const valueElement = record.querySelector('value');
-        const startDateElement = record.querySelector('startDate');
-        const sourceNameElement = record.querySelector('sourceName');
-        
-        if (!valueElement || !startDateElement) {
-          errors.push('Missing required fields in record');
-          processed++;
-          if (onProgress && processed % 1000 === 0) {
-            onProgress({
-              processed,
-              total: totalRecords,
-              percentage: Math.round((processed / totalRecords) * 100)
-            });
+    // Report initial progress
+    if (onProgress && totalRecords > 0) {
+      onProgress({
+        processed: 0,
+        total: totalRecords,
+        percentage: 0
+      });
+    }
+
+    // Process records in batches to avoid blocking the UI
+    const batchSize = 1000;
+    const processBatch = (startIndex: number) => {
+      return new Promise<void>((resolve) => {
+        // Use requestIdleCallback for better performance
+        const process = (deadline?: IdleDeadline) => {
+          let i = startIndex;
+          while (i < records.length && (!deadline || deadline.timeRemaining() > 0)) {
+            const record = records[i];
+            try {
+              const valueElement = record.querySelector('value');
+              const startDateElement = record.querySelector('startDate');
+              const sourceNameElement = record.querySelector('sourceName');
+              
+              if (valueElement && startDateElement) {
+                const value = parseFloat(valueElement.textContent || '0');
+                const startDateStr = startDateElement.textContent || '';
+                const sourceName = sourceNameElement?.textContent?.trim();
+
+                if (!isNaN(value) && value >= 0) {
+                  const date = parseAppleHealthDate(startDateStr);
+                  if (date) {
+                    const dateKey = date.toISOString().split('T')[0];
+                    const existing = stepDataMap.get(dateKey);
+
+                    if (existing) {
+                      existing.steps += Math.round(value);
+                    } else {
+                      stepDataMap.set(dateKey, {
+                        steps: Math.round(value),
+                        sourceName
+                      });
+                    }
+                  }
+                }
+              }
+            } catch (error) {
+              errors.push(`Record ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            }
+            
+            processed++;
+            i++;
+            
+            // Report progress more frequently for large files
+            if (onProgress && (processed % 100 === 0 || processed === totalRecords)) {
+              onProgress({
+                processed,
+                total: totalRecords,
+                percentage: Math.round((processed / totalRecords) * 100)
+              });
+            }
           }
-          return;
-        }
-
-        const value = parseFloat(valueElement.textContent || '0');
-        const startDateStr = startDateElement.textContent || '';
-        const sourceName = sourceNameElement?.textContent?.trim();
-
-        if (isNaN(value) || value < 0) {
-          errors.push(`Invalid step value: ${valueElement.textContent}`);
-          processed++;
-          return;
-        }
-
-        // Parse date (Apple Health uses ISO format with timezone)
-        const date = parseAppleHealthDate(startDateStr);
-        if (!date) {
-          errors.push(`Invalid date format: ${startDateStr}`);
-          processed++;
-          return;
-        }
-
-        // Group by date (sum steps for the same day)
-        const dateKey = date.toISOString().split('T')[0];
-        const existing = stepDataMap.get(dateKey);
-
-        if (existing) {
-          existing.steps += Math.round(value);
-        } else {
-          stepDataMap.set(dateKey, {
-            steps: Math.round(value),
-            sourceName
-          });
-        }
-
-        processed++;
+          
+          if (i < records.length) {
+            // Continue processing in next batch
+            if (typeof requestIdleCallback !== 'undefined') {
+              requestIdleCallback(process);
+            } else {
+              setTimeout(() => process(), 0);
+            }
+          } else {
+            resolve();
+          }
+        };
         
-        // Report progress every 1000 records
-        if (onProgress && processed % 1000 === 0) {
-          onProgress({
-            processed,
-            total: totalRecords,
-            percentage: Math.round((processed / totalRecords) * 100)
-          });
+        if (typeof requestIdleCallback !== 'undefined') {
+          requestIdleCallback(process);
+        } else {
+          process();
         }
-      } catch (error) {
-        errors.push(`Record parsing error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        processed++;
-      }
-    });
+      });
+    };
+
+    await processBatch(0);
 
     // Convert map to array
     const stepData: AppleHealthStepData[] = Array.from(stepDataMap.entries())
@@ -416,7 +434,45 @@ export async function parseAppleHealthFile(
   const isXML = fileName.endsWith('.xml') || fileName.endsWith('.xml.gz');
   
   try {
-    const text = await file.text();
+    // For very large files, use chunked reading with progress
+    if (sizeMB > 500) {
+      onProgress?.({
+        processed: 0,
+        total: 0,
+        percentage: 0
+      });
+    }
+
+    // Use FileReader for better error handling
+    const text = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          resolve(e.target.result as string);
+        } else {
+          reject(new Error('Failed to read file content'));
+        }
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('File reading error. The file may be corrupted or too large for your browser.'));
+      };
+      
+      reader.onprogress = (e) => {
+        if (e.lengthComputable && sizeMB > 500) {
+          const percentage = Math.round((e.loaded / e.total) * 100);
+          onProgress?.({
+            processed: Math.round(e.loaded / 1024), // KB
+            total: Math.round(e.total / 1024), // KB
+            percentage
+          });
+        }
+      };
+      
+      // Read as text
+      reader.readAsText(file, 'UTF-8');
+    });
     
     if (isXML) {
       return await parseAppleHealthXML(text, onProgress);
@@ -424,10 +480,23 @@ export async function parseAppleHealthFile(
       return parseAppleHealthCSV(text);
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    // Provide more helpful error messages
+    if (errorMessage.includes('memory') || errorMessage.includes('quota')) {
+      return {
+        success: false,
+        data: [],
+        errors: [`File is too large for your browser to process (${Math.round(sizeMB)}MB). Try using a smaller date range or split the file.`],
+        totalRecords: 0,
+        dateRange: null
+      };
+    }
+    
     return {
       success: false,
       data: [],
-      errors: [`Failed to read file: ${error instanceof Error ? error.message : 'Unknown error'}`],
+      errors: [`Failed to read file: ${errorMessage}`],
       totalRecords: 0,
       dateRange: null
     };

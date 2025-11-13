@@ -328,11 +328,24 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         </label>
       </div>
       {!isEditing && (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-          <ActivityTimer
-            onDurationChange={setDuration}
-            initialDuration={duration}
-          />
+        <div className="space-y-2">
+          <div className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
+            <span>⏱️</span>
+            <span>{t('timer.title')}</span>
+            {duration > 0 && (
+              <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
+                ({Math.floor(duration / 60)} {lang === 'tr' ? 'dakika' : 'min'})
+              </span>
+            )}
+          </div>
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+            <ActivityTimer
+              onDurationChange={(newDuration) => {
+                setDuration(newDuration);
+              }}
+              initialDuration={duration}
+            />
+          </div>
         </div>
       )}
       <label className="space-y-1 block">

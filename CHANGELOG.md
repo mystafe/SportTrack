@@ -2,6 +2,28 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.9.1] - 2025-01
+
+### Changed
+- **Navbar İyileştirmeleri**:
+  - Activities ve Statistics linklerinde yazı kaldırıldı, sadece ikonlar gösteriliyor (📝 ve 📊)
+  - ARIA labels eklendi erişilebilirlik için
+
+### Fixed
+- **Apple Health Import Büyük Dosya Desteği**:
+  - 1.3GB+ dosyalar için FileReader API ile daha iyi hata yönetimi
+  - Büyük dosyalar için chunked/batched processing
+  - requestIdleCallback kullanarak UI blocking önlendi
+  - Daha sık progress reporting (her 100 kayıtta bir)
+  - Memory/quota hataları için daha açıklayıcı hata mesajları
+  - FileReader progress events ile dosya okuma ilerlemesi gösterimi
+
+### Improved
+- **Aktivite Süresi Entegrasyonu**:
+  - ActivityTimer'a başlık ve süre gösterimi eklendi
+  - Timer başlığında mevcut süre bilgisi gösteriliyor
+  - Daha iyi görsel hiyerarşi ve kullanıcı geri bildirimi
+
 ## [0.9.0] - 2025-01
 
 ### Changed
