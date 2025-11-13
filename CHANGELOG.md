@@ -2,6 +2,33 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.9.3] - 2025-01
+
+### Added
+- **Yeni Aktivite Ekleme Sayfası**: `/add` route'u eklendi
+  - Aktivite ekleme formu artık ayrı bir sayfada
+  - Ana sayfadaki "Aktivite Ekle" butonu yeni sayfaya yönlendiriyor
+  - Başarılı ekleme sonrası aktiviteler sayfasına yönlendirme
+
+### Changed
+- **Navbar İyileştirmeleri**:
+  - 4 navigasyon ikonu (📝, 📊, 🏆, 🎯) güzel bir container içinde hizalandı
+  - Hover ve active state animasyonları eklendi
+  - Background container ile görsel olarak gruplandı
+  - İkonlar daha büyük ve tutarlı boyutlarda (text-xl sm:text-2xl)
+  
+- **Activities Sayfası**:
+  - "Yeni Aktivite" formu kaldırıldı
+  - Sayfa artık sadece aktivite listesi ve filtreleme içeriyor
+  - Daha temiz ve odaklanmış bir görünüm
+
+### Improved
+- **Genel Görsel İyileştirmeler**:
+  - Navbar ikonları için modern container tasarımı
+  - Smooth hover ve scale animasyonları
+  - Daha iyi spacing ve alignment
+  - Responsive tasarım iyileştirmeleri
+
 ## [0.9.2] - 2025-01
 
 ### Added

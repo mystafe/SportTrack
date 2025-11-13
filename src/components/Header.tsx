@@ -17,19 +17,38 @@ export function Header() {
         <Link href="/" className="font-semibold text-2xl sm:text-lg" aria-label={t('nav.home')}>
           SportTrack
         </Link>
-        <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
-          <Link href="/activities" className="hover:text-brand hidden sm:inline min-h-[44px] flex items-center px-2 text-xl" aria-label={t('nav.activities')}>
-            📝
-          </Link>
-          <Link href="/stats" className={`hover:text-brand ${isMobile ? 'inline min-h-[44px] flex items-center px-2 text-xl' : 'hidden sm:inline text-xl'}`} aria-label={t('nav.stats')}>
-            📊
-          </Link>
-          <Link href="/achievements" className={`hover:text-brand ${isMobile ? 'inline min-h-[44px] flex items-center px-2' : 'hidden sm:inline'}`}>
-            🏆
-          </Link>
-          <Link href="/challenges" className={`hover:text-brand ${isMobile ? 'inline min-h-[44px] flex items-center px-2' : 'hidden sm:inline'}`}>
-            🎯
-          </Link>
+        <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+          {/* Navigation Icons - Always visible, beautifully aligned */}
+          <div className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-lg bg-gray-100/50 dark:bg-gray-800/50">
+            <Link 
+              href="/activities" 
+              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-xl sm:text-2xl hover:scale-110 active:scale-95 transition-all duration-200 rounded-md hover:bg-white/50 dark:hover:bg-gray-700/50" 
+              aria-label={t('nav.activities')}
+            >
+              📝
+            </Link>
+            <Link 
+              href="/stats" 
+              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-xl sm:text-2xl hover:scale-110 active:scale-95 transition-all duration-200 rounded-md hover:bg-white/50 dark:hover:bg-gray-700/50" 
+              aria-label={t('nav.stats')}
+            >
+              📊
+            </Link>
+            <Link 
+              href="/achievements" 
+              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-xl sm:text-2xl hover:scale-110 active:scale-95 transition-all duration-200 rounded-md hover:bg-white/50 dark:hover:bg-gray-700/50"
+              aria-label={t('nav.achievements')}
+            >
+              🏆
+            </Link>
+            <Link 
+              href="/challenges" 
+              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-xl sm:text-2xl hover:scale-110 active:scale-95 transition-all duration-200 rounded-md hover:bg-white/50 dark:hover:bg-gray-700/50"
+              aria-label={t('nav.challenges')}
+            >
+              🎯
+            </Link>
+          </div>
           {!isMobile && (
             <>
               <DataExportImport />

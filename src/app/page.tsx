@@ -66,7 +66,7 @@ export default function HomePage() {
           </p>
         </div>
         <Link
-          href="/activities"
+          href="/add"
           className="px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-xs sm:text-sm shadow self-start sm:self-auto transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
           aria-label={t('actions.addActivity')}
         >

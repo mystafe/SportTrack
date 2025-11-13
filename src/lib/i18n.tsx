@@ -10,6 +10,9 @@ type Translations = Record<string, Record<Language, string>>;
 const translations: Translations = {
   'nav.activities': { tr: 'Aktiviteler', en: 'Activities' },
   'nav.stats': { tr: 'İstatistikler', en: 'Statistics' },
+  'nav.addActivity': { tr: 'Aktivite Ekle', en: 'Add Activity' },
+  'nav.achievements': { tr: 'Başarımlar', en: 'Achievements' },
+  'nav.challenges': { tr: 'Zorluklar', en: 'Challenges' },
   'nav.main': { tr: 'Ana navigasyon', en: 'Main navigation' },
   'nav.home': { tr: 'Ana sayfa', en: 'Home page' },
   'header.overviewTitle': { tr: 'Genel Bakış', en: 'Overview' },
