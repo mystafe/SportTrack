@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useSettings } from '@/lib/settingsStore';
-import { notificationService, NotificationSettings, DEFAULT_NOTIFICATION_SETTINGS } from '@/lib/notificationService';
+import { notificationService, NotificationSettings as NotificationSettingsType, DEFAULT_NOTIFICATION_SETTINGS } from '@/lib/notificationService';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -13,7 +13,7 @@ export function NotificationSettings() {
   const { settings } = useSettings();
   const { showToast } = useToaster();
   const isMobile = useIsMobile();
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>(DEFAULT_NOTIFICATION_SETTINGS);
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSettingsType>(DEFAULT_NOTIFICATION_SETTINGS);
   const [permission, setPermission] = useState<'default' | 'granted' | 'denied'>('default');
   const [isSupported, setIsSupported] = useState(false);
 
@@ -34,7 +34,7 @@ export function NotificationSettings() {
     }
   }, []);
 
-  const saveSettings = (newSettings: NotificationSettings) => {
+  const saveSettings = (newSettings: NotificationSettingsType) => {
     try {
       localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(newSettings));
       setNotificationSettings(newSettings);
@@ -69,9 +69,9 @@ export function NotificationSettings() {
     }
   };
 
-  const updateSetting = <K extends keyof NotificationSettings>(
+  const updateSetting = <K extends keyof NotificationSettingsType>(
     key: K,
-    value: NotificationSettings[K]
+    value: NotificationSettingsType[K]
   ) => {
     const newSettings = { ...notificationSettings, [key]: value };
     saveSettings(newSettings);
