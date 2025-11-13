@@ -270,9 +270,9 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           />
         </label>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <label className="space-y-1">
-          <div className="text-sm text-gray-700">
+      <div className="space-y-3">
+        <label className="space-y-1 block">
+          <div className="text-sm text-gray-700 dark:text-gray-300">
             {t('form.amount')} ({getActivityUnit(definition, lang)})
           </div>
           <input
@@ -287,19 +287,16 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             aria-describedby={getActivityDescription(definition, lang) ? 'amount-description' : undefined}
           />
           {getActivityDescription(definition, lang) ? (
-            <div id="amount-description" className="text-xs text-gray-500" role="note">
+            <div id="amount-description" className="text-xs text-gray-500 dark:text-gray-400" role="note">
               {getActivityDescription(definition, lang)}
             </div>
           ) : null}
+          <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+            <span>{definition.multiplier}x</span>
+            <span>·</span>
+            <span>{t('form.points')}: {pointsDisplay}</span>
+          </div>
         </label>
-        <div className="space-y-1 flex flex-col justify-end">
-          <div className="text-sm text-gray-700">{t('form.multiplier')}</div>
-          <div className="text-lg font-semibold">{definition?.multiplier ?? 1}x</div>
-        </div>
-        <div className="space-y-1 flex flex-col justify-end">
-          <div className="text-sm text-gray-700">{t('form.points')}</div>
-          <div className="text-lg font-semibold text-brand">{pointsDisplay}</div>
-        </div>
       </div>
       <label className="space-y-1 block">
         <div className="text-sm text-gray-700">{t('form.noteOptional')}</div>

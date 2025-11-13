@@ -8,6 +8,7 @@ import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ActivityDefinition } from '@/lib/activityConfig';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 
 export function QuickAdd() {
   const { t, lang } = useI18n();
@@ -16,6 +17,7 @@ export function QuickAdd() {
   const isMobile = useIsMobile();
   const definitions = useActivityDefinitions();
   const [isAdding, setIsAdding] = useState<string | null>(null);
+  const [confirmActivity, setConfirmActivity] = useState<ActivityDefinition | null>(null);
 
   const { activities } = useActivities();
 
@@ -46,27 +48,36 @@ export function QuickAdd() {
       .slice(0, 6);
   }, [definitions, activities]);
 
-  const handleQuickAdd = async (definition: ActivityDefinition) => {
-    if (isAdding) return;
+  const handleQuickAddClick = (definition: ActivityDefinition) => {
+    setConfirmActivity(definition);
+  };
+
+  const handleConfirmAdd = async () => {
+    if (!confirmActivity || isAdding) return;
     
-    setIsAdding(definition.key);
+    setIsAdding(confirmActivity.key);
     try {
       const record = addActivity({
-        definition,
-        amount: definition.defaultAmount,
+        definition: confirmActivity,
+        amount: confirmActivity.defaultAmount,
         performedAt: new Date().toISOString()
       });
       
       showToast(
-        `${definition.icon} ${getActivityLabel(definition, lang)} ${t('quickAdd.added')}`,
+        `${confirmActivity.icon} ${getActivityLabel(confirmActivity, lang)} ${t('quickAdd.added')}`,
         'success'
       );
+      setConfirmActivity(null);
     } catch (error) {
       console.error('Failed to add activity:', error);
       showToast(t('quickAdd.failed'), 'error');
     } finally {
       setIsAdding(null);
     }
+  };
+
+  const handleCancelAdd = () => {
+    setConfirmActivity(null);
   };
 
   if (mostUsedActivities.length === 0) {

@@ -392,6 +392,12 @@ const translations: Translations = {
     tr: '{activity} aktivitesini ekle',
     en: 'Add {activity} activity'
   },
+  'quickAdd.confirmTitle': { tr: 'Aktivite Ekle', en: 'Add Activity' },
+  'quickAdd.confirmMessage': {
+    tr: '{activity} aktivitesini {amount} {unit} olarak eklemek istiyor musunuz? ({points} puan)',
+    en: 'Do you want to add {activity} activity with {amount} {unit}? ({points} points)'
+  },
+  'quickAdd.confirmAdd': { tr: 'Ekle', en: 'Add' },
 
   'filters.title': { tr: 'Filtreler', en: 'Filters' },
   'filters.dateRange': { tr: 'Tarih Aralığı', en: 'Date Range' },
