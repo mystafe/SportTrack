@@ -2,6 +2,35 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.13.2] - 2025-01
+
+### Fixed
+- **ScrollToTop Button - Final Fix**:
+  - Lowered scroll threshold from 300px to 200px for earlier visibility
+  - Increased bottom offset (`bottom-40` mobile, `bottom-36` desktop)
+  - Added explicit `position: fixed` in inline styles
+  - Added capture phase to scroll event listener
+  - Added resize event listener
+  - Better scroll detection with multiple fallbacks
+- **Footer Visibility**:
+  - Added margin-bottom (`mb-20` mobile, `mb-24` desktop) to account for QuoteTicker height
+  - Footer now readable above QuoteTicker
+  - Better text contrast (dark:text-gray-400)
+  - Enhanced font weights for better readability
+
+### Changed
+- **QuoteTicker Design Improvements**:
+  - Enhanced background gradients (stronger colors)
+  - Better border styling (border-brand/60)
+  - Increased padding (py-3.5 mobile, py-4.5 desktop)
+  - Enhanced gradient fade edges (wider, w-20)
+  - Added decorative pulsing dots on left and right edges
+  - Changed separator from bullet (•) to sparkle (✦)
+  - Increased text repetitions from 5 to 6 for smoother scroll
+  - Slower animation (30s instead of 25s) for better readability
+  - Better backdrop blur (backdrop-blur-md)
+  - Added performance optimizations (backface-visibility, transform: translateZ(0))
+
 ## [0.13.1] - 2025-01
 
 ### Fixed

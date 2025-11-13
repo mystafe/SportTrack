@@ -18,22 +18,27 @@ export function ScrollToTop() {
     if (!mounted || typeof window === 'undefined') return;
 
     const handleScroll = () => {
-      const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-      setIsVisible(scrollY > 300);
+      const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+      // Lower threshold for better visibility
+      setIsVisible(scrollY > 200);
     };
 
-    // Initial check
+    // Initial check immediately
     handleScroll();
 
     // Listen to scroll events with multiple methods
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
     window.addEventListener('wheel', handleScroll, { passive: true });
     window.addEventListener('touchmove', handleScroll, { passive: true });
     
+    // Also check on resize
+    window.addEventListener('resize', handleScroll, { passive: true });
+    
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleScroll, true);
       window.removeEventListener('wheel', handleScroll);
       window.removeEventListener('touchmove', handleScroll);
+      window.removeEventListener('resize', handleScroll);
     };
   }, [mounted]);
 
@@ -49,14 +54,15 @@ export function ScrollToTop() {
 
   // Calculate position above QuoteTicker
   // QuoteTicker height: ~50-60px (mobile) or ~60-70px (desktop) + safe-bottom
-  // Use larger offset to ensure visibility
-  const bottomOffset = isMobile ? 'bottom-36' : 'bottom-32';
+  // Use larger offset to ensure visibility - account for safe-bottom
+  const bottomOffset = isMobile ? 'bottom-40' : 'bottom-36';
 
   return (
     <div
       className={`fixed ${bottomOffset} right-4 sm:right-6 z-[99999] transition-all duration-500 ease-in-out ${!isVisible ? 'opacity-0 pointer-events-none translate-y-4 scale-90' : 'opacity-100 pointer-events-auto translate-y-0 scale-100'}`}
       style={{ 
         willChange: 'opacity, transform',
+        position: 'fixed',
       }}
     >
       <button
