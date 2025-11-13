@@ -43,23 +43,23 @@ export function ActivityFilters({
   };
 
   return (
-    <div className="space-y-4 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card">
-      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+    <div className="space-y-2.5 sm:space-y-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-2.5 sm:p-3 shadow-sm">
+      <h3 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-700 dark:text-gray-300`}>
         {t('filters.title')}
       </h3>
 
       {/* Date Range Filter */}
-      <div className="space-y-2">
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+      <div className="space-y-1.5">
+        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
           {t('filters.dateRange')}
         </label>
-        <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-5'} gap-2`}>
+        <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-5'} gap-1.5`}>
           {(['all', 'today', 'week', 'month', 'custom'] as const).map((range) => (
             <button
               key={range}
               type="button"
               onClick={() => updateFilter('dateRange', range)}
-              className={`px-3 py-2 text-xs rounded border transition-colors ${
+              className={`px-2 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} rounded border transition-colors ${
                 filters.dateRange === range
                   ? 'bg-brand text-white border-brand'
                   : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -70,34 +70,34 @@ export function ActivityFilters({
           ))}
         </div>
         {filters.dateRange === 'custom' && (
-          <div className="grid grid-cols-2 gap-2 mt-2">
+          <div className="grid grid-cols-2 gap-1.5 mt-1.5">
             <input
               type="date"
               value={filters.customStart || ''}
               onChange={(e) => updateFilter('customStart', e.target.value)}
               max={format(new Date(), 'yyyy-MM-dd')}
-              className="w-full border border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 text-xs bg-white dark:bg-gray-900"
+              className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
             />
             <input
               type="date"
               value={filters.customEnd || ''}
               onChange={(e) => updateFilter('customEnd', e.target.value)}
               max={format(new Date(), 'yyyy-MM-dd')}
-              className="w-full border border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 text-xs bg-white dark:bg-gray-900"
+              className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
             />
           </div>
         )}
       </div>
 
       {/* Category Filter */}
-      <div className="space-y-2">
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+      <div className="space-y-1.5">
+        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
           {t('filters.category')}
         </label>
         <select
           value={filters.category}
           onChange={(e) => updateFilter('category', e.target.value as FilterState['category'])}
-          className="w-full border border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 text-xs bg-white dark:bg-gray-900"
+          className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
         >
           <option value="all">{t('filters.allCategories')}</option>
           <option value="cardio">{t('filters.category.cardio')}</option>
@@ -109,14 +109,14 @@ export function ActivityFilters({
       </div>
 
       {/* Activity Type Filter */}
-      <div className="space-y-2">
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+      <div className="space-y-1.5">
+        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
           {t('filters.activityType')}
         </label>
         <select
           value={filters.activityType}
           onChange={(e) => updateFilter('activityType', e.target.value)}
-          className="w-full border border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 text-xs bg-white dark:bg-gray-900"
+          className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
         >
           <option value="all">{t('filters.allActivities')}</option>
           {uniqueActivityKeys.map((key) => {
@@ -132,8 +132,8 @@ export function ActivityFilters({
       </div>
 
       {/* Search */}
-      <div className="space-y-2">
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+      <div className="space-y-1.5">
+        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
           {t('filters.search')}
         </label>
         <input
@@ -141,19 +141,19 @@ export function ActivityFilters({
           value={filters.searchQuery}
           onChange={(e) => updateFilter('searchQuery', e.target.value)}
           placeholder={t('filters.searchPlaceholder')}
-          className="w-full border border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 text-xs bg-white dark:bg-gray-900"
+          className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
         />
       </div>
 
       {/* Sort */}
-      <div className="space-y-2">
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+      <div className="space-y-1.5">
+        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
           {t('filters.sortBy')}
         </label>
         <select
           value={filters.sortBy}
           onChange={(e) => updateFilter('sortBy', e.target.value as FilterState['sortBy'])}
-          className="w-full border border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 text-xs bg-white dark:bg-gray-900"
+          className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
         >
           <option value="date-desc">{t('filters.sort.dateDesc')}</option>
           <option value="date-asc">{t('filters.sort.dateAsc')}</option>
@@ -162,22 +162,22 @@ export function ActivityFilters({
         </select>
       </div>
 
-            {/* Clear Filters */}
-            {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.category !== 'all' || filters.searchQuery) && (
-              <button
-                type="button"
-                onClick={() => onFiltersChange({
-                  dateRange: 'all',
-                  activityType: 'all',
-                  category: 'all',
-                  searchQuery: '',
-                  sortBy: 'date-desc'
-                })}
-                className="w-full px-3 py-2 text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                {t('filters.clear')}
-              </button>
-            )}
+      {/* Clear Filters */}
+      {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.category !== 'all' || filters.searchQuery) && (
+        <button
+          type="button"
+          onClick={() => onFiltersChange({
+            dateRange: 'all',
+            activityType: 'all',
+            category: 'all',
+            searchQuery: '',
+            sortBy: 'date-desc'
+          })}
+          className={`w-full px-2 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors`}
+        >
+          {t('filters.clear')}
+        </button>
+      )}
     </div>
   );
 }

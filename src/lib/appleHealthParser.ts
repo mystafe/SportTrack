@@ -443,11 +443,51 @@ export async function parseAppleHealthFile(
       });
     }
 
-    // Use FileReader for better error handling
+    // For very large files (>1GB), warn user and use a more memory-efficient approach
+    if (sizeMB > 1000) {
+      // Try to use ArrayBuffer and process in chunks for very large files
+      const arrayBuffer = await file.arrayBuffer();
+      const decoder = new TextDecoder('utf-8');
+      
+      // Process in 100MB chunks to avoid memory issues
+      const chunkSize = 100 * 1024 * 1024; // 100MB chunks
+      let text = '';
+      let processed = 0;
+      
+      for (let offset = 0; offset < arrayBuffer.byteLength; offset += chunkSize) {
+        const chunk = arrayBuffer.slice(offset, Math.min(offset + chunkSize, arrayBuffer.byteLength));
+        const chunkText = decoder.decode(chunk, { stream: offset + chunkSize < arrayBuffer.byteLength });
+        text += chunkText;
+        processed += chunk.byteLength;
+        
+        // Report progress
+        if (onProgress) {
+          const percentage = Math.round((processed / arrayBuffer.byteLength) * 100);
+          onProgress({
+            processed: Math.round(processed / 1024), // KB
+            total: Math.round(arrayBuffer.byteLength / 1024), // KB
+            percentage
+          });
+        }
+        
+        // Yield to browser to prevent blocking
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+      
+      if (isXML) {
+        return await parseAppleHealthXML(text, onProgress);
+      } else {
+        return parseAppleHealthCSV(text);
+      }
+    }
+    
+    // For smaller files, use FileReader
     const text = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
+      let timeoutId: NodeJS.Timeout | null = null;
       
       reader.onload = (e) => {
+        if (timeoutId) clearTimeout(timeoutId);
         if (e.target?.result) {
           resolve(e.target.result as string);
         } else {
@@ -456,6 +496,7 @@ export async function parseAppleHealthFile(
       };
       
       reader.onerror = () => {
+        if (timeoutId) clearTimeout(timeoutId);
         reject(new Error('File reading error. The file may be corrupted or too large for your browser.'));
       };
       
@@ -469,6 +510,14 @@ export async function parseAppleHealthFile(
           });
         }
       };
+      
+      // Set a timeout for very large files (5 minutes)
+      if (sizeMB > 500) {
+        timeoutId = setTimeout(() => {
+          reader.abort();
+          reject(new Error(`File reading timeout. The file (${Math.round(sizeMB)}MB) is too large to process. Please try splitting it or using a smaller date range.`));
+        }, 5 * 60 * 1000); // 5 minutes
+      }
       
       // Read as text
       reader.readAsText(file, 'UTF-8');

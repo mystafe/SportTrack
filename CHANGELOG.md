@@ -2,6 +2,38 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.9.4] - 2025-01
+
+### Changed
+- **Navbar İkonları Daha Elegant**:
+  - Container kaldırıldı, daha minimal ve elegant tasarım
+  - İkonlar arası gap azaltıldı (gap-0.5 sm:gap-1)
+  - Hover efektleri iyileştirildi (group-hover:scale-110)
+  - Daha smooth transition animasyonları (duration-300)
+  - İkon boyutları optimize edildi (text-lg sm:text-xl)
+
+- **Activities Sayfası İyileştirmeleri**:
+  - Sayfa ikonu değiştirildi: 📝 → 📋
+  - "Aktiviteleri Özelleştir" butonu sayfa başlığına taşındı
+  - Sayfa daha compact hale getirildi (spacing azaltıldı)
+  - Aktivite listesi daha compact (padding ve font size azaltıldı)
+  - Filtered stats summary daha compact
+
+- **ActivityFilters Compact Tasarım**:
+  - Padding azaltıldı (p-2.5 sm:p-3)
+  - Font size'lar küçültüldü (text-[10px] mobilde)
+  - Spacing azaltıldı (space-y-1.5)
+  - Buton ve input'lar daha compact
+  - Shadow daha subtle (shadow-sm)
+
+### Fixed
+- **Apple Health Büyük Dosya Desteği (1.3GB+)**:
+  - 1GB+ dosyalar için ArrayBuffer ve chunked processing
+  - 100MB chunk'lar halinde işleme
+  - Browser blocking önlendi (setTimeout ile yield)
+  - FileReader için timeout eklendi (5 dakika)
+  - Daha iyi hata mesajları ve progress reporting
+
 ## [0.9.3] - 2025-01
 
 ### Added

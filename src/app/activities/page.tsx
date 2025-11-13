@@ -2,6 +2,7 @@
 
 import { ActivityForm } from '@/components/ActivityForm';
 import { ActivityFilters, useFilteredActivities } from '@/components/ActivityFilters';
+import { ManageActivitiesDialog } from '@/components/ManageActivitiesDialog';
 import type { FilterState } from '@/components/ActivityFilters';
 import { useMemo, useState } from 'react';
 import { format, startOfDay } from 'date-fns';
@@ -12,6 +13,7 @@ import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useToaster } from '@/components/Toaster';
 import { ActivityListSkeleton } from '@/components/LoadingSkeleton';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
   const hours = Math.floor(seconds / 3600);
@@ -27,11 +29,14 @@ function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
 export default function ActivitiesPage() {
   const { t } = useI18n();
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold flex items-center gap-2">
-        <span>📝</span>
-        <span>{t('nav.activities')}</span>
-      </h1>
+    <div className="space-y-4 sm:space-y-5">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
+          <span>📋</span>
+          <span>{t('nav.activities')}</span>
+        </h1>
+        <ManageActivitiesDialog />
+      </div>
       <ActivitiesClient />
     </div>
   );
@@ -39,6 +44,7 @@ export default function ActivitiesPage() {
 
 function ActivitiesClient() {
   const { t, lang } = useI18n();
+  const isMobile = useIsMobile();
   const { activities, deleteActivity, hydrated } = useActivities();
   const { showToast } = useToaster();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -95,41 +101,41 @@ function ActivitiesClient() {
   }, [filteredActivities]);
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Filters */}
+    <div className="space-y-3 sm:space-y-4">
+      {/* Compact Filters */}
       <ActivityFilters filters={filters} onFiltersChange={setFilters} />
 
-            {/* Filtered Stats Summary */}
+      {/* Compact Filtered Stats Summary */}
       {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.category !== 'all' || filters.searchQuery) && (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 shadow-sm">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-medium text-gray-700 dark:text-gray-300">
               {t('filters.results')}
             </span>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-gray-600 dark:text-gray-400">
               {filteredStats.totalCount} {t('filters.activities')} · {numberFormatter.format(filteredStats.totalPoints)} {t('list.pointsUnit')}
             </div>
           </div>
         </div>
       )}
 
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm font-medium">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs sm:text-sm font-medium px-1">
           <span>{t('list.records')}</span>
           {filteredActivities.length !== activities.length && (
-            <span className="text-xs text-gray-500">
+            <span className="text-[10px] sm:text-xs text-gray-500">
               {filteredActivities.length} / {activities.length}
             </span>
           )}
         </div>
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card overflow-hidden">
+        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
           {filteredActivities.length === 0 ? (
-            <div className="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-6 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               {t('filters.noResults')}
             </div>
           ) : editing ? (
             <div className="border-b border-gray-200 dark:border-gray-800">
-              <div className="flex items-center justify-between px-4 py-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+              <div className="flex items-center justify-between px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400">
                 <span>{t('list.editingTitle')}</span>
                 <button
                   className="text-xs underline-offset-2 hover:underline"
@@ -138,7 +144,7 @@ function ActivitiesClient() {
                   {t('form.cancel')}
                 </button>
               </div>
-              <div className="px-4 pb-4">
+              <div className="px-3 pb-3">
                 <ActivityForm
                   initial={{
                     id: editing.id,
@@ -182,19 +188,18 @@ function ActivitiesClient() {
             onCancel={() => setDeleteConfirm(null)}
           />
           {!hydrated ? (
-            <div className="p-4 space-y-3">
-              <div className="h-6 w-40 rounded skeleton" />
-              <div className="h-12 rounded skeleton" />
-              <div className="h-12 rounded skeleton" />
-              <div className="h-12 rounded skeleton" />
+            <div className="p-3 space-y-2">
+              <div className="h-5 w-32 rounded skeleton" />
+              <div className="h-10 rounded skeleton" />
+              <div className="h-10 rounded skeleton" />
             </div>
           ) : filteredActivities.length === 0 ? (
-            <div className="p-4 text-sm text-gray-600 dark:text-gray-400">{t('filters.noResults')}</div>
+            <div className="p-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">{t('filters.noResults')}</div>
           ) : (
             <div className="divide-y divide-gray-200 dark:divide-gray-800">
               {groups.map(({ day, acts }) => (
                 <div key={day}>
-                  <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-3 py-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-2.5 py-1.5 text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400">
                     {format(new Date(day), 'd MMMM EEEE', { locale: dateLocale })}
                   </div>
                   <ul className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -204,17 +209,17 @@ function ActivitiesClient() {
                       return (
                         <li
                           key={activity.id}
-                          className="group p-3 flex items-start justify-between gap-3 rounded transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900/30 hover:shadow-sm"
+                          className="group px-2.5 py-2 flex items-start justify-between gap-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900/30"
                         >
-                          <div>
-                            <div className="text-sm font-medium flex items-center gap-2 flex-wrap">
-                              <span className="text-lg">{activity.icon}</span>
-                              <span>{getActivityLabel(activity, lang)}</span>
-                              <span className="inline-flex items-center rounded-full bg-brand/10 text-brand px-2 py-0.5 text-xs font-medium">
+                          <div className="flex-1 min-w-0">
+                            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium flex items-center gap-1.5 flex-wrap`}>
+                              <span className="text-base">{activity.icon}</span>
+                              <span className="truncate">{getActivityLabel(activity, lang)}</span>
+                              <span className="inline-flex items-center rounded-full bg-brand/10 text-brand px-1.5 py-0.5 text-[10px] sm:text-xs font-medium whitespace-nowrap">
                                 {`${numberFormatter.format(activity.points)} ${t('list.pointsUnit')}`}
                               </span>
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 mt-0.5`}>
                               {timeFormatter.format(new Date(activity.performedAt))} • {activity.amount}{' '}
                               {getActivityUnit(activity, lang)} • {activity.multiplier}x
                               {activity.duration && activity.duration > 0 ? (
@@ -222,18 +227,18 @@ function ActivitiesClient() {
                               ) : null}
                             </div>
                             {activity.note ? (
-                              <div className="text-sm mt-1 text-gray-700 dark:text-gray-300">{activity.note}</div>
+                              <div className={`${isMobile ? 'text-xs' : 'text-sm'} mt-1 text-gray-700 dark:text-gray-300 line-clamp-2`}>{activity.note}</div>
                             ) : null}
                           </div>
-                          <div className="flex items-center gap-2 text-xs opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+                          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex-shrink-0">
                             <button
-                              className="text-brand hover:underline transition-all duration-200 hover:scale-105 active:scale-95"
+                              className="text-brand hover:underline transition-all duration-200 hover:scale-105 active:scale-95 whitespace-nowrap"
                               onClick={() => setEditingId(activity.id)}
                             >
                               {t('list.edit')}
                             </button>
                             <button
-                              className="text-red-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                              className="text-red-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95 disabled:hover:scale-100 whitespace-nowrap"
                               disabled={!isToday}
                               title={!isToday ? t('list.deleteDisabled') : undefined}
                               onClick={() => {

@@ -17,36 +17,36 @@ export function Header() {
         <Link href="/" className="font-semibold text-2xl sm:text-lg" aria-label={t('nav.home')}>
           SportTrack
         </Link>
-        <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-          {/* Navigation Icons - Always visible, beautifully aligned */}
-          <div className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-lg bg-gray-100/50 dark:bg-gray-800/50">
+        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+          {/* Navigation Icons - Elegant and minimal */}
+          <div className="flex items-center gap-0.5 sm:gap-1">
             <Link 
               href="/activities" 
-              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-xl sm:text-2xl hover:scale-110 active:scale-95 transition-all duration-200 rounded-md hover:bg-white/50 dark:hover:bg-gray-700/50" 
+              className="min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-300 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:scale-105 active:scale-95 group" 
               aria-label={t('nav.activities')}
             >
-              📝
+              <span className="group-hover:scale-110 transition-transform duration-300">📋</span>
             </Link>
             <Link 
               href="/stats" 
-              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-xl sm:text-2xl hover:scale-110 active:scale-95 transition-all duration-200 rounded-md hover:bg-white/50 dark:hover:bg-gray-700/50" 
+              className="min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-300 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:scale-105 active:scale-95 group" 
               aria-label={t('nav.stats')}
             >
-              📊
+              <span className="group-hover:scale-110 transition-transform duration-300">📊</span>
             </Link>
             <Link 
               href="/achievements" 
-              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-xl sm:text-2xl hover:scale-110 active:scale-95 transition-all duration-200 rounded-md hover:bg-white/50 dark:hover:bg-gray-700/50"
+              className="min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-300 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:scale-105 active:scale-95 group"
               aria-label={t('nav.achievements')}
             >
-              🏆
+              <span className="group-hover:scale-110 transition-transform duration-300">🏆</span>
             </Link>
             <Link 
               href="/challenges" 
-              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-xl sm:text-2xl hover:scale-110 active:scale-95 transition-all duration-200 rounded-md hover:bg-white/50 dark:hover:bg-gray-700/50"
+              className="min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-300 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:scale-105 active:scale-95 group"
               aria-label={t('nav.challenges')}
             >
-              🎯
+              <span className="group-hover:scale-110 transition-transform duration-300">🎯</span>
             </Link>
           </div>
           {!isMobile && (
