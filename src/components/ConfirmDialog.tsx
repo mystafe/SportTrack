@@ -45,6 +45,19 @@ export function ConfirmDialog({
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCancel();
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [open, onCancel]);
+
   if (!mounted || !open) return null;
 
   const handleConfirm = () => {
@@ -60,18 +73,6 @@ export function ConfirmDialog({
       handleCancel();
     }
   };
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
-        handleCancel();
-      }
-    };
-    if (open) {
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
-    }
-  }, [open, handleCancel]);
 
   const dialog = (
     <div
