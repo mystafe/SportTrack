@@ -5,7 +5,7 @@ import { useI18n } from '@/lib/i18n';
 import { useToaster } from '@/components/Toaster';
 import { useActivities } from '@/lib/activityStore';
 import { useActivityDefinitions } from '@/lib/settingsStore';
-import { parseAppleHealthCSV, type AppleHealthStepData } from '@/lib/appleHealthParser';
+import { parseAppleHealthFile, type AppleHealthStepData, type ParseProgress } from '@/lib/appleHealthParser';
 import { BASE_ACTIVITY_MAP } from '@/lib/activityConfig';
 import { startOfDay } from 'date-fns';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
@@ -17,6 +17,7 @@ export function AppleHealthImport() {
   const definitions = useActivityDefinitions();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [parseProgress, setParseProgress] = useState<ParseProgress | null>(null);
   const [parseResult, setParseResult] = useState<{
     data: AppleHealthStepData[];
     totalRecords: number;
@@ -31,15 +32,39 @@ export function AppleHealthImport() {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Check file size
+    const sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > 100) {
+      const proceed = window.confirm(
+        t('appleHealth.largeFileWarning', {
+          size: Math.round(sizeMB).toString()
+        })
+      );
+      if (!proceed) {
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+    }
+
     setIsImporting(true);
+    setParseProgress({ processed: 0, total: 0, percentage: 0 });
+
     try {
-      const text = await file.text();
-      const result = parseAppleHealthCSV(text);
+      const result = await parseAppleHealthFile(
+        file,
+        (progress) => {
+          setParseProgress(progress);
+        }
+      );
+
+      setParseProgress(null);
 
       if (!result.success || result.data.length === 0) {
         showToast(
           t('appleHealth.parseFailed', {
-            errors: result.errors.length > 0 ? result.errors.join(', ') : 'No step data found'
+            errors: result.errors.length > 0 ? result.errors.slice(0, 3).join(', ') : 'No step data found'
           }),
           'error'
         );
@@ -59,7 +84,8 @@ export function AppleHealthImport() {
       setShowConfirm(true);
       setIsImporting(false);
     } catch (error) {
-      console.error('Failed to parse Apple Health CSV:', error);
+      console.error('Failed to parse Apple Health file:', error);
+      setParseProgress(null);
       showToast(
         t('appleHealth.parseFailed', {
           errors: error instanceof Error ? error.message : 'Unknown error'
@@ -132,7 +158,7 @@ export function AppleHealthImport() {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".csv"
+          accept=".csv,.xml,.xml.gz"
           onChange={handleFileSelect}
           disabled={isImporting}
           className="hidden"
@@ -140,6 +166,24 @@ export function AppleHealthImport() {
         />
         {isImporting ? '⏳' : '🍎'} {t('appleHealth.import')}
       </label>
+      
+      {isImporting && parseProgress && parseProgress.total > 0 && (
+        <div className="mt-2 space-y-1">
+          <div className="text-xs text-gray-600 dark:text-gray-400">
+            {t('appleHealth.processing', {
+              processed: String(parseProgress.processed),
+              total: String(parseProgress.total),
+              percentage: String(parseProgress.percentage)
+            })}
+          </div>
+          <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+            <div
+              className="bg-brand h-2 rounded-full transition-all duration-300"
+              style={{ width: `${parseProgress.percentage}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       <ConfirmDialog
         open={showConfirm && !!parseResult}

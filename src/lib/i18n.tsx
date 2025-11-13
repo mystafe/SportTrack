@@ -483,16 +483,16 @@ const translations: Translations = {
     en: 'Go to the "Profile" tab in the bottom right corner'
   },
   'appleHealth.step1c': {
-    tr: '"Verileri Dışa Aktar" seçeneğini bulun ve CSV formatını seçin',
-    en: 'Find "Export Data" option and select CSV format'
+    tr: '"Verileri Dışa Aktar" seçeneğini bulun ve XML veya CSV formatını seçin',
+    en: 'Find "Export Data" option and select XML or CSV format'
   },
   'appleHealth.step2': {
-    tr: '2. CSV Dosyasını Hazırlama',
-    en: '2. Prepare CSV File'
+    tr: '2. Dosya Hazırlama',
+    en: '2. Prepare File'
   },
   'appleHealth.step2a': {
-    tr: 'Dışa aktarılan CSV dosyasında "Step Count" (Adım Sayısı) verilerini içeren satırları bulun. Dosya şu formatta olmalıdır:',
-    en: 'In the exported CSV file, find rows containing "Step Count" data. The file should be in this format:'
+    tr: 'Dışa aktarılan dosyada "Step Count" (Adım Sayısı) verilerini bulun. CSV veya XML formatında olabilir. Büyük dosyalar (1GB+) için işlem biraz zaman alabilir.',
+    en: 'In the exported file, find "Step Count" data. It can be in CSV or XML format. Large files (1GB+) may take some time to process.'
   },
   'appleHealth.step2b': {
     tr: 'type,sourceName,unit,value,startDate,endDate\nHKQuantityTypeIdentifierStepCount,Health,count,8500,2024-01-01 00:00:00 +0000,2024-01-01 23:59:59 +0000',
@@ -503,12 +503,20 @@ const translations: Translations = {
     en: '3. Import to SportTrack'
   },
   'appleHealth.step3a': {
-    tr: 'Ayarlar menüsünden "Apple Health" butonuna tıklayın ve CSV dosyanızı seçin. Sistem otomatik olarak adım verilerini "Yürüme" aktivitesi olarak içe aktaracaktır.',
-    en: 'Click the "Apple Health" button in the settings menu and select your CSV file. The system will automatically import step data as "Walking" activities.'
+    tr: 'Ayarlar menüsünden "Apple Health" butonuna tıklayın ve XML veya CSV dosyanızı seçin. Sistem otomatik olarak adım verilerini "Yürüme" aktivitesi olarak içe aktaracaktır. Büyük dosyalar için işlem sırasında ilerleme çubuğu gösterilecektir.',
+    en: 'Click the "Apple Health" button in the settings menu and select your XML or CSV file. The system will automatically import step data as "Walking" activities. A progress bar will be shown for large files.'
   },
   'appleHealth.note': {
     tr: 'Not: Mevcut yürüme aktiviteleri silinip yenileriyle değiştirilecektir. Bu işlem geri alınamaz.',
     en: 'Note: Existing walking activities will be deleted and replaced. This action cannot be undone.'
+  },
+  'appleHealth.largeFileWarning': {
+    tr: 'Büyük dosya tespit edildi ({size}MB). İşlem biraz zaman alabilir. Devam etmek istiyor musunuz?',
+    en: 'Large file detected ({size}MB). Processing may take some time. Do you want to continue?'
+  },
+  'appleHealth.processing': {
+    tr: 'İşleniyor: {processed} / {total} kayıt ({percentage}%)',
+    en: 'Processing: {processed} / {total} records ({percentage}%)'
   },
 
   'templates.title': { tr: 'Aktivite Şablonları', en: 'Activity Templates' },

@@ -2,6 +2,26 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.8.9] - 2025-01
+
+### Added
+- **Apple Health XML Support**: XML format desteği eklendi
+  - XML export dosyalarını parse etme desteği
+  - Büyük dosyalar (1GB+) için optimizasyon
+  - İlerleme çubuğu (progress bar) gösterimi
+  - Dosya boyutu kontrolü ve uyarıları
+  - parseAppleHealthXML ve parseAppleHealthFile fonksiyonları
+
+### Changed
+- Apple Health import artık hem CSV hem de XML formatlarını destekliyor
+- Büyük dosyalar için kullanıcıya onay mesajı gösteriliyor
+- İşlem sırasında gerçek zamanlı ilerleme gösterimi eklendi
+- Maksimum dosya boyutu 2GB olarak ayarlandı
+
+### Fixed
+- Büyük dosyaların işlenmesi sırasında memory optimizasyonu yapıldı
+- XML parsing hataları için daha iyi hata mesajları eklendi
+
 ## [0.8.8] - 2025-01
 
 ### Added
