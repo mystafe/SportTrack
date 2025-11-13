@@ -13,6 +13,8 @@ import { TrendChart } from '@/components/charts/TrendChart';
 import { ActivityBarChart } from '@/components/charts/ActivityBarChart';
 import { ActivityPieChart } from '@/components/charts/ActivityPieChart';
 import { ActivityHeatmap } from '@/components/charts/ActivityHeatmap';
+import { PersonalRecords } from '@/components/PersonalRecords';
+import { ActivityTimeAnalysis } from '@/components/ActivityTimeAnalysis';
 
 export default function StatsPage() {
   const { t, lang } = useI18n();
@@ -385,6 +387,12 @@ export default function StatsPage() {
           {allDays.filter(day => day.points >= target).length} / {allDays.length} {t('stats.detailed.totalSessions')}
         </div>
       </div>
+
+      {/* Personal Records */}
+      <PersonalRecords />
+
+      {/* Activity Time Analysis */}
+      <ActivityTimeAnalysis activities={activities} />
     </div>
   );
 }

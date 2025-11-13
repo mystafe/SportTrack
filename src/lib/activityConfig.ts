@@ -88,7 +88,7 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     label: 'Ağırlık Çalışması',
     labelEn: 'Weight Lifting',
     icon: '🏋️',
-    multiplier: 10,
+    multiplier: 15,
     unit: 'dakika',
     unitEn: 'minutes',
     defaultAmount: 30,

@@ -181,6 +181,48 @@ export class NotificationService {
     });
   }
 
+  async showLevelUp(lang: 'tr' | 'en', level: number): Promise<void> {
+    if (!this.canNotify()) return;
+
+    const messages = {
+      tr: {
+        title: '🎉 Seviye Atladın!',
+        body: `Tebrikler! Seviye ${level}'e ulaştın!`
+      },
+      en: {
+        title: '🎉 Level Up!',
+        body: `Congratulations! You reached level ${level}!`
+      }
+    };
+
+    await this.showNotification(messages[lang].title, {
+      body: messages[lang].body,
+      tag: 'level-up',
+      requireInteraction: true
+    });
+  }
+
+  async showChallengeCompleted(lang: 'tr' | 'en', challengeName: string, icon: string): Promise<void> {
+    if (!this.canNotify()) return;
+
+    const messages = {
+      tr: {
+        title: `${icon} Zorluk Tamamlandı!`,
+        body: `Tebrikler! "${challengeName}" zorluğunu tamamladın!`
+      },
+      en: {
+        title: `${icon} Challenge Completed!`,
+        body: `Congratulations! You completed the "${challengeName}" challenge!`
+      }
+    };
+
+    await this.showNotification(messages[lang].title, {
+      body: messages[lang].body,
+      tag: 'challenge-completed',
+      requireInteraction: true
+    });
+  }
+
   startDailyReminderCheck(
     settings: NotificationSettings,
     lang: 'tr' | 'en',

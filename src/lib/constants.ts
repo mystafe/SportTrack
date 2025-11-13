@@ -5,7 +5,9 @@ export const STORAGE_KEYS = {
   THEME: 'theme',
   LANGUAGE: 'lang',
   BADGES: 'sporttrack.badges.v1',
-  NOTIFICATIONS: 'sporttrack.notifications.v1'
+  NOTIFICATIONS: 'sporttrack.notifications.v1',
+  LEVELS: 'sporttrack.levels.v1',
+  CHALLENGES: 'sporttrack.challenges.v1'
 } as const;
 
 export const TIMEOUTS = {

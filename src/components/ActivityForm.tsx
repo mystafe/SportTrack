@@ -9,7 +9,10 @@ import { getActivityLabel, getActivityUnit, getActivityDescription } from '@/lib
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useBadges } from '@/lib/badgeStore';
+import { useLevel } from '@/lib/levelStore';
+import { useChallenges } from '@/lib/challengeStore';
 import { notificationService } from '@/lib/notificationService';
+import { ActivityTimer } from '@/components/ActivityTimer';
 
 function toLocalInputValue(date: Date) {
   const year = date.getFullYear();
@@ -90,6 +93,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
   const { checkNewBadges } = useBadges();
+  const { checkLevelUp: checkLevelUpCallback } = useLevel();
+  const { checkCompletedChallenges } = useChallenges();
   const { settings } = useSettings();
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
@@ -106,6 +111,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
     initial?.amount ? String(initial.amount) : String(fallbackDefinition?.defaultAmount ?? definitions[0]?.defaultAmount ?? 10)
   );
   const [note, setNote] = useState<string>(initial?.note ?? '');
+  const [duration, setDuration] = useState<number>(initial?.duration ?? 0);
   const [loading, setLoading] = useState(false);
 
   const definition =
@@ -166,7 +172,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           definition,
           amount: amountValue,
           note: note || undefined,
-          performedAt: performedAtISO
+          performedAt: performedAtISO,
+          duration: duration > 0 ? duration : undefined
         });
         showToast(t('toast.activityUpdated'), 'success');
         onSaved?.();
@@ -176,11 +183,12 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           definition,
           amount: amountValue,
           note: note || undefined,
-          performedAt: performedAtISO
+          performedAt: performedAtISO,
+          duration: duration > 0 ? duration : undefined
         });
         showToast(t('toast.activityAdded'), 'success');
         
-        // Check for new badges
+        // Check for new badges and level up
         setTimeout(() => {
           const newBadges = checkNewBadges();
           if (newBadges.length > 0) {
@@ -190,10 +198,30 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
               notificationService.showBadgeUnlocked(lang as 'tr' | 'en', badge.name[lang], badge.icon);
             });
           }
+          
+          // Check for level up
+          const newLevel = checkLevelUpCallback();
+          if (newLevel) {
+            showToast(`${t('level.levelUp')} ${t('level.level')} ${newLevel}! 🎉`, 'success');
+            notificationService.showLevelUp(lang as 'tr' | 'en', newLevel);
+          }
+          
+          // Check for completed challenges
+          const completedChallenges = checkCompletedChallenges();
+          if (completedChallenges.length > 0) {
+            completedChallenges.forEach(challenge => {
+              showToast(
+                `${challenge.icon || '🎯'} ${t('challenges.completedMessage', { name: challenge.name[lang] })}`,
+                'success'
+              );
+              notificationService.showChallengeCompleted(lang as 'tr' | 'en', challenge.name[lang], challenge.icon || '🎯');
+            });
+          }
         }, 500);
         
         setAmount(String(definition.defaultAmount));
         setNote('');
+        setDuration(0);
         setPerformedAt(toLocalInputValue(new Date()));
         onCreated?.();
         // Redirect to home page after toast notification
@@ -298,6 +326,14 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           </div>
         </label>
       </div>
+      {!isEditing && (
+        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+          <ActivityTimer
+            onDurationChange={setDuration}
+            initialDuration={duration}
+          />
+        </div>
+      )}
       <label className="space-y-1 block">
         <div className="text-sm text-gray-700">{t('form.noteOptional')}</div>
         <textarea

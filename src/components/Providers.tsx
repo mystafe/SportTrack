@@ -5,6 +5,8 @@ import { I18nProvider } from '@/lib/i18n';
 import { ActivitiesProvider } from '@/lib/activityStore';
 import { SettingsProvider } from '@/lib/settingsStore';
 import { BadgeProvider } from '@/lib/badgeStore';
+import { LevelProvider } from '@/lib/levelStore';
+import { ChallengeProvider } from '@/lib/challengeStore';
 import { ToasterProvider } from '@/components/Toaster';
 import { StorageErrorHandler } from '@/components/StorageErrorHandler';
 import { InstallPrompt } from '@/components/InstallPrompt';
@@ -15,14 +17,18 @@ export function Providers({ children }: { children: ReactNode }) {
     <I18nProvider>
       <SettingsProvider>
         <ActivitiesProvider>
-          <BadgeProvider>
-            <ToasterProvider>
-              <StorageErrorHandler />
-              <InstallPrompt />
-              <NotificationManager />
-              {children}
-            </ToasterProvider>
-          </BadgeProvider>
+          <LevelProvider>
+            <ChallengeProvider>
+              <BadgeProvider>
+                <ToasterProvider>
+                  <StorageErrorHandler />
+                  <InstallPrompt />
+                  <NotificationManager />
+                  {children}
+                </ToasterProvider>
+              </BadgeProvider>
+            </ChallengeProvider>
+          </LevelProvider>
         </ActivitiesProvider>
       </SettingsProvider>
     </I18nProvider>

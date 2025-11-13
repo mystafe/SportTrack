@@ -116,9 +116,14 @@ export async function exportToPDF(
   if (settings) {
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
+    const moodText = settings.mood
+      ? options.language === 'tr'
+        ? ` | Ruh Hali: ${settings.mood === 'happy' ? 'Mutlu' : settings.mood === 'cheerful' ? 'Neşeli' : settings.mood === 'sad' ? 'Üzgün' : settings.mood === 'unhappy' ? 'Mutsuz' : settings.mood === 'tired' ? 'Yorgun/Hasta' : ''}`
+        : ` | Mood: ${settings.mood === 'happy' ? 'Happy' : settings.mood === 'cheerful' ? 'Cheerful' : settings.mood === 'sad' ? 'Sad' : settings.mood === 'unhappy' ? 'Unhappy' : settings.mood === 'tired' ? 'Tired/Sick' : ''}`
+      : '';
     const userInfo = options.language === 'tr'
-      ? `Kullanıcı: ${settings.name} | Günlük Hedef: ${settings.dailyTarget.toLocaleString()} puan`
-      : `User: ${settings.name} | Daily Goal: ${settings.dailyTarget.toLocaleString()} points`;
+      ? `Kullanıcı: ${settings.name} | Günlük Hedef: ${settings.dailyTarget.toLocaleString()} puan${moodText}`
+      : `User: ${settings.name} | Daily Goal: ${settings.dailyTarget.toLocaleString()} points${moodText}`;
     doc.text(userInfo, margin, yPos);
     yPos += 8;
   }

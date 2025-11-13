@@ -2,6 +2,250 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.8.4] - 2025-01
+
+### Added
+- **Zaman Analizi**: En aktif saatler ve günler analizi
+  - Saat bazında aktivite dağılım grafikleri (0-23 saat)
+  - Haftanın günlerine göre aktivite dağılım grafikleri
+  - En aktif saat ve gün özet kartları
+  - Bar chart grafikleri ile görselleştirme
+
+### Changed
+- Weightlifting katsayısı 10'dan 15'e yükseltildi
+- Aktivite listesinde süre bilgisi gösterimi eklendi
+
+## [0.8.3] - 2025-01
+
+### Added
+- **Aktivite Süresi Takibi**: Gerçek zamanlı timer
+  - Başlat/Durdur/Sıfırla butonları
+  - Saat:dakika:saniye formatında gösterim
+  - Süre bilgisi aktivite kaydına otomatik ekleniyor
+  - Aktivite listesinde süre gösterimi
+
+### Changed
+- ActivityRecord tipine `duration` alanı eklendi (saniye cinsinden)
+
+## [0.8.2] - 2025-01
+
+### Added
+- **Aktivite Süresi Takibi**: Gerçek zamanlı timer bileşeni
+  - ActivityTimer component'i eklendi
+  - Aktivite formuna timer entegrasyonu
+
+## [0.8.1] - 2025-01
+
+### Added
+- **Kişisel Rekorlar Sistemi**: En iyi performansların takibi
+  - En iyi gün (en yüksek günlük puan)
+  - En uzun seri (en uzun hedef tamamlama serisi)
+  - En hızlı hedef tamamlama (hedefin en erken tamamlandığı saat)
+  - Aktivite bazında rekorlar (her aktivite için en yüksek puan ve miktar)
+  - Stats sayfasına Personal Records bölümü eklendi
+
+## [0.8.0] - 2025-01
+
+### Added
+- **Zorluklar ve Hedefler Sistemi**: Kapsamlı hedef takip sistemi
+  - Günlük, haftalık, aylık ve özel zorluklar
+  - Otomatik ilerleme takibi ve durum yönetimi
+  - Varsayılan günlük zorluk (kullanıcının günlük hedefine göre)
+  - Zorluk CRUD işlemleri (ekleme, düzenleme, silme)
+  - Tamamlanan zorluklar için toast ve push notification
+  - `/challenges` sayfası ve ChallengeCard, ChallengeDialog bileşenleri
+  - Header'a challenges linki eklendi
+
+## [0.7.9] - 2025-01
+
+### Added
+- **Seviye Sistemi**: XP tabanlı seviye ilerlemesi
+  - Seviye 1-50+ arası seviyeler
+  - XP hesaplama (her puan = 1 XP)
+  - Seviye ilerleme çubuğu
+  - Seviye başlıkları (Başlangıç, Acemi, Deneyimli, Uzman, Usta, Efsane, Efsanevi)
+  - Seviye atlama bildirimleri (toast + push notification)
+  - Ayarlar sayfasında seviye gösterimi
+  - LevelProvider ve levelStore eklendi
+
+## [0.7.8] - 2025-01
+
+### Fixed
+- Template kategorileri ve görüntüleme sorunları düzeltildi
+- Export/Import'a mood (ruh hali) desteği eklendi
+- Template çevirileri eklendi
+
+## [0.7.7] - 2025-01
+
+### Added
+- **Aktivite Şablonları**: Önceden tanımlı aktivite kombinasyonları
+  - Aktivite şablonları sistemi (`ActivityTemplates` component)
+  - Kategorilere göre şablonlar (hızlı, kardiyo, güç, esneklik, karışık)
+  - Şablon ekleme ve onay dialog'u
+  - Aktivite filtreleme sistemine kategori filtresi eklendi
+
+## [0.7.6] - 2025-01
+
+### Fixed
+- Template sistemindeki sorunlar düzeltildi
+- Template kategorileri optimizasyonu
+
+## [0.7.5] - 2025-01
+
+### Added
+- **Aktivite Şablonları**: Önceden tanımlı aktivite kombinasyonları
+  - `activityTemplates.ts` dosyası ve şablon tanımları
+  - `ActivityTemplates` component'i
+
+## [0.7.4] - 2025-01
+
+### Added
+- **Apple Health Entegrasyonu**: Apple Health CSV import desteği
+  - Apple Health CSV dosyası import
+  - Adım verileri otomatik parse ve kayıt
+  - Mevcut adım kayıtlarını değiştirme desteği
+
+## [0.7.3] - 2025-01
+
+### Added
+- **Aktivite Filtreleme**: Gelişmiş filtreleme ve sıralama
+  - Tarih aralığı filtreleme (tümü, bugün, son 7 gün, son 30 gün, özel)
+  - Aktivite türü filtreleme
+  - Kategori filtreleme
+  - Arama (aktivite adı, not, key)
+  - Sıralama (tarih, puan - artan/azalan)
+  - Filtrelenmiş sonuçlar özeti
+  - `ActivityFilters` component ve `useFilteredActivities` hook
+
+## [0.7.2] - 2025-01
+
+### Added
+- **Hızlı Aktivite Ekleme**: En çok kullanılan aktiviteler için hızlı erişim
+  - QuickAdd component'i
+  - En sık kullanılan aktivitelerin otomatik hesaplanması
+  - Tek tıkla aktivite ekleme
+  - Ana sayfaya entegrasyon
+
+## [0.7.1] - 2025-01
+
+### Added
+- **Bildirimler ve Hatırlatıcılar**: Kapsamlı bildirim sistemi
+  - Push notification desteği
+  - Günlük hatırlatıcılar (özelleştirilebilir saat)
+  - Hedef tamamlama bildirimleri
+  - Seri koruma uyarıları
+  - Rozet kazanma bildirimleri
+  - Bildirim ayarları UI (`NotificationSettings` component)
+  - Arka plan bildirim kontrolü (`NotificationManager` component)
+  - NotificationService singleton class
+
+## [0.7.0] - 2025-01
+
+### Added
+- **Rozetler ve Başarımlar**: Gamification sistemi
+  - 17 farklı rozet (streak, points, activities, special)
+  - Rozet nadirlik seviyeleri (common, rare, epic, legendary)
+  - Otomatik rozet kontrolü ve kazanma
+  - `/achievements` sayfası
+  - Rozet kategorilerine göre gruplandırma
+  - Rozet ilerleme çubukları
+  - BadgeProvider ve badgeStore eklendi
+
+## [0.6.2] - 2025-01
+
+### Added
+- **CSV ve PDF Export**: Gelişmiş veri export özellikleri
+  - CSV export (Excel uyumlu, UTF-8 BOM desteği)
+  - PDF export (jspdf ve jspdf-autotable kullanarak)
+  - Tarih aralığı seçimi (tüm zamanlar, son 7 gün, son 30 gün, özel)
+  - ExportDialog component'i
+  - Kullanıcı bilgileri ve özet istatistikler PDF'de
+  - Ruh hali bilgisi export'a eklendi
+
+## [0.6.1] - 2025-01
+
+### Added
+- **Gelişmiş Grafikler**: Recharts kütüphanesi ile görselleştirme
+  - Trend grafikleri (7, 30, 90 günlük çizgi grafikleri)
+  - Aktivite karşılaştırma grafikleri (bar chart)
+  - Aktivite dağılım grafikleri (pie chart)
+  - Aktivite heatmap (GitHub tarzı)
+  - Responsive chart container'lar
+  - Stats sayfasına grafik entegrasyonu
+
+## [0.6.0] - 2025-01
+
+### Added
+- **PWA (Progressive Web App) Özellikleri**: Tam PWA desteği
+  - Service Worker implementasyonu
+  - Offline çalışma desteği
+  - Ana ekrana ekleme (Add to Home Screen)
+  - App-like deneyim
+  - Push notification desteği
+  - InstallPrompt component'i
+  - Web App Manifest dosyası
+  - iOS PWA desteği (safe-area-inset)
+
+## [0.5.7] - 2024
+
+### Added
+- Ruh hali seçimi ve motivasyonel mesajlar sistemi
+- Motivasyonel alıntılar genişletildi (40+ alıntı)
+- Ruh haline göre esprili, ciddi ve motive edici mesajlar
+
+### Changed
+- Footer versiyon gösterimi mobilde aynı satırda, sağa hizalı
+
+## [0.5.6] - 2024
+
+### Fixed
+- Cross-language hint mesajları düzeltildi
+- Placeholder metinleri doğru dilde gösteriliyor
+- Mobil date input overflow sorunu çözüldü
+
+## [0.5.5] - 2024
+
+### Changed
+- Mobil tasarım iyileştirmeleri
+- Touch target boyutları artırıldı (min-h-[44px])
+- Kart padding ve font boyutları optimize edildi
+
+## [0.5.4] - 2024
+
+### Changed
+- Mobil navbar boyutu artırıldı
+- Diğer elementlerin boyutları optimize edildi
+
+## [0.5.3] - 2024
+
+### Changed
+- Default aktivitelerin çarpanları, açıklamaları, varsayılan değerleri ve birimleri güncellendi
+- Cross-language placeholder metinleri düzeltildi
+
+## [0.5.2] - 2024
+
+### Fixed
+- Build hataları düzeltildi (Mood type, motivationalMessages type errors)
+
+## [0.5.1] - 2024
+
+### Fixed
+- Placeholder metinleri doğru dilde gösteriliyor
+- Footer versiyon gösterimi mobilde düzeltildi
+
+## [0.5.0] - 2024
+
+### Added
+- Ruh hali seçimi (sad, unhappy, cheerful, happy, tired/sick)
+- Ruh haline göre motivasyonel mesajlar sistemi
+- Motivasyonel alıntılar genişletildi
+
+## [0.4.4] - 2024
+
+### Changed
+- README.md güncellendi
+- Mobil UI iyileştirmeleri
+
 ## [0.4.3] - 2024
 
 ### Added
@@ -67,4 +311,3 @@ All notable changes to SportTrack will be documented in this file.
 - Statistics and highlights
 - Multi-language support (Turkish/English)
 - Dark mode support
-

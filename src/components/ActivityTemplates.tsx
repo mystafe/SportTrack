@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
 import { useActivityDefinitions } from '@/lib/settingsStore';
@@ -63,11 +63,19 @@ export function ActivityTemplates() {
     setSelectedTemplate(null);
   };
 
-  const categories: Array<ActivityTemplate['category']> = ['quick', 'cardio', 'strength', 'mixed'];
-  const templatesByCategory = categories.map(cat => ({
-    category: cat,
-    templates: ACTIVITY_TEMPLATES.filter(t => t.category === cat)
-  })).filter(group => group.templates.length > 0);
+  // Get unique categories from templates
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set<ActivityTemplate['category']>();
+    ACTIVITY_TEMPLATES.forEach(t => uniqueCategories.add(t.category));
+    return Array.from(uniqueCategories);
+  }, []);
+  
+  const templatesByCategory = useMemo(() => {
+    return categories.map(cat => ({
+      category: cat,
+      templates: ACTIVITY_TEMPLATES.filter(t => t.category === cat)
+    })).filter(group => group.templates.length > 0);
+  }, [categories]);
 
   return (
     <div className="space-y-4">

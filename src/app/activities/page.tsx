@@ -14,6 +14,17 @@ import { useToaster } from '@/components/Toaster';
 import { ActivityListSkeleton } from '@/components/LoadingSkeleton';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 
+function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+  return `${minutes}:${String(secs).padStart(2, '0')}`;
+}
+
 export default function ActivitiesPage() {
   const { t } = useI18n();
   return (
@@ -216,6 +227,9 @@ function ActivitiesClient() {
                             <div className="text-xs text-gray-500 dark:text-gray-400">
                               {timeFormatter.format(new Date(activity.performedAt))} • {activity.amount}{' '}
                               {getActivityUnit(activity, lang)} • {activity.multiplier}x
+                              {activity.duration && activity.duration > 0 ? (
+                                <> • {formatDuration(activity.duration, lang)}</>
+                              ) : null}
                             </div>
                             {activity.note ? (
                               <div className="text-sm mt-1 text-gray-700 dark:text-gray-300">{activity.note}</div>

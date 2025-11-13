@@ -26,7 +26,7 @@ export function DataExportImport() {
         activities,
         settings,
         exportDate: new Date().toISOString(),
-        version: '0.3.4'
+        version: '0.7.7'
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);

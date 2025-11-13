@@ -8,6 +8,9 @@ Günlük spor aktivitelerini ön tanımlı çarpanlar ile puanlayıp, günlük p
 - Tailwind CSS
 - LocalStorage (client-side data persistence)
 - date-fns
+- Recharts (grafik görselleştirme)
+- jsPDF & jsPDF-autotable (PDF export)
+- next-pwa (PWA desteği)
 
 ## Kurulum
 1. Bağımlılıkları yükle:
@@ -28,11 +31,13 @@ Günlük spor aktivitelerini ön tanımlı çarpanlar ile puanlayıp, günlük p
 | Yüzme               | 5      | 20                | dakika   | Yüzme süresini dakika olarak girin|
 | Şınav               | 20     | 20                | tekrar   | Tamamlanan şınav tekrar sayısı    |
 | Mekik               | 10     | 20                | tekrar   | Tamamlanan mekik tekrar sayısı    |
-| Ağırlık Çalışması   | 1      | 30                | dakika   | Toplam süreyi dakika olarak girin |
+| Ağırlık Çalışması   | 15     | 30                | dakika   | Toplam süreyi dakika olarak girin |
 | Merdiven Çıkma      | 20     | 50                | basamak  | Çıktığınız toplam basamak sayısı  |
 
 ## Özellikler
-- ✅ Aktivite kayıt formu (tarih & saat, miktar, opsiyonel not)
+
+### Temel Özellikler
+- ✅ Aktivite kayıt formu (tarih & saat, miktar, opsiyonel not, süre takibi)
 - ✅ Her aktivite için otomatik puan hesabı
 - ✅ Özelleştirilebilir günlük puan hedefi (varsayılan: 10.000)
 - ✅ İlerleme çubuğu ve hedef tamamlama animasyonları
@@ -43,9 +48,63 @@ Günlük spor aktivitelerini ön tanımlı çarpanlar ile puanlayıp, günlük p
 - ✅ Özel aktivite ekleme ve yönetimi
 - ✅ Çoklu dil desteği (Türkçe/İngilizce)
 - ✅ Dark mode desteği
-- ✅ Veri dışa/içe aktarma (JSON)
 - ✅ Tam responsive tasarım (mobil uyumlu)
 - ✅ Erişilebilirlik özellikleri (ARIA labels, klavye navigasyonu)
+
+### Gelişmiş İstatistikler ve Görselleştirme
+- ✅ Trend grafikleri (7, 30, 90 günlük)
+- ✅ Aktivite karşılaştırma grafikleri (bar chart)
+- ✅ Aktivite dağılım grafikleri (pie chart)
+- ✅ Aktivite heatmap (GitHub tarzı)
+- ✅ Kişisel rekorlar (en iyi gün, en uzun seri, en hızlı hedef tamamlama)
+- ✅ Zaman analizi (en aktif saatler ve günler)
+- ✅ Aktivite bazında rekorlar
+
+### Veri Yönetimi
+- ✅ Veri dışa/içe aktarma (JSON)
+- ✅ CSV export (Excel uyumlu)
+- ✅ PDF raporlar (aylık/yıllık özet)
+- ✅ Apple Health CSV import desteği
+- ✅ Ruh hali (mood) export/import desteği
+
+### Gamification ve Motivasyon
+- ✅ Rozetler ve başarımlar sistemi (17 farklı rozet)
+- ✅ Seviye sistemi (1-50+ seviyeler, XP tabanlı)
+- ✅ Zorluklar ve Hedefler (günlük, haftalık, aylık, özel)
+- ✅ Ruh hali seçimi ve motivasyonel mesajlar
+- ✅ Motivasyonel alıntılar (40+ alıntı)
+
+### Aktivite Özellikleri
+- ✅ Aktivite şablonları (hızlı kombinasyonlar)
+- ✅ Hızlı aktivite ekleme (en çok kullanılan aktiviteler)
+- ✅ Aktivite filtreleme (tarih, kategori, arama, sıralama)
+- ✅ Aktivite süresi takibi (gerçek zamanlı timer)
+- ✅ Aktivite kategorileri (kardiyo, güç, esneklik, spor, diğer)
+
+### Bildirimler
+- ✅ Push bildirimleri desteği
+- ✅ Günlük hatırlatıcılar
+- ✅ Hedef tamamlama bildirimleri
+- ✅ Seri koruma uyarıları
+- ✅ Rozet kazanma bildirimleri
+- ✅ Seviye atlama bildirimleri
+- ✅ Zorluk tamamlama bildirimleri
+
+### PWA (Progressive Web App)
+- ✅ Service Worker implementasyonu
+- ✅ Offline çalışma desteği
+- ✅ Ana ekrana ekleme (Add to Home Screen)
+- ✅ App-like deneyim
+- ✅ Push notification desteği
+
+### Kullanıcı Deneyimi
+- ✅ Loading states (skeleton loaders)
+- ✅ Özel confirmation dialogs
+- ✅ Toast bildirimleri
+- ✅ Animasyonlar (toasts, dialogs, progress bars, cards, buttons)
+- ✅ Hedef tamamlama animasyonları (confetti, pulse, shimmer)
+- ✅ Error handling (storage quota, parse errors)
+- ✅ Performance optimizasyonları (localStorage debouncing)
 
 ## Geliştirme Notları
 - Yeni aktivite türleri eklemek için `src/lib/activityConfig.ts` içindeki `BASE_ACTIVITY_DEFINITIONS` listesine ekleme yapabilirsiniz.

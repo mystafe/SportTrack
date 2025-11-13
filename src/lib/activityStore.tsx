@@ -37,6 +37,7 @@ export type ActivityRecord = {
   descriptionEn?: string;
   isCustom?: boolean;
   category?: 'cardio' | 'strength' | 'flexibility' | 'sports' | 'other';
+  duration?: number; // Duration in seconds
 };
 
 type AddActivityInput = {
@@ -44,6 +45,7 @@ type AddActivityInput = {
   amount: number;
   performedAt?: string;
   note?: string | null;
+  duration?: number; // Duration in seconds
 };
 
 type UpdateActivityInput = AddActivityInput;
@@ -77,7 +79,8 @@ function buildRecord(
   definition: ActivityDefinition,
   amount: number,
   performedAt?: string,
-  note?: string | null
+  note?: string | null,
+  duration?: number
 ): ActivityRecord {
   const iso = performedAt ? new Date(performedAt).toISOString() : new Date().toISOString();
   const multiplier = definition.multiplier;
@@ -96,7 +99,8 @@ function buildRecord(
     note: note ?? null,
     description: definition.description,
     descriptionEn: definition.descriptionEn,
-    isCustom: definition.isCustom ?? false
+    isCustom: definition.isCustom ?? false,
+    duration: duration && duration > 0 ? duration : undefined
   };
 }
 
@@ -175,7 +179,8 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
         input.definition,
         input.amount,
         input.performedAt,
-        input.note
+        input.note,
+        input.duration
       );
       setActivities((prev) => [record, ...prev]);
       return record;
@@ -208,7 +213,8 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
             performedAt: iso,
             note: input.note ?? null,
             points: computePoints(multiplier, input.amount),
-            isCustom: input.definition.isCustom ?? false
+            isCustom: input.definition.isCustom ?? false,
+            duration: input.duration && input.duration > 0 ? input.duration : undefined
           };
           return updated;
         })

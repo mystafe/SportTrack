@@ -10,6 +10,7 @@ import { DataExportImport } from '@/components/DataExportImport';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationSettings } from '@/components/NotificationSettings';
+import { LevelDisplay } from '@/components/LevelDisplay';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 export function SettingsDialog() {
@@ -187,6 +188,9 @@ export function SettingsDialog() {
               <option value="tired">{t('settings.moodTired')}</option>
             </select>
           </label>
+          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+            <LevelDisplay />
+          </div>
           {error ? (
             <p className="text-xs text-red-500">{error}</p>
           ) : null}
