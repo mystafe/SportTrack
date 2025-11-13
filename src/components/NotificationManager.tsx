@@ -2,16 +2,14 @@
 
 import { useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
-import { useActivities, useActivitiesSummary } from '@/lib/activityStore';
+import { useActivitiesSummary } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
 import { notificationService, DEFAULT_NOTIFICATION_SETTINGS } from '@/lib/notificationService';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
-import { startOfDay, subDays } from 'date-fns';
 
 export function NotificationManager() {
   const { lang } = useI18n();
-  const { activities } = useActivities();
   const { settings } = useSettings();
   const target = settings?.dailyTarget && settings.dailyTarget > 0
     ? settings.dailyTarget

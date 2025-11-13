@@ -9,6 +9,7 @@ import { getActivityLabel, getActivityUnit, getActivityDescription } from '@/lib
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useBadges } from '@/lib/badgeStore';
+import { notificationService } from '@/lib/notificationService';
 
 function toLocalInputValue(date: Date) {
   const year = date.getFullYear();
