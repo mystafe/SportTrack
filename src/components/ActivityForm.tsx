@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ActivityDefinition, ActivityKey } from '@/lib/activityConfig';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
-import { useActivityDefinitions } from '@/lib/settingsStore';
+import { useActivityDefinitions, useSettings } from '@/lib/settingsStore';
 import { getActivityLabel, getActivityUnit, getActivityDescription } from '@/lib/activityUtils';
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
