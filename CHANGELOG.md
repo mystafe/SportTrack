@@ -2,6 +2,42 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.13.1] - 2025-01
+
+### Fixed
+- **QuoteTicker (Kayan Yazı) - Complete Redesign**:
+  - Completely redesigned with beautiful marquee animation
+  - Text now repeats 5 times for seamless infinite scroll
+  - Added gradient fade edges on left and right sides
+  - Enhanced background with stronger gradients and backdrop blur
+  - Better border styling (border-brand/50)
+  - Improved typography (font-black, larger drop-shadow)
+  - Smooth marquee animation (25s duration)
+  - Hover to pause functionality
+  - Better visual hierarchy and spacing
+- **ScrollToTop Button - Complete Fix**:
+  - Wrapped button in container div for better control
+  - Increased z-index to `z-[99999]` (maximum priority)
+  - Increased bottom offset (`bottom-36` mobile, `bottom-32` desktop)
+  - Added multiple scroll event listeners (scroll, wheel, touchmove)
+  - Enhanced visibility transition with translate-y and scale
+  - Larger button size (w-16 h-16 mobile, w-20 h-20 desktop)
+  - Multiple glow effects for better visibility
+  - Enhanced shine effect
+  - Better border styling
+  - Improved performance with will-change
+
+### Changed
+- **QuoteTicker Design**:
+  - New marquee animation system
+  - Gradient fade edges for professional look
+  - Stronger background gradients
+  - Better visual effects
+- **ScrollToTop**:
+  - Complete restructuring for better visibility
+  - Enhanced visual design with multiple effects
+  - Better event handling
+
 ## [0.13.0] - 2025-01
 
 ### Fixed
