@@ -89,6 +89,25 @@ export function ActivityFilters({
         )}
       </div>
 
+      {/* Category Filter */}
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+          {t('filters.category')}
+        </label>
+        <select
+          value={filters.category}
+          onChange={(e) => updateFilter('category', e.target.value as FilterState['category'])}
+          className="w-full border border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 text-xs bg-white dark:bg-gray-900"
+        >
+          <option value="all">{t('filters.allCategories')}</option>
+          <option value="cardio">{t('filters.category.cardio')}</option>
+          <option value="strength">{t('filters.category.strength')}</option>
+          <option value="flexibility">{t('filters.category.flexibility')}</option>
+          <option value="sports">{t('filters.category.sports')}</option>
+          <option value="other">{t('filters.category.other')}</option>
+        </select>
+      </div>
+
       {/* Activity Type Filter */}
       <div className="space-y-2">
         <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
