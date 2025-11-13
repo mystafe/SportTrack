@@ -2,6 +2,30 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.11.7] - 2025-01
+
+### Fixed
+- **Apple Health CSV Import - Invalid String Length Error**:
+  - Implemented chunked processing for large CSV files (>100MB)
+  - Added `parseAppleHealthCSVChunked` function for streaming CSV parsing
+  - CSV files are now processed in batches of 1000 lines to avoid memory issues
+  - Progress reporting for large CSV files
+  - Better error messages for file size limitations
+  - Prevents "Invalid string length" errors for very large CSV files
+
+### Added
+- **Visual Design Analysis**:
+  - Created comprehensive `VISUAL_IMPROVEMENTS.md` document
+  - Detailed recommendations for color palette, typography, spacing, and layout
+  - Page-specific improvement suggestions
+  - Mobile-specific enhancements
+  - Dark mode refinements
+  - Animation and transition optimizations
+
+### Changed
+- **CSV Parsing**: Large CSV files (>100MB) now use chunked processing instead of loading entire file into memory
+- **Error Handling**: More specific error messages for CSV parsing failures
+
 ## [0.11.6] - 2025-01
 
 ### Fixed

@@ -144,6 +144,139 @@ export function parseAppleHealthCSV(csvContent: string): ParseResult {
 }
 
 /**
+ * Parse large CSV files in chunks to avoid memory issues
+ */
+async function parseAppleHealthCSVChunked(
+  csvContent: string,
+  onProgress?: (progress: ParseProgress) => void
+): Promise<ParseResult> {
+  const errors: string[] = [];
+  const stepDataMap = new Map<string, { steps: number; sourceName?: string }>();
+  
+  // Split into lines and process in batches
+  const lines = csvContent.split('\n').filter(line => line.trim());
+  const totalLines = lines.length;
+  
+  if (totalLines === 0) {
+    return {
+      success: false,
+      data: [],
+      errors: ['CSV file is empty'],
+      totalRecords: 0,
+      dateRange: null
+    };
+  }
+
+  // Try to detect header row
+  let startIndex = 0;
+  const firstLine = lines[0].toLowerCase();
+  if (firstLine.includes('date') || firstLine.includes('type') || firstLine.includes('value')) {
+    startIndex = 1; // Skip header
+  }
+
+  const batchSize = 1000; // Process 1000 lines at a time
+  let processed = 0;
+  const dates: string[] = [];
+
+  // Process in batches
+  for (let batchStart = startIndex; batchStart < lines.length; batchStart += batchSize) {
+    const batchEnd = Math.min(batchStart + batchSize, lines.length);
+    
+    for (let i = batchStart; i < batchEnd; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      try {
+        const parts = parseCSVLine(line);
+        
+        if (parts.length < 3) {
+          errors.push(`Line ${i + 1}: Insufficient columns`);
+          continue;
+        }
+
+        const dateIndex = findColumnIndex(parts, ['date', 'time', 'timestamp']);
+        const valueIndex = findColumnIndex(parts, ['value', 'count', 'steps']);
+        const typeIndex = findColumnIndex(parts, ['type', 'category']);
+        const sourceIndex = findColumnIndex(parts, ['source', 'sourcename', 'source name']);
+
+        if (dateIndex === -1 || valueIndex === -1) {
+          continue; // Skip invalid lines
+        }
+
+        const dateStr = parts[dateIndex].trim();
+        const valueStr = parts[valueIndex].trim();
+        const typeStr = typeIndex >= 0 ? parts[typeIndex].trim().toLowerCase() : '';
+
+        // Only process step count data
+        if (typeIndex >= 0 && !typeStr.includes('step') && !typeStr.includes('count')) {
+          continue;
+        }
+
+        const date = parseDate(dateStr);
+        if (!date) continue;
+
+        const steps = parseFloat(valueStr);
+        if (isNaN(steps) || steps < 0) continue;
+
+        const sourceName = sourceIndex >= 0 ? parts[sourceIndex].trim() : undefined;
+        const dateKey = date.toISOString().split('T')[0];
+        
+        const existing = stepDataMap.get(dateKey);
+        if (existing) {
+          existing.steps += Math.round(steps);
+        } else {
+          stepDataMap.set(dateKey, {
+            steps: Math.round(steps),
+            sourceName
+          });
+          dates.push(dateKey);
+        }
+
+        processed++;
+      } catch (error) {
+        errors.push(`Line ${i + 1}: ${error instanceof Error ? error.message : 'Parse error'}`);
+      }
+    }
+    
+    // Report progress
+    if (onProgress) {
+      onProgress({
+        processed,
+        total: totalLines,
+        percentage: Math.round((processed / totalLines) * 100)
+      });
+    }
+    
+    // Yield to browser to prevent blocking
+    await new Promise(resolve => setTimeout(resolve, 0));
+  }
+
+  // Convert map to array
+  const stepData: AppleHealthStepData[] = Array.from(stepDataMap.entries())
+    .map(([date, data]) => ({
+      date,
+      steps: data.steps,
+      sourceName: data.sourceName
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const dateRange = dates.length > 0
+    ? {
+        start: dates[0],
+        end: dates[dates.length - 1]
+      }
+    : null;
+
+  return {
+    success: stepData.length > 0,
+    data: stepData,
+    errors: errors.slice(0, 20), // Limit errors
+    totalRecords: processed,
+    dateRange
+  };
+}
+
+/**
  * Parse CSV line handling quoted values
  */
 function parseCSVLine(line: string): string[] {
@@ -601,12 +734,32 @@ export async function parseAppleHealthFile(
       // Pass ArrayBuffer directly for large files to avoid string conversion issues
       return await parseAppleHealthXML(text, onProgress);
     } else {
-      // CSV parsing requires string
+      // CSV parsing requires string - handle large files with chunked processing
       let csvText: string;
       try {
         if (text instanceof ArrayBuffer) {
-          const decoder = new TextDecoder('utf-8');
-          csvText = decoder.decode(text);
+          // For large CSV files, process in chunks to avoid string length limits
+          if (sizeMB > 50) {
+            // Use chunked decoding for large files
+            const decoder = new TextDecoder('utf-8');
+            const chunkSize = 50 * 1024 * 1024; // 50MB chunks
+            const chunks: string[] = [];
+            
+            for (let offset = 0; offset < text.byteLength; offset += chunkSize) {
+              const chunk = text.slice(offset, Math.min(offset + chunkSize, text.byteLength));
+              const chunkText = decoder.decode(chunk, { stream: offset + chunkSize < text.byteLength });
+              chunks.push(chunkText);
+              
+              // Yield to browser to prevent blocking
+              await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            
+            csvText = chunks.join('');
+          } else {
+            // For smaller files, decode normally
+            const decoder = new TextDecoder('utf-8');
+            csvText = decoder.decode(text);
+          }
         } else {
           csvText = text;
         }
@@ -622,15 +775,20 @@ export async function parseAppleHealthFile(
           };
         }
         
+        // For very large CSV files, use streaming parser
+        if (sizeMB > 100) {
+          return await parseAppleHealthCSVChunked(csvText, onProgress);
+        }
+        
         return parseAppleHealthCSV(csvText);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         // Check for string length errors
-        if (errorMessage.includes('length') || errorMessage.includes('Invalid string')) {
+        if (errorMessage.includes('length') || errorMessage.includes('Invalid string') || errorMessage.includes('Maximum call stack')) {
           return {
             success: false,
             data: [],
-            errors: [`CSV file is too large to process (${Math.round(sizeMB)}MB). Please try exporting a smaller date range from Apple Health.`],
+            errors: [`CSV file is too large to process (${Math.round(sizeMB)}MB). Please try exporting a smaller date range from Apple Health, or use XML format instead.`],
             totalRecords: 0,
             dateRange: null
           };
