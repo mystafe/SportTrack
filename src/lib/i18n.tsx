@@ -382,6 +382,15 @@ const translations: Translations = {
   'notifications.saveFailed': {
     tr: 'Bildirim ayarları kaydedilemedi',
     en: 'Failed to save notification settings'
+  },
+
+  'quickAdd.title': { tr: 'Hızlı Ekle', en: 'Quick Add' },
+  'quickAdd.subtitle': { tr: 'En çok kullandıkların', en: 'Most used' },
+  'quickAdd.added': { tr: 'eklendi', en: 'added' },
+  'quickAdd.failed': { tr: 'Aktivite eklenemedi', en: 'Failed to add activity' },
+  'quickAdd.addActivity': {
+    tr: '{activity} aktivitesini ekle',
+    en: 'Add {activity} activity'
   }
 };
 

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
 import { useSettings } from '@/lib/settingsStore';
 import { StatsHighlights } from '@/components/StatsHighlights';
+import { QuickAdd } from '@/components/QuickAdd';
 import { useActivitiesSummary, useActivities } from '@/lib/activityStore';
 import { getRandomQuote } from '@/lib/quotes';
 import { getMotivationalMessage } from '@/lib/motivationalMessages';
@@ -92,6 +93,7 @@ export default function HomePage() {
       )}
       
       <StatsCards />
+      <QuickAdd />
       <StatsHighlights />
     </div>
   );
