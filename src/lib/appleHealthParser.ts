@@ -229,30 +229,74 @@ function parseDate(dateStr: string): Date | null {
  * Expected format: Apple Health XML export
  */
 export async function parseAppleHealthXML(
-  xmlContent: string,
+  xmlContent: string | ArrayBuffer,
   onProgress?: (progress: ParseProgress) => void
 ): Promise<ParseResult> {
   const errors: string[] = [];
   const stepDataMap = new Map<string, { steps: number; sourceName?: string }>();
   
   try {
+    // Handle ArrayBuffer input (for large files)
+    let xmlString: string;
+    if (xmlContent instanceof ArrayBuffer) {
+      // Convert ArrayBuffer to string using TextDecoder
+      const decoder = new TextDecoder('utf-8');
+      xmlString = decoder.decode(xmlContent);
+    } else {
+      xmlString = xmlContent;
+    }
+    
+    // Check if content is empty or whitespace only
+    if (!xmlString || xmlString.trim().length === 0) {
+      return {
+        success: false,
+        data: [],
+        errors: ['XML file is empty or contains no data.'],
+        totalRecords: 0,
+        dateRange: null
+      };
+    }
+    
     // Check file size - warn if very large
-    const sizeMB = new Blob([xmlContent]).size / (1024 * 1024);
+    const sizeMB = new Blob([xmlString]).size / (1024 * 1024);
     if (sizeMB > 500) {
       errors.push(`Large file detected (${Math.round(sizeMB)}MB). Processing may take time.`);
     }
 
     // Use DOMParser for XML parsing
     const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+    const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
     
     // Check for parsing errors
     const parseError = xmlDoc.querySelector('parsererror');
     if (parseError) {
+      const errorText = parseError.textContent || 'Unknown parsing error';
+      // Check if document is empty
+      if (errorText.includes('Document is empty') || xmlString.trim().length < 100) {
+        return {
+          success: false,
+          data: [],
+          errors: ['XML file appears to be empty or invalid. Please ensure you exported the correct file from Apple Health.'],
+          totalRecords: 0,
+          dateRange: null
+        };
+      }
       return {
         success: false,
         data: [],
-        errors: ['XML parsing error: ' + parseError.textContent],
+        errors: ['XML parsing error: ' + errorText],
+        totalRecords: 0,
+        dateRange: null
+      };
+    }
+    
+    // Check if document has any content
+    const healthData = xmlDoc.querySelector('HealthData');
+    if (!healthData) {
+      return {
+        success: false,
+        data: [],
+        errors: ['Invalid Apple Health XML format. The file does not contain HealthData element.'],
         totalRecords: 0,
         dateRange: null
       };
@@ -482,7 +526,7 @@ export async function parseAppleHealthFile(
     }
     
     // For smaller files, use FileReader with ArrayBuffer to avoid string length limits
-    const text = await new Promise<string>((resolve, reject) => {
+    const text = await new Promise<string | ArrayBuffer>((resolve, reject) => {
       const reader = new FileReader();
       let timeoutId: NodeJS.Timeout | null = null;
       
@@ -490,19 +534,34 @@ export async function parseAppleHealthFile(
         if (timeoutId) clearTimeout(timeoutId);
         try {
           if (e.target?.result) {
-            // Use ArrayBuffer for large files to avoid string length limits
+            // For large files, pass ArrayBuffer directly to avoid string length limits
             if (e.target.result instanceof ArrayBuffer) {
-              const decoder = new TextDecoder('utf-8');
-              const text = decoder.decode(e.target.result);
-              resolve(text);
+              // Check if ArrayBuffer is empty
+              if (e.target.result.byteLength === 0) {
+                reject(new Error('File is empty'));
+                return;
+              }
+              resolve(e.target.result);
             } else {
-              resolve(e.target.result as string);
+              // For smaller files, use string
+              const text = e.target.result as string;
+              if (!text || text.trim().length === 0) {
+                reject(new Error('File is empty'));
+                return;
+              }
+              resolve(text);
             }
           } else {
             reject(new Error('Failed to read file content'));
           }
         } catch (error) {
-          reject(new Error(`Failed to decode file: ${error instanceof Error ? error.message : 'Unknown error'}`));
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          // Provide more specific error messages
+          if (errorMessage.includes('length') || errorMessage.includes('Invalid string')) {
+            reject(new Error(`File is too large to process as text (${Math.round(sizeMB)}MB). Please try exporting a smaller date range from Apple Health.`));
+          } else {
+            reject(new Error(`Failed to decode file: ${errorMessage}`));
+          }
         }
       };
       
@@ -539,9 +598,18 @@ export async function parseAppleHealthFile(
     });
     
     if (isXML) {
+      // Pass ArrayBuffer directly for large files to avoid string conversion issues
       return await parseAppleHealthXML(text, onProgress);
     } else {
-      return parseAppleHealthCSV(text);
+      // CSV parsing requires string
+      let csvText: string;
+      if (text instanceof ArrayBuffer) {
+        const decoder = new TextDecoder('utf-8');
+        csvText = decoder.decode(text);
+      } else {
+        csvText = text;
+      }
+      return parseAppleHealthCSV(csvText);
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

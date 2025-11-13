@@ -77,8 +77,19 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
       if (element) {
         setTargetElement(element);
         updatePosition(element);
-        // Scroll element into view
-        element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        // Scroll element into view - but only if it's not already visible
+        const rect = element.getBoundingClientRect();
+        const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+        
+        // Only scroll if element is not visible or too close to bottom
+        if (!isVisible || rect.bottom > window.innerHeight * 0.8) {
+          // Use a more conservative scroll that doesn't go to the very bottom
+          const scrollY = rect.top + window.scrollY - (window.innerHeight / 2);
+          window.scrollTo({ 
+            top: Math.max(0, scrollY), 
+            behavior: 'smooth' 
+          });
+        }
       } else {
         console.warn(`Onboarding: Could not find element with selector: ${step.target}`);
       }
@@ -142,59 +153,90 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
 
   const tooltipPosition = currentStepData.position || (isMobile ? 'bottom' : 'right');
   
-  // Calculate tooltip position
+  // Calculate tooltip position - smarter positioning to avoid going off-screen
   let tooltipStyle: React.CSSProperties = {};
   const spacing = 16;
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
+  
+  // Calculate if element is near edges
+  const isNearTop = position.top < viewportHeight * 0.3;
+  const isNearBottom = position.top + position.height > viewportHeight * 0.7;
+  const isNearLeft = position.left < viewportWidth * 0.2;
+  const isNearRight = position.left + position.width > viewportWidth * 0.8;
   
   switch (tooltipPosition) {
     case 'top':
       tooltipStyle = {
         bottom: `${position.height + spacing}px`,
         left: '50%',
-        transform: 'translateX(-50%)'
+        transform: 'translateX(-50%)',
+        maxWidth: '90vw'
       };
       break;
     case 'bottom':
-      tooltipStyle = {
-        top: `${position.height + spacing}px`,
-        left: '50%',
-        transform: 'translateX(-50%)'
-      };
+      // If near bottom, show tooltip above instead
+      if (isNearBottom) {
+        tooltipStyle = {
+          bottom: `${position.height + spacing}px`,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          maxWidth: '90vw'
+        };
+      } else {
+        tooltipStyle = {
+          top: `${position.top + position.height + spacing}px`,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          maxWidth: '90vw'
+        };
+      }
       break;
     case 'left':
       tooltipStyle = {
         right: `${position.width + spacing}px`,
         top: '50%',
-        transform: 'translateY(-50%)'
+        transform: 'translateY(-50%)',
+        maxWidth: '40vw'
       };
       break;
     case 'right':
       tooltipStyle = {
-        left: `${position.width + spacing}px`,
+        left: `${position.left + position.width + spacing}px`,
         top: '50%',
-        transform: 'translateY(-50%)'
+        transform: 'translateY(-50%)',
+        maxWidth: '40vw'
       };
       break;
     case 'center':
       tooltipStyle = {
         top: '50%',
         left: '50%',
-        transform: 'translate(-50%, -50%)'
+        transform: 'translate(-50%, -50%)',
+        maxWidth: '90vw'
       };
       break;
+  }
+  
+  // Ensure tooltip stays within viewport
+  if (tooltipStyle.top !== undefined && typeof tooltipStyle.top === 'string') {
+    const topValue = parseInt(tooltipStyle.top);
+    if (topValue + 200 > viewportHeight) {
+      tooltipStyle.top = `${Math.max(20, viewportHeight - 250)}px`;
+    }
   }
 
   return typeof window !== 'undefined' ? createPortal(
     <>
-      {/* Overlay */}
+      {/* Overlay - Less blurry, more transparent */}
       <div
         ref={overlayRef}
-        className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm animate-fade-in"
+        className="fixed inset-0 z-[9998] bg-black/40 backdrop-blur-[2px] animate-fade-in"
         onClick={skipTour}
         aria-hidden="true"
       />
       
-      {/* Highlight */}
+      {/* Highlight - More visible, less dark overlay */}
       {position && (
         <div
           className="fixed z-[9999] rounded-xl border-4 border-brand animate-scale-in pointer-events-none"
@@ -203,9 +245,10 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
             left: `${position.left - 4}px`,
             width: `${position.width + 8}px`,
             height: `${position.height + 8}px`,
-            boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.75), 0 0 0 4px #0ea5e9, 0 0 30px rgba(14, 165, 233, 0.8), inset 0 0 20px rgba(14, 165, 233, 0.3)`,
-            backgroundColor: 'rgba(14, 165, 233, 0.1)',
-            zIndex: 9999
+            boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 0 4px #0ea5e9, 0 0 40px rgba(14, 165, 233, 1), 0 0 80px rgba(14, 165, 233, 0.6), inset 0 0 30px rgba(14, 165, 233, 0.4)`,
+            backgroundColor: 'rgba(14, 165, 233, 0.2)',
+            zIndex: 9999,
+            filter: 'drop-shadow(0 0 20px rgba(14, 165, 233, 0.8))'
           }}
         />
       )}

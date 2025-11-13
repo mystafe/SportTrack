@@ -2,6 +2,38 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.10.8] - 2025-01
+
+### Fixed
+- **Onboarding Tour Improvements**:
+  - Fixed issue where tour would scroll to bottom on second step
+  - Reduced overlay blur (from `bg-black/60 backdrop-blur-sm` to `bg-black/40 backdrop-blur-[2px]`)
+  - Enhanced highlight visibility with brighter glow and better contrast
+  - Improved tooltip positioning to avoid going off-screen
+  - Smarter scroll behavior that only scrolls when element is not visible
+  - Better viewport edge detection for tooltip placement
+
+- **Apple Health Import Fixes**:
+  - Fixed "Invalid string length" error for large XML files (Export.xml)
+  - Fixed "Document is empty" error for empty XML files (Export_Cda.xml)
+  - Improved ArrayBuffer handling for files larger than 50MB
+  - Added better error messages for empty files
+  - Added validation for HealthData element in XML files
+  - Improved file reading error handling with specific messages
+
+### Changed
+- **Onboarding Tour UX**:
+  - Overlay is now less intrusive (40% opacity vs 60%)
+  - Highlight is more visible with enhanced glow effects
+  - Tooltip positioning adapts to viewport edges
+  - Scroll behavior is more conservative and user-friendly
+
+- **Apple Health Parser**:
+  - Better handling of ArrayBuffer input for large files
+  - Improved empty file detection
+  - More descriptive error messages
+  - Better memory management for very large files
+
 ## [0.10.7] - 2025-01
 
 ### Added
