@@ -8,7 +8,7 @@ import { useSettings } from '@/lib/settingsStore';
 import { exportToCSV, exportToPDF, ExportFormat } from '@/lib/exportUtils';
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
-import { format, startOfDay, endOfDay, subDays } from 'date-fns';
+import { format as formatDate, startOfDay, endOfDay, subDays } from 'date-fns';
 
 type ExportDialogProps = {
   open: boolean;
@@ -21,7 +21,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
   const isMobile = useIsMobile();
-  const [format, setFormat] = useState<ExportFormat>('csv');
+  const [exportFormat, setExportFormat] = useState<ExportFormat>('csv');
   const [dateRange, setDateRange] = useState<'all' | '7days' | '30days' | 'custom'>('all');
   const [customStart, setCustomStart] = useState<string>('');
   const [customEnd, setCustomEnd] = useState<string>('');
@@ -57,12 +57,12 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
       }
 
       const options = {
-        format,
+        format: exportFormat,
         dateRange: dateRangeOption,
         language: lang as 'tr' | 'en'
       };
 
-      if (format === 'csv') {
+      if (exportFormat === 'csv') {
         exportToCSV(activities, settings, options);
         showToast(t('export.csvSuccess'), 'success');
       } else {
@@ -110,9 +110,9 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setFormat('csv')}
+                onClick={() => setExportFormat('csv')}
                 className={`flex-1 px-4 py-2 rounded-lg border transition-colors ${
-                  format === 'csv'
+                  exportFormat === 'csv'
                     ? 'bg-brand text-white border-brand'
                     : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
                 }`}
@@ -121,9 +121,9 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
               </button>
               <button
                 type="button"
-                onClick={() => setFormat('pdf')}
+                onClick={() => setExportFormat('pdf')}
                 className={`flex-1 px-4 py-2 rounded-lg border transition-colors ${
-                  format === 'pdf'
+                  exportFormat === 'pdf'
                     ? 'bg-brand text-white border-brand'
                     : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
                 }`}
@@ -172,7 +172,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
                   type="date"
                   value={customEnd}
                   onChange={(e) => setCustomEnd(e.target.value)}
-                  max={format(new Date(), 'yyyy-MM-dd')}
+                  max={formatDate(new Date(), 'yyyy-MM-dd')}
                   className="w-full border border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 bg-white dark:bg-gray-900 text-sm"
                 />
               </div>
