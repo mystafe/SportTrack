@@ -221,6 +221,10 @@ const translations: Translations = {
   'stats.detailed.selectDate': { tr: 'Tarih seçin', en: 'Select date' },
   'stats.detailed.dayDetails': { tr: 'Gün Detayları', en: 'Day Details' },
   'stats.detailed.activitiesOnDay': { tr: 'Bu günkü aktiviteler', en: 'Activities on this day' },
+  'stats.detailed.trendChart': { tr: 'Trend Grafiği', en: 'Trend Chart' },
+  'stats.detailed.activityComparison': { tr: 'Aktivite Karşılaştırması', en: 'Activity Comparison' },
+  'stats.detailed.activityDistribution': { tr: 'Aktivite Dağılımı', en: 'Activity Distribution' },
+  'stats.detailed.activityHeatmap': { tr: 'Yıllık Aktivite Haritası', en: 'Yearly Activity Heatmap' },
   'toast.activityAdded': {
     tr: 'Aktivite başarıyla eklendi',
     en: 'Activity added successfully'

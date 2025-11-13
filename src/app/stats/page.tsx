@@ -9,6 +9,10 @@ import { useSettings } from '@/lib/settingsStore';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { TrendChart } from '@/components/charts/TrendChart';
+import { ActivityBarChart } from '@/components/charts/ActivityBarChart';
+import { ActivityPieChart } from '@/components/charts/ActivityPieChart';
+import { ActivityHeatmap } from '@/components/charts/ActivityHeatmap';
 
 export default function StatsPage() {
   const { t, lang } = useI18n();
@@ -21,6 +25,7 @@ export default function StatsPage() {
   const dateLocale = lang === 'tr' ? tr : enUS;
   const isMobile = useIsMobile();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [trendDays, setTrendDays] = useState<7 | 30 | 90>(30);
 
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
@@ -207,6 +212,50 @@ export default function StatsPage() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Trend Chart */}
+      <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">{t('stats.detailed.trendChart')}</h2>
+          <div className="flex items-center gap-2">
+            {([7, 30, 90] as const).map((days) => (
+              <button
+                key={days}
+                onClick={() => setTrendDays(days)}
+                className={`px-2 py-1 text-xs rounded transition-colors ${
+                  trendDays === days
+                    ? 'bg-brand text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+              >
+                {days} {lang === 'tr' ? 'gün' : 'days'}
+              </button>
+            ))}
+          </div>
+        </div>
+        <TrendChart activities={activities} target={target} days={trendDays} />
+      </div>
+
+      {/* Charts Row */}
+      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-4 sm:gap-6`}>
+        {/* Bar Chart */}
+        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
+          <h2 className="text-lg font-semibold mb-4">{t('stats.detailed.activityComparison')}</h2>
+          <ActivityBarChart activities={activities} />
+        </div>
+
+        {/* Pie Chart */}
+        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
+          <h2 className="text-lg font-semibold mb-4">{t('stats.detailed.activityDistribution')}</h2>
+          <ActivityPieChart activities={activities} />
+        </div>
+      </div>
+
+      {/* Heatmap */}
+      <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
+        <h2 className="text-lg font-semibold mb-4">{t('stats.detailed.activityHeatmap')}</h2>
+        <ActivityHeatmap activities={activities} target={target} />
       </div>
 
       {/* Daily Statistics */}
