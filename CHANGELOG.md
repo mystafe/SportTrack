@@ -2,6 +2,42 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.11.4] - 2025-01
+
+### Fixed
+- **Landing Page Text Readability - Critical Fix**:
+  - **Z-Index Hierarchy**: Fixed z-index layering - all decorative elements now behind text
+    - Quote dots: `z-index: 0` (behind text)
+    - Pattern overlay: `z-index: 0` (behind text)
+    - Shimmer overlay: `z-index: 0` (behind text)
+    - Sparkle particles: `z-index: 1` (behind text)
+    - Quote marks: `z-index: 1` (behind text)
+    - Decorative icon: `z-index: 10` (behind text)
+    - Quote text: `z-index: 50` (always on top)
+    - Motivational message: `z-index: 50` (always on top)
+  
+  - **Opacity Reductions**: Reduced opacity of all decorative elements to prevent text obstruction
+    - Quote dots: `opacity: 0.3` → `0.15` (light), `0.1` (dark)
+    - Pattern overlay: `opacity: 0.05` → `0.03` (light), `0.1` → `0.05` (dark)
+    - Sparkle particles: `opacity: 1` → `0.6` (max), `opacity: 1` → `0.5` (enhanced)
+    - Quote marks: `opacity: 0.15` → `0.1`
+    - Decorative icon: `opacity: 20` → `15`
+  
+  - **Text Shadow**: Added explicit text shadow to quote and motivational message text for better contrast
+    - `textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'`
+  
+  - **Motivational Card Background**: Reduced background gradient opacity
+    - Light mode: `rgba(14, 165, 233, 0.15)` → `0.1`, `rgba(2, 132, 199, 0.2)` → `0.15`
+    - Dark mode: `rgba(14, 165, 233, 0.25)` → `0.15`, `rgba(2, 132, 199, 0.3)` → `0.2`
+  
+  - **Pattern Overlay Colors**: Reduced pattern overlay color intensity
+    - Light mode: `rgba(14, 165, 233, 0.1)` → `0.05`
+    - Dark mode: `rgba(96, 165, 250, 0.15)` → `0.08`
+
+### Changed
+- **Text Z-Index**: Increased from `z-20` to `z-50` to ensure text is always above all decorative elements
+- **All Decorative Elements**: Explicitly set z-index values to create proper layering hierarchy
+
 ## [0.11.3] - 2025-01
 
 ### Fixed

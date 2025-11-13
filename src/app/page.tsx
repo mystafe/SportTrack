@@ -108,20 +108,20 @@ export default function HomePage() {
         <span className="quote-mark quote-mark-right">"</span>
         
         {/* Quote text */}
-        <div className="relative z-20">
+        <div className="relative z-50">
           {mounted && quote ? (
-            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-bold leading-relaxed`}>
+            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-bold leading-relaxed`} style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}>
               {lang === 'tr' ? quote.tr : quote.en}
             </p>
           ) : (
-            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-bold leading-relaxed`}>
+            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-bold leading-relaxed`} style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}>
               {lang === 'tr' ? 'Her gün biraz daha ileri git.' : 'Every day is an opportunity, make the most of it.'}
             </p>
           )}
         </div>
         
         {/* Decorative icon */}
-        <div className="absolute top-4 right-4 text-2xl opacity-20 icon-rotate">
+        <div className="absolute top-4 right-4 text-2xl opacity-15 icon-rotate z-10">
           ✨
         </div>
       </div>
@@ -133,9 +133,9 @@ export default function HomePage() {
           <div className="pattern-overlay"></div>
           <div className="quote-shimmer"></div>
           
-          <div className="flex items-center gap-4 relative z-20">
+          <div className="flex items-center gap-4 relative z-50">
             <span className={`text-3xl sm:text-4xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'} flex-shrink-0`}>{motivationalMessage.emoji}</span>
-            <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-white flex-1 leading-relaxed drop-shadow-sm">
+            <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-white flex-1 leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}>
               {lang === 'tr' ? motivationalMessage.tr : motivationalMessage.en}
             </p>
           </div>
