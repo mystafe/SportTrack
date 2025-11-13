@@ -1,0 +1,165 @@
+'use client';
+
+import { useState, useRef } from 'react';
+import { useI18n } from '@/lib/i18n';
+import { useToaster } from '@/components/Toaster';
+import { useActivities } from '@/lib/activityStore';
+import { useActivityDefinitions } from '@/lib/settingsStore';
+import { parseAppleHealthCSV, type AppleHealthStepData } from '@/lib/appleHealthParser';
+import { BASE_ACTIVITY_MAP } from '@/lib/activityConfig';
+import { startOfDay } from 'date-fns';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+
+export function AppleHealthImport() {
+  const { t, lang } = useI18n();
+  const { showToast } = useToaster();
+  const { activities, addActivity, deleteActivity } = useActivities();
+  const definitions = useActivityDefinitions();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [parseResult, setParseResult] = useState<{
+    data: AppleHealthStepData[];
+    totalRecords: number;
+    dateRange: { start: string; end: string } | null;
+    errors: string[];
+  } | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const walkingDefinition = definitions.find(d => d.key === 'WALKING') || BASE_ACTIVITY_MAP['WALKING'];
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    try {
+      const text = await file.text();
+      const result = parseAppleHealthCSV(text);
+
+      if (!result.success || result.data.length === 0) {
+        showToast(
+          t('appleHealth.parseFailed', {
+            errors: result.errors.length > 0 ? result.errors.join(', ') : 'No step data found'
+          }),
+          'error'
+        );
+        setIsImporting(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+
+      setParseResult({
+        data: result.data,
+        totalRecords: result.totalRecords,
+        dateRange: result.dateRange,
+        errors: result.errors
+      });
+      setShowConfirm(true);
+      setIsImporting(false);
+    } catch (error) {
+      console.error('Failed to parse Apple Health CSV:', error);
+      showToast(
+        t('appleHealth.parseFailed', {
+          errors: error instanceof Error ? error.message : 'Unknown error'
+        }),
+        'error'
+      );
+      setIsImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleImport = () => {
+    if (!parseResult || !walkingDefinition) return;
+
+    try {
+      // Find existing WALKING activities and delete them
+      const existingWalkingActivities = activities.filter(a => a.activityKey === 'WALKING');
+      
+      existingWalkingActivities.forEach(activity => {
+        deleteActivity(activity.id);
+      });
+
+      // Add new step data as WALKING activities
+      parseResult.data.forEach((stepData) => {
+        // Create activity for each day with step count
+        // Use start of day for consistent date handling
+        const date = new Date(stepData.date);
+        const performedAt = startOfDay(date).toISOString();
+
+        addActivity({
+          definition: walkingDefinition,
+          amount: stepData.steps,
+          performedAt: performedAt,
+          note: stepData.sourceName ? `Apple Health (${stepData.sourceName})` : 'Apple Health'
+        });
+      });
+
+      showToast(
+        t('appleHealth.importSuccess', {
+          count: String(parseResult.data.length),
+          replaced: String(existingWalkingActivities.length)
+        }),
+        'success'
+      );
+
+      setParseResult(null);
+      setShowConfirm(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error) {
+      console.error('Failed to import Apple Health data:', error);
+      showToast(t('appleHealth.importFailed'), 'error');
+    }
+  };
+
+  const handleCancel = () => {
+    setParseResult(null);
+    setShowConfirm(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <>
+      <label className="px-2 py-1 text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv"
+          onChange={handleFileSelect}
+          disabled={isImporting}
+          className="hidden"
+          aria-label={t('appleHealth.importLabel')}
+        />
+        {isImporting ? '⏳' : '🍎'} {t('appleHealth.import')}
+      </label>
+
+      <ConfirmDialog
+        open={showConfirm && !!parseResult}
+        title={t('appleHealth.confirmTitle')}
+        message={
+          parseResult
+            ? t('appleHealth.confirmMessage', {
+                count: String(parseResult.data.length),
+                start: parseResult.dateRange?.start || '',
+                end: parseResult.dateRange?.end || '',
+                existing: String(activities.filter(a => a.activityKey === 'WALKING').length)
+              })
+            : ''
+        }
+        variant="default"
+        confirmLabel={t('appleHealth.confirmImport')}
+        onConfirm={handleImport}
+        onCancel={handleCancel}
+      />
+    </>
+  );
+}
+

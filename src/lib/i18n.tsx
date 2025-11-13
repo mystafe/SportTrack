@@ -412,7 +412,34 @@ const translations: Translations = {
   'filters.clear': { tr: 'Filtreleri Temizle', en: 'Clear Filters' },
   'filters.results': { tr: 'Filtrelenmiş Sonuçlar', en: 'Filtered Results' },
   'filters.activities': { tr: 'aktivite', en: 'activities' },
-  'filters.noResults': { tr: 'Filtrelere uygun aktivite bulunamadı', en: 'No activities match the filters' }
+  'filters.noResults': { tr: 'Filtrelere uygun aktivite bulunamadı', en: 'No activities match the filters' },
+
+  'appleHealth.import': { tr: 'Apple Health', en: 'Apple Health' },
+  'appleHealth.importLabel': {
+    tr: 'Apple Health CSV dosyasını içe aktar',
+    en: 'Import Apple Health CSV file'
+  },
+  'appleHealth.parseFailed': {
+    tr: 'CSV dosyası parse edilemedi: {errors}',
+    en: 'Failed to parse CSV file: {errors}'
+  },
+  'appleHealth.confirmTitle': {
+    tr: 'Apple Health Verilerini İçe Aktar',
+    en: 'Import Apple Health Data'
+  },
+  'appleHealth.confirmMessage': {
+    tr: '{count} günlük adım verisi bulundu ({start} - {end}). Mevcut {existing} adım kaydı silinecek ve yenileriyle değiştirilecek. Devam etmek istiyor musunuz?',
+    en: 'Found {count} days of step data ({start} - {end}). Existing {existing} step records will be deleted and replaced. Do you want to continue?'
+  },
+  'appleHealth.confirmImport': { tr: 'İçe Aktar', en: 'Import' },
+  'appleHealth.importSuccess': {
+    tr: '{count} günlük adım verisi içe aktarıldı ({replaced} kayıt değiştirildi)',
+    en: 'Imported {count} days of step data ({replaced} records replaced)'
+  },
+  'appleHealth.importFailed': {
+    tr: 'Apple Health verileri içe aktarılamadı',
+    en: 'Failed to import Apple Health data'
+  }
 };
 
 type I18nContextValue = {

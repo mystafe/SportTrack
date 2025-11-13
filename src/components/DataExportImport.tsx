@@ -9,6 +9,7 @@ import { ActivityRecord } from '@/lib/activityStore';
 import { UserSettings } from '@/lib/settingsStore';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { ExportDialog } from '@/components/ExportDialog';
+import { AppleHealthImport } from '@/components/AppleHealthImport';
 
 export function DataExportImport() {
   const { activities } = useActivities();
@@ -137,6 +138,7 @@ export function DataExportImport() {
         />
         {isImporting ? '⏳' : '📥'} {t('data.import')}
       </label>
+      <AppleHealthImport />
       </div>
       <ExportDialog open={showExportDialog} onClose={() => setShowExportDialog(false)} />
     </>
