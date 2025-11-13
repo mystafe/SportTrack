@@ -2,6 +2,29 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.11.9] - 2025-01
+
+### Changed
+- **Visual Design Improvements**:
+  - Improved color contrast across all components (text-gray-900 → text-gray-950)
+  - Enhanced typography hierarchy with better font weights (font-medium → font-semibold/font-bold)
+  - Added subtle gradients to cards (from-white via-gray-50 to-white)
+  - Improved card shadows (shadow-lg → shadow-md hover:shadow-xl)
+  - Better border colors (border-gray-300 → border-gray-200)
+  - Enhanced hover effects with gradient backgrounds
+  - Improved font sizes (text-xs → text-sm, text-base → text-lg for headings)
+  - Better line heights (leading-relaxed for body text)
+
+### Fixed
+- **Page.tsx**: Fixed missing `mounted` state causing hydration issues
+- **Input Cursor Shifting**: Added explicit `transform: none` to input focus states to prevent cursor movement
+
+### Improved
+- **StatsHighlights**: Better typography hierarchy and contrast
+- **QuickAdd**: Enhanced visual design with gradients and better typography
+- **ActivityTemplates**: Improved card design and typography
+- **StatsCards**: Better gradients, shadows, and typography consistency
+
 ## [0.11.8] - 2025-01
 
 ### Added

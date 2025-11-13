@@ -96,18 +96,18 @@ export function StatsHighlights() {
 
   return (
     <section className="mt-8 space-y-4">
-      <h2 className="text-sm font-bold uppercase tracking-wide text-gray-800 dark:text-gray-200">
+      <h2 className={`${isMobile ? 'text-sm' : 'text-base'} font-bold uppercase tracking-wide text-gray-900 dark:text-gray-100`}>
         {t('stats.highlightsTitle')}
       </h2>
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.bestDay')}</div>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.highlight.bestDay')}</div>
             {bestDay ? (
               <>
-                <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
+                <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
                   {format(new Date(bestDay.date), 'd MMMM yyyy, EEEE', { locale: dateLocale })}
                 </div>
-                <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
+                <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
                   {numberFormatter.format(bestDay.points)} {t('list.pointsUnit')}
                 </div>
               </>
@@ -118,15 +118,15 @@ export function StatsHighlights() {
             )}
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.bestActivity')}</div>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.highlight.bestActivity')}</div>
             {topActivity ? (
               <>
-                <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100`}>
+                <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold flex items-center gap-2 text-gray-950 dark:text-gray-100`}>
                   <span className={isMobile ? 'emoji-celebrate' : 'emoji-bounce'}>{topActivity.icon}</span>
                   <span className={isMobile ? 'number-count-mobile' : 'number-transition'}>{topActivity.label}</span>
                 </div>
-                <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
+                <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
                   {numberFormatter.format(topActivity.points)} {t('list.pointsUnit')} •{' '}
                   {topActivity.count} {t('stats.highlight.sessions')}
                 </div>
@@ -138,44 +138,44 @@ export function StatsHighlights() {
             )}
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.currentStreak')}</div>
-            <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>{summary.streakDays}</div>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.highlight.currentStreak')}</div>
+            <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>{summary.streakDays}</div>
+            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold`}>
               {t('stats.highlight.totalActivities', {
                 count: summary.totalActivities
               })}
             </div>
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.averageDaily')}</div>
-            <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.highlight.averageDaily')}</div>
+            <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
               {numberFormatter.format(averageDailyPoints)} {t('list.pointsUnit')}
             </div>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
               {t('stats.highlight.totalDays', { count: totalDays })}
             </div>
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.totalPoints')}</div>
-            <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.highlight.totalPoints')}</div>
+            <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
               {numberFormatter.format(summary.totalPoints)} {t('list.pointsUnit')}
             </div>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
               {t('stats.highlight.totalActivities', {
                 count: summary.totalActivities
               })}
             </div>
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.todayProgress')}</div>
-            <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.highlight.todayProgress')}</div>
+            <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
               {numberFormatter.format(summary.todayPoints)} / {numberFormatter.format(summary.targetPoints)}
             </div>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'number-count-mobile' : 'number-count'}`}>
               {Math.round((summary.todayPoints / summary.targetPoints) * 100)}% {t('stats.highlight.complete')}
             </div>
           </div>

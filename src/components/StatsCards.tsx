@@ -38,7 +38,7 @@ export function StatsCards() {
     return (
       <button
         type="button"
-        className="flex w-full items-center justify-between text-sm text-gray-700 dark:text-gray-200 font-medium mb-3 transition-all duration-200 hover:text-gray-900 dark:hover:text-white"
+        className="flex w-full items-center justify-between text-sm text-gray-800 dark:text-gray-200 font-semibold mb-3 transition-all duration-200 hover:text-gray-950 dark:hover:text-white"
         onClick={() => setActiveMobileSection(id)}
         aria-expanded={isActive}
         aria-controls={`stats-section-${id}`}
@@ -97,7 +97,7 @@ export function StatsCards() {
         aria-expanded={overviewOpen}
         aria-controls="stats-overview"
       >
-        <span>{t('stats.overview') || 'Overview'}</span>
+        <span className="font-bold">{t('stats.overview') || 'Overview'}</span>
         <span className="ml-2 text-base transition-transform duration-300 ease-in-out" aria-hidden style={{ transform: overviewOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
           ▼
         </span>
@@ -127,13 +127,13 @@ export function StatsCards() {
       )}
       
       {/* Overview Section */}
-      <div className="card-entrance rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 p-4 shadow-lg">
+      <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300">
         {renderOverviewHeader()}
         {overviewOpen && (
           <div id="stats-overview" className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
-        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-400/50 ring-2 ring-green-500/20 dark:ring-green-400/20 pulse-glow-mobile' : ''}`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.todayPoints')}</div>
-          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400 number-count-mobile' : ''} ${isMobile ? 'number-count-mobile' : ''}`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-emerald-500 dark:border-emerald-400/50 ring-2 ring-emerald-500/20 dark:ring-emerald-400/20 pulse-glow-mobile' : ''}`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.todayPoints')}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-brand dark:text-brand-light transition-all duration-300 ${showGoalAnimation ? 'points-value text-emerald-600 dark:text-emerald-400 number-count-mobile' : ''} ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(summary.todayPoints)}
           </div>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>
@@ -152,31 +152,31 @@ export function StatsCards() {
             )}
           </div>
         </div>
-        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.totalPoints')}</div>
-          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300 text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : ''}`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.totalPoints')}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold transition-all duration-300 text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(summary.totalPoints)}
           </div>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
         </div>
-        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.streak')}</div>
-          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${isMobile ? 'number-count-mobile' : ''}`}>{summary.streakDays}</div>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.streakDesc')}</div>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.streak')}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-brand dark:text-brand-light transition-all duration-300 ${isMobile ? 'number-count-mobile' : ''}`}>{summary.streakDays}</div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold`}>{t('stats.streakDesc')}</div>
         </div>
-        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.averageDaily') || 'Average Daily'}</div>
-          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300 text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : ''}`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('stats.averageDaily') || 'Average Daily'}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold transition-all duration-300 text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(Math.round(summary.totalPoints / Math.max(1, summary.totalActivities)))}
           </div>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.perActivity') || 'Per Activity'}</div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold`}>{t('stats.perActivity') || 'Per Activity'}</div>
         </div>
           </div>
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="card-entrance slide-in-left rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  p-4 shadow-lg magnetic-hover gpu-accelerated">
+        <div className="card-entrance slide-in-left rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
           {renderSectionHeader('breakdown', t('stats.breakdownToday'))}
           {(isMobile ? activeMobileSection === 'breakdown' : true) && (
             <div id="stats-section-breakdown">
@@ -187,13 +187,13 @@ export function StatsCards() {
                   {summary.breakdownToday.map((item) => (
                     <li
                       key={item.key}
-                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-md "
+                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900/50 dark:to-gray-800/50 transition-all duration-200 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 hover:shadow-md "
                     >
                       <div className="flex items-center gap-3">
                         <div className="text-xl">{item.icon}</div>
                         <div>
-                          <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">{getActivityLabel(item, lang)}</div>
-                          <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                          <div className="text-sm font-bold text-gray-950 dark:text-gray-100">{getActivityLabel(item, lang)}</div>
+                          <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                             {item.amount} {getActivityUnit(item, lang)}
                           </div>
                         </div>
@@ -208,7 +208,7 @@ export function StatsCards() {
             </div>
           )}
         </div>
-        <div className="rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  p-4 shadow-lg hover-lift transition-smooth">
+        <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300 hover-lift transition-smooth">
           {renderSectionHeader('lastSeven', t('stats.lastSeven'))}
           {(isMobile ? activeMobileSection === 'lastSeven' : true) && (
             <div id="stats-section-lastSeven">
@@ -219,12 +219,12 @@ export function StatsCards() {
                   {summary.lastSevenDays.map((day) => (
                     <li
                       key={day.date}
-                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-md "
+                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900/50 dark:to-gray-800/50 transition-all duration-200 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 hover:shadow-md "
                     >
-                      <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      <div className="text-sm font-bold text-gray-950 dark:text-gray-100">
                         {format(new Date(day.date), 'd MMMM EEEE', { locale: dateLocale })}
                       </div>
-                      <div className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                      <div className="text-sm font-bold text-gray-950 dark:text-gray-100">
                         {numberFormatter.format(day.points)} / {numberFormatter.format(summary.targetPoints)}
                       </div>
                     </li>

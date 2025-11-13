@@ -87,10 +87,10 @@ export function QuickAdd() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-white`}>
+        <h3 className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-950 dark:text-white`}>
           {t('quickAdd.title')}
         </h3>
-        <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-700 dark:text-gray-200 font-medium`}>
+        <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-semibold`}>
           {t('quickAdd.subtitle')}
         </span>
       </div>
@@ -122,10 +122,10 @@ export function QuickAdd() {
               <div className={`text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300 ${isAddingThis ? 'icon-wiggle-mobile' : ''}`}>
                 {definition.icon}
               </div>
-              <div className="text-xs sm:text-sm font-semibold text-center text-gray-900 dark:text-gray-100 line-clamp-2 group-hover:text-brand transition-colors">
+              <div className="text-xs sm:text-sm font-bold text-center text-gray-950 dark:text-gray-100 line-clamp-2 group-hover:text-brand transition-colors">
                 {getActivityLabel(definition, lang)}
               </div>
-              <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium">
+              <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-semibold">
                 {definition.defaultAmount} {getActivityUnit(definition, lang)}
               </div>
               {isAddingThis && (

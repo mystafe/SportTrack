@@ -80,10 +80,10 @@ export function ActivityTemplates() {
   return (
     <div className={isMobile ? 'space-y-3' : 'space-y-4'}>
       <div className="flex items-center justify-between">
-        <h3 className={`${isMobile ? 'text-sm' : 'text-base sm:text-lg'} font-semibold text-gray-900 dark:text-white`}>
+        <h3 className={`${isMobile ? 'text-base' : 'text-lg sm:text-xl'} font-bold text-gray-950 dark:text-white`}>
           {t('templates.title')}
         </h3>
-        <span className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} text-gray-700 dark:text-gray-200 font-medium`}>
+        <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-semibold`}>
           {t('templates.subtitle')}
         </span>
       </div>
@@ -101,30 +101,30 @@ export function ActivityTemplates() {
                 type="button"
                 onClick={() => handleTemplateClick(template)}
                 disabled={isAdding}
-                className={`stagger-item template-card-enhanced ${isMobile ? 'touch-feedback mobile-press mobile-card-lift fade-in-scale-mobile' : 'ripple-effect magnetic-hover tilt-3d'} relative flex flex-col items-start ${isMobile ? 'gap-2 p-2.5 rounded-lg' : 'gap-3 p-4 rounded-xl'} border-2 border-gray-200 dark:border-gray-700/50 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900/80 dark:to-gray-800/80  hover:border-brand dark:hover:border-brand/60 hover:shadow-lg hover:shadow-brand/20 dark:hover:shadow-brand/30 transition-all duration-300 scale-on-interact disabled:opacity-50 disabled:cursor-not-allowed group gpu-accelerated`}
+                className={`stagger-item template-card-enhanced ${isMobile ? 'touch-feedback mobile-press mobile-card-lift fade-in-scale-mobile' : 'ripple-effect magnetic-hover tilt-3d'} relative flex flex-col items-start ${isMobile ? 'gap-2 p-2.5 rounded-lg' : 'gap-3 p-4 rounded-xl'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 hover:border-brand dark:hover:border-brand/60 hover:bg-gradient-to-br hover:from-brand/5 hover:via-brand/3 hover:to-brand/5 dark:hover:from-brand/10 dark:hover:via-brand/8 dark:hover:to-brand/10 hover:shadow-xl hover:shadow-brand/20 dark:hover:shadow-brand/30 transition-all duration-300 scale-on-interact disabled:opacity-50 disabled:cursor-not-allowed group gpu-accelerated`}
               >
                 <div className={`flex items-start ${isMobile ? 'gap-2' : 'gap-3'} w-full`}>
                   <div className={`${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl'} transform group-hover:scale-110 transition-transform duration-300`}>
                     {template.icon}
                   </div>
                   <div className="flex-1 text-left min-w-0">
-                    <div className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold text-gray-900 dark:text-white ${isMobile ? 'mb-0.5' : 'mb-1'} group-hover:text-brand transition-colors`}>
+                    <div className={`${isMobile ? 'text-sm' : 'text-base'} font-bold text-gray-950 dark:text-white ${isMobile ? 'mb-0.5' : 'mb-1'} group-hover:text-brand transition-colors`}>
                       {template.name[lang]}
                     </div>
-                    <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium ${isMobile ? 'leading-tight' : 'leading-relaxed'}`}>
+                    <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'leading-tight' : 'leading-relaxed'}`}>
                       {template.description[lang]}
                     </div>
                   </div>
                 </div>
                   <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'} w-full ${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-300 dark:border-gray-600`}>
-                    <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1.5'} ${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-700 dark:text-gray-200 font-medium`}>
-                    <span className="font-medium">{template.activities.length}</span>
+                    <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1.5'} ${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-semibold`}>
+                    <span className="font-bold">{template.activities.length}</span>
                     <span>{t('templates.activities')}</span>
                   </div>
                   <span className="text-gray-300 dark:text-gray-600">•</span>
-                  <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1.5'} ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
-                    <span className="font-semibold text-brand">~{template.estimatedPoints}</span>
-                    <span className="text-gray-600 dark:text-gray-400">{t('templates.points')}</span>
+                  <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1.5'} ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                    <span className="font-bold text-brand">~{template.estimatedPoints}</span>
+                    <span className="text-gray-600 dark:text-gray-400 font-semibold">{t('templates.points')}</span>
                   </div>
                 </div>
                 {isAdding && (

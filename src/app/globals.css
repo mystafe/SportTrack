@@ -1398,17 +1398,21 @@ html {
   opacity: 1;
 }
 
-/* Enhanced input focus */
+/* Enhanced input focus - No transform to prevent cursor shifting */
 .input-enhanced:focus {
   outline: none;
-  border-color: rgba(14, 165, 233, 0.5);
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  border-color: rgba(14, 165, 233, 0.6);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  /* Explicitly no transform to prevent cursor shifting */
+  transform: none;
 }
 
 .dark .input-enhanced:focus {
-  border-color: rgba(96, 165, 250, 0.6);
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+  border-color: rgba(96, 165, 250, 0.7);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  /* Explicitly no transform to prevent cursor shifting */
+  transform: none;
 }
 
 /* Button glow effect */

@@ -38,7 +38,12 @@ export default function HomePage() {
     ? Math.min(100, Math.round((summary.todayPoints / dailyTarget) * 100))
     : 0;
   
+  const [mounted, setMounted] = useState(false);
   const [motivationalMessage, setMotivationalMessage] = useState<MotivationalMessage | null>(null);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   useEffect(() => {
     if (mounted) {
@@ -63,8 +68,8 @@ export default function HomePage() {
     <div className="space-y-4 sm:space-y-6 page-transition">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className={isMobile ? 'title-entrance' : ''}>
-          <h1 className={`text-xl sm:text-2xl font-bold ${isMobile ? 'text-brand dark:text-brand-light' : 'text-gray-900 dark:text-white'}`}>{greeting}</h1>
-          <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium">
+          <h1 className={`text-2xl sm:text-3xl font-bold ${isMobile ? 'text-brand dark:text-brand-light' : 'text-gray-950 dark:text-white'}`}>{greeting}</h1>
+          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-200 font-medium leading-relaxed">
             {t('header.overviewSubtitle')}
           </p>
         </div>
@@ -87,7 +92,7 @@ export default function HomePage() {
           
           <div className="flex items-center gap-4 relative z-50">
             <span className={`text-3xl sm:text-4xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'} flex-shrink-0`}>{motivationalMessage.emoji}</span>
-            <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-white flex-1 leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}>
+            <p className="text-sm sm:text-base md:text-lg font-bold text-gray-950 dark:text-white flex-1 leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}>
               {lang === 'tr' ? motivationalMessage.tr : motivationalMessage.en}
             </p>
           </div>
