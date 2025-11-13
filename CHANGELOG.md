@@ -2,6 +2,41 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.8.7] - 2025-01
+
+### Added
+- **Ortalama Günlük Aktivite Süresi Analizi**: Aktivite sürelerinin detaylı analizi
+  - Ortalama günlük aktivite süresi hesaplama
+  - Toplam aktivite süresi gösterimi
+  - Süre kayıtlı gün sayısı
+  - En uzun aktivite günü ve tarihi
+  - DurationStats bileşeni ile görselleştirme
+  - durationUtils utility fonksiyonları (formatDuration, formatDurationShort)
+
+### Changed
+- Stats sayfasına Duration Stats bölümü eklendi
+
+## [0.8.6] - 2025-01
+
+### Added
+- **Haftalık ve Aylık Karşılaştırma**: Dönemsel performans karşılaştırması
+  - Bu hafta vs geçen hafta karşılaştırması
+  - Bu ay vs geçen ay karşılaştırması
+  - Toplam puan, aktivite sayısı, günlük ortalama ve tamamlama oranı karşılaştırması
+  - Değişim göstergeleri (mutlak ve yüzde değerler)
+  - Bar chart grafikleri ile görsel karşılaştırma
+  - PeriodComparison bileşeni ve comparisonUtils utility fonksiyonları
+
+### Fixed
+- ActivityFormInitial tipine `duration` alanı eklendi
+
+## [0.8.5] - 2025-01
+
+### Added
+- **Haftalık ve Aylık Karşılaştırma**: Dönemsel performans karşılaştırması
+  - PeriodComparison component'i eklendi
+  - comparisonUtils utility fonksiyonları
+
 ## [0.8.4] - 2025-01
 
 ### Added

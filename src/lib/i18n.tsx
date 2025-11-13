@@ -225,6 +225,19 @@ const translations: Translations = {
   'stats.detailed.activityComparison': { tr: 'Aktivite Karşılaştırması', en: 'Activity Comparison' },
   'stats.detailed.activityDistribution': { tr: 'Aktivite Dağılımı', en: 'Activity Distribution' },
   'stats.detailed.activityHeatmap': { tr: 'Yıllık Aktivite Haritası', en: 'Yearly Activity Heatmap' },
+  'stats.duration.title': { tr: 'Aktivite Süresi Analizi', en: 'Activity Duration Analysis' },
+  'stats.duration.subtitle': {
+    tr: 'Günlük aktivite sürelerinizi ve ortalamalarınızı görüntüleyin.',
+    en: 'View your daily activity durations and averages.'
+  },
+  'stats.duration.averageDaily': { tr: 'Ortalama Günlük Süre', en: 'Average Daily Duration' },
+  'stats.duration.totalDuration': { tr: 'Toplam Süre', en: 'Total Duration' },
+  'stats.duration.daysWithDuration': { tr: 'Süre Kayıtlı Günler', en: 'Days with Duration' },
+  'stats.duration.longestDay': { tr: 'En Uzun Gün', en: 'Longest Day' },
+  'stats.duration.noDurationData': {
+    tr: 'Henüz süre kaydı yok. Aktivite eklerken süre takibi yapabilirsiniz.',
+    en: 'No duration data yet. You can track duration when adding activities.'
+  },
   'toast.activityAdded': {
     tr: 'Aktivite başarıyla eklendi',
     en: 'Activity added successfully'
