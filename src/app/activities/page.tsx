@@ -209,7 +209,7 @@ function ActivitiesClient() {
                       return (
                         <li
                           key={activity.id}
-                          className={`stagger-item ripple-effect magnetic-hover gpu-accelerated group px-2.5 py-2 flex items-start justify-between gap-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900/30`}
+                          className={`stagger-item ${isMobile ? 'touch-feedback mobile-card-lift slide-in-bottom-mobile' : 'ripple-effect magnetic-hover'} gpu-accelerated group px-2.5 py-2 flex items-start justify-between gap-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900/30`}
                           style={{ animationDelay: `${(groupIndex * 0.1) + (acts.indexOf(activity) * 0.05)}s` }}
                         >
                           <div className="flex-1 min-w-0">

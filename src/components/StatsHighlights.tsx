@@ -100,7 +100,7 @@ export function StatsHighlights() {
         {t('stats.highlightsTitle')}
       </h2>
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
-          <div className={`stagger-item stats-highlight-card card-entrance rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.bestDay')}</div>
             {bestDay ? (
               <>
@@ -118,7 +118,7 @@ export function StatsHighlights() {
             )}
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.bestActivity')}</div>
             {topActivity ? (
               <>
@@ -138,7 +138,7 @@ export function StatsHighlights() {
             )}
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.currentStreak')}</div>
             <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 number-transition`}>{summary.streakDays}</div>
             <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`}>
@@ -148,7 +148,7 @@ export function StatsHighlights() {
             </div>
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.averageDaily')}</div>
             <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 number-transition`}>
               {numberFormatter.format(averageDailyPoints)} {t('list.pointsUnit')}
@@ -158,7 +158,7 @@ export function StatsHighlights() {
             </div>
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.totalPoints')}</div>
             <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 number-transition`}>
               {numberFormatter.format(summary.totalPoints)} {t('list.pointsUnit')}
@@ -170,7 +170,7 @@ export function StatsHighlights() {
             </div>
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.todayProgress')}</div>
             <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 number-transition`}>
               {numberFormatter.format(summary.todayPoints)} / {numberFormatter.format(summary.targetPoints)}

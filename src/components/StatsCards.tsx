@@ -108,9 +108,9 @@ export function StatsCards() {
         </>
       )}
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
-        <div className={`stagger-item card-entrance rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-400/50 ring-2 ring-green-500/20 dark:ring-green-400/20' : ''}`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-400/50 ring-2 ring-green-500/20 dark:ring-green-400/20 pulse-glow-mobile' : ''}`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}>{t('stats.todayPoints')}</div>
-          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400' : ''}`}>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400 number-count-mobile' : ''} ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(summary.todayPoints)}
           </div>
           <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>
@@ -121,7 +121,7 @@ export function StatsCards() {
           </div>
           <div className={`${isMobile ? 'h-2.5' : 'h-2'} bg-gray-200 dark:bg-gray-800 rounded overflow-hidden relative`} role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={t('stats.progressLabel', { current: summary.todayPoints, target: summary.targetPoints })}>
             <div
-              className={`h-full rounded transition-all duration-500 ease-out animate-progress ${showGoalAnimation ? 'progress-bar' : 'bg-gradient-to-r from-brand to-brand-dark'}`}
+              className={`h-full rounded transition-all duration-500 ease-out animate-progress ${isMobile ? 'progress-fill-mobile' : ''} ${showGoalAnimation ? 'progress-bar' : 'bg-gradient-to-r from-brand to-brand-dark'}`}
               style={{ width: `${pct}%` }}
             />
             {showGoalAnimation && (
@@ -129,16 +129,16 @@ export function StatsCards() {
             )}
           </div>
         </div>
-        <div className={`stagger-item card-entrance rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}>{t('stats.totalPoints')}</div>
-          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300 text-gray-900 dark:text-gray-100`}>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300 text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(summary.totalPoints)}
           </div>
           <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
         </div>
-        <div className={`stagger-item card-entrance rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}>{t('stats.streak')}</div>
-          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300`}>{summary.streakDays}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${isMobile ? 'number-count-mobile' : ''}`}>{summary.streakDays}</div>
           <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.streakDesc')}</div>
         </div>
       </div>

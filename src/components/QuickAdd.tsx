@@ -104,7 +104,7 @@ export function QuickAdd() {
               onClick={() => handleQuickAddClick(definition)}
               disabled={isAddingThis}
               className={`
-                stagger-item ripple-effect magnetic-hover tilt-3d
+                stagger-item touch-feedback mobile-press mobile-card-lift fade-in-scale-mobile
                 relative flex flex-col items-center justify-center gap-2
                 p-4 sm:p-5 rounded-xl border-2
                 transition-all duration-300
@@ -112,14 +112,14 @@ export function QuickAdd() {
                 backdrop-blur-sm gpu-accelerated
                 ${
                   isAddingThis
-                    ? 'border-brand dark:border-brand/60 bg-gradient-to-br from-brand/20 to-brand/10 dark:from-brand/25 dark:to-brand/15 cursor-wait shadow-lg shadow-brand/20 dark:shadow-brand/30'
+                    ? 'border-brand dark:border-brand/60 bg-gradient-to-br from-brand/20 to-brand/10 dark:from-brand/25 dark:to-brand/15 cursor-wait shadow-lg shadow-brand/20 dark:shadow-brand/30 pulse-glow-mobile'
                     : 'border-gray-200 dark:border-gray-700/50 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900/80 dark:to-gray-800/80 hover:border-brand dark:hover:border-brand/60 hover:bg-brand/5 dark:hover:bg-brand/10 hover:shadow-lg hover:shadow-brand/10 dark:hover:shadow-brand/20 scale-on-interact'
                 }
                 disabled:opacity-50 disabled:cursor-not-allowed group
               `}
               aria-label={t('quickAdd.addActivity', { activity: getActivityLabel(definition, lang) })}
             >
-              <div className="text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300">
+              <div className={`text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300 ${isAddingThis ? 'icon-wiggle-mobile' : ''}`}>
                 {definition.icon}
               </div>
               <div className="text-xs sm:text-sm font-semibold text-center text-gray-900 dark:text-white line-clamp-2 group-hover:text-brand transition-colors">

@@ -365,7 +365,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         <button
           type="submit"
           disabled={loading}
-          className={`btn-enhanced ripple-effect button-glow ${isMobile && !isEditing ? 'w-full' : ''} ${isMobile ? 'px-3 py-2 min-h-[40px] text-xs rounded-md' : 'px-4 py-3 min-h-[44px] text-sm rounded-lg'} bg-brand text-white hover:bg-brand-dark font-medium disabled:opacity-50 shadow transition-all duration-200 scale-on-interact disabled:hover:scale-100`}
+          className={`btn-enhanced ${isMobile ? 'touch-feedback mobile-press' : 'ripple-effect'} button-glow ${isMobile && !isEditing ? 'w-full' : ''} ${isMobile ? 'px-3 py-2 min-h-[40px] text-xs rounded-md bounce-in-mobile' : 'px-4 py-3 min-h-[44px] text-sm rounded-lg'} bg-brand text-white hover:bg-brand-dark font-medium disabled:opacity-50 shadow transition-all duration-200 scale-on-interact disabled:hover:scale-100`}
           aria-label={loading ? t('form.loading') : isEditing ? t('form.save') : t('form.add')}
           aria-busy={loading}
         >

@@ -2,6 +2,47 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.10.6] - 2025-01
+
+### Added
+- **Mobile-First Animations & Visual Effects**:
+  - Touch feedback animations (ripple effect on touch)
+  - Press animation for mobile buttons and cards
+  - Swipe gesture hint animation
+  - Pull to refresh animation
+  - Bottom sheet slide up animation
+  - Modal backdrop fade animation
+  - Card lift on touch animation
+  - Shimmer loading for mobile
+  - Pulse glow for mobile
+  - Bounce in animation for mobile
+  - Slide in from bottom for mobile
+  - Fade in scale for mobile
+  - Number count animation for mobile
+  - Icon wiggle animation for mobile
+  - Progress bar fill animation for mobile
+
+- **Enhanced Mobile Components**:
+  - QuickAdd buttons: touch-feedback, mobile-press, mobile-card-lift, fade-in-scale-mobile
+  - StatsCards: mobile-card-lift, touch-feedback, bounce-in-mobile, number-count-mobile, progress-fill-mobile
+  - Activity Form buttons: touch-feedback, mobile-press, bounce-in-mobile
+  - Activity list items: touch-feedback, mobile-card-lift, slide-in-bottom-mobile
+  - Activity Templates: touch-feedback, mobile-press, mobile-card-lift, fade-in-scale-mobile
+  - Stats Highlights: mobile-card-lift, touch-feedback, bounce-in-mobile
+  - ConfirmDialog: backdrop-fade, slide-up-bottom for mobile
+
+- **Mobile Optimizations**:
+  - Disabled hover effects on mobile (magnetic-hover, tilt-3d, scale-on-interact)
+  - Enhanced touch feedback for buttons
+  - Smoother transitions with optimized timing functions
+  - GPU-accelerated animations for better performance
+
+### Changed
+- **Mobile Animation Performance**:
+  - Reduced animation durations on mobile (stagger-item: 0.3s, card-entrance: 0.4s)
+  - Optimized transition timing functions
+  - Better touch target sizes and feedback
+
 ## [0.10.5] - 2025-01
 
 ### Fixed

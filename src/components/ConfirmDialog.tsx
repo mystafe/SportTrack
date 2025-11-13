@@ -76,14 +76,14 @@ export function ConfirmDialog({
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[9999] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
+      className={`fixed inset-0 z-[9999] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} ${isMobile ? 'backdrop-fade' : 'animate-fade-in'} safe-bottom`}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-dialog-title"
       aria-describedby="confirm-dialog-message"
     >
-      <div className={`bg-white dark:bg-gray-900 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-lg shadow-xl max-w-md w-full mx-4'} border border-gray-200 dark:border-gray-800 animate-scale-in`}>
+      <div className={`bg-white dark:bg-gray-900 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto slide-up-bottom' : 'rounded-lg shadow-xl max-w-md w-full mx-4 animate-scale-in'} border border-gray-200 dark:border-gray-800`}>
         <div className={`${isMobile ? 'p-6' : 'p-6'}`}>
           <h2
             id="confirm-dialog-title"
