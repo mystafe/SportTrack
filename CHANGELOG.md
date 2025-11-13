@@ -2,6 +2,30 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.12.5] - 2025-01
+
+### Changed
+- **DataExportImport Visual Improvements**:
+  - Updated export and import buttons with gradient backgrounds
+  - Enhanced button styling with gradients and improved borders
+  - Better typography hierarchy (font-semibold)
+  - Improved hover effects
+
+- **NotificationSettings Visual Improvements**:
+  - Updated toggle switches with gradient backgrounds when enabled
+  - Enhanced "Request Permission" button with gradients
+  - Improved input fields with gradient backgrounds
+  - Better typography hierarchy (font-semibold/font-bold)
+  - Enhanced settings section with subtle gradient background
+  - Improved visual hierarchy and spacing
+
+### Improved
+- **Settings Components**: Unified gradient and shadow system across all settings components
+- **Toggle Switches**: Consistent gradient styling when enabled
+- **Input Fields**: Consistent gradient backgrounds across all settings inputs
+- **Typography**: Better font weights for improved readability
+- **Visual Consistency**: Consistent styling across DataExportImport and NotificationSettings
+
 ## [0.12.4] - 2025-01
 
 ### Fixed

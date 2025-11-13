@@ -120,13 +120,13 @@ export function DataExportImport() {
         <button
           type="button"
           onClick={() => setShowExportDialog(true)}
-          className="px-2 py-1 text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300"
+          className="px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 font-semibold"
           title={t('data.exportTooltip')}
           aria-label={t('data.exportTooltip')}
         >
           💾 {t('data.export')}
         </button>
-      <label className="px-2 py-1 text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer">
+      <label className="px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold">
         <input
           ref={fileInputRef}
           type="file"

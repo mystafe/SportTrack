@@ -79,7 +79,7 @@ export function NotificationSettings() {
 
   if (!isSupported) {
     return (
-      <div className="text-sm text-gray-500 dark:text-gray-400">
+      <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
         {t('notifications.notSupported')}
       </div>
     );
@@ -89,16 +89,16 @@ export function NotificationSettings() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <div className="font-medium text-sm">{t('notifications.title')}</div>
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <div className="font-bold text-sm text-gray-950 dark:text-white">{t('notifications.title')}</div>
+          <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">
             {t('notifications.subtitle')}
           </div>
         </div>
         <button
           type="button"
           onClick={() => updateSetting('enabled', !notificationSettings.enabled)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            notificationSettings.enabled ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
+            notificationSettings.enabled ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md' : 'bg-gray-300 dark:bg-gray-700'
           }`}
         >
           <span
@@ -113,23 +113,23 @@ export function NotificationSettings() {
         <button
           type="button"
           onClick={handleRequestPermission}
-          className="w-full px-4 py-2 text-sm rounded-lg bg-brand text-white hover:bg-brand-dark transition-colors"
+          className="w-full px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300"
         >
           {t('notifications.requestPermission')}
         </button>
       )}
 
       {permission === 'granted' && notificationSettings.enabled && (
-        <div className="space-y-4 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+        <div className="space-y-4 pl-4 border-l-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50/30 to-transparent dark:from-gray-800/30 dark:to-transparent rounded-r-lg py-2">
           {/* Daily Reminder */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">{t('notifications.dailyReminder')}</label>
+              <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">{t('notifications.dailyReminder')}</label>
               <button
                 type="button"
                 onClick={() => updateSetting('dailyReminder', !notificationSettings.dailyReminder)}
-                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                  notificationSettings.dailyReminder ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 ${
+                  notificationSettings.dailyReminder ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md' : 'bg-gray-300 dark:bg-gray-700'
                 }`}
               >
                 <span
@@ -144,14 +144,14 @@ export function NotificationSettings() {
                 type="time"
                 value={notificationSettings.dailyReminderTime}
                 onChange={(e) => updateSetting('dailyReminderTime', e.target.value)}
-                className="w-full border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-sm bg-white dark:bg-gray-900"
+                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-sm bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
               />
             )}
           </div>
 
           {/* Goal Completion */}
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">{t('notifications.goalCompletion')}</label>
+            <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">{t('notifications.goalCompletion')}</label>
             <button
               type="button"
               onClick={() => updateSetting('goalCompletion', !notificationSettings.goalCompletion)}
@@ -170,7 +170,7 @@ export function NotificationSettings() {
           {/* Streak Reminder */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">{t('notifications.streakReminder')}</label>
+              <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">{t('notifications.streakReminder')}</label>
               <button
                 type="button"
                 onClick={() => updateSetting('streakReminder', !notificationSettings.streakReminder)}
@@ -190,7 +190,7 @@ export function NotificationSettings() {
                 type="time"
                 value={notificationSettings.streakReminderTime}
                 onChange={(e) => updateSetting('streakReminderTime', e.target.value)}
-                className="w-full border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-sm bg-white dark:bg-gray-900"
+                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-sm bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
               />
             )}
           </div>
