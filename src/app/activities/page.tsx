@@ -29,7 +29,10 @@ export default function ActivitiesPage() {
   const { t } = useI18n();
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">{t('nav.activities')}</h1>
+      <h1 className="text-2xl font-semibold flex items-center gap-2">
+        <span>📝</span>
+        <span>{t('nav.activities')}</span>
+      </h1>
       <ActivitiesClient />
     </div>
   );

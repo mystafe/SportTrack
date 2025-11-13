@@ -2,6 +2,19 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.9.0] - 2025-01
+
+### Changed
+- **UI İyileştirmeleri**:
+  - Activities sayfasına 📝 ikonu eklendi
+  - Statistics sayfasına 📊 ikonu eklendi
+  - Statistics sayfası başlığı sadeleştirildi
+  - Sayfa başlıkları tutarlı hale getirildi
+
+### Fixed
+- Statistics sayfasında aktivite ekleme formu olmadığı doğrulandı
+- Activities sayfasında istatistikler ile ilgili içerik olmadığı doğrulandı
+
 ## [0.8.9] - 2025-01
 
 ### Added

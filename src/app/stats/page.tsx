@@ -150,13 +150,11 @@ export default function StatsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">{t('stats.detailed.title')}</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          {t('stats.detailed.subtitle')}
-        </p>
-      </div>
+    <div className="space-y-4 sm:space-y-6">
+      <h1 className="text-2xl font-semibold flex items-center gap-2">
+        <span>📊</span>
+        <span>{t('nav.stats')}</span>
+      </h1>
 
       {/* Summary Cards */}
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${isMobile ? 'gap-2' : 'gap-4'}`}>
