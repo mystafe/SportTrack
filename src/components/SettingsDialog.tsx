@@ -84,10 +84,10 @@ export function SettingsDialog() {
         }
       }}
     >
-      <div className="relative w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl p-4 sm:p-6 space-y-4 my-auto">
+      <div className="relative w-full max-w-md rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 space-y-4 my-auto">
         <div>
-          <h2 className="text-lg font-semibold">{t('settings.appSettings')}</h2>
-          <p className="text-xs text-gray-500 mt-1">
+          <h2 className="text-lg font-bold text-gray-950 dark:text-white">{t('settings.appSettings')}</h2>
+          <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">
             {t('settings.appSettingsSubtitle')}
           </p>
         </div>
@@ -107,7 +107,7 @@ export function SettingsDialog() {
                   setShowAppSettings(false);
                 }
               }}
-              className="w-full px-3 py-2 text-xs sm:text-sm rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 text-gray-700 dark:text-gray-300"
+              className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 text-gray-700 dark:text-gray-300 font-semibold"
             >
               🎓 {t('settings.showOnboarding') || 'Show Onboarding Tour'}
             </button>
@@ -132,7 +132,7 @@ export function SettingsDialog() {
               <button
                 type="button"
                 onClick={() => keyboardShortcuts.showHelp()}
-                className="px-3 py-2 text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="px-3 py-2 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold"
               >
                 {t('settings.keyboardShortcuts')}
               </button>
@@ -154,7 +154,7 @@ export function SettingsDialog() {
         <div className="flex items-center justify-end gap-2 pt-2">
           <button
             type="button"
-            className="px-3 py-2 text-xs rounded bg-brand text-white hover:bg-brand-dark shadow"
+            className="px-3 py-2 text-xs rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300"
             onClick={() => setShowAppSettings(false)}
           >
             OK
@@ -193,7 +193,7 @@ export function SettingsDialog() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} bg-white dark:bg-gray-900`}
+              className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
               placeholder={t('settings.namePlaceholder')}
             />
           </label>
@@ -208,7 +208,7 @@ export function SettingsDialog() {
               step={100}
               value={dailyTarget}
               onChange={(e) => setDailyTarget(e.target.value)}
-              className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} bg-white dark:bg-gray-900`}
+              className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
               placeholder="10000"
             />
           </label>
@@ -219,7 +219,7 @@ export function SettingsDialog() {
             <select
               value={mood || ''}
               onChange={(e) => setMood((e.target.value || null) as Mood)}
-              className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} bg-white dark:bg-gray-900`}
+              className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
             >
               <option value="">{t('settings.moodNone')}</option>
               <option value="happy">{t('settings.moodHappy')}</option>
@@ -241,7 +241,7 @@ export function SettingsDialog() {
           <div className={`${isMobile ? 'pt-2' : 'pt-3'} flex ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
             <button
               type="submit"
-              className={`flex-1 px-3 py-1.5 ${isMobile ? 'text-xs' : 'text-sm'} rounded bg-brand text-white hover:bg-brand-dark transition-colors`}
+              className={`flex-1 px-3 py-1.5 ${isMobile ? 'text-xs' : 'text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
             >
               {t('settings.save') || 'Save'}
             </button>
@@ -255,7 +255,7 @@ export function SettingsDialog() {
                   setDailyTarget(String(settings.dailyTarget || DEFAULT_DAILY_TARGET));
                 }
               }}
-              className={`px-3 py-1.5 ${isMobile ? 'text-xs' : 'text-sm'} rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors`}
+              className={`px-3 py-1.5 ${isMobile ? 'text-xs' : 'text-sm'} rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
             >
               {t('form.cancel')}
             </button>

@@ -198,7 +198,7 @@ export function ManageActivitiesDialog() {
       <button
         type="button"
         onClick={openDialog}
-        className="px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+        className="px-2 py-1 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold"
       >
         {t('activities.custom.manageButton')}
       </button>
@@ -211,11 +211,11 @@ export function ManageActivitiesDialog() {
             }
           }}
         >
-          <div className="w-full max-w-2xl rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl my-auto max-h-[90vh] overflow-y-auto">
-            <div className="flex items-start justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-b border-gray-200 dark:border-gray-800">
+          <div className="w-full max-w-2xl rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 my-auto max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-b-2 border-gray-200 dark:border-gray-700">
               <div>
-                <h2 className="text-sm sm:text-base font-semibold">{t('activities.custom.title')}</h2>
-                <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
+                <h2 className="text-sm sm:text-base font-bold text-gray-950 dark:text-white">{t('activities.custom.title')}</h2>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-0.5">
                   {t('activities.custom.subtitle')}
                 </p>
               </div>
@@ -245,7 +245,7 @@ export function ManageActivitiesDialog() {
                           setForm((prev) => ({ ...prev, labelEn: e.target.value }));
                         }
                       }}
-                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
+                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.label') : 'e.g. Swimming'}
                       required
                     />
@@ -270,7 +270,7 @@ export function ManageActivitiesDialog() {
                           setForm((prev) => ({ ...prev, label: e.target.value }));
                         }
                       }}
-                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
+                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
                       placeholder={lang === 'tr' ? 'e.g. Swimming' : 'Örn. Yüzme'}
                     />
                     {/* EN alanı için hint - İngilizce */}
@@ -291,7 +291,7 @@ export function ManageActivitiesDialog() {
                       maxLength={4}
                       value={form.icon}
                       onChange={(e) => setForm((prev) => ({ ...prev, icon: e.target.value }))}
-                      className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      className="mt-1 w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1.5 text-sm bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
                       placeholder="🏊"
                       required
                     />
@@ -309,7 +309,7 @@ export function ManageActivitiesDialog() {
                           multiplier: Number(e.target.value)
                         }))
                       }
-                      className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      className="mt-1 w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1.5 text-sm bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
                       required
                     />
                   </label>
@@ -326,7 +326,7 @@ export function ManageActivitiesDialog() {
                           defaultAmount: e.target.value
                         }))
                       }
-                      className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded px-2.5 py-1.5 text-sm bg-white dark:bg-gray-900"
+                      className="mt-1 w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1.5 text-sm bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
                       required
                     />
                   </label>
@@ -348,7 +348,7 @@ export function ManageActivitiesDialog() {
                           setForm((prev) => ({ ...prev, unitEn: e.target.value }));
                         }
                       }}
-                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
+                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.unit') : 'e.g. minutes'}
                       required
                     />
@@ -373,7 +373,7 @@ export function ManageActivitiesDialog() {
                           setForm((prev) => ({ ...prev, unit: e.target.value }));
                         }
                       }}
-                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900`}
+                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
                       placeholder={lang === 'tr' ? 'e.g. minutes' : 'Örn. dakika'}
                     />
                     {/* EN alanı için hint - İngilizce */}
@@ -401,7 +401,7 @@ export function ManageActivitiesDialog() {
                         }
                       }}
                       rows={isMobile ? 1 : 2}
-                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900 resize-none`}
+                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced resize-none`}
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.description') : t('activities.custom.placeholders.descriptionEn')}
                     />
                   </div>
@@ -419,7 +419,7 @@ export function ManageActivitiesDialog() {
                         }
                       }}
                       rows={isMobile ? 1 : 2}
-                      className={`w-full border border-gray-200 dark:border-gray-700 rounded ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-white dark:bg-gray-900 resize-none`}
+                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced resize-none`}
                       placeholder={lang === 'tr' ? t('activities.custom.placeholders.descriptionEn') : 'Açıklama girin'}
                     />
                   </div>
@@ -440,13 +440,13 @@ export function ManageActivitiesDialog() {
                   <button
                     type="button"
                     onClick={closeDialog}
-                    className="px-2.5 py-1.5 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                    className="px-2.5 py-1.5 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold"
                   >
                     {t('form.cancel')}
                   </button>
                   <button
                     type="submit"
-                    className="px-2.5 py-1.5 text-xs rounded bg-brand text-white hover:bg-brand-dark shadow transition-colors"
+                    className="px-2.5 py-1.5 text-xs rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300"
                   >
                     {isEditing ? t('activities.custom.save') : t('activities.custom.add')}
                   </button>
@@ -466,26 +466,26 @@ export function ManageActivitiesDialog() {
                       {customActivities.map((activity) => (
                         <li
                           key={activity.id}
-                          className="border border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 flex items-center justify-between gap-2"
+                          className="border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gradient-to-r from-gray-50/50 to-white dark:from-gray-800/30 dark:to-gray-800/50 px-2 py-1.5 flex items-center justify-between gap-2 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700/50 dark:hover:to-gray-700/30 transition-all duration-200"
                         >
                           <div className="min-w-0 flex-1">
-                            <div className="text-xs sm:text-sm font-medium flex items-center gap-1.5 truncate">
+                            <div className="text-xs sm:text-sm font-bold flex items-center gap-1.5 truncate text-gray-950 dark:text-gray-100">
                               {activity.icon && <span>{activity.icon}</span>}
                               <span className="truncate">{getActivityLabel(activity, lang)}</span>
                             </div>
-                            <div className="text-[10px] sm:text-xs text-gray-500">
+                            <div className="text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-400">
                               {activity.multiplier}x • {activity.defaultAmount} {getActivityUnit(activity, lang)}
                             </div>
                           </div>
                           <div className="flex items-center gap-1.5 text-[10px] sm:text-xs flex-shrink-0">
                             <button
-                              className="text-brand hover:underline px-1"
+                              className="text-brand dark:text-brand-light hover:text-brand-dark dark:hover:text-brand font-semibold hover:underline px-1 transition-all duration-200"
                               onClick={() => handleEdit(activity)}
                             >
                               {t('activities.custom.edit')}
                             </button>
                             <button
-                              className="text-red-600 hover:underline px-1"
+                              className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold hover:underline px-1 transition-all duration-200"
                               onClick={() => handleDelete(activity.id)}
                             >
                               {t('activities.custom.remove')}

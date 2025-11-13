@@ -2,6 +2,39 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.12.2] - 2025-01
+
+### Changed
+- **ActivityForm Visual Improvements**:
+  - Updated activity selection buttons with gradient backgrounds
+  - Enhanced input fields with gradient backgrounds and better borders
+  - Improved textarea styling with gradients
+  - Better button styles with gradients and improved shadows
+  - Enhanced typography hierarchy (font-medium → font-semibold/font-bold)
+  - Improved multiplier badge styling
+
+- **SettingsDialog Visual Improvements**:
+  - Updated dialog containers with gradient backgrounds
+  - Enhanced input fields with gradient backgrounds
+  - Improved button styles with gradients
+  - Better typography hierarchy
+  - Enhanced shadows and transitions
+
+- **ManageActivitiesDialog Visual Improvements**:
+  - Updated dialog container with gradient backgrounds
+  - Enhanced all input fields and textareas with gradients
+  - Improved button styles with gradients
+  - Better activity list item styling with gradients
+  - Enhanced typography hierarchy
+  - Improved hover effects
+
+### Improved
+- **Form Consistency**: Unified gradient and shadow system across all form components
+- **Input Fields**: All inputs now have gradient backgrounds and improved borders
+- **Typography**: Better font weights for improved readability
+- **Buttons**: Consistent gradient styles across all buttons
+- **Mobile Experience**: Better touch feedback and visual hierarchy
+
 ## [0.12.1] - 2025-01
 
 ### Changed
