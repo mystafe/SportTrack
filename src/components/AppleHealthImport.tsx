@@ -34,6 +34,29 @@ export function AppleHealthImport() {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Validate file type
+    const fileName = file.name.toLowerCase();
+    const isValidType = fileName.endsWith('.csv') || 
+                        fileName.endsWith('.xml') || 
+                        fileName.endsWith('.xml.gz') ||
+                        file.type === 'text/csv' ||
+                        file.type === 'application/csv' ||
+                        file.type === 'text/xml' ||
+                        file.type === 'application/xml' ||
+                        file.type === 'application/gzip' ||
+                        file.type === ''; // Some mobile browsers don't set MIME type
+
+    if (!isValidType) {
+      showToast(
+        `Invalid file type: ${file.name}. Please select a CSV or XML file.`,
+        'error'
+      );
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
     // Check file size
     const sizeMB = file.size / (1024 * 1024);
     if (sizeMB > 100) {
