@@ -77,6 +77,7 @@ export default function HomePage() {
           href="/add"
           className="px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-xs sm:text-sm shadow self-start sm:self-auto btn-enhanced ripple-effect scale-on-interact"
           aria-label={t('actions.addActivity')}
+          data-tour-id="add-activity"
         >
           {t('actions.addActivity')}
         </Link>
@@ -133,9 +134,17 @@ export default function HomePage() {
         </div>
       )}
       
-      <StatsCards />
+      {/* Stats Cards and Highlights Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="lg:col-span-1">
+          <StatsCards />
+        </div>
+        <div className="lg:col-span-1">
+          <StatsHighlights />
+        </div>
+      </div>
+      
       <QuickAdd />
-      <StatsHighlights />
       <ActivityTemplates />
     </div>
   );

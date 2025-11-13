@@ -2,6 +2,37 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.10.4] - 2025-01
+
+### Changed
+- **Mobile Logo Enhancement**:
+  - SportTrack yazısı mobilde biraz daha büyük (text-[10px] → text-[11px])
+  - Daha okunabilir görünüm
+
+- **Activities Icon Update**:
+  - Aktiviteler ikonu değiştirildi (📝 → 🏃)
+  - Daha dinamik ve spor temalı görünüm
+
+- **Mobile User Profile Button**:
+  - Kullanıcı butonu genişletildi (max-w-[80px] → max-w-[100px])
+  - Daha uzun isimler gösterilebiliyor (6 karakter → 8 karakter)
+
+- **Landing Page Layout Improvements**:
+  - StatsCards ve StatsHighlights yan yana gösteriliyor (desktop'ta)
+  - QuickAdd, ActivityTemplates'in üstüne taşındı
+  - Daha kompakt ve organize layout
+
+- **Onboarding Tour Improvements**:
+  - Doğru selector'lar kullanılıyor (data-tour-id attributes)
+  - Highlight efekti daha görünür (daha koyu overlay, daha parlak border, glow efekti)
+  - Element bulunamazsa alternatif selector'lar deneniyor
+  - Element otomatik olarak görünür alana scroll ediliyor
+  - Tooltip pozisyonları iyileştirildi
+
+### Fixed
+- Onboarding tour'un yanlış elementleri gösterme sorunu düzeltildi
+- Highlight'ın hangi elementi işaret ettiği artık daha net anlaşılıyor
+
 ## [0.10.3] - 2025-01
 
 ### Added

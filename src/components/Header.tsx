@@ -25,8 +25,9 @@ export function Header() {
               href="/activities" 
               className="nav-icon nav-icon-activities min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group" 
               aria-label={t('nav.activities')}
+              data-tour-id="activities"
             >
-              <span className="relative z-10 group-hover:scale-125 group-active:scale-95 transition-transform duration-300 filter drop-shadow-sm">📝</span>
+              <span className="relative z-10 group-hover:scale-125 group-active:scale-95 transition-transform duration-300 filter drop-shadow-sm">🏃</span>
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-cyan-500/20 to-blue-600/20 dark:from-blue-400/30 dark:via-cyan-400/30 dark:to-blue-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full blur-sm"></div>
               <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-400/50 dark:group-hover:border-blue-400/70 rounded-full transition-all duration-500"></div>
             </Link>
@@ -34,6 +35,7 @@ export function Header() {
               href="/stats" 
               className="nav-icon nav-icon-stats min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group" 
               aria-label={t('nav.stats')}
+              data-tour-id="stats"
             >
               <span className="relative z-10 group-hover:scale-125 group-active:scale-95 transition-transform duration-300 filter drop-shadow-sm">📊</span>
               <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 via-emerald-500/20 to-green-600/20 dark:from-green-400/30 dark:via-emerald-400/30 dark:to-green-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full blur-sm"></div>
@@ -43,6 +45,7 @@ export function Header() {
               href="/achievements" 
               className="nav-icon nav-icon-achievements min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group"
               aria-label={t('nav.achievements')}
+              data-tour-id="achievements"
             >
               <span className="relative z-10 group-hover:scale-125 group-active:scale-95 transition-transform duration-300 filter drop-shadow-sm">🏆</span>
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 via-amber-500/20 to-yellow-600/20 dark:from-yellow-400/30 dark:via-amber-400/30 dark:to-yellow-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full blur-sm"></div>
@@ -52,6 +55,7 @@ export function Header() {
               href="/challenges" 
               className="nav-icon nav-icon-challenges min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group"
               aria-label={t('nav.challenges')}
+              data-tour-id="challenges"
             >
               <span className="relative z-10 group-hover:scale-125 group-active:scale-95 transition-transform duration-300 filter drop-shadow-sm">🎯</span>
               <div className="absolute inset-0 bg-gradient-to-br from-red-500/20 via-rose-500/20 to-red-600/20 dark:from-red-400/30 dark:via-rose-400/30 dark:to-red-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full blur-sm"></div>

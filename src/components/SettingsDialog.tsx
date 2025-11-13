@@ -280,12 +280,13 @@ export function SettingsDialog() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="px-2 py-2 min-h-[36px] min-w-[36px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 overflow-hidden max-w-[80px] sm:max-w-none"
+            className="px-2 py-2 min-h-[36px] min-w-[36px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 overflow-hidden max-w-[100px] sm:max-w-none"
             title={settings?.name || t('settings.setProfile')}
             aria-label={settings?.name || t('settings.setProfile')}
+            data-tour-id="profile"
           >
             <span className="truncate text-[10px] sm:text-xs">
-              {settings?.name ? (settings.name.length > 6 ? settings.name.substring(0, 6) + '...' : settings.name) : '👤'}
+              {settings?.name ? (settings.name.length > 8 ? settings.name.substring(0, 8) + '...' : settings.name) : '👤'}
             </span>
           </button>
           <button

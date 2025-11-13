@@ -60,15 +60,6 @@ export function OnboardingManager() {
         }
       },
       {
-        id: 'profile',
-        target: 'button[aria-label*="Profile"], button[aria-label*="Profil"], button:has-text("👤")',
-        title: lang === 'tr' ? 'Profil Ayarları 👤' : 'Profile Settings 👤',
-        content: lang === 'tr'
-          ? 'Buradan profil bilgilerinizi, günlük hedefinizi ve ruh halinizi ayarlayabilirsiniz.'
-          : 'Here you can set your profile information, daily target, and mood.',
-        position: 'bottom'
-      },
-      {
         id: 'add-activity',
         target: 'a[href="/add"]',
         title: lang === 'tr' ? 'Aktivite Ekleme ➕' : 'Add Activity ➕',
@@ -88,8 +79,8 @@ export function OnboardingManager() {
       },
       {
         id: 'activities',
-        target: 'a[href="/activities"]',
-        title: lang === 'tr' ? 'Aktiviteler 📋' : 'Activities 📋',
+        target: '[data-tour-id="activities"]',
+        title: lang === 'tr' ? 'Aktiviteler 🏃' : 'Activities 🏃',
         content: lang === 'tr'
           ? 'Tüm aktivitelerinizi buradan görüntüleyebilir, düzenleyebilir ve filtreleyebilirsiniz.'
           : 'View, edit, and filter all your activities here.',
@@ -111,6 +102,15 @@ export function OnboardingManager() {
         content: lang === 'tr'
           ? 'Günlük, haftalık ve özel zorluklar oluşturup takip edebilirsiniz.'
           : 'Create and track daily, weekly, and custom challenges.',
+        position: 'bottom'
+      },
+      {
+        id: 'profile',
+        target: 'button[aria-label*="Profile"], button[aria-label*="Profil"], button[title*="Profile"], button[title*="Profil"]',
+        title: lang === 'tr' ? 'Profil Ayarları 👤' : 'Profile Settings 👤',
+        content: lang === 'tr'
+          ? 'Buradan profil bilgilerinizi, günlük hedefinizi ve ruh halinizi ayarlayabilirsiniz.'
+          : 'Here you can set your profile information, daily target, and mood.',
         position: 'bottom'
       },
       {

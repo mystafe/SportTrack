@@ -47,12 +47,42 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
 
     // Wait a bit for DOM updates
     setTimeout(() => {
-      const element = document.querySelector(step.target) as HTMLElement;
+      let element: HTMLElement | null = null;
+      
+      // Try multiple selector strategies
+      try {
+        element = document.querySelector(step.target) as HTMLElement;
+      } catch (e) {
+        // If selector fails, try alternative approaches
+        if (step.target.includes('data-tour-id')) {
+          const tourId = step.target.match(/data-tour-id="([^"]+)"/)?.[1];
+          if (tourId) {
+            element = document.querySelector(`[data-tour-id="${tourId}"]`) as HTMLElement;
+          }
+        } else if (step.target.includes('href')) {
+          const href = step.target.match(/href="([^"]+)"/)?.[1];
+          if (href) {
+            element = document.querySelector(`a[href="${href}"]`) as HTMLElement;
+          }
+        } else if (step.target.includes('aria-label')) {
+          const label = step.target.match(/aria-label[*]="([^"]+)"/)?.[1];
+          if (label) {
+            element = Array.from(document.querySelectorAll('button, a')).find(
+              el => el.getAttribute('aria-label')?.includes(label)
+            ) as HTMLElement;
+          }
+        }
+      }
+      
       if (element) {
         setTargetElement(element);
         updatePosition(element);
+        // Scroll element into view
+        element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+      } else {
+        console.warn(`Onboarding: Could not find element with selector: ${step.target}`);
       }
-    }, 100);
+    }, 300);
   }, [currentStep, steps, onComplete]);
 
   useEffect(() => {
@@ -165,16 +195,20 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
       />
       
       {/* Highlight */}
-      <div
-        className="fixed z-[9999] rounded-xl border-4 border-brand shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] animate-scale-in pointer-events-none"
-        style={{
-          top: `${position.top}px`,
-          left: `${position.left}px`,
-          width: `${position.width}px`,
-          height: `${position.height}px`,
-          boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.6), 0 0 0 4px #0ea5e9, 0 0 20px rgba(14, 165, 233, 0.5)`
-        }}
-      />
+      {position && (
+        <div
+          className="fixed z-[9999] rounded-xl border-4 border-brand animate-scale-in pointer-events-none"
+          style={{
+            top: `${position.top - 4}px`,
+            left: `${position.left - 4}px`,
+            width: `${position.width + 8}px`,
+            height: `${position.height + 8}px`,
+            boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.75), 0 0 0 4px #0ea5e9, 0 0 30px rgba(14, 165, 233, 0.8), inset 0 0 20px rgba(14, 165, 233, 0.3)`,
+            backgroundColor: 'rgba(14, 165, 233, 0.1)',
+            zIndex: 9999
+          }}
+        />
+      )}
 
       {/* Tooltip */}
       <div
