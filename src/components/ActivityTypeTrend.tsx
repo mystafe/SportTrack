@@ -58,17 +58,17 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
 
   if (trends.length === 0) {
     return (
-      <section className="mt-8 space-y-4">
+      <section className="mt-8 spacing-md">
         <div>
-          <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 dark:text-white`}>
+          <h2 className="text-heading-3 text-gray-900 dark:text-white">
             {t('activityTrend.title')}
           </h2>
-          <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400 mt-1`}>
+          <p className="text-body text-gray-600 dark:text-gray-400 mt-1">
             {t('activityTrend.subtitle')}
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-card">
-          <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-6 shadow-md">
+          <p className="text-body text-gray-600 dark:text-gray-400 text-center">
             {t('activityTrend.noData')}
           </p>
         </div>
@@ -79,13 +79,13 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
   const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'];
 
   return (
-    <section className="mt-8 space-y-4">
+    <section className="mt-8 spacing-md">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 dark:text-white`}>
+          <h2 className="text-heading-3 text-gray-900 dark:text-white">
             {t('activityTrend.title')}
           </h2>
-          <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400 mt-1`}>
+          <p className="text-body text-gray-600 dark:text-gray-400 mt-1">
             {t('activityTrend.subtitle')}
           </p>
         </div>
@@ -106,7 +106,7 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
+      <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
         {chartData.length === 0 ? (
           <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
             {t('activityTrend.noData')}

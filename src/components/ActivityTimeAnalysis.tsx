@@ -143,8 +143,8 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
 
       {/* Hour Distribution Chart */}
       {hourlyData.length > 0 && (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+          <h3 className="text-heading-3 text-gray-900 dark:text-white mb-4">
             {t('timeAnalysis.hourDistribution')}
           </h3>
           <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
@@ -181,8 +181,8 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
 
       {/* Day of Week Distribution Chart */}
       {dayOfWeekData.length > 0 && (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+          <h3 className="text-heading-3 text-gray-900 dark:text-white mb-4">
             {t('timeAnalysis.dayDistribution')}
           </h3>
           <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
