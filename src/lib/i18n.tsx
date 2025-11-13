@@ -150,7 +150,7 @@ const translations: Translations = {
     en: 'Daily 10,000 points streak'
   },
   'stats.overview': { tr: 'Genel Bakış', en: 'Overview' },
-  'stats.breakdownToday': { tr: 'Bugünkü Dağılım', en: 'Today's Breakdown' },
+  'stats.breakdownToday': { tr: 'Bugünkü Dağılım', en: "Today's Breakdown" },
   'stats.noActivityToday': {
     tr: 'Bugün henüz aktivite eklenmedi.',
     en: 'No activity added today.'

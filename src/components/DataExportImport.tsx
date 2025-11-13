@@ -17,6 +17,7 @@ export function DataExportImport() {
   const { settings } = useSettings();
   const { t } = useI18n();
   const { showToast } = useToaster();
+  const isMobile = useIsMobile();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
