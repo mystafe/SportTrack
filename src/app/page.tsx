@@ -57,7 +57,7 @@ export default function HomePage() {
   }, [motivationalMessage]);
   
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 page-transition">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold">{greeting}</h1>
@@ -67,7 +67,7 @@ export default function HomePage() {
         </div>
         <Link
           href="/add"
-          className="px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-xs sm:text-sm shadow self-start sm:self-auto transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
+          className="px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-xs sm:text-sm shadow self-start sm:self-auto btn-enhanced ripple-effect scale-on-interact"
           aria-label={t('actions.addActivity')}
         >
           {t('actions.addActivity')}
@@ -75,7 +75,7 @@ export default function HomePage() {
       </div>
       
       {/* Motivational Quote */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-gradient-to-r from-brand/10 via-brand/8 to-brand/5 dark:from-brand/20 dark:via-brand/15 dark:to-brand/10 p-4 shadow-card animate-fade-in backdrop-blur-sm">
+      <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-gradient-to-r from-brand/10 via-brand/8 to-brand/5 dark:from-brand/20 dark:via-brand/15 dark:to-brand/10 p-4 shadow-card card-entrance backdrop-blur-sm float-animation">
         <p className="text-sm sm:text-base text-gray-700 dark:text-gray-200 italic text-center">
           "{lang === 'tr' ? quote.tr : quote.en}"
         </p>

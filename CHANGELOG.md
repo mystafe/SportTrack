@@ -2,6 +2,36 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.10.1] - 2025-01
+
+### Added
+- **Extraordinary Animations & Micro-interactions**:
+  - Smooth page transitions with fade-in effects
+  - Stagger animations for list items (sequential entrance)
+  - Floating animations for cards
+  - Gradient animations
+  - Ripple effects on button clicks
+  - Magnetic hover effects (cards lift and scale)
+  - 3D tilt effects on hover
+  - Enhanced button animations with ripple
+  - Card entrance animations
+  - Slide-in animations from sides
+  - GPU acceleration for smooth performance
+  - Mobile-optimized animation durations
+  - Reduced motion support for accessibility
+  - Glass morphism effects
+  - Smooth scroll behavior
+
+### Changed
+- **Visual Enhancements**:
+  - All stat cards now have magnetic hover and 3D tilt effects
+  - Quick Add buttons enhanced with ripple and magnetic effects
+  - Activity list items have stagger animations
+  - Stats highlights cards have slide-in animations
+  - Activity templates have enhanced hover effects
+  - All interactive elements have smooth scale animations
+  - Improved performance with GPU acceleration
+
 ## [0.10.0] - 2025-01
 
 ### Added

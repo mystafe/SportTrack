@@ -197,7 +197,7 @@ function ActivitiesClient() {
             <div className="p-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">{t('filters.noResults')}</div>
           ) : (
             <div className="divide-y divide-gray-200 dark:divide-gray-800">
-              {groups.map(({ day, acts }) => (
+              {groups.map(({ day, acts }, groupIndex) => (
                 <div key={day}>
                   <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-2.5 py-1.5 text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400">
                     {format(new Date(day), 'd MMMM EEEE', { locale: dateLocale })}
@@ -209,7 +209,8 @@ function ActivitiesClient() {
                       return (
                         <li
                           key={activity.id}
-                          className="group px-2.5 py-2 flex items-start justify-between gap-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900/30"
+                          className={`stagger-item ripple-effect magnetic-hover gpu-accelerated group px-2.5 py-2 flex items-start justify-between gap-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900/30`}
+                          style={{ animationDelay: `${(groupIndex * 0.1) + (acts.indexOf(activity) * 0.05)}s` }}
                         >
                           <div className="flex-1 min-w-0">
                             <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium flex items-center gap-1.5 flex-wrap`}>
