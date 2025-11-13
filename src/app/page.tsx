@@ -135,7 +135,7 @@ export default function HomePage() {
           
           <div className="flex items-center gap-4 relative z-10">
             <span className={`text-3xl sm:text-4xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'} flex-shrink-0`}>{motivationalMessage.emoji}</span>
-            <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 dark:text-gray-100 flex-1 leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-white flex-1 leading-relaxed">
               {lang === 'tr' ? motivationalMessage.tr : motivationalMessage.en}
             </p>
           </div>
