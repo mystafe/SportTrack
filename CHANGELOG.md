@@ -2,6 +2,74 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.12.8] - 2025-01
+
+### Changed
+- **Activity Records Redesign**: Completely redesigned activity record cards with stunning visual effects
+  - **Card Design**:
+    - Beautiful gradient backgrounds (from-white via-gray-50/50 to-white)
+    - Enhanced shadows (shadow-md hover:shadow-2xl)
+    - Rounded corners (rounded-xl)
+    - Border styling with transparency (border-gray-200/50)
+    - Today's activities highlighted with ring effect
+  - **Date Headers**:
+    - Gradient backgrounds with brand colors
+    - Backdrop blur effect
+    - Calendar emoji icon
+    - Smooth entrance animation
+    - Enhanced typography with drop shadows
+  - **Activity Icons**:
+    - Larger size (text-2xl sm:text-3xl)
+    - Floating animation (iconFloat)
+    - Smooth rotation and movement
+  - **Points Badge**:
+    - Gradient background (from-brand via-brand-dark to-brand)
+    - Sparkle emoji (✨)
+    - Pulse animation
+    - Enhanced shadow and border
+    - White text with drop shadow
+  - **Metadata Badges**:
+    - Time badge with clock emoji (🕐)
+    - Amount badge with chart emoji (📊)
+    - Multiplier badge with gradient (purple to pink) and lightning emoji (⚡)
+    - Duration badge with timer emoji (⏱️) when available
+    - Each badge has its own background color and styling
+  - **Note Display**:
+    - Styled with italic font
+    - Left border accent (border-l-4 border-brand/50)
+    - Background color for better visibility
+    - Quote marks around text
+  - **Action Buttons**:
+    - Gradient backgrounds (brand for edit, red for delete)
+    - Emoji icons (✏️ edit, 🗑️ delete)
+    - Enhanced shadows and hover effects
+    - Scale animations on hover/active
+    - Better visibility on hover
+
+### Added
+- **New CSS Animations**:
+  - `activityCardEntrance`: Stunning entrance animation with blur and scale effects
+  - `activityShimmer`: Continuous shimmer effect across cards
+  - `activityGlowPulse`: Pulsing glow effect
+  - `dateHeaderEntrance`: Smooth slide-in animation for date headers
+  - `pointsBadgePulse`: Pulse animation for points badge
+  - `iconFloat`: Floating animation for activity icons
+  - `cardLiftHover`: Lift effect on hover
+  - `activityRipple`: Ripple effect on click/tap
+- **Visual Effects**:
+  - Gradient overlay on hover
+  - Shimmer effect on cards
+  - Smooth transitions and transforms
+  - Enhanced shadows and borders
+  - Better spacing and padding
+
+### Improved
+- **Typography**: Larger, bolder fonts for better readability
+- **Spacing**: Better padding and gaps between elements
+- **Color Contrast**: Improved contrast for better visibility
+- **Mobile Experience**: Optimized for mobile with appropriate sizing
+- **Accessibility**: Better touch targets and visual feedback
+
 ## [0.12.7] - 2025-01
 
 ### Fixed

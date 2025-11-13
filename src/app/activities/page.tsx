@@ -207,59 +207,84 @@ function ActivitiesClient() {
           ) : filteredActivities.length === 0 ? (
             <div className="p-4 text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium">{t('filters.noResults')}</div>
           ) : (
-            <div className="divide-y divide-gray-200 dark:divide-gray-800">
+            <div className="space-y-1">
               {groups.map(({ day, acts }, groupIndex) => (
-                <div key={day}>
-                  <div className="sticky top-0 z-10 bg-gradient-to-r from-white/95 via-gray-50/95 to-white/95 dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 backdrop-blur-sm px-3 py-2 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700">
-                    {format(new Date(day), 'd MMMM EEEE', { locale: dateLocale })}
+                <div key={day} className="space-y-1">
+                  <div className="sticky top-0 z-10 date-header-entrance bg-gradient-to-r from-brand/10 via-brand/5 to-brand/10 dark:from-brand/20 dark:via-brand/10 dark:to-brand/20 backdrop-blur-md px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white border-b-2 border-brand/30 dark:border-brand/40 rounded-t-xl shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-brand dark:text-brand-light">📅</span>
+                      <span className="drop-shadow-sm">{format(new Date(day), 'd MMMM EEEE', { locale: dateLocale })}</span>
+                    </div>
                   </div>
-                  <ul className="divide-y divide-gray-200 dark:divide-gray-800">
-                    {acts.map((activity) => {
+                  <ul className="space-y-2 px-1 pb-2">
+                    {acts.map((activity, actIndex) => {
                       const isToday =
                         startOfDay(new Date(activity.performedAt)).toISOString() === todayKey;
                       return (
                         <li
                           key={activity.id}
-                          className={`stagger-item ${isMobile ? 'touch-feedback mobile-card-lift slide-in-bottom-mobile' : 'ripple-effect magnetic-hover'} gpu-accelerated group px-2.5 py-2 flex items-start justify-between gap-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900/30`}
-                          style={{ animationDelay: `${(groupIndex * 0.1) + (acts.indexOf(activity) * 0.05)}s` }}
+                          className={`activity-card-entrance activity-card-shimmer activity-card-hover activity-ripple gpu-accelerated group relative rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-br from-white via-gray-50/50 to-white dark:from-gray-900/80 dark:via-gray-800/50 dark:to-gray-900/80 px-4 py-3 shadow-md hover:shadow-2xl transition-all duration-300 ${isToday ? 'ring-2 ring-brand/30 dark:ring-brand/40' : ''}`}
+                          style={{ animationDelay: `${(groupIndex * 0.1) + (actIndex * 0.05)}s` }}
                         >
-                          <div className="flex-1 min-w-0">
-                            <div className={`${isMobile ? 'text-sm' : 'text-base'} font-bold flex items-center gap-1.5 flex-wrap`}>
-                              <span className={`text-lg ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>{activity.icon}</span>
-                              <span className="truncate text-gray-950 dark:text-gray-100">{getActivityLabel(activity, lang)}</span>
-                              <span className="inline-flex items-center rounded-full bg-gradient-to-r from-brand/15 via-brand/10 to-brand/15 dark:from-brand/20 dark:via-brand/15 dark:to-brand/20 text-brand dark:text-brand-light px-2 py-0.5 text-xs sm:text-sm font-bold whitespace-nowrap border border-brand/20 dark:border-brand/30">
-                                {`${numberFormatter.format(activity.points)} ${t('list.pointsUnit')}`}
-                              </span>
-                            </div>
-                            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 mt-1 font-semibold`}>
-                              {timeFormatter.format(new Date(activity.performedAt))} • {activity.amount}{' '}
-                              {getActivityUnit(activity, lang)} • {activity.multiplier}x
-                              {activity.duration && activity.duration > 0 ? (
-                                <> • {formatDuration(activity.duration, lang)}</>
+                          {/* Gradient overlay on hover */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-brand/5 via-transparent to-brand/5 dark:from-brand/10 dark:via-transparent dark:to-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl pointer-events-none"></div>
+                          
+                          <div className="relative z-10 flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-extrabold flex items-center gap-2 flex-wrap mb-2`}>
+                                <span className={`text-2xl sm:text-3xl activity-icon-float ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>{activity.icon}</span>
+                                <span className="truncate text-gray-950 dark:text-white drop-shadow-sm">{getActivityLabel(activity, lang)}</span>
+                                <span className="inline-flex items-center rounded-full points-badge-animated bg-gradient-to-r from-brand via-brand-dark to-brand text-white px-3 py-1 text-xs sm:text-sm font-extrabold whitespace-nowrap border-2 border-white/20 dark:border-white/10 shadow-lg">
+                                  <span className="drop-shadow-md">✨</span>
+                                  <span className="ml-1.5">{numberFormatter.format(activity.points)}</span>
+                                  <span className="ml-1 text-[10px] opacity-90">{t('list.pointsUnit')}</span>
+                                </span>
+                              </div>
+                              <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-300 mt-1.5 font-semibold flex items-center gap-2 flex-wrap`}>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100/50 dark:bg-gray-800/50">
+                                  <span>🕐</span>
+                                  <span>{timeFormatter.format(new Date(activity.performedAt))}</span>
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100/50 dark:bg-gray-800/50">
+                                  <span>📊</span>
+                                  <span>{activity.amount} {getActivityUnit(activity, lang)}</span>
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-700 dark:text-purple-300 font-bold">
+                                  <span>⚡</span>
+                                  <span>{activity.multiplier}x</span>
+                                </span>
+                                {activity.duration && activity.duration > 0 ? (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-100/50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                                    <span>⏱️</span>
+                                    <span>{formatDuration(activity.duration, lang)}</span>
+                                  </span>
+                                ) : null}
+                              </div>
+                              {activity.note ? (
+                                <div className={`${isMobile ? 'text-xs' : 'text-sm'} mt-2.5 px-3 py-2 rounded-lg bg-gray-50/80 dark:bg-gray-800/50 border-l-4 border-brand/50 text-gray-700 dark:text-gray-300 line-clamp-2 font-medium italic`}>
+                                  "{activity.note}"
+                                </div>
                               ) : null}
                             </div>
-                            {activity.note ? (
-                              <div className={`${isMobile ? 'text-xs' : 'text-sm'} mt-1.5 text-gray-700 dark:text-gray-300 line-clamp-2 font-medium`}>{activity.note}</div>
-                            ) : null}
-                          </div>
-                          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex-shrink-0">
-                            <button
-                              className="text-brand hover:text-brand-dark dark:hover:text-brand-light font-semibold hover:underline transition-all duration-200 hover:scale-110 active:scale-95 whitespace-nowrap"
-                              onClick={() => setEditingId(activity.id)}
-                            >
-                              {t('list.edit')}
-                            </button>
-                            <button
-                              className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold hover:underline disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 hover:scale-110 active:scale-95 disabled:hover:scale-100 whitespace-nowrap"
-                              disabled={!isToday}
-                              title={!isToday ? t('list.deleteDisabled') : undefined}
-                              onClick={() => {
-                                if (!isToday) return;
-                                setDeleteConfirm({ id: activity.id, activity });
-                              }}
-                            >
-                              {t('list.delete')}
-                            </button>
+                            <div className="flex items-center gap-2 text-xs sm:text-sm opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all duration-300 flex-shrink-0">
+                              <button
+                                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 whitespace-nowrap"
+                                onClick={() => setEditingId(activity.id)}
+                              >
+                                ✏️ {t('list.edit')}
+                              </button>
+                              <button
+                                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold shadow-md hover:shadow-xl disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-300 hover:scale-110 active:scale-95 disabled:hover:scale-100 whitespace-nowrap"
+                                disabled={!isToday}
+                                title={!isToday ? t('list.deleteDisabled') : undefined}
+                                onClick={() => {
+                                  if (!isToday) return;
+                                  setDeleteConfirm({ id: activity.id, activity });
+                                }}
+                              >
+                                🗑️ {t('list.delete')}
+                              </button>
+                            </div>
                           </div>
                         </li>
                       );
