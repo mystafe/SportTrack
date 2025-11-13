@@ -41,7 +41,7 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
   
-  // Motivational message based on progress
+  // Motivational message based on progress - client-side only to avoid hydration mismatch
   const todayActivities = useMemo(() => {
     const today = startOfDay(new Date());
     return activities.filter(activity => 
@@ -53,22 +53,26 @@ export default function HomePage() {
     ? Math.min(100, Math.round((summary.todayPoints / dailyTarget) * 100))
     : 0;
   
-  const motivationalMessage = useMemo(() => 
-    getMotivationalMessage(progress, todayActivities.length > 0, settings?.mood ?? null),
-    [progress, todayActivities.length, settings?.mood]
-  );
+  const [motivationalMessage, setMotivationalMessage] = useState<MotivationalMessage | null>(null);
+  
+  useEffect(() => {
+    if (mounted) {
+      const message = getMotivationalMessage(progress, todayActivities.length > 0, settings?.mood ?? null);
+      setMotivationalMessage(message);
+    }
+  }, [mounted, progress, todayActivities.length, settings?.mood]);
   
   const [showMessage, setShowMessage] = useState(true);
   
   useEffect(() => {
-    if (motivationalMessage) {
+    if (motivationalMessage && mounted) {
       setShowMessage(true);
       const timer = setTimeout(() => {
         setShowMessage(false);
       }, 5000); // Show for 5 seconds
       return () => clearTimeout(timer);
     }
-  }, [motivationalMessage]);
+  }, [motivationalMessage, mounted]);
   
   return (
     <div className="space-y-4 sm:space-y-6 page-transition">

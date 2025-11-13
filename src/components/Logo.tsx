@@ -58,10 +58,10 @@ export function Logo() {
           </svg>
         </div>
         <div className="flex flex-col leading-tight">
-          <span className="font-semibold text-[11px] sm:text-xs bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">
+          <span className="font-semibold text-xs sm:text-sm bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">
             sport
           </span>
-          <span className="font-semibold text-[11px] sm:text-xs bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">
+          <span className="font-semibold text-xs sm:text-sm bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">
             track
           </span>
         </div>

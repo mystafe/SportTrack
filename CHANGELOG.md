@@ -2,6 +2,22 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.11.6] - 2025-01
+
+### Fixed
+- **Hydration Error - Motivational Message**:
+  - Fixed hydration mismatch by making motivational message client-side only
+  - Added `mounted` state check before generating motivational message
+  - Message now renders consistently on server and client
+  - Prevents "Text content did not match. Server: '🎯' Client: '🚀'" error
+
+- **Mobile Logo Text Size**:
+  - Increased mobile "sport track" text size from `text-[11px]` to `text-xs sm:text-sm`
+  - Better readability on mobile devices
+
+### Changed
+- **Motivational Message Rendering**: Now uses `useState` and `useEffect` instead of `useMemo` to ensure client-side only rendering
+
 ## [0.11.5] - 2025-01
 
 ### Fixed
