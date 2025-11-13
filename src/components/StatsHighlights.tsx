@@ -101,13 +101,13 @@ export function StatsHighlights() {
       </h2>
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
           <div className={`rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
-            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500`}>{t('stats.highlight.bestDay')}</div>
+            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.bestDay')}</div>
             {bestDay ? (
               <>
-                <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold`}>
+                <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100`}>
                   {format(new Date(bestDay.date), 'd MMMM yyyy, EEEE', { locale: dateLocale })}
                 </div>
-                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`}>
                   {numberFormatter.format(bestDay.points)} {t('list.pointsUnit')}
                 </div>
               </>
@@ -118,8 +118,8 @@ export function StatsHighlights() {
             )}
           </div>
 
-          <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
-            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500`}>{t('stats.highlight.bestActivity')}</div>
+          <div className={`rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-card space-y-1 hover-lift transition-smooth`}>
+            <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>{t('stats.highlight.bestActivity')}</div>
             {topActivity ? (
               <>
                 <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100`}>

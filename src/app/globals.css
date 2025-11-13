@@ -246,3 +246,84 @@ body {
   z-index: 9999;
 }
 
+/* Extraordinary Navbar Icon Styles */
+.nav-icon {
+  position: relative;
+  background: transparent;
+  backdrop-filter: blur(4px);
+}
+
+.nav-icon::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.nav-icon:hover::before {
+  opacity: 1;
+  animation: shimmer-border 2s linear infinite;
+}
+
+.nav-icon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.dark .nav-icon:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.15), 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.nav-icon:active {
+  transform: translateY(0) scale(0.95);
+}
+
+@keyframes shimmer-border {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+/* Icon-specific glow effects */
+.nav-icon-activities:hover span {
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6));
+}
+
+.nav-icon-stats:hover span {
+  filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
+}
+
+.nav-icon-achievements:hover span {
+  filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.6));
+}
+
+.nav-icon-challenges:hover span {
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+}
+
+.dark .nav-icon-activities:hover span {
+  filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.8));
+}
+
+.dark .nav-icon-stats:hover span {
+  filter: drop-shadow(0 0 12px rgba(74, 222, 128, 0.8));
+}
+
+.dark .nav-icon-achievements:hover span {
+  filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.8));
+}
+
+.dark .nav-icon-challenges:hover span {
+  filter: drop-shadow(0 0 12px rgba(248, 113, 113, 0.8));
+}
+

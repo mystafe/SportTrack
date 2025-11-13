@@ -2,6 +2,34 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.9.7] - 2025-01
+
+### Added
+- **Beautiful Logo**: 
+  - Custom SVG logo with animated running figure
+  - Gradient background with glow effects
+  - Responsive design (full logo on desktop, compact "ST" on mobile)
+  - Smooth animations and hover effects
+  - Dark mode optimized
+
+### Fixed
+- **Apple Health CSV Import Error**: 
+  - Fixed "Invalid string length" error for large CSV files
+  - Files larger than 50MB now use ArrayBuffer instead of readAsText
+  - Better error handling and memory management
+  - Improved progress reporting for large files
+
+### Changed
+- **Extraordinary Navbar Icons**:
+  - Each icon has unique color-themed gradient backgrounds on hover
+  - Shimmer border animation effects
+  - Icon-specific glow effects (blue for activities, green for stats, yellow for achievements, red for challenges)
+  - Enhanced shadow effects in dark mode
+  - Smooth scale animations (125% on hover, 95% on active)
+  - Backdrop blur effects
+  - 3D lift effect on hover (translateY)
+  - Rounded-xl borders for modern look
+
 ## [0.9.6] - 2025-01
 
 ### Changed

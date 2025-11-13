@@ -481,17 +481,28 @@ export async function parseAppleHealthFile(
       }
     }
     
-    // For smaller files, use FileReader
+    // For smaller files, use FileReader with ArrayBuffer to avoid string length limits
     const text = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       let timeoutId: NodeJS.Timeout | null = null;
       
       reader.onload = (e) => {
         if (timeoutId) clearTimeout(timeoutId);
-        if (e.target?.result) {
-          resolve(e.target.result as string);
-        } else {
-          reject(new Error('Failed to read file content'));
+        try {
+          if (e.target?.result) {
+            // Use ArrayBuffer for large files to avoid string length limits
+            if (e.target.result instanceof ArrayBuffer) {
+              const decoder = new TextDecoder('utf-8');
+              const text = decoder.decode(e.target.result);
+              resolve(text);
+            } else {
+              resolve(e.target.result as string);
+            }
+          } else {
+            reject(new Error('Failed to read file content'));
+          }
+        } catch (error) {
+          reject(new Error(`Failed to decode file: ${error instanceof Error ? error.message : 'Unknown error'}`));
         }
       };
       
@@ -501,7 +512,7 @@ export async function parseAppleHealthFile(
       };
       
       reader.onprogress = (e) => {
-        if (e.lengthComputable && sizeMB > 500) {
+        if (e.lengthComputable && sizeMB > 100) {
           const percentage = Math.round((e.loaded / e.total) * 100);
           onProgress?.({
             processed: Math.round(e.loaded / 1024), // KB
@@ -519,8 +530,12 @@ export async function parseAppleHealthFile(
         }, 5 * 60 * 1000); // 5 minutes
       }
       
-      // Read as text
-      reader.readAsText(file, 'UTF-8');
+      // Use ArrayBuffer for files larger than 50MB to avoid string length limits
+      if (sizeMB > 50) {
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.readAsText(file, 'UTF-8');
+      }
     });
     
     if (isXML) {
