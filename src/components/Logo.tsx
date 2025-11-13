@@ -7,7 +7,7 @@ export function Logo() {
   
   if (isMobile) {
     return (
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
         <div className="relative">
           <svg 
             width="28" 
@@ -57,9 +57,14 @@ export function Logo() {
             />
           </svg>
         </div>
-        <span className="font-bold text-lg bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">
-          ST
-        </span>
+        <div className="flex flex-col leading-tight">
+          <span className="font-semibold text-[10px] bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">
+            sport
+          </span>
+          <span className="font-semibold text-[10px] bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">
+            track
+          </span>
+        </div>
       </div>
     );
   }

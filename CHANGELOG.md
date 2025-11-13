@@ -2,6 +2,19 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.9.9] - 2025-01
+
+### Changed
+- **Mobile Logo Enhancement**:
+  - Logo yanında "sport" ve "track" alt alta küçük font ile gösteriliyor
+  - Mavi gradient renk tonu (brand color)
+  - Daha kompakt ve şık görünüm
+
+- **Navbar Icons**:
+  - Tüm navbar ikonları yuvarlak (rounded-full) yapıldı
+  - Daha modern ve tutarlı görünüm
+  - Activities ikonu 📋 → 📝 olarak değiştirildi
+
 ## [0.9.8] - 2025-01
 
 ### Added

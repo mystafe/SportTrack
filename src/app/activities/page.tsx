@@ -32,7 +32,7 @@ export default function ActivitiesPage() {
     <div className="space-y-4 sm:space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-          <span>📋</span>
+          <span>📝</span>
           <span>{t('nav.activities')}</span>
         </h1>
         <ManageActivitiesDialog />
