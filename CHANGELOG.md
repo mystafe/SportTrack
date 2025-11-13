@@ -2,6 +2,38 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.13.0] - 2025-01
+
+### Fixed
+- **QuoteTicker (Kayan Yazı)**:
+  - Fixed scrolling animation - text now scrolls smoothly from right to left
+  - Added seamless loop by duplicating quote text 3 times
+  - Fixed container width (`w-full`) for proper overflow handling
+  - Improved animation timing (20s instead of 30s for better visibility)
+  - Added `will-change: transform` for better performance
+  - Fixed container height and overflow settings
+  - Better padding and spacing
+- **ScrollToTop Button**:
+  - Fixed visibility issue - button now properly appears when scrolling
+  - Added `mounted` state to prevent hydration issues
+  - Increased z-index to `z-[9999]` (above all elements)
+  - Increased bottom offset (`bottom-32` mobile, `bottom-28` desktop) to account for QuoteTicker height
+  - Added initial visibility check on mount
+  - Added scale animation for better visibility transition
+  - Added `will-change` for performance optimization
+  - Added passive event listener for better scroll performance
+  - Better transition handling with opacity and scale
+
+### Changed
+- **QuoteTicker Animation**: 
+  - Text now repeats 3 times for seamless infinite scroll
+  - Faster animation speed (20s instead of 30s)
+  - Better container styling with explicit width/height
+- **ScrollToTop**: 
+  - Better positioning calculation
+  - Enhanced visual feedback with scale animation
+  - Improved performance with will-change and passive listeners
+
 ## [0.12.9] - 2025-01
 
 ### Fixed

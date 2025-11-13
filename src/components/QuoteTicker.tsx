@@ -31,11 +31,15 @@ export function QuoteTicker() {
 
   if (!mounted || !quote) return null;
 
+  const quoteText = lang === 'tr' ? quote.tr : quote.en;
+
   return (
-    <div className={`fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-brand/15 via-brand/10 to-brand/15 dark:from-brand/25 dark:via-brand/15 dark:to-brand/25 border-t-2 border-brand/40 dark:border-brand/50 ${isMobile ? 'py-2.5 px-3' : 'py-3.5 px-4'} overflow-hidden safe-bottom shadow-lg`}>
-      <div className={`quote-ticker-container ${isMobile ? 'text-xs' : 'text-sm'} text-gray-950 dark:text-white font-bold italic text-center whitespace-nowrap ${isGlowing ? 'quote-ticker-glow' : ''} drop-shadow-sm`}>
-        <div className="animate-scroll-left">
-          {lang === 'tr' ? quote.tr : quote.en}
+    <div className={`fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-brand/15 via-brand/10 to-brand/15 dark:from-brand/25 dark:via-brand/15 dark:to-brand/25 border-t-2 border-brand/40 dark:border-brand/50 ${isMobile ? 'py-3 px-2' : 'py-4 px-3'} overflow-hidden safe-bottom shadow-lg`}>
+      <div className={`quote-ticker-container w-full ${isMobile ? 'text-xs' : 'text-sm'} text-gray-950 dark:text-white font-bold italic ${isGlowing ? 'quote-ticker-glow' : ''} drop-shadow-sm`}>
+        <div className="animate-scroll-left whitespace-nowrap">
+          <span className="inline-block pr-8">{quoteText}</span>
+          <span className="inline-block pr-8">{quoteText}</span>
+          <span className="inline-block pr-8">{quoteText}</span>
         </div>
       </div>
     </div>

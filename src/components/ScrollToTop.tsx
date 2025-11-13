@@ -6,11 +6,19 @@ import { useI18n } from '@/lib/i18n';
 
 export function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const isMobile = useIsMobile();
   const { t } = useI18n();
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const toggleVisibility = () => {
+      // Show button when scrolled down more than 300px
       if (window.pageYOffset > 300) {
         setIsVisible(true);
       } else {
@@ -18,9 +26,13 @@ export function ScrollToTop() {
       }
     };
 
-    window.addEventListener('scroll', toggleVisibility);
+    // Initial check
+    toggleVisibility();
+
+    // Listen to scroll events
+    window.addEventListener('scroll', toggleVisibility, { passive: true });
     return () => window.removeEventListener('scroll', toggleVisibility);
-  }, []);
+  }, [mounted]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -29,17 +41,23 @@ export function ScrollToTop() {
     });
   };
 
+  if (!mounted) return null;
+
   // Calculate position above QuoteTicker
-  // QuoteTicker height: ~50-60px (mobile) or ~60-70px (desktop) + safe-bottom
-  const bottomOffset = isMobile ? 'bottom-28' : 'bottom-24';
+  // QuoteTicker: py-3 (mobile) or py-4 (desktop) + text height + safe-bottom
+  // Approximate: ~50-60px mobile, ~60-70px desktop + safe-bottom
+  const bottomOffset = isMobile ? 'bottom-32' : 'bottom-28';
 
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed ${bottomOffset} right-4 sm:right-6 z-[100] ${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-2xl hover:shadow-brand/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center ${isMobile ? 'touch-feedback mobile-press' : ''} border-4 border-white/30 dark:border-white/20 animate-bounce-subtle ${!isVisible ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
+      className={`fixed ${bottomOffset} right-4 sm:right-6 z-[9999] ${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-2xl hover:shadow-brand/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center ${isMobile ? 'touch-feedback mobile-press' : ''} border-4 border-white/30 dark:border-white/20 animate-bounce-subtle ${!isVisible ? 'opacity-0 pointer-events-none scale-90' : 'opacity-100 pointer-events-auto scale-100'}`}
       aria-label={t('scrollToTop') || 'Scroll to top'}
       title={t('scrollToTop') || 'Scroll to top'}
-      style={{ transition: 'opacity 0.3s ease-in-out' }}
+      style={{ 
+        transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
+        willChange: 'opacity, transform'
+      }}
     >
       <span className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-extrabold drop-shadow-lg`}>↑</span>
       {/* Glow effect */}
