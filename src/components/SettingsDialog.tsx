@@ -177,10 +177,10 @@ export function SettingsDialog() {
         }
       }}
     >
-      <div className="relative w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl p-4 sm:p-6 space-y-4 my-auto">
+      <div className="relative w-full max-w-md rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 space-y-4 my-auto">
         <div>
-          <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold`}>{t('settings.title')}</h2>
-          <p className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mt-0.5`}>
+          <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-white`}>{t('settings.title')}</h2>
+          <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-600 dark:text-gray-400 mt-0.5`}>
             {t('settings.subtitle')}
           </p>
         </div>
