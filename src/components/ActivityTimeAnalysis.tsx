@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
 import { parseISO } from 'date-fns';
@@ -11,7 +11,7 @@ interface ActivityTimeAnalysisProps {
   activities: Array<{ performedAt: string; points: number }>;
 }
 
-export function ActivityTimeAnalysis({ activities }: ActivityTimeAnalysisProps) {
+export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activities }: ActivityTimeAnalysisProps) {
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
 
@@ -218,5 +218,5 @@ export function ActivityTimeAnalysis({ activities }: ActivityTimeAnalysisProps) 
       )}
     </div>
   );
-}
+});
 

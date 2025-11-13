@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, memo } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
@@ -12,7 +12,7 @@ import { getActivityLabel } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { StatsHighlightsSkeleton } from '@/components/LoadingSkeleton';
 
-export function StatsHighlights() {
+export const StatsHighlights = memo(function StatsHighlights() {
   const { activities, hydrated } = useActivities();
   const { t, lang } = useI18n();
   const { settings } = useSettings();
@@ -193,5 +193,5 @@ export function StatsHighlights() {
         </div>
     </section>
   );
-}
+});
 

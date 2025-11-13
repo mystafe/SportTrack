@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, memo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
 import { calculateActivityTrends, getTopActivityTypes, type ActivityTypeTrend } from '@/lib/activityTrendUtils';
@@ -11,7 +11,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { format, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 
-export function ActivityTypeTrend() {
+export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
   const { t, lang } = useI18n();
   const { activities, hydrated } = useActivities();
   const definitions = useActivityDefinitions();

@@ -2,6 +2,51 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.14.0] - 2025-01
+
+### Added
+- **Comprehensive Performance Optimizations**:
+  - Added `React.memo` to all major components:
+    - `StatsHighlights`, `StatsCards`, `PersonalRecords`
+    - `ChallengeCard`, `PeriodComparison`, `DurationStats`
+    - `ActivityTimeAnalysis`, `ActivityTypeTrend`, `ActivityFilters`
+  - Implemented `useCallback` hooks for event handlers in `ActivityFilters`
+  - Significant reduction in unnecessary re-renders across the application
+- **Typography Scale System Integration**:
+  - Applied `text-heading-1`, `text-heading-2`, `text-heading-3` throughout components
+  - Replaced inline font sizes with `text-body`, `text-body-small`, `text-label`
+  - Consistent typography hierarchy across all pages
+- **Spacing Scale System Integration**:
+  - Applied `spacing-xs`, `spacing-sm`, `spacing-md`, `spacing-lg`, `spacing-xl` utilities
+  - Replaced inconsistent `space-y-*` and `gap-*` classes
+  - Better visual consistency and maintainability
+
+### Changed
+- **Visual Consistency Improvements**:
+  - All cards now use consistent `card-entrance` animation and styling
+  - Unified card design: `rounded-xl border-2` with gradient backgrounds
+  - Consistent shadow system: `shadow-md hover:shadow-xl`
+  - Improved border colors: `border-gray-200 dark:border-gray-700`
+  - Enhanced gradient backgrounds across all components
+- **Component Updates**:
+  - `PersonalRecords`: Updated card designs, typography, and spacing
+  - `ChallengeCard`: Enhanced mobile touch targets, typography, and visual design
+  - `DurationStats`: Improved card styling and typography consistency
+  - `PeriodComparison`: Updated card designs and typography
+  - `ActivityTimeAnalysis`: Enhanced card styling and typography
+  - `ActivityTypeTrend`: Improved card designs and typography
+  - `ActivityFilters`: Added memoization and useCallback optimizations
+- **Mobile UX Enhancements**:
+  - Improved touch target sizes in `ChallengeCard` (min-h-[36px] min-w-[36px]`)
+  - Better mobile spacing and padding throughout
+  - Enhanced mobile typography scaling
+
+### Fixed
+- **Performance**:
+  - Reduced unnecessary re-renders in all optimized components
+  - Better memory management with proper memoization
+  - Improved callback dependency management
+
 ## [0.13.5] - 2025-01
 
 ### Added

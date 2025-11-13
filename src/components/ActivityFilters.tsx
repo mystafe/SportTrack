@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo, useCallback } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
 import { useActivityDefinitions } from '@/lib/settingsStore';
@@ -20,7 +20,7 @@ export type FilterState = {
   sortBy: 'date-desc' | 'date-asc' | 'points-desc' | 'points-asc';
 };
 
-export function ActivityFilters({
+export const ActivityFilters = memo(function ActivityFilters({
   filters,
   onFiltersChange
 }: {
@@ -38,9 +38,9 @@ export function ActivityFilters({
     return Array.from(keys);
   }, [activities]);
 
-  const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+  const updateFilter = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     onFiltersChange({ ...filters, [key]: value });
-  };
+  }, [filters, onFiltersChange]);
 
   return (
     <div className="space-y-2.5 sm:space-y-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-2.5 sm:p-3 shadow-md hover:shadow-xl transition-shadow duration-300">
@@ -180,7 +180,7 @@ export function ActivityFilters({
       )}
     </div>
   );
-}
+});
 
 export function useFilteredActivities(filters: FilterState) {
   const { activities } = useActivities();

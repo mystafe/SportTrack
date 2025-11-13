@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef, memo } from 'react';
 import { format } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
@@ -11,7 +11,7 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { StatsCardSkeleton } from '@/components/LoadingSkeleton';
 import { notificationService } from '@/lib/notificationService';
 
-export function StatsCards() {
+export const StatsCards = memo(function StatsCards() {
   const { t, lang } = useI18n();
   const { settings, hydrated: settingsHydrated } = useSettings();
   const { hydrated: activitiesHydrated } = useActivities();
@@ -254,4 +254,4 @@ export function StatsCards() {
       </div>
     </div>
   );
-}
+});

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
@@ -11,7 +11,7 @@ import { enUS, tr } from 'date-fns/locale';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
-export function PeriodComparison() {
+export const PeriodComparison = memo(function PeriodComparison() {
   const { activities, hydrated } = useActivities();
   const { settings } = useSettings();
   const { t, lang } = useI18n();
