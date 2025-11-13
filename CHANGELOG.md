@@ -2,6 +2,62 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.12.9] - 2025-01
+
+### Fixed
+- **Mobile Logo**: Increased text size from `text-sm sm:text-base` to `text-lg sm:text-xl` for better visibility
+- **ScrollToTop Button**: 
+  - Fixed visibility issue - button now always renders (with opacity control)
+  - Increased z-index to z-[100] (above all other elements)
+  - Increased bottom offset (bottom-28 mobile, bottom-24 desktop)
+  - Larger button size (w-14 h-14 mobile, w-16 h-16 desktop)
+  - Enhanced visual design with outer glow ring and pulse animation
+  - Better border styling (border-4)
+- **Accordion Design**: 
+  - Unified accordion icons - all use ▼ (down arrow) with consistent rotation
+  - Icons rotate -90deg when closed, 0deg when open
+  - Brand color for icons (text-brand)
+  - Larger icon size (text-lg)
+  - All accordions default to open (already implemented, confirmed)
+
+### Changed
+- **Activity Records Complete Redesign**:
+  - **Card Layout**: Complete restructure with better hierarchy
+  - **Today's Activities**: Special highlighting with ring-4, brand gradient background, and star icon
+  - **Header Section**: 
+    - Larger icons (text-3xl mobile, text-4xl desktop)
+    - Star icon (⭐) for today's activities
+    - "Bugün" badge for today's activities
+    - Better spacing and alignment
+  - **Details Badges**: 
+    - Colorful badges with distinct colors (blue, emerald, purple-pink gradient, cyan)
+    - Better borders and backgrounds
+    - Larger emoji icons (text-base)
+    - Font-black for numbers
+  - **Note Display**: 
+    - Gradient background
+    - Brand-colored quote marks
+    - Better padding and styling
+    - Shadow-inner effect
+  - **Action Buttons**: 
+    - Full-width buttons (flex-1)
+    - Border-top separator
+    - Better spacing and sizing
+    - Larger emoji icons
+  - **Visual Effects**:
+    - Shine effect on hover (sweeping gradient)
+    - Enhanced gradient overlays
+    - Better shadows (shadow-lg default, shadow-2xl hover/today)
+    - Rounded-2xl corners
+    - Better border colors
+
+### Improved
+- **Typography**: Font-black for headings, better font weights throughout
+- **Spacing**: Better padding (px-5 py-4) and gaps
+- **Color Scheme**: More vibrant and distinct colors for badges
+- **Visual Hierarchy**: Clear separation between sections
+- **Mobile Experience**: Optimized sizing and spacing for mobile
+
 ## [0.12.8] - 2025-01
 
 ### Changed

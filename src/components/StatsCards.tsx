@@ -39,14 +39,14 @@ export function StatsCards() {
       return (
         <button
           type="button"
-          className="flex w-full items-center justify-between text-sm font-semibold text-gray-900 dark:text-white mb-3 transition-all duration-200 hover:text-brand"
+          className="flex w-full items-center justify-between text-sm font-bold text-gray-900 dark:text-white mb-3 transition-all duration-200 hover:text-brand"
           onClick={() => setIsOpen(!isOpen)}
           aria-expanded={isOpen}
           aria-controls={`stats-section-${id}`}
         >
           <span className="font-bold">{title}</span>
-          <span className="ml-2 text-base transition-transform duration-300 ease-in-out" aria-hidden style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-            {isOpen ? '\u2212' : '+'}
+          <span className="ml-2 text-lg font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light" aria-hidden style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
+            ▼
           </span>
         </button>
       );
@@ -62,8 +62,8 @@ export function StatsCards() {
         aria-label={t('stats.sectionToggle', { section: title })}
       >
         <span>{title}</span>
-        <span className="ml-2 text-base transition-transform duration-300 ease-in-out" aria-hidden>
-          {isActive ? '\u2212' : '+'}
+        <span className="ml-2 text-lg font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light" aria-hidden style={{ transform: isActive ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
+          ▼
         </span>
       </button>
     );
@@ -115,7 +115,7 @@ export function StatsCards() {
         aria-controls="stats-overview"
       >
         <span className="font-bold">{t('stats.overview') || 'Overview'}</span>
-        <span className="ml-2 text-base transition-transform duration-300 ease-in-out" aria-hidden style={{ transform: overviewOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+        <span className="ml-2 text-lg font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light" aria-hidden style={{ transform: overviewOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
           ▼
         </span>
       </button>

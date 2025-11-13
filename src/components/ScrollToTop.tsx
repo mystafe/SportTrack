@@ -29,22 +29,23 @@ export function ScrollToTop() {
     });
   };
 
-  if (!isVisible) return null;
-
   // Calculate position above QuoteTicker
-  // QuoteTicker height: ~40-50px (mobile) or ~50-60px (desktop) + safe-bottom
-  const bottomOffset = isMobile ? 'bottom-24' : 'bottom-20';
+  // QuoteTicker height: ~50-60px (mobile) or ~60-70px (desktop) + safe-bottom
+  const bottomOffset = isMobile ? 'bottom-28' : 'bottom-24';
 
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed ${bottomOffset} right-4 sm:right-6 z-[60] ${isMobile ? 'w-12 h-12' : 'w-14 h-14'} rounded-full bg-gradient-to-br from-brand via-brand to-brand-dark text-white shadow-2xl hover:shadow-brand/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center ${isMobile ? 'touch-feedback mobile-press' : ''} border-2 border-white/20 dark:border-white/10 animate-bounce-subtle`}
+      className={`fixed ${bottomOffset} right-4 sm:right-6 z-[100] ${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-2xl hover:shadow-brand/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center ${isMobile ? 'touch-feedback mobile-press' : ''} border-4 border-white/30 dark:border-white/20 animate-bounce-subtle ${!isVisible ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
       aria-label={t('scrollToTop') || 'Scroll to top'}
       title={t('scrollToTop') || 'Scroll to top'}
+      style={{ transition: 'opacity 0.3s ease-in-out' }}
     >
-      <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold drop-shadow-lg`}>↑</span>
+      <span className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-extrabold drop-shadow-lg`}>↑</span>
       {/* Glow effect */}
-      <div className="absolute inset-0 rounded-full bg-brand/30 blur-md -z-10 animate-pulse"></div>
+      <div className="absolute inset-0 rounded-full bg-brand/40 blur-lg -z-10 animate-pulse"></div>
+      {/* Outer glow ring */}
+      <div className="absolute inset-0 rounded-full border-2 border-brand/50 animate-ping opacity-75"></div>
     </button>
   );
 }
