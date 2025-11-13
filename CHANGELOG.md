@@ -2,6 +2,36 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.13.3] - 2025-01
+
+### Added
+- **Enhanced Loading States**:
+  - Added comprehensive skeleton loaders for Challenges, Achievements, and Stats pages
+  - New `ChallengeCardSkeleton`, `BadgeCardSkeleton`, and `PageSkeleton` components
+  - Improved skeleton animations with better gradients and smoother transitions
+  - Skeleton loaders now match the actual content layout for better UX
+- **Improved Empty States**:
+  - Enhanced empty state for Challenges page with emoji, better messaging, and CTA button
+  - Improved empty state for Activities page filters with search icon and helpful message
+  - Better visual hierarchy and spacing in empty states
+  - More engaging and informative empty state messages
+
+### Changed
+- **Form Validation Improvements**:
+  - Better error messages in ActivityForm with user-friendly Turkish/English messages
+  - Error messages now use toast notifications instead of throwing errors
+  - More descriptive validation feedback
+- **Visual Consistency**:
+  - Improved skeleton loader styling to match card designs
+  - Better border radius consistency across skeleton components
+  - Enhanced gradient backgrounds for skeleton loaders
+
+### Fixed
+- **Loading State Consistency**:
+  - Replaced simple "Loading..." text with proper skeleton loaders
+  - Consistent loading experience across all pages
+  - Better visual feedback during data hydration
+
 ## [0.13.2] - 2025-01
 
 ### Fixed

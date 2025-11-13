@@ -141,8 +141,14 @@ function ActivitiesClient() {
         </div>
         <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
           {filteredActivities.length === 0 ? (
-            <div className="p-6 text-center text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium">
-              {t('filters.noResults')}
+            <div className="p-12 text-center">
+              <div className={`${isMobile ? 'text-5xl' : 'text-6xl'} mb-4 ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>🔍</div>
+              <p className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 mb-2`}>
+                {t('filters.noResults')}
+              </p>
+              <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400`}>
+                {lang === 'tr' ? 'Filtreleri değiştirerek tekrar deneyin.' : 'Try changing the filters.'}
+              </p>
             </div>
           ) : editing ? (
             <div className="border-b border-gray-200 dark:border-gray-800">

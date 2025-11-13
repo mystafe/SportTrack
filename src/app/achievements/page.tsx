@@ -7,6 +7,7 @@ import { BADGE_DEFINITIONS, Badge } from '@/lib/badges';
 import { format } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { PageSkeleton, BadgeCardSkeleton } from '@/components/LoadingSkeleton';
 
 export default function AchievementsPage() {
   const { badges, hydrated } = useBadges();
@@ -79,9 +80,17 @@ export default function AchievementsPage() {
   if (!hydrated) {
     return (
       <div className="space-y-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-1/3"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2"></div>
+        <PageSkeleton />
+        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 skeleton">
+          <div className="h-4 w-32 rounded skeleton mb-3" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+            <div className="h-full w-1/3 bg-gray-300 dark:bg-gray-700 rounded-full skeleton" />
+          </div>
+        </div>
+        <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'} gap-3 sm:gap-4`}>
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <BadgeCardSkeleton key={i} />
+          ))}
         </div>
       </div>
     );

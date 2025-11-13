@@ -159,11 +159,19 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       : new Date().toISOString();
     try {
       if (!definition) {
-        throw new Error('Aktivite tanımı bulunamadı');
+        const errorMsg = lang === 'tr' ? 'Lütfen bir aktivite seçin.' : 'Please select an activity.';
+        showToast(errorMsg, 'error');
+        setLoading(false);
+        return;
       }
       const amountValue = Number(amount) || 0;
       if (amountValue <= 0) {
-        throw new Error('Miktar 0\'dan büyük olmalıdır');
+        const errorMsg = lang === 'tr' 
+          ? 'Miktar 0\'dan büyük bir sayı olmalıdır.' 
+          : 'Amount must be a number greater than 0.';
+        showToast(errorMsg, 'error');
+        setLoading(false);
+        return;
       }
       if (initial?.id) {
         updateActivity(initial.id, {

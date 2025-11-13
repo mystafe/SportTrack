@@ -8,6 +8,7 @@ import { ChallengeCard } from '@/components/ChallengeCard';
 import { ChallengeDialog } from '@/components/ChallengeDialog';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { PageSkeleton, ChallengeCardSkeleton } from '@/components/LoadingSkeleton';
 
 export default function ChallengesPage() {
   const { challenges, hydrated, addChallenge, updateChallenge, deleteChallenge } = useChallenges();
@@ -19,8 +20,13 @@ export default function ChallengesPage() {
 
   if (!hydrated) {
     return (
-      <div className="container py-8">
-        <div className="text-center text-gray-500">Loading...</div>
+      <div className="container py-6 sm:py-8">
+        <PageSkeleton />
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <ChallengeCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }
@@ -83,14 +89,18 @@ export default function ChallengesPage() {
       </div>
 
       {challenges.length === 0 ? (
-        <div className="card-entrance text-center py-12 px-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-md">
-          <p className="text-lg sm:text-xl font-bold text-gray-950 dark:text-gray-100 mb-3">{t('challenges.noChallenges')}</p>
+        <div className="card-entrance text-center py-16 px-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-md hover:shadow-xl transition-shadow duration-300">
+          <div className={`${isMobile ? 'text-5xl' : 'text-6xl'} mb-4 ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>🎯</div>
+          <p className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-950 dark:text-gray-100 mb-2`}>{t('challenges.noChallenges')}</p>
+          <p className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-600 dark:text-gray-400 mb-6`}>
+            {lang === 'tr' ? 'İlk hedefini oluştur ve başarıya ulaş!' : 'Create your first goal and achieve success!'}
+          </p>
           <button
             type="button"
             onClick={handleAddChallenge}
-            className="text-brand dark:text-brand-light hover:text-brand-dark dark:hover:text-brand font-semibold hover:underline transition-all duration-200"
+            className={`px-6 py-3 bg-gradient-to-r from-brand to-brand-dark text-white rounded-lg hover:from-brand-dark hover:to-brand font-semibold transition-all duration-300 hover:scale-105 active:scale-95 shadow-md hover:shadow-xl ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'}`}
           >
-            {t('challenges.createFirst')}
+            + {t('challenges.addChallenge')}
           </button>
         </div>
       ) : (

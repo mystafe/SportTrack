@@ -18,6 +18,7 @@ import { ActivityTimeAnalysis } from '@/components/ActivityTimeAnalysis';
 import { PeriodComparison } from '@/components/PeriodComparison';
 import { DurationStats } from '@/components/DurationStats';
 import { ActivityTypeTrend } from '@/components/ActivityTypeTrend';
+import { PageSkeleton } from '@/components/LoadingSkeleton';
 
 export default function StatsPage() {
   const { t, lang } = useI18n();
@@ -141,10 +142,15 @@ export default function StatsPage() {
 
   if (!hydrated) {
     return (
-      <div className="space-y-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-1/3"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2"></div>
+      <div className="space-y-4 sm:space-y-6">
+        <PageSkeleton />
+        <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${isMobile ? 'gap-2' : 'gap-4'}`}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 skeleton">
+              <div className="h-4 w-24 rounded skeleton mb-3" />
+              <div className="h-8 w-32 rounded skeleton" />
+            </div>
+          ))}
         </div>
       </div>
     );
