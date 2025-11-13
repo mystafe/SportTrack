@@ -2,6 +2,37 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.12.3] - 2025-01
+
+### Changed
+- **ActivityFilters Visual Improvements**:
+  - Updated filter container with gradient backgrounds
+  - Enhanced date range buttons with gradients
+  - Improved all input fields and selects with gradient backgrounds
+  - Better typography hierarchy (font-medium → font-semibold/font-bold)
+  - Enhanced "Clear Filters" button styling
+
+- **ExportDialog Visual Improvements**:
+  - Updated dialog container with gradient backgrounds
+  - Enhanced format selection buttons with gradients
+  - Improved date range selector and inputs with gradients
+  - Better button styles with gradients
+  - Enhanced typography hierarchy
+
+- **ChallengeDialog Visual Improvements**:
+  - Updated dialog container with gradient backgrounds
+  - Enhanced all input fields and textareas with gradients
+  - Improved button styles with gradients
+  - Better typography hierarchy
+  - Enhanced form element styling
+
+### Improved
+- **Filter Components**: Unified gradient and shadow system across all filter components
+- **Dialog Consistency**: All dialogs now have consistent gradient backgrounds and styling
+- **Form Elements**: Consistent input styling across all dialogs
+- **Typography**: Better font weights for improved readability
+- **Buttons**: Consistent gradient styles across all filter and dialog buttons
+
 ## [0.12.2] - 2025-01
 
 ### Changed

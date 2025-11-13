@@ -43,14 +43,14 @@ export function ActivityFilters({
   };
 
   return (
-    <div className="space-y-2.5 sm:space-y-3 rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm p-2.5 sm:p-3 shadow-sm">
-      <h3 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-700 dark:text-gray-300`}>
+    <div className="space-y-2.5 sm:space-y-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-2.5 sm:p-3 shadow-md hover:shadow-xl transition-shadow duration-300">
+      <h3 className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-gray-950 dark:text-white`}>
         {t('filters.title')}
       </h3>
 
       {/* Date Range Filter */}
       <div className="space-y-1.5">
-        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
+        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}>
           {t('filters.dateRange')}
         </label>
         <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-5'} gap-1.5`}>
@@ -59,10 +59,10 @@ export function ActivityFilters({
               key={range}
               type="button"
               onClick={() => updateFilter('dateRange', range)}
-              className={`px-2 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} rounded border transition-colors ${
+              className={`px-2 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} rounded-lg border-2 font-semibold transition-all duration-200 ${
                 filters.dateRange === range
-                  ? 'bg-brand text-white border-brand'
-                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ? 'bg-gradient-to-r from-brand to-brand-dark text-white border-brand shadow-md'
+                  : 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600'
               }`}
             >
               {t(`filters.dateRange.${range}`)}
@@ -76,14 +76,14 @@ export function ActivityFilters({
               value={filters.customStart || ''}
               onChange={(e) => updateFilter('customStart', e.target.value)}
               max={format(new Date(), 'yyyy-MM-dd')}
-              className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
+              className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
             />
             <input
               type="date"
               value={filters.customEnd || ''}
               onChange={(e) => updateFilter('customEnd', e.target.value)}
               max={format(new Date(), 'yyyy-MM-dd')}
-              className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
+              className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
             />
           </div>
         )}
@@ -91,13 +91,13 @@ export function ActivityFilters({
 
       {/* Category Filter */}
       <div className="space-y-1.5">
-        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
+        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}>
           {t('filters.category')}
         </label>
         <select
           value={filters.category}
           onChange={(e) => updateFilter('category', e.target.value as FilterState['category'])}
-          className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
+          className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
         >
           <option value="all">{t('filters.allCategories')}</option>
           <option value="cardio">{t('filters.category.cardio')}</option>
@@ -110,13 +110,13 @@ export function ActivityFilters({
 
       {/* Activity Type Filter */}
       <div className="space-y-1.5">
-        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
+        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}>
           {t('filters.activityType')}
         </label>
         <select
           value={filters.activityType}
           onChange={(e) => updateFilter('activityType', e.target.value)}
-          className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
+          className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
         >
           <option value="all">{t('filters.allActivities')}</option>
           {uniqueActivityKeys.map((key) => {
@@ -133,7 +133,7 @@ export function ActivityFilters({
 
       {/* Search */}
       <div className="space-y-1.5">
-        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
+        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}>
           {t('filters.search')}
         </label>
         <input
@@ -141,19 +141,19 @@ export function ActivityFilters({
           value={filters.searchQuery}
           onChange={(e) => updateFilter('searchQuery', e.target.value)}
           placeholder={t('filters.searchPlaceholder')}
-          className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
+          className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
         />
       </div>
 
       {/* Sort */}
       <div className="space-y-1.5">
-        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
+        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}>
           {t('filters.sortBy')}
         </label>
         <select
           value={filters.sortBy}
           onChange={(e) => updateFilter('sortBy', e.target.value as FilterState['sortBy'])}
-          className={`w-full border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-white dark:bg-gray-900`}
+          className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-1.5 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
         >
           <option value="date-desc">{t('filters.sort.dateDesc')}</option>
           <option value="date-asc">{t('filters.sort.dateAsc')}</option>
@@ -173,7 +173,7 @@ export function ActivityFilters({
             searchQuery: '',
             sortBy: 'date-desc'
           })}
-          className={`w-full px-2 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors`}
+          className={`w-full px-2 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
         >
           {t('filters.clear')}
         </button>

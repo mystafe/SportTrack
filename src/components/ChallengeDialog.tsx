@@ -129,22 +129,22 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
         }
       }}
     >
-      <div className={`relative w-full ${isMobile ? 'max-w-full' : 'max-w-md'} rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl p-4 sm:p-6 space-y-4 my-auto`}>
+      <div className={`relative w-full ${isMobile ? 'max-w-full' : 'max-w-md'} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 space-y-4 my-auto`}>
         <div>
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-lg font-bold text-gray-950 dark:text-white">
             {challenge ? t('challenges.editChallenge') : t('challenges.addChallenge')}
           </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+            <label className="text-xs font-semibold text-gray-800 dark:text-gray-200 block mb-2">
               {t('challenges.custom')} / {t('challenges.daily')} / {t('challenges.weekly')} / {t('challenges.monthly')}
             </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value as ChallengeType)}
-              className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+              className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
             >
               <option value="daily">{t('challenges.daily')}</option>
               <option value="weekly">{t('challenges.weekly')}</option>
@@ -163,7 +163,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
                   type="text"
                   value={nameTr}
                   onChange={(e) => setNameTr(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
                   required
                 />
               </div>
@@ -175,7 +175,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
                   type="text"
                   value={nameEn}
                   onChange={(e) => setNameEn(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
                   required
                 />
               </div>
@@ -186,7 +186,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
                 <textarea
                   value={descriptionTr}
                   onChange={(e) => setDescriptionTr(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
                   rows={2}
                 />
               </div>
@@ -197,7 +197,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
                 <textarea
                   value={descriptionEn}
                   onChange={(e) => setDescriptionEn(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
                   rows={2}
                 />
               </div>
@@ -205,14 +205,14 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
           )}
 
           <div>
-            <label className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+            <label className="text-xs font-semibold text-gray-800 dark:text-gray-200 block mb-2">
               {t('challenges.targetPoints')}
             </label>
             <input
               type="number"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+              className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
               min="1"
               required
             />
@@ -228,7 +228,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
                   required
                 />
               </div>
@@ -240,7 +240,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
                   required
                 />
               </div>
@@ -248,14 +248,14 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
           )}
 
           <div>
-            <label className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+            <label className="text-xs font-semibold text-gray-800 dark:text-gray-200 block mb-2">
               Emoji/Icon
             </label>
             <input
               type="text"
               value={icon}
               onChange={(e) => setIcon(e.target.value)}
-              className="w-full border border-gray-200 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900"
+              className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
               placeholder="🎯"
             />
           </div>
@@ -264,13 +264,13 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-2 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+              className="px-3 py-2 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold"
             >
               {t('challenges.cancel')}
             </button>
             <button
               type="submit"
-              className="px-3 py-2 text-xs rounded bg-brand text-white hover:bg-brand-dark shadow"
+              className="px-3 py-2 text-xs rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300"
             >
               {t('challenges.save')}
             </button>
