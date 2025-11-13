@@ -15,6 +15,7 @@ import { ActivityPieChart } from '@/components/charts/ActivityPieChart';
 import { ActivityHeatmap } from '@/components/charts/ActivityHeatmap';
 import { PersonalRecords } from '@/components/PersonalRecords';
 import { ActivityTimeAnalysis } from '@/components/ActivityTimeAnalysis';
+import { PeriodComparison } from '@/components/PeriodComparison';
 
 export default function StatsPage() {
   const { t, lang } = useI18n();
@@ -393,6 +394,9 @@ export default function StatsPage() {
 
       {/* Activity Time Analysis */}
       <ActivityTimeAnalysis activities={activities} />
+
+      {/* Period Comparison */}
+      <PeriodComparison />
     </div>
   );
 }

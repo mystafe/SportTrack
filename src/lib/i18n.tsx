@@ -535,7 +535,18 @@ const translations: Translations = {
   'timeAnalysis.hourDistribution': { tr: 'Saatlere Göre Dağılım', en: 'Distribution by Hour' },
   'timeAnalysis.dayDistribution': { tr: 'Günlere Göre Dağılım', en: 'Distribution by Day' },
   'timeAnalysis.activities': { tr: 'aktivite', en: 'activities' },
-  'timeAnalysis.points': { tr: 'Puan', en: 'Points' }
+  'timeAnalysis.points': { tr: 'Puan', en: 'Points' },
+
+  'comparison.title': { tr: 'Haftalık ve Aylık Karşılaştırma', en: 'Weekly & Monthly Comparison' },
+  'comparison.subtitle': { tr: 'Bu hafta/ay ile geçen hafta/ay karşılaştırması', en: 'Compare this week/month with previous week/month' },
+  'comparison.weekly': { tr: 'Haftalık Karşılaştırma', en: 'Weekly Comparison' },
+  'comparison.monthly': { tr: 'Aylık Karşılaştırma', en: 'Monthly Comparison' },
+  'comparison.totalPoints': { tr: 'Toplam Puan', en: 'Total Points' },
+  'comparison.totalActivities': { tr: 'Toplam Aktivite', en: 'Total Activities' },
+  'comparison.avgDaily': { tr: 'Ortalama Günlük', en: 'Avg Daily' },
+  'comparison.completionRate': { tr: 'Tamamlama Oranı', en: 'Completion Rate' },
+  'comparison.points': { tr: 'Puan', en: 'Points' },
+  'comparison.activities': { tr: 'Aktiviteler', en: 'Activities' }
 };
 
 type I18nContextValue = {

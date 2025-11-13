@@ -37,6 +37,7 @@ type ActivityFormInitial = Pick<
   | 'performedAt'
   | 'note'
   | 'isCustom'
+  | 'duration'
 >;
 
 type ActivityFormProps = {
