@@ -1,5 +1,7 @@
 export type ActivityKey = string;
 
+export type ActivityCategory = 'cardio' | 'strength' | 'flexibility' | 'sports' | 'other';
+
 export type ActivityDefinition = {
   key: ActivityKey;
   label: string;
@@ -12,6 +14,7 @@ export type ActivityDefinition = {
   description?: string;
   descriptionEn?: string;
   isCustom?: boolean;
+  category?: ActivityCategory;
 };
 
 export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
@@ -25,7 +28,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unitEn: 'steps',
     defaultAmount: 1000,
     description: 'Adım sayınızı girin',
-    descriptionEn: 'Enter your step count'
+    descriptionEn: 'Enter your step count',
+    category: 'cardio'
   },
   {
     key: 'RUNNING',
@@ -37,7 +41,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unitEn: 'steps',
     defaultAmount: 500,
     description: 'Koşu adım sayınızı girin',
-    descriptionEn: 'Enter your running step count'
+    descriptionEn: 'Enter your running step count',
+    category: 'cardio'
   },
   {
     key: 'SWIMMING',
@@ -49,7 +54,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unitEn: 'minutes',
     defaultAmount: 20,
     description: 'Yüzme süresini dakika olarak girin',
-    descriptionEn: 'Enter swimming duration in minutes'
+    descriptionEn: 'Enter swimming duration in minutes',
+    category: 'cardio'
   },
   {
     key: 'PUSH_UP',
@@ -61,7 +67,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unitEn: 'reps',
     defaultAmount: 20,
     description: 'Tamamlanan şınav tekrar sayısı',
-    descriptionEn: 'Number of push-up repetitions completed'
+    descriptionEn: 'Number of push-up repetitions completed',
+    category: 'strength'
   },
   {
     key: 'SIT_UP',
@@ -73,7 +80,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unitEn: 'reps',
     defaultAmount: 20,
     description: 'Tamamlanan mekik tekrar sayısı',
-    descriptionEn: 'Number of sit-up repetitions completed'
+    descriptionEn: 'Number of sit-up repetitions completed',
+    category: 'strength'
   },
   {
     key: 'WEIGHT_LIFTING',
@@ -85,7 +93,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unitEn: 'minutes',
     defaultAmount: 30,
     description: 'Toplam süreyi dakika olarak girin',
-    descriptionEn: 'Enter total duration in minutes'
+    descriptionEn: 'Enter total duration in minutes',
+    category: 'strength'
   },
   {
     key: 'STAIRS',
@@ -97,7 +106,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     unitEn: 'steps',
     defaultAmount: 50,
     description: 'Çıktığınız toplam basamak sayısı',
-    descriptionEn: 'Total number of steps climbed'
+    descriptionEn: 'Total number of steps climbed',
+    category: 'cardio'
   }
 ];
 

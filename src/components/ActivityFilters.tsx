@@ -8,12 +8,14 @@ import { getActivityLabel } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { format, startOfDay, endOfDay, subDays, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
+import { ActivityCategory } from '@/lib/activityConfig';
 
 export type FilterState = {
   dateRange: 'all' | 'today' | 'week' | 'month' | 'custom';
   customStart?: string;
   customEnd?: string;
   activityType: string; // 'all' or activity key
+  category: 'all' | 'cardio' | 'strength' | 'flexibility' | 'sports' | 'other';
   searchQuery: string;
   sortBy: 'date-desc' | 'date-asc' | 'points-desc' | 'points-asc';
 };
@@ -141,21 +143,22 @@ export function ActivityFilters({
         </select>
       </div>
 
-      {/* Clear Filters */}
-      {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.searchQuery) && (
-        <button
-          type="button"
-          onClick={() => onFiltersChange({
-            dateRange: 'all',
-            activityType: 'all',
-            searchQuery: '',
-            sortBy: 'date-desc'
-          })}
-          className="w-full px-3 py-2 text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-        >
-          {t('filters.clear')}
-        </button>
-      )}
+            {/* Clear Filters */}
+            {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.category !== 'all' || filters.searchQuery) && (
+              <button
+                type="button"
+                onClick={() => onFiltersChange({
+                  dateRange: 'all',
+                  activityType: 'all',
+                  category: 'all',
+                  searchQuery: '',
+                  sortBy: 'date-desc'
+                })}
+                className="w-full px-3 py-2 text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                {t('filters.clear')}
+              </button>
+            )}
     </div>
   );
 }

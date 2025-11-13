@@ -36,6 +36,7 @@ export type ActivityRecord = {
   description?: string;
   descriptionEn?: string;
   isCustom?: boolean;
+  category?: 'cardio' | 'strength' | 'flexibility' | 'sports' | 'other';
 };
 
 type AddActivityInput = {

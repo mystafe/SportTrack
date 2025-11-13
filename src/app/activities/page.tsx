@@ -33,6 +33,7 @@ function ActivitiesClient() {
   const [filters, setFilters] = useState<FilterState>({
     dateRange: 'all',
     activityType: 'all',
+    category: 'all',
     searchQuery: '',
     sortBy: 'date-desc'
   });
@@ -85,8 +86,8 @@ function ActivitiesClient() {
       {/* Filters */}
       <ActivityFilters filters={filters} onFiltersChange={setFilters} />
 
-      {/* Filtered Stats Summary */}
-      {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.searchQuery) && (
+            {/* Filtered Stats Summary */}
+            {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.category !== 'all' || filters.searchQuery) && (
         <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
