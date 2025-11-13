@@ -75,7 +75,7 @@ export default function HomePage() {
       </div>
       
       {/* Motivational Quote */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-brand/10 to-brand/5 dark:from-brand/20 dark:to-brand/10 p-4 shadow-card animate-fade-in">
+      <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-gradient-to-r from-brand/10 via-brand/8 to-brand/5 dark:from-brand/20 dark:via-brand/15 dark:to-brand/10 p-4 shadow-card animate-fade-in backdrop-blur-sm">
         <p className="text-sm sm:text-base text-gray-700 dark:text-gray-200 italic text-center">
           "{lang === 'tr' ? quote.tr : quote.en}"
         </p>
@@ -83,7 +83,7 @@ export default function HomePage() {
       
       {/* Motivational Message */}
       {motivationalMessage && showMessage && (
-        <div className={`rounded-lg border-2 border-brand/30 dark:border-brand/50 bg-brand/5 dark:bg-brand/10 p-4 shadow-lg animate-slide-in-right transition-all duration-500 ${showMessage ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
+        <div className={`rounded-xl border-2 border-brand/30 dark:border-brand/40 bg-gradient-to-r from-brand/5 to-brand/10 dark:from-brand/10 dark:to-brand/15 p-4 shadow-lg animate-slide-in-right transition-all duration-500 backdrop-blur-sm ${showMessage ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
           <div className="flex items-center gap-3">
             <span className="text-2xl">{motivationalMessage.emoji}</span>
             <p className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-100 flex-1">

@@ -43,7 +43,7 @@ export function ActivityFilters({
   };
 
   return (
-    <div className="space-y-2.5 sm:space-y-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-2.5 sm:p-3 shadow-sm">
+    <div className="space-y-2.5 sm:space-y-3 rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm p-2.5 sm:p-3 shadow-sm">
       <h3 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-700 dark:text-gray-300`}>
         {t('filters.title')}
       </h3>

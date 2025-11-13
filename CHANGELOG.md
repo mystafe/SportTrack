@@ -2,6 +2,31 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.9.6] - 2025-01
+
+### Changed
+- **Dark Mode Görsel İyileştirmeleri**:
+  - Tüm kartlar için daha iyi dark mode kontrastları (`dark:border-gray-700/50`, `dark:bg-gray-900/80`)
+  - Backdrop blur efekti eklendi (`backdrop-blur-sm`)
+  - Shadow'lar dark mode'da daha belirgin ve elegant
+  - Border renkleri dark mode'da daha subtle (`dark:border-gray-700/50`)
+  - Text renkleri dark mode'da daha iyi kontrast (`dark:text-gray-100`, `dark:text-gray-400`)
+
+### Improved
+- **Mobil Görsel İyileştirmeleri**:
+  - Tüm kartlar `rounded-xl` ile daha modern görünüm
+  - Background gradient'leri daha subtle ve elegant
+  - Card spacing'leri optimize edildi (`gap-2.5` mobilde)
+  - Hover efektleri dark mode'da daha belirgin
+  - Brand color dark mode'da daha açık (`dark:text-brand-light`)
+
+- **Genel Görsel İyileştirmeleri**:
+  - Body background gradient eklendi (light ve dark mode)
+  - Shadow utilities dark mode için optimize edildi
+  - Tüm kartlar backdrop-blur ile daha modern görünüm
+  - Border radius tutarlılığı (`rounded-xl` tüm kartlarda)
+  - Text kontrastları iyileştirildi
+
 ## [0.9.5] - 2025-01
 
 ### Added

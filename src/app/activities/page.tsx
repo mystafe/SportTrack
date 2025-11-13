@@ -107,7 +107,7 @@ function ActivitiesClient() {
 
       {/* Compact Filtered Stats Summary */}
       {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.category !== 'all' || filters.searchQuery) && (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 shadow-sm">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm px-3 py-2 shadow-sm">
           <div className="flex items-center justify-between text-xs">
             <span className="font-medium text-gray-700 dark:text-gray-300">
               {t('filters.results')}
@@ -128,7 +128,7 @@ function ActivitiesClient() {
             </span>
           )}
         </div>
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm shadow-sm overflow-hidden">
           {filteredActivities.length === 0 ? (
             <div className="p-6 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               {t('filters.noResults')}

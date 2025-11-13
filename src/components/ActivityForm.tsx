@@ -259,10 +259,10 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     return String(def.defaultAmount);
                   });
                 }}
-                className={`text-left rounded-lg border px-3 py-2 shadow-card transition-all duration-200 ${
+                className={`text-left rounded-xl border px-3 py-2 shadow-card transition-all duration-200 backdrop-blur-sm ${
                   active
-                    ? 'border-brand ring-2 ring-brand/30 bg-brand/5 scale-105'
-                    : 'border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900 hover:scale-102 hover:shadow-md'
+                    ? 'border-brand dark:border-brand/60 ring-2 ring-brand/30 dark:ring-brand/20 bg-brand/5 dark:bg-brand/10 scale-105'
+                    : 'border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:scale-102 hover:shadow-md'
                 }`}
                 aria-pressed={active}
                 aria-label={t('form.selectActivityLabel', { activity: getActivityLabel(def, lang) })}
@@ -340,7 +340,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
               </span>
             )}
           </div>
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm p-4 shadow-sm">
             <ActivityTimer
               onDurationChange={(newDuration) => {
                 setDuration(newDuration);

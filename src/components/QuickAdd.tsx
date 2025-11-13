@@ -108,10 +108,11 @@ export function QuickAdd() {
                 p-4 sm:p-5 rounded-xl border-2
                 transition-all duration-300
                 min-h-[90px] sm:min-h-[110px]
+                backdrop-blur-sm
                 ${
                   isAddingThis
-                    ? 'border-brand bg-gradient-to-br from-brand/20 to-brand/10 cursor-wait shadow-lg shadow-brand/20'
-                    : 'border-gray-200 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 hover:border-brand hover:bg-brand/5 hover:shadow-lg hover:shadow-brand/10 hover:scale-105 active:scale-95'
+                    ? 'border-brand dark:border-brand/60 bg-gradient-to-br from-brand/20 to-brand/10 dark:from-brand/25 dark:to-brand/15 cursor-wait shadow-lg shadow-brand/20 dark:shadow-brand/30'
+                    : 'border-gray-200 dark:border-gray-700/50 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900/80 dark:to-gray-800/80 hover:border-brand dark:hover:border-brand/60 hover:bg-brand/5 dark:hover:bg-brand/10 hover:shadow-lg hover:shadow-brand/10 dark:hover:shadow-brand/20 hover:scale-105 active:scale-95'
                 }
                 disabled:opacity-50 disabled:cursor-not-allowed group
               `}

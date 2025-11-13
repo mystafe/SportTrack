@@ -107,10 +107,10 @@ export function StatsCards() {
           ))}
         </>
       )}
-      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-3' : 'gap-4'}`}>
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-500' : ''}`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>{t('stats.todayPoints')}</div>
-          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400' : ''}`}>
+      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
+        <div className={`rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-400/50 ring-2 ring-green-500/20 dark:ring-green-400/20' : ''}`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}>{t('stats.todayPoints')}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400' : ''}`}>
             {numberFormatter.format(summary.todayPoints)}
           </div>
           <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>
@@ -129,22 +129,22 @@ export function StatsCards() {
             )}
           </div>
         </div>
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>{t('stats.totalPoints')}</div>
-          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300`}>
+        <div className={`rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}>{t('stats.totalPoints')}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300 text-gray-900 dark:text-gray-100`}>
             {numberFormatter.format(summary.totalPoints)}
           </div>
           <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
         </div>
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>{t('stats.streak')}</div>
-          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand transition-all duration-300`}>{summary.streakDays}</div>
+        <div className={`rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card hover-lift transition-smooth`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}>{t('stats.streak')}</div>
+          <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300`}>{summary.streakDays}</div>
           <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.streakDesc')}</div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card hover-lift transition-smooth">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm p-4 shadow-card hover-lift transition-smooth">
           {renderSectionHeader('breakdown', t('stats.breakdownToday'))}
           {(!isMobile || activeMobileSection === 'breakdown') && (
             <div id="stats-section-breakdown">
@@ -155,7 +155,7 @@ export function StatsCards() {
                   {summary.breakdownToday.map((item) => (
                     <li
                       key={item.key}
-                      className="flex items-center justify-between gap-3 border rounded px-3 py-2 border-gray-200 dark:border-gray-800 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 hover:shadow-sm"
+                      className="flex items-center justify-between gap-3 border rounded-lg px-3 py-2 border-gray-200 dark:border-gray-700/50 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-sm backdrop-blur-sm"
                     >
                       <div className="flex items-center gap-3">
                         <div className="text-lg">{item.icon}</div>
@@ -176,7 +176,7 @@ export function StatsCards() {
             </div>
           )}
         </div>
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card hover-lift transition-smooth">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm p-4 shadow-card hover-lift transition-smooth">
           {renderSectionHeader('lastSeven', t('stats.lastSeven'))}
           {(!isMobile || activeMobileSection === 'lastSeven') && (
             <div id="stats-section-lastSeven">
@@ -187,7 +187,7 @@ export function StatsCards() {
                   {summary.lastSevenDays.map((day) => (
                     <li
                       key={day.date}
-                      className="flex items-center justify-between gap-3 border rounded px-3 py-2 border-gray-200 dark:border-gray-800 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 hover:shadow-sm"
+                      className="flex items-center justify-between gap-3 border rounded-lg px-3 py-2 border-gray-200 dark:border-gray-700/50 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-sm backdrop-blur-sm"
                     >
                       <div className="text-sm font-medium">
                         {format(new Date(day.date), 'd MMMM EEEE', { locale: dateLocale })}
