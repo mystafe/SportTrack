@@ -106,7 +106,7 @@ export function OnboardingManager() {
       },
       {
         id: 'profile',
-        target: 'button[aria-label*="Profile"], button[aria-label*="Profil"], button[title*="Profile"], button[title*="Profil"]',
+        target: '[data-tour-id="profile"]',
         title: lang === 'tr' ? 'Profil Ayarları 👤' : 'Profile Settings 👤',
         content: lang === 'tr'
           ? 'Buradan profil bilgilerinizi, günlük hedefinizi ve ruh halinizi ayarlayabilirsiniz.'
