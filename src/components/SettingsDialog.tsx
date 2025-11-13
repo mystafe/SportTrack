@@ -100,6 +100,20 @@ export function SettingsDialog() {
             <DataExportImport />
           </div>
           <div>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined' && (window as any).resetOnboarding) {
+                  (window as any).resetOnboarding();
+                  setShowAppSettings(false);
+                }
+              }}
+              className="w-full px-3 py-2 text-xs sm:text-sm rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 text-gray-700 dark:text-gray-300"
+            >
+              🎓 {t('settings.showOnboarding') || 'Show Onboarding Tour'}
+            </button>
+          </div>
+          <div>
             <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
               {t('nav.main')}
             </span>

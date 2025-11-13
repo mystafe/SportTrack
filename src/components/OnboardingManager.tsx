@@ -44,6 +44,20 @@ export function OnboardingManager() {
     setHasCompletedOnboarding(true);
   };
 
+  // Function to reset onboarding (called from settings)
+  const resetOnboarding = () => {
+    localStorage.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETED);
+    setHasCompletedOnboarding(false);
+    setTimeout(() => {
+      setShowTour(true);
+    }, 500);
+  };
+
+  // Expose reset function globally for settings dialog
+  if (typeof window !== 'undefined') {
+    (window as any).resetOnboarding = resetOnboarding;
+  }
+
   const getTourSteps = (): TourStep[] => {
     return [
       {

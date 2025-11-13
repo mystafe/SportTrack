@@ -341,6 +341,10 @@ const translations: Translations = {
     tr: 'Hedef 1.000 ile 100.000 arasında olmalıdır.',
     en: 'Goal must be between 1,000 and 100,000.'
   },
+  'settings.showOnboarding': {
+    tr: 'Tanıtım Turunu Tekrar Göster',
+    en: 'Show Onboarding Tour Again'
+  },
 
   'footer.byName': { tr: 'Mustafa Evleksiz', en: 'Mustafa Evleksiz' },
 

@@ -109,11 +109,11 @@ export function StatsCards() {
       )}
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
         <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-400/50 ring-2 ring-green-500/20 dark:ring-green-400/20 pulse-glow-mobile' : ''}`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}>{t('stats.todayPoints')}</div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.todayPoints')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400 number-count-mobile' : ''} ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(summary.todayPoints)}
           </div>
-          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>
             {t('stats.target')}: {numberFormatter.format(summary.targetPoints)}
             {isGoalCompleted && (
               <span className="ml-1 text-green-600 dark:text-green-400 font-semibold">✓ {t('stats.goalCompleted')}</span>
@@ -130,16 +130,16 @@ export function StatsCards() {
           </div>
         </div>
         <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}>{t('stats.totalPoints')}</div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.totalPoints')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300 text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(summary.totalPoints)}
           </div>
-          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
         </div>
         <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-card magnetic-hover tilt-3d gpu-accelerated`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}>{t('stats.streak')}</div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.streak')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${isMobile ? 'number-count-mobile' : ''}`}>{summary.streakDays}</div>
-          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>{t('stats.streakDesc')}</div>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.streakDesc')}</div>
         </div>
       </div>
 

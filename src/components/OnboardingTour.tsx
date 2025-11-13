@@ -29,8 +29,49 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
   const overlayRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastActionTimeRef = useRef<number>(Date.now());
 
   const currentStepData = steps[currentStep];
+
+  // Auto-close after 30 seconds of inactivity
+  useEffect(() => {
+    // Reset timeout when step changes or user interacts
+    const resetTimeout = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      lastActionTimeRef.current = Date.now();
+      
+      timeoutRef.current = setTimeout(() => {
+        const timeSinceLastAction = Date.now() - lastActionTimeRef.current;
+        if (timeSinceLastAction >= 30000) {
+          onSkip();
+        }
+      }, 30000);
+    };
+
+    resetTimeout();
+
+    // Track user interactions
+    const handleInteraction = () => {
+      lastActionTimeRef.current = Date.now();
+      resetTimeout();
+    };
+
+    window.addEventListener('click', handleInteraction);
+    window.addEventListener('keydown', handleInteraction);
+    window.addEventListener('scroll', handleInteraction);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+      window.removeEventListener('scroll', handleInteraction);
+    };
+  }, [currentStep, onSkip]);
 
   useEffect(() => {
     if (currentStep >= steps.length) {

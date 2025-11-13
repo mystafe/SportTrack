@@ -2,6 +2,42 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.11.0] - 2025-01
+
+### Fixed
+- **Readability Improvements**:
+  - Increased font sizes across all components (cards, highlights, activity records)
+  - Improved text contrast: Changed `text-gray-500 dark:text-gray-400` to `text-gray-700 dark:text-gray-300` with `font-medium`
+  - Enhanced activity record readability: Larger fonts (`text-sm` → `text-base` on mobile, `text-xs` → `text-sm` for details)
+  - Improved highlight cards: Better contrast and larger text sizes
+  - Better date headers: Increased font size and improved contrast (`text-xs sm:text-sm font-semibold`)
+  - Activity templates: Improved text sizes and contrast
+  - QuickAdd buttons: Better text visibility
+
+### Added
+- **Onboarding Tour Auto-Close**:
+  - Tour automatically closes after 30 seconds of inactivity
+  - Tracks user interactions (clicks, keyboard, scroll) to reset timeout
+  - Prevents tour from staying open indefinitely
+
+- **Onboarding Tour Reset**:
+  - Added "Show Onboarding Tour Again" button in App Settings dialog
+  - Allows users to restart the onboarding tour anytime
+  - Resets onboarding completion status
+
+### Changed
+- **Text Contrast**:
+  - Labels: `text-gray-500` → `text-gray-700 dark:text-gray-300` with `font-medium`
+  - Values: Maintained `text-gray-900 dark:text-gray-100` for better readability
+  - Secondary text: `text-gray-500` → `text-gray-700 dark:text-gray-300` with `font-medium`
+  - Activity records: Improved font weights and sizes
+
+- **Mobile Typography**:
+  - Activity names: `text-xs` → `text-sm` on mobile
+  - Activity details: `text-[10px]` → `text-xs` on mobile
+  - Highlight cards: `text-xs` → `text-sm` for labels, `text-sm` → `text-base` for values
+  - Date headers: `text-[10px]` → `text-xs` on mobile
+
 ## [0.10.9] - 2025-01
 
 ### Fixed

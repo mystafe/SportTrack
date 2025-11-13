@@ -122,10 +122,10 @@ export function QuickAdd() {
               <div className={`text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300 ${isAddingThis ? 'icon-wiggle-mobile' : ''}`}>
                 {definition.icon}
               </div>
-              <div className="text-xs sm:text-sm font-semibold text-center text-gray-900 dark:text-white line-clamp-2 group-hover:text-brand transition-colors">
+              <div className="text-xs sm:text-sm font-semibold text-center text-gray-900 dark:text-gray-100 line-clamp-2 group-hover:text-brand transition-colors">
                 {getActivityLabel(definition, lang)}
               </div>
-              <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-medium">
+              <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium">
                 {definition.defaultAmount} {getActivityUnit(definition, lang)}
               </div>
               {isAddingThis && (

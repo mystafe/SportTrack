@@ -108,10 +108,10 @@ export function ActivityTemplates() {
                     {template.icon}
                   </div>
                   <div className="flex-1 text-left min-w-0">
-                    <div className={`${isMobile ? 'text-xs' : 'text-sm sm:text-base'} font-semibold text-gray-900 dark:text-white ${isMobile ? 'mb-0.5' : 'mb-1'} group-hover:text-brand transition-colors`}>
+                    <div className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold text-gray-900 dark:text-white ${isMobile ? 'mb-0.5' : 'mb-1'} group-hover:text-brand transition-colors`}>
                       {template.name[lang]}
                     </div>
-                    <div className={`${isMobile ? 'text-[10px]' : 'text-xs sm:text-sm'} text-gray-600 dark:text-gray-400 ${isMobile ? 'leading-tight' : 'leading-relaxed'}`}>
+                    <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium ${isMobile ? 'leading-tight' : 'leading-relaxed'}`}>
                       {template.description[lang]}
                     </div>
                   </div>

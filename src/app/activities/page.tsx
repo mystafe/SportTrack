@@ -199,7 +199,7 @@ function ActivitiesClient() {
             <div className="divide-y divide-gray-200 dark:divide-gray-800">
               {groups.map(({ day, acts }, groupIndex) => (
                 <div key={day}>
-                  <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-2.5 py-1.5 text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <div className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur px-3 py-2 text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200">
                     {format(new Date(day), 'd MMMM EEEE', { locale: dateLocale })}
                   </div>
                   <ul className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -213,14 +213,14 @@ function ActivitiesClient() {
                           style={{ animationDelay: `${(groupIndex * 0.1) + (acts.indexOf(activity) * 0.05)}s` }}
                         >
                           <div className="flex-1 min-w-0">
-                            <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium flex items-center gap-1.5 flex-wrap`}>
-                              <span className="text-base">{activity.icon}</span>
-                              <span className="truncate">{getActivityLabel(activity, lang)}</span>
-                              <span className="inline-flex items-center rounded-full bg-brand/10 text-brand px-1.5 py-0.5 text-[10px] sm:text-xs font-medium whitespace-nowrap">
+                            <div className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold flex items-center gap-1.5 flex-wrap`}>
+                              <span className="text-lg">{activity.icon}</span>
+                              <span className="truncate text-gray-900 dark:text-gray-100">{getActivityLabel(activity, lang)}</span>
+                              <span className="inline-flex items-center rounded-full bg-brand/10 text-brand px-2 py-0.5 text-xs sm:text-sm font-semibold whitespace-nowrap">
                                 {`${numberFormatter.format(activity.points)} ${t('list.pointsUnit')}`}
                               </span>
                             </div>
-                            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400 mt-0.5`}>
+                            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 mt-1 font-medium`}>
                               {timeFormatter.format(new Date(activity.performedAt))} • {activity.amount}{' '}
                               {getActivityUnit(activity, lang)} • {activity.multiplier}x
                               {activity.duration && activity.duration > 0 ? (
@@ -228,7 +228,7 @@ function ActivitiesClient() {
                               ) : null}
                             </div>
                             {activity.note ? (
-                              <div className={`${isMobile ? 'text-xs' : 'text-sm'} mt-1 text-gray-700 dark:text-gray-300 line-clamp-2`}>{activity.note}</div>
+                              <div className={`${isMobile ? 'text-xs' : 'text-sm'} mt-1.5 text-gray-700 dark:text-gray-300 line-clamp-2`}>{activity.note}</div>
                             ) : null}
                           </div>
                           <div className="flex items-center gap-1.5 text-[10px] sm:text-xs opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex-shrink-0">
