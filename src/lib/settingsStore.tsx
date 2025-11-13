@@ -92,7 +92,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           setSettings({
             name: parsed.name,
             dailyTarget: parsed.dailyTarget,
-            customActivities: dedupeCustomActivities(parsed.customActivities as CustomActivityDefinition[])
+            customActivities: dedupeCustomActivities(parsed.customActivities as CustomActivityDefinition[]),
+            mood: parsed.mood ?? undefined
           });
         }
       }

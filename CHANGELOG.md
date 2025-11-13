@@ -2,6 +2,14 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.14.3] - 2025-01
+
+### Fixed
+- **Mood Persistence**:
+  - Fixed issue where mood selection was lost after page refresh
+  - Mood is now properly loaded from localStorage when settings are initialized
+  - Mood persists correctly across page reloads and browser sessions
+
 ## [0.14.2] - 2025-01
 
 ### Added
