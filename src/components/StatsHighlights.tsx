@@ -100,7 +100,7 @@ export function StatsHighlights() {
         {t('stats.highlightsTitle')}
       </h2>
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.bestDay')}</div>
             {bestDay ? (
               <>
@@ -112,13 +112,13 @@ export function StatsHighlights() {
                 </div>
               </>
             ) : (
-              <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400`}>
+              <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-medium`}>
                 {t('stats.highlight.bestDayFallback')}
               </div>
             )}
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.bestActivity')}</div>
             {topActivity ? (
               <>
@@ -132,13 +132,13 @@ export function StatsHighlights() {
                 </div>
               </>
             ) : (
-              <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400`}>
+              <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-medium`}>
                 {t('stats.highlight.bestActivityFallback')}
               </div>
             )}
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.currentStreak')}</div>
             <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>{summary.streakDays}</div>
             <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>
@@ -148,7 +148,7 @@ export function StatsHighlights() {
             </div>
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.averageDaily')}</div>
             <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
               {numberFormatter.format(averageDailyPoints)} {t('list.pointsUnit')}
@@ -158,7 +158,7 @@ export function StatsHighlights() {
             </div>
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.totalPoints')}</div>
             <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
               {numberFormatter.format(summary.totalPoints)} {t('list.pointsUnit')}
@@ -170,7 +170,7 @@ export function StatsHighlights() {
             </div>
           </div>
 
-          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
+          <div className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3' : 'p-4'} shadow-lg space-y-1 gpu-accelerated`}>
             <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.highlight.todayProgress')}</div>
             <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}>
               {numberFormatter.format(summary.todayPoints)} / {numberFormatter.format(summary.targetPoints)}
@@ -182,7 +182,7 @@ export function StatsHighlights() {
           
           <Link
             href="/stats"
-            className={`stagger-item card-entrance slide-in-right magnetic-hover hover-scale-glow rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gradient-to-br from-brand/10 via-brand/8 to-brand/5 dark:from-brand/20 dark:via-brand/15 dark:to-brand/10 ${isMobile ? 'p-3' : 'p-4'} shadow-lg group backdrop-blur-sm gpu-accelerated`}
+            className={`stagger-item card-entrance slide-in-right magnetic-hover hover-scale-glow rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gradient-to-br from-brand/10 via-brand/8 to-brand/5 dark:from-brand/20 dark:via-brand/15 dark:to-brand/10 ${isMobile ? 'p-3' : 'p-4'} shadow-lg group  gpu-accelerated`}
           >
             <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-700 dark:text-gray-200 font-medium mb-1`}>{t('stats.detailed.title')}</div>
             <div className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-900 dark:text-white group-hover:text-brand transition-colors`}>

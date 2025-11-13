@@ -74,7 +74,7 @@ export default function HomePage() {
     <div className="space-y-4 sm:space-y-6 page-transition">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className={isMobile ? 'title-entrance' : ''}>
-          <h1 className={`text-xl sm:text-2xl font-bold text-gray-900 dark:text-white ${isMobile ? 'gradient-text-animated' : ''}`}>{greeting}</h1>
+          <h1 className={`text-xl sm:text-2xl font-bold ${isMobile ? 'text-brand dark:text-brand-light' : 'text-gray-900 dark:text-white'}`}>{greeting}</h1>
           <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium">
             {t('header.overviewSubtitle')}
           </p>
@@ -90,7 +90,7 @@ export default function HomePage() {
       </div>
       
       {/* Motivational Quote - Extraordinary Design */}
-      <div className="quote-card glow-border relative rounded-xl border-2 border-brand/30 dark:border-brand/40 p-6 sm:p-8 shadow-2xl card-entrance quote-card-entrance backdrop-blur-sm overflow-hidden">
+      <div className="quote-card glow-border relative rounded-xl border-2 border-brand/30 dark:border-brand/40 p-6 sm:p-8 shadow-2xl card-entrance quote-card-entrance overflow-hidden">
         {/* Decorative elements */}
         <div className="quote-dots"></div>
         <div className="pattern-overlay"></div>
@@ -108,13 +108,13 @@ export default function HomePage() {
         <span className="quote-mark quote-mark-right">"</span>
         
         {/* Quote text */}
-        <div className="relative z-10">
+        <div className="relative z-20">
           {mounted && quote ? (
-            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-semibold leading-relaxed text-reveal ${isMobile ? 'quote-rotate' : 'rotate-quote'}`}>
+            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-bold leading-relaxed`}>
               {lang === 'tr' ? quote.tr : quote.en}
             </p>
           ) : (
-            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-semibold leading-relaxed`}>
+            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-bold leading-relaxed`}>
               {lang === 'tr' ? 'Her gün biraz daha ileri git.' : 'Every day is an opportunity, make the most of it.'}
             </p>
           )}
@@ -128,14 +128,14 @@ export default function HomePage() {
       
       {/* Motivational Message - Enhanced Design */}
       {motivationalMessage && showMessage && (
-        <div className={`motivational-card glow-border rounded-xl border-2 border-brand/40 dark:border-brand/50 p-5 sm:p-6 shadow-2xl ${isMobile ? 'motivational-entrance slide-in-bottom-mobile' : 'animate-slide-in-right'} transition-all duration-500 backdrop-blur-sm overflow-hidden relative ${showMessage ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
+        <div className={`motivational-card glow-border rounded-xl border-2 border-brand/40 dark:border-brand/50 p-5 sm:p-6 shadow-2xl ${isMobile ? 'motivational-entrance slide-in-bottom-mobile' : 'animate-slide-in-right'} transition-all duration-500 overflow-hidden relative ${showMessage ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
           {/* Decorative elements */}
           <div className="pattern-overlay"></div>
           <div className="quote-shimmer"></div>
           
-          <div className="flex items-center gap-4 relative z-10">
+          <div className="flex items-center gap-4 relative z-20">
             <span className={`text-3xl sm:text-4xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'} flex-shrink-0`}>{motivationalMessage.emoji}</span>
-            <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-white flex-1 leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-white flex-1 leading-relaxed drop-shadow-sm">
               {lang === 'tr' ? motivationalMessage.tr : motivationalMessage.en}
             </p>
           </div>

@@ -109,7 +109,7 @@ export function QuickAdd() {
                 p-4 sm:p-5 rounded-xl border-2
                 transition-all duration-300
                 min-h-[90px] sm:min-h-[110px]
-                backdrop-blur-sm gpu-accelerated
+ gpu-accelerated
                 ${
                   isAddingThis
                     ? 'border-brand dark:border-brand/60 bg-gradient-to-br from-brand/20 to-brand/10 dark:from-brand/25 dark:to-brand/15 cursor-wait shadow-lg shadow-brand/20 dark:shadow-brand/30 pulse-glow-mobile'
@@ -129,7 +129,7 @@ export function QuickAdd() {
                 {definition.defaultAmount} {getActivityUnit(definition, lang)}
               </div>
               {isAddingThis && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-xl backdrop-blur-sm">
+                <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-xl ">
                   <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent"></div>
                 </div>
               )}

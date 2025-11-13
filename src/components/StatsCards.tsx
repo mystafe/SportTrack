@@ -31,13 +31,13 @@ export function StatsCards() {
     title: string
   ) => {
     if (!isMobile) {
-      return <div className="text-sm text-gray-500 mb-3">{title}</div>;
+      return <div className="text-sm text-gray-700 dark:text-gray-200 font-medium mb-3">{title}</div>;
     }
     const isActive = activeMobileSection === id;
     return (
       <button
         type="button"
-        className="flex w-full items-center justify-between text-sm text-gray-500 mb-3 transition-all duration-200 hover:text-gray-700 dark:hover:text-gray-300"
+        className="flex w-full items-center justify-between text-sm text-gray-700 dark:text-gray-200 font-medium mb-3 transition-all duration-200 hover:text-gray-900 dark:hover:text-white"
         onClick={() => setActiveMobileSection(id)}
         aria-expanded={isActive}
         aria-controls={`stats-section-${id}`}
@@ -108,7 +108,7 @@ export function StatsCards() {
         </>
       )}
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>
-        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-400/50 ring-2 ring-green-500/20 dark:ring-green-400/20 pulse-glow-mobile' : ''}`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-green-500 dark:border-green-400/50 ring-2 ring-green-500/20 dark:ring-green-400/20 pulse-glow-mobile' : ''}`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.todayPoints')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${showGoalAnimation ? 'points-value text-green-600 dark:text-green-400 number-count-mobile' : ''} ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(summary.todayPoints)}
@@ -129,14 +129,14 @@ export function StatsCards() {
             )}
           </div>
         </div>
-        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.totalPoints')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold transition-all duration-300 text-gray-900 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : ''}`}>
             {numberFormatter.format(summary.totalPoints)}
           </div>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.totalActivities', { count: summary.totalActivities })}</div>
         </div>
-        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated`}>
+        <div className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg magnetic-hover tilt-3d gpu-accelerated`}>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>{t('stats.streak')}</div>
           <div className={`${isMobile ? 'text-xl' : 'text-3xl'} font-semibold text-brand dark:text-brand-light transition-all duration-300 ${isMobile ? 'number-count-mobile' : ''}`}>{summary.streakDays}</div>
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-medium`}>{t('stats.streakDesc')}</div>
@@ -144,7 +144,7 @@ export function StatsCards() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="card-entrance slide-in-left rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm p-4 shadow-lg magnetic-hover gpu-accelerated">
+        <div className="card-entrance slide-in-left rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  p-4 shadow-lg magnetic-hover gpu-accelerated">
           {renderSectionHeader('breakdown', t('stats.breakdownToday'))}
           {(!isMobile || activeMobileSection === 'breakdown') && (
             <div id="stats-section-breakdown">
@@ -155,7 +155,7 @@ export function StatsCards() {
                   {summary.breakdownToday.map((item) => (
                     <li
                       key={item.key}
-                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-md backdrop-blur-sm"
+                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-md "
                     >
                       <div className="flex items-center gap-3">
                         <div className="text-xl">{item.icon}</div>
@@ -176,7 +176,7 @@ export function StatsCards() {
             </div>
           )}
         </div>
-        <div className="rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90 backdrop-blur-sm p-4 shadow-lg hover-lift transition-smooth">
+        <div className="rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/90  p-4 shadow-lg hover-lift transition-smooth">
           {renderSectionHeader('lastSeven', t('stats.lastSeven'))}
           {(!isMobile || activeMobileSection === 'lastSeven') && (
             <div id="stats-section-lastSeven">
@@ -187,7 +187,7 @@ export function StatsCards() {
                   {summary.lastSevenDays.map((day) => (
                     <li
                       key={day.date}
-                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-md backdrop-blur-sm"
+                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-md "
                     >
                       <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                         {format(new Date(day.date), 'd MMMM EEEE', { locale: dateLocale })}

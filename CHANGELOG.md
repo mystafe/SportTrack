@@ -2,6 +2,33 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.11.3] - 2025-01
+
+### Fixed
+- **Critical Text Readability Issues**:
+  - **Gradient Text Animation**: Fixed transparent text issue by adding fallback color (`color: #0ea5e9`) and browser support fallback
+  - **Quote Text Animations**: Removed opacity animations from `text-reveal`, `rotate-quote`, and `quote-rotate` - text now always visible
+  - **Quote Card Entrance**: Removed `blur(4px)` filter from entrance animation that was making text unreadable
+  - **Shimmer Overlay**: Moved shimmer overlay behind text (`z-index: 0`) and reduced opacity to prevent text obstruction
+  - **Backdrop Blur**: Removed `backdrop-blur-sm` from all cards (StatsCards, StatsHighlights, ActivityTemplates, QuickAdd) - was blurring text
+  - **Quote Card**: Removed `backdrop-blur-sm` from quote card container
+  - **Motivational Message**: Removed `backdrop-blur-sm` and increased z-index to ensure text visibility
+  - **Text Z-Index**: Increased quote text z-index from `z-10` to `z-20` to ensure it's above all decorative elements
+  - **Font Weight**: Changed quote text from `font-semibold` to `font-bold` for better visibility
+  - **Text Shadow**: Added `drop-shadow-sm` to motivational message text for better contrast
+
+- **Stats Cards Text**:
+  - Section headers: `text-gray-500` → `text-gray-700 dark:text-gray-200` with `font-medium`
+  - Improved text contrast throughout
+
+- **Stats Highlights Text**:
+  - Fallback text: `text-gray-600 dark:text-gray-400` → `text-gray-700 dark:text-gray-200` with `font-medium`
+
+### Changed
+- **Page Title**: Removed `gradient-text-animated` on mobile, replaced with solid brand color for better readability
+- **Quote Text**: Removed all animation classes (`text-reveal`, `quote-rotate`, `rotate-quote`) that were causing opacity issues
+- **All Animations**: Removed opacity transitions from text animations - only transform animations remain
+
 ## [0.11.2] - 2025-01
 
 ### Fixed
