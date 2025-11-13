@@ -391,7 +391,28 @@ const translations: Translations = {
   'quickAdd.addActivity': {
     tr: '{activity} aktivitesini ekle',
     en: 'Add {activity} activity'
-  }
+  },
+
+  'filters.title': { tr: 'Filtreler', en: 'Filters' },
+  'filters.dateRange': { tr: 'Tarih Aralığı', en: 'Date Range' },
+  'filters.dateRange.all': { tr: 'Tümü', en: 'All' },
+  'filters.dateRange.today': { tr: 'Bugün', en: 'Today' },
+  'filters.dateRange.week': { tr: 'Son 7 Gün', en: 'Last 7 Days' },
+  'filters.dateRange.month': { tr: 'Son 30 Gün', en: 'Last 30 Days' },
+  'filters.dateRange.custom': { tr: 'Özel', en: 'Custom' },
+  'filters.activityType': { tr: 'Aktivite Türü', en: 'Activity Type' },
+  'filters.allActivities': { tr: 'Tüm Aktiviteler', en: 'All Activities' },
+  'filters.search': { tr: 'Ara', en: 'Search' },
+  'filters.searchPlaceholder': { tr: 'Aktivite adı veya not ara...', en: 'Search activity name or note...' },
+  'filters.sortBy': { tr: 'Sırala', en: 'Sort By' },
+  'filters.sort.dateDesc': { tr: 'Tarih (Yeni → Eski)', en: 'Date (Newest → Oldest)' },
+  'filters.sort.dateAsc': { tr: 'Tarih (Eski → Yeni)', en: 'Date (Oldest → Newest)' },
+  'filters.sort.pointsDesc': { tr: 'Puan (Yüksek → Düşük)', en: 'Points (High → Low)' },
+  'filters.sort.pointsAsc': { tr: 'Puan (Düşük → Yüksek)', en: 'Points (Low → High)' },
+  'filters.clear': { tr: 'Filtreleri Temizle', en: 'Clear Filters' },
+  'filters.results': { tr: 'Filtrelenmiş Sonuçlar', en: 'Filtered Results' },
+  'filters.activities': { tr: 'aktivite', en: 'activities' },
+  'filters.noResults': { tr: 'Filtrelere uygun aktivite bulunamadı', en: 'No activities match the filters' }
 };
 
 type I18nContextValue = {

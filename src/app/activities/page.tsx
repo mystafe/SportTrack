@@ -2,6 +2,8 @@
 
 import { ActivityForm } from '@/components/ActivityForm';
 import { ManageActivitiesDialog } from '@/components/ManageActivitiesDialog';
+import { ActivityFilters, useFilteredActivities } from '@/components/ActivityFilters';
+import type { FilterState } from '@/components/ActivityFilters';
 import { useMemo, useState } from 'react';
 import { format, startOfDay } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
@@ -28,6 +30,13 @@ function ActivitiesClient() {
   const { showToast } = useToaster();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; activity: ActivityRecord } | null>(null);
+  const [filters, setFilters] = useState<FilterState>({
+    dateRange: 'all',
+    activityType: 'all',
+    searchQuery: '',
+    sortBy: 'date-desc'
+  });
+  const filteredActivities = useFilteredActivities(filters);
 
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
@@ -51,7 +60,7 @@ function ActivitiesClient() {
 
   const groups = useMemo(() => {
     const grouped = new Map<string, ActivityRecord[]>();
-    for (const activity of activities) {
+    for (const activity of filteredActivities) {
       const key = startOfDay(new Date(activity.performedAt)).toISOString();
       grouped.set(key, [...(grouped.get(key) ?? []), activity]);
     }
@@ -63,25 +72,60 @@ function ActivitiesClient() {
         )
       }))
       .sort((a, b) => +new Date(b.day) - +new Date(a.day));
-  }, [activities]);
+  }, [filteredActivities]);
+
+  const filteredStats = useMemo(() => {
+    const totalPoints = filteredActivities.reduce((sum, a) => sum + a.points, 0);
+    const totalCount = filteredActivities.length;
+    return { totalPoints, totalCount };
+  }, [filteredActivities]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-      {!editing && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm font-medium">
-            <span>{t('list.newActivity')}</span>
-            <ManageActivitiesDialog />
-          </div>
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card">
-            <ActivityForm />
+    <div className="space-y-4 sm:space-y-6">
+      {/* Filters */}
+      <ActivityFilters filters={filters} onFiltersChange={setFilters} />
+
+      {/* Filtered Stats Summary */}
+      {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.searchQuery) && (
+        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('filters.results')}
+            </span>
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              {filteredStats.totalCount} {t('filters.activities')} · {numberFormatter.format(filteredStats.totalPoints)} {t('list.pointsUnit')}
+            </div>
           </div>
         </div>
       )}
-      <div className="space-y-3">
-        <div className="text-sm font-medium">{t('list.records')}</div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        {!editing && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm font-medium">
+              <span>{t('list.newActivity')}</span>
+              <ManageActivitiesDialog />
+            </div>
+            <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-card">
+              <ActivityForm />
+            </div>
+          </div>
+        )}
+        <div className="space-y-3">
+        <div className="flex items-center justify-between text-sm font-medium">
+          <span>{t('list.records')}</span>
+          {filteredActivities.length !== activities.length && (
+            <span className="text-xs text-gray-500">
+              {filteredActivities.length} / {activities.length}
+            </span>
+          )}
+        </div>
         <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card overflow-hidden">
-          {editing ? (
+          {filteredActivities.length === 0 ? (
+            <div className="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+              {t('filters.noResults')}
+            </div>
+          ) : editing ? (
             <div className="border-b border-gray-200 dark:border-gray-800">
               <div className="flex items-center justify-between px-4 py-2 text-xs font-medium text-gray-600 dark:text-gray-400">
                 <span>{t('list.editingTitle')}</span>
@@ -142,8 +186,8 @@ function ActivitiesClient() {
               <div className="h-12 rounded skeleton" />
               <div className="h-12 rounded skeleton" />
             </div>
-          ) : activities.length === 0 ? (
-            <div className="p-4 text-sm text-gray-600 dark:text-gray-400">{t('list.empty')}</div>
+          ) : filteredActivities.length === 0 ? (
+            <div className="p-4 text-sm text-gray-600 dark:text-gray-400">{t('filters.noResults')}</div>
           ) : (
             <div className="divide-y divide-gray-200 dark:divide-gray-800">
               {groups.map(({ day, acts }) => (
