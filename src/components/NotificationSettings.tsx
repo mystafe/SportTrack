@@ -155,8 +155,8 @@ export function NotificationSettings() {
             <button
               type="button"
               onClick={() => updateSetting('goalCompletion', !notificationSettings.goalCompletion)}
-              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                notificationSettings.goalCompletion ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'
+              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 ${
+                notificationSettings.goalCompletion ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md' : 'bg-gray-300 dark:bg-gray-700'
               }`}
             >
               <span
@@ -174,8 +174,8 @@ export function NotificationSettings() {
               <button
                 type="button"
                 onClick={() => updateSetting('streakReminder', !notificationSettings.streakReminder)}
-                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                  notificationSettings.streakReminder ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 ${
+                  notificationSettings.streakReminder ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md' : 'bg-gray-300 dark:bg-gray-700'
                 }`}
               >
                 <span
