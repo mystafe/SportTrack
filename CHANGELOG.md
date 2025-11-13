@@ -2,6 +2,46 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.11.5] - 2025-01
+
+### Fixed
+- **Critical: Content Visibility Issues - Animations Causing Text to Disappear**:
+  - **Stagger Item Animation**: Removed opacity animation from `staggerFadeIn` - content now always visible
+    - Changed from `opacity: 0` → `opacity: 1 !important`
+    - Only transform animation remains
+  
+  - **Card Entrance Animation**: Removed opacity animation from `cardEntrance` - cards now always visible
+    - Changed from `opacity: 0` → `opacity: 1 !important`
+    - Only transform animation remains
+  
+  - **Fade In Scale Mobile**: Removed opacity animation from `fadeInScaleMobile` - mobile content now always visible
+    - Changed from `opacity: 0` → `opacity: 1 !important`
+    - Only transform animation remains
+  
+  - **Card Lift Animation**: Removed opacity animation from `cardLift` - mobile cards now always visible
+    - Changed from `opacity: 0` → `opacity: 1 !important`
+    - Only transform animation remains
+  
+  - **Slide In Bottom Mobile**: Removed opacity animation from `slideInBottomMobile` - mobile content now always visible
+    - Changed from `opacity: 0` → `opacity: 1 !important`
+    - Only transform animation remains
+  
+  - **Slide In Left/Right**: Removed opacity animations from `slideInLeft` and `slideInRight` - content now always visible
+    - Changed from `opacity: 0` → `opacity: 1 !important`
+    - Only transform animations remain
+  
+  - **Bounce In Mobile**: Removed opacity animation from `bounceInMobile` - mobile content now always visible
+    - Changed from `opacity: 0` → `opacity: 1 !important`
+    - Only transform animation remains
+
+### Changed
+- **All Entrance Animations**: Removed opacity transitions from all entrance animations
+  - StatsCards: Always visible
+  - StatsHighlights: Always visible
+  - QuickAdd: Always visible
+  - ActivityTemplates: Always visible
+  - Only transform animations (translate, scale) remain for smooth entrance effects
+
 ## [0.11.4] - 2025-01
 
 ### Fixed
