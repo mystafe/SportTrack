@@ -9,6 +9,7 @@ import {
   calculateChallengeProgress,
   updateChallengeStatus,
   getDefaultDailyChallenge,
+  getDefaultWeeklyChallenge,
   type ChallengeType
 } from './challenges';
 import { STORAGE_KEYS } from './constants';
@@ -40,19 +41,28 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
       if (stored) {
         const parsed = JSON.parse(stored) as Challenge[];
-        setChallenges(parsed);
+        // Check if default weekly challenge exists, if not add it
+        const hasWeekly = parsed.some(c => c.type === 'weekly' && c.id.startsWith('weekly-') && c.target === 50000);
+        if (!hasWeekly) {
+          const weeklyChallenge = getDefaultWeeklyChallenge();
+          setChallenges([...parsed, weeklyChallenge]);
+        } else {
+          setChallenges(parsed);
+        }
       } else {
-        // Create default daily challenge
+        // Create default daily and weekly challenges
         const dailyTarget = settings?.dailyTarget ?? DEFAULT_DAILY_TARGET;
-        const defaultChallenge = getDefaultDailyChallenge(dailyTarget);
-        setChallenges([defaultChallenge]);
+        const defaultDaily = getDefaultDailyChallenge(dailyTarget);
+        const defaultWeekly = getDefaultWeeklyChallenge();
+        setChallenges([defaultDaily, defaultWeekly]);
       }
     } catch (error) {
       console.error('Failed to load challenges:', error);
-      // Create default daily challenge on error
+      // Create default challenges on error
       const dailyTarget = settings?.dailyTarget ?? DEFAULT_DAILY_TARGET;
-      const defaultChallenge = getDefaultDailyChallenge(dailyTarget);
-      setChallenges([defaultChallenge]);
+      const defaultDaily = getDefaultDailyChallenge(dailyTarget);
+      const defaultWeekly = getDefaultWeeklyChallenge();
+      setChallenges([defaultDaily, defaultWeekly]);
     } finally {
       setHydrated(true);
     }

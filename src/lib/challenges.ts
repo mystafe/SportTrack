@@ -247,3 +247,18 @@ export function getDefaultDailyChallenge(dailyTarget: number): Challenge {
   );
 }
 
+/**
+ * Get default weekly challenge (50k points)
+ */
+export function getDefaultWeeklyChallenge(): Challenge {
+  return createWeeklyChallenge(
+    {
+      tr: 'Haftalık Hedef',
+      en: 'Weekly Goal'
+    },
+    50000,
+    new Date(),
+    '🔥'
+  );
+}
+

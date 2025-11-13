@@ -261,14 +261,18 @@ export function SettingsDialog() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="px-3 py-2 min-h-[44px] text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all"
+            className="px-2 py-2 min-h-[36px] min-w-[36px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 overflow-hidden max-w-[80px] sm:max-w-none"
+            title={settings?.name || t('settings.setProfile')}
+            aria-label={settings?.name || t('settings.setProfile')}
           >
-            {settings?.name ? settings.name : t('settings.setProfile')}
+            <span className="truncate text-[10px] sm:text-xs">
+              {settings?.name ? (settings.name.length > 6 ? settings.name.substring(0, 6) + '...' : settings.name) : '👤'}
+            </span>
           </button>
           <button
             type="button"
             onClick={() => setShowAppSettings(true)}
-            className="px-3 py-2 min-h-[44px] min-w-[44px] text-base rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center"
+            className="px-2 py-2 min-h-[36px] min-w-[36px] text-base rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0"
             title={t('settings.appSettings')}
             aria-label={t('settings.appSettings')}
           >
@@ -279,7 +283,8 @@ export function SettingsDialog() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+          className="px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 max-w-[120px] truncate"
+          title={settings?.name || t('settings.setProfile')}
         >
           {settings?.name ? settings.name : t('settings.setProfile')}
         </button>

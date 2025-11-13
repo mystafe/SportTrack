@@ -2,6 +2,32 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.9.5] - 2025-01
+
+### Added
+- **Default Haftalık Challenge**: 50k puan hedefli haftalık challenge eklendi
+  - Yeni kullanıcılar için otomatik olarak oluşturuluyor
+  - Mevcut kullanıcılar için de eklenecek (eğer yoksa)
+  - getDefaultWeeklyChallenge fonksiyonu eklendi
+
+### Changed
+- **Navbar Mobil Uyumluluk**:
+  - Logo mobilde "ST" olarak kısaltıldı
+  - Navbar container'a `min-w-0` ve `flex-1` eklendi overflow önlemek için
+  - Navigation icons container'a `flex-shrink-0` eklendi
+  - SettingsDialog butonu mobilde daha compact (max-w-[80px])
+  - Uzun kullanıcı isimleri truncate ediliyor (6 karakter + "...")
+  - Kullanıcı ismi yoksa 👤 ikonu gösteriliyor
+  - Butonlar daha küçük ve estetik (`min-h-[36px]`, `rounded-lg`)
+  - Desktop'ta kullanıcı ismi için `max-w-[120px] truncate` eklendi
+
+### Improved
+- **Navbar Estetik İyileştirmeleri**:
+  - Daha iyi spacing ve alignment
+  - Flexbox layout iyileştirmeleri
+  - Overflow handling iyileştirildi
+  - Responsive tasarım optimizasyonları
+
 ## [0.9.4] - 2025-01
 
 ### Changed
