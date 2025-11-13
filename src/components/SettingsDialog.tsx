@@ -9,6 +9,7 @@ import { LIMITS } from '@/lib/constants';
 import { DataExportImport } from '@/components/DataExportImport';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { NotificationSettings } from '@/components/NotificationSettings';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 export function SettingsDialog() {
@@ -101,6 +102,9 @@ export function SettingsDialog() {
               <LanguageToggle />
               <ThemeToggle />
             </div>
+          </div>
+          <div>
+            <NotificationSettings />
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 pt-2">

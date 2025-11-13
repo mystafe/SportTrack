@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
@@ -9,6 +9,7 @@ import { useSettings } from '@/lib/settingsStore';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { StatsCardSkeleton } from '@/components/LoadingSkeleton';
+import { notificationService } from '@/lib/notificationService';
 
 export function StatsCards() {
   const { t, lang } = useI18n();
@@ -59,12 +60,20 @@ export function StatsCards() {
   const [wasCompleted, setWasCompleted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showGoalAnimation, setShowGoalAnimation] = useState(false);
+  const notificationSentRef = useRef(false);
 
   useEffect(() => {
     if (isGoalCompleted && !wasCompleted) {
       setWasCompleted(true);
       setShowConfetti(true);
       setShowGoalAnimation(true);
+      
+      // Send notification for goal completion
+      if (!notificationSentRef.current && notificationService.canNotify()) {
+        notificationService.showGoalCompletion(lang as 'tr' | 'en', summary.todayPoints);
+        notificationSentRef.current = true;
+      }
+      
       const confettiTimer = setTimeout(() => setShowConfetti(false), 3000);
       const animationTimer = setTimeout(() => setShowGoalAnimation(false), 10000);
       return () => {
@@ -74,8 +83,9 @@ export function StatsCards() {
     } else if (!isGoalCompleted) {
       setWasCompleted(false);
       setShowGoalAnimation(false);
+      notificationSentRef.current = false;
     }
-  }, [isGoalCompleted, wasCompleted]);
+  }, [isGoalCompleted, wasCompleted, summary.todayPoints, lang]);
 
   return (
     <div className="space-y-6">

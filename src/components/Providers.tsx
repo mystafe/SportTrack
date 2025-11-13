@@ -8,6 +8,7 @@ import { BadgeProvider } from '@/lib/badgeStore';
 import { ToasterProvider } from '@/components/Toaster';
 import { StorageErrorHandler } from '@/components/StorageErrorHandler';
 import { InstallPrompt } from '@/components/InstallPrompt';
+import { NotificationManager } from '@/components/NotificationManager';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -18,6 +19,7 @@ export function Providers({ children }: { children: ReactNode }) {
             <ToasterProvider>
               <StorageErrorHandler />
               <InstallPrompt />
+              <NotificationManager />
               {children}
             </ToasterProvider>
           </BadgeProvider>

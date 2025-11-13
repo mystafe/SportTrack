@@ -89,6 +89,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
   const { checkNewBadges } = useBadges();
+  const { settings } = useSettings();
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
     [lang]
@@ -184,6 +185,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           if (newBadges.length > 0) {
             newBadges.forEach(badge => {
               showToast(`${badge.icon} ${badge.name[lang]}`, 'success');
+              // Show notification for badge unlock
+              notificationService.showBadgeUnlocked(lang as 'tr' | 'en', badge.name[lang], badge.icon);
             });
           }
         }, 500);

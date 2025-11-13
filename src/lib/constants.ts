@@ -4,7 +4,8 @@ export const STORAGE_KEYS = {
   SETTINGS: 'sporttrack.settings.v1',
   THEME: 'theme',
   LANGUAGE: 'lang',
-  BADGES: 'sporttrack.badges.v1'
+  BADGES: 'sporttrack.badges.v1',
+  NOTIFICATIONS: 'sporttrack.notifications.v1'
 } as const;
 
 export const TIMEOUTS = {

@@ -344,7 +344,45 @@ const translations: Translations = {
     en: 'Install the app for faster access and offline functionality'
   },
   'pwa.install': { tr: 'Yükle', en: 'Install' },
-  'pwa.dismiss': { tr: 'Daha Sonra', en: 'Later' }
+  'pwa.dismiss': { tr: 'Daha Sonra', en: 'Later' },
+
+  'notifications.title': { tr: 'Bildirimler', en: 'Notifications' },
+  'notifications.subtitle': {
+    tr: 'Aktivite hatırlatıcıları ve başarı bildirimleri',
+    en: 'Activity reminders and achievement notifications'
+  },
+  'notifications.requestPermission': {
+    tr: 'Bildirim İzni İste',
+    en: 'Request Notification Permission'
+  },
+  'notifications.permissionGranted': {
+    tr: 'Bildirim izni verildi',
+    en: 'Notification permission granted'
+  },
+  'notifications.permissionDenied': {
+    tr: 'Bildirim izni reddedildi',
+    en: 'Notification permission denied'
+  },
+  'notifications.notSupported': {
+    tr: 'Tarayıcınız bildirimleri desteklemiyor',
+    en: 'Your browser does not support notifications'
+  },
+  'notifications.dailyReminder': {
+    tr: 'Günlük Hatırlatıcı',
+    en: 'Daily Reminder'
+  },
+  'notifications.goalCompletion': {
+    tr: 'Hedef Tamamlama Bildirimi',
+    en: 'Goal Completion Notification'
+  },
+  'notifications.streakReminder': {
+    tr: 'Seri Hatırlatıcısı',
+    en: 'Streak Reminder'
+  },
+  'notifications.saveFailed': {
+    tr: 'Bildirim ayarları kaydedilemedi',
+    en: 'Failed to save notification settings'
+  }
 };
 
 type I18nContextValue = {
