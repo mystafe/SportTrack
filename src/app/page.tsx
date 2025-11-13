@@ -9,7 +9,7 @@ import { StatsHighlights } from '@/components/StatsHighlights';
 import { QuickAdd } from '@/components/QuickAdd';
 import { ActivityTemplates } from '@/components/ActivityTemplates';
 import { useActivitiesSummary, useActivities } from '@/lib/activityStore';
-import { getRandomQuote } from '@/lib/quotes';
+import { getRandomQuote, type Quote } from '@/lib/quotes';
 import { getMotivationalMessage } from '@/lib/motivationalMessages';
 import { startOfDay, isSameDay } from 'date-fns';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -26,10 +26,14 @@ export default function HomePage() {
     ? t('header.greeting', { name: settings!.name })
     : t('header.overviewTitle');
   
-  // Random quote on mount and rotate every 10 seconds
-  const [quote, setQuote] = useState(() => getRandomQuote());
+  // Random quote on mount and rotate every 10 seconds - client-side only to avoid hydration mismatch
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
+    setMounted(true);
+    setQuote(getRandomQuote());
+    
     const interval = setInterval(() => {
       setQuote(getRandomQuote());
     }, 10000); // Rotate quote every 10 seconds
@@ -70,8 +74,8 @@ export default function HomePage() {
     <div className="space-y-4 sm:space-y-6 page-transition">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className={isMobile ? 'title-entrance' : ''}>
-          <h1 className={`text-xl sm:text-2xl font-semibold ${isMobile ? 'gradient-text-animated' : ''}`}>{greeting}</h1>
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+          <h1 className={`text-xl sm:text-2xl font-bold text-gray-900 dark:text-white ${isMobile ? 'gradient-text-animated' : ''}`}>{greeting}</h1>
+          <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium">
             {t('header.overviewSubtitle')}
           </p>
         </div>
@@ -105,9 +109,15 @@ export default function HomePage() {
         
         {/* Quote text */}
         <div className="relative z-10">
-          <p className={`text-base sm:text-lg md:text-xl text-gray-800 dark:text-gray-100 italic text-center font-medium leading-relaxed text-reveal ${isMobile ? 'quote-rotate' : 'rotate-quote'}`}>
-            {lang === 'tr' ? quote.tr : quote.en}
-          </p>
+          {mounted && quote ? (
+            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-semibold leading-relaxed text-reveal ${isMobile ? 'quote-rotate' : 'rotate-quote'}`}>
+              {lang === 'tr' ? quote.tr : quote.en}
+            </p>
+          ) : (
+            <p className={`text-base sm:text-lg md:text-xl text-gray-900 dark:text-white italic text-center font-semibold leading-relaxed`}>
+              {lang === 'tr' ? 'Her gün biraz daha ileri git.' : 'Every day is an opportunity, make the most of it.'}
+            </p>
+          )}
         </div>
         
         {/* Decorative icon */}

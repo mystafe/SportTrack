@@ -83,7 +83,7 @@ export function ActivityTemplates() {
         <h3 className={`${isMobile ? 'text-sm' : 'text-base sm:text-lg'} font-semibold text-gray-900 dark:text-white`}>
           {t('templates.title')}
         </h3>
-        <span className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} text-gray-500 dark:text-gray-400`}>
+        <span className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} text-gray-700 dark:text-gray-200 font-medium`}>
           {t('templates.subtitle')}
         </span>
       </div>
@@ -116,8 +116,8 @@ export function ActivityTemplates() {
                     </div>
                   </div>
                 </div>
-                <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'} w-full ${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700/50`}>
-                  <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1.5'} ${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400`}>
+                  <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'} w-full ${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-300 dark:border-gray-600`}>
+                    <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1.5'} ${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-700 dark:text-gray-200 font-medium`}>
                     <span className="font-medium">{template.activities.length}</span>
                     <span>{t('templates.activities')}</span>
                   </div>

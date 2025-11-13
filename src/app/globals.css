@@ -1023,14 +1023,15 @@ html {
 .quote-card {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(2, 132, 199, 0.15) 50%, rgba(14, 165, 233, 0.1) 100%);
-  background-size: 200% 200%;
-  animation: gradientShift 8s ease infinite;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%);
+  border: 2px solid rgba(14, 165, 233, 0.5);
+  box-shadow: 0 8px 32px rgba(14, 165, 233, 0.2), 0 0 0 1px rgba(14, 165, 233, 0.2);
 }
 
 .dark .quote-card {
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(2, 132, 199, 0.25) 50%, rgba(14, 165, 233, 0.2) 100%);
-  background-size: 200% 200%;
+  background: linear-gradient(135deg, rgba(31, 41, 55, 1) 0%, rgba(17, 24, 39, 1) 100%);
+  border-color: rgba(14, 165, 233, 0.6);
+  box-shadow: 0 8px 32px rgba(14, 165, 233, 0.3), 0 0 0 1px rgba(14, 165, 233, 0.3);
 }
 
 /* Quote mark decorations */

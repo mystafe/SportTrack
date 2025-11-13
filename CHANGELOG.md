@@ -2,6 +2,47 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.11.2] - 2025-01
+
+### Fixed
+- **React Hydration Error**:
+  - Fixed quote hydration mismatch by making quotes client-side only
+  - Added `mounted` state to prevent server/client mismatch
+  - Quote now renders consistently on server and client
+
+- **Text Readability Improvements**:
+  - Quote text: `text-gray-800 dark:text-gray-100` → `text-gray-900 dark:text-white` with `font-semibold`
+  - Page title: Added `font-bold` and `text-gray-900 dark:text-white`
+  - Subtitle: `text-gray-600 dark:text-gray-400` → `text-gray-700 dark:text-gray-200` with `font-medium`
+  - Motivational message: `font-semibold` → `font-bold`, `text-gray-800` → `text-gray-900 dark:text-white`
+  - Highlights title: `text-gray-500 dark:text-gray-400` → `text-gray-800 dark:text-gray-200` with `font-bold`
+  - Stats link card: Improved text contrast and font weights
+  - Activity filters: Better text contrast throughout
+  - QuickAdd subtitle: Improved contrast
+  - ActivityTemplates: Better text visibility
+
+- **Quote Card Background**:
+  - Changed from animated gradient to solid background for better readability
+  - Light mode: Pure white background
+  - Dark mode: Solid gray-800/gray-900 background
+  - Enhanced border visibility
+
+- **Manifest Icon Error**:
+  - Added SVG icon as primary icon in manifest
+  - Updated metadata icons to include SVG fallback
+  - Fixed icon size validation issues
+
+### Changed
+- **Card Borders**:
+  - Activity filters container: `border` → `border-2`
+  - Activity list container: `border` → `border-2`
+  - Better border colors for visibility
+
+- **Text Contrast**:
+  - All `text-gray-500/400/600` → `text-gray-700/800/900 dark:text-gray-200/300`
+  - Added `font-medium` or `font-semibold` to improve readability
+  - Quote text now uses `font-semibold` instead of `font-medium`
+
 ## [0.11.1] - 2025-01
 
 ### Fixed

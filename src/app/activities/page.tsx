@@ -112,7 +112,7 @@ function ActivitiesClient() {
             <span className="font-medium text-gray-700 dark:text-gray-300">
               {t('filters.results')}
             </span>
-            <div className="text-gray-600 dark:text-gray-400">
+            <div className="text-gray-700 dark:text-gray-200 font-medium">
               {filteredStats.totalCount} {t('filters.activities')} · {numberFormatter.format(filteredStats.totalPoints)} {t('list.pointsUnit')}
             </div>
           </div>
@@ -123,19 +123,19 @@ function ActivitiesClient() {
         <div className="flex items-center justify-between text-xs sm:text-sm font-medium px-1">
           <span>{t('list.records')}</span>
           {filteredActivities.length !== activities.length && (
-            <span className="text-[10px] sm:text-xs text-gray-500">
+            <span className="text-[10px] sm:text-xs text-gray-700 dark:text-gray-300 font-medium">
               {filteredActivities.length} / {activities.length}
             </span>
           )}
         </div>
         <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900/80 backdrop-blur-sm shadow-sm overflow-hidden">
           {filteredActivities.length === 0 ? (
-            <div className="p-6 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-6 text-center text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium">
               {t('filters.noResults')}
             </div>
           ) : editing ? (
             <div className="border-b border-gray-200 dark:border-gray-800">
-              <div className="flex items-center justify-between px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400">
+              <div className="flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-gray-800 dark:text-gray-200">
                 <span>{t('list.editingTitle')}</span>
                 <button
                   className="text-xs underline-offset-2 hover:underline"
@@ -194,7 +194,7 @@ function ActivitiesClient() {
               <div className="h-10 rounded skeleton" />
             </div>
           ) : filteredActivities.length === 0 ? (
-            <div className="p-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">{t('filters.noResults')}</div>
+            <div className="p-4 text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium">{t('filters.noResults')}</div>
           ) : (
             <div className="divide-y divide-gray-200 dark:divide-gray-800">
               {groups.map(({ day, acts }, groupIndex) => (

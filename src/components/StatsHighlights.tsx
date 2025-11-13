@@ -96,7 +96,7 @@ export function StatsHighlights() {
 
   return (
     <section className="mt-8 space-y-4">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+      <h2 className="text-sm font-bold uppercase tracking-wide text-gray-800 dark:text-gray-200">
         {t('stats.highlightsTitle')}
       </h2>
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'gap-4'}`}>

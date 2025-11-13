@@ -90,7 +90,7 @@ export function QuickAdd() {
         <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-white`}>
           {t('quickAdd.title')}
         </h3>
-        <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`}>
+        <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-700 dark:text-gray-200 font-medium`}>
           {t('quickAdd.subtitle')}
         </span>
       </div>
