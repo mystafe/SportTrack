@@ -9,7 +9,7 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { format, startOfDay, endOfDay, subDays, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 
-type FilterState = {
+export type FilterState = {
   dateRange: 'all' | 'today' | 'week' | 'month' | 'custom';
   customStart?: string;
   customEnd?: string;

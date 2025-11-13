@@ -112,15 +112,15 @@ function ActivitiesClient() {
           </div>
         )}
         <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm font-medium">
+          <div className="flex items-center justify-between text-sm font-medium">
           <span>{t('list.records')}</span>
           {filteredActivities.length !== activities.length && (
             <span className="text-xs text-gray-500">
               {filteredActivities.length} / {activities.length}
             </span>
           )}
-        </div>
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card overflow-hidden">
+          </div>
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card overflow-hidden">
           {filteredActivities.length === 0 ? (
             <div className="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
               {t('filters.noResults')}
@@ -247,6 +247,7 @@ function ActivitiesClient() {
               ))}
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>
