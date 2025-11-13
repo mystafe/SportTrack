@@ -172,8 +172,8 @@ export function StatsCards() {
           <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold`}>{t('stats.perActivity') || 'Per Activity'}</div>
         </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="card-entrance slide-in-left rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
