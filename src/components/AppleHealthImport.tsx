@@ -9,12 +9,14 @@ import { parseAppleHealthFile, type AppleHealthStepData, type ParseProgress } fr
 import { BASE_ACTIVITY_MAP } from '@/lib/activityConfig';
 import { startOfDay } from 'date-fns';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 export function AppleHealthImport() {
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
   const { activities, addActivity, deleteActivity } = useActivities();
   const definitions = useActivityDefinitions();
+  const isMobile = useIsMobile();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [parseProgress, setParseProgress] = useState<ParseProgress | null>(null);
@@ -62,10 +64,12 @@ export function AppleHealthImport() {
       setParseProgress(null);
 
       if (!result.success || result.data.length === 0) {
+        const errorMessage = result.errors.length > 0 
+          ? result.errors.slice(0, 3).join(', ')
+          : 'No step data found in file';
+        
         showToast(
-          t('appleHealth.parseFailed', {
-            errors: result.errors.length > 0 ? result.errors.slice(0, 3).join(', ') : 'No step data found'
-          }),
+          t('appleHealth.parseFailed', { errors: errorMessage }) || `Failed to parse file: ${errorMessage}`,
           'error'
         );
         setIsImporting(false);
