@@ -2,6 +2,15 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.14.4] - 2025-01
+
+### Fixed
+- **iOS Dark Mode Safe Area**:
+  - Fixed white background appearing in safe area insets (notch and home indicator areas) on iOS devices in dark mode
+  - Added pseudo-elements (`::before` and `::after`) to cover safe area insets with proper background colors
+  - Safe area insets now correctly show black background in dark mode
+  - Improved visual consistency across iOS devices with notches and home indicators
+
 ## [0.14.3] - 2025-01
 
 ### Fixed

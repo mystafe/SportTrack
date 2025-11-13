@@ -27,6 +27,55 @@ body {
   @apply bg-white text-gray-900 dark:bg-black dark:text-gray-100;
   transition: background-color 0.3s ease, color 0.3s ease;
   min-height: 100%;
+  /* Ensure body background covers safe area insets */
+  background-color: inherit;
+}
+
+/* iOS safe area background fix - cover safe area insets with proper background */
+@supports (padding: max(0px)) {
+  html::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    background-color: #ffffff;
+    z-index: 999999;
+    pointer-events: none;
+  }
+
+  html.dark::before {
+    background-color: #000000;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not(.light)::before {
+      background-color: #000000;
+    }
+  }
+
+  html::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-bottom);
+    background-color: #ffffff;
+    z-index: 999999;
+    pointer-events: none;
+  }
+
+  html.dark::after {
+    background-color: #000000;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not(.light)::after {
+      background-color: #000000;
+    }
+  }
 }
 
 .container {
