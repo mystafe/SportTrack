@@ -2,6 +2,14 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.12.4] - 2025-01
+
+### Fixed
+- **Build Error Fix**: Corrected JSX closing tag order in StatsCards component
+  - Fixed incorrect closing tag sequence in Overview section
+  - Resolved "Unexpected token div" build error
+  - Build now completes successfully
+
 ## [0.12.3] - 2025-01
 
 ### Changed
