@@ -167,6 +167,182 @@ export const MOTIVATIONAL_QUOTES: Quote[] = [
   {
     tr: 'Hedeflerin için çalış, hayallerin için değil.',
     en: 'Work for your goals, not your dreams.'
+  },
+  {
+    tr: 'Vücudun bir tapınaktır, ona saygı göster.',
+    en: 'Your body is a temple, respect it.'
+  },
+  {
+    tr: 'Zorlu antrenmanlar, güçlü karakterler yaratır.',
+    en: 'Tough workouts build strong characters.'
+  },
+  {
+    tr: 'Bugün yapmadığın şey, yarın seni geride bırakır.',
+    en: 'What you don\'t do today will leave you behind tomorrow.'
+  },
+  {
+    tr: 'Spor yapmak, kendine yapabileceğin en iyi yatırımdır.',
+    en: 'Exercise is the best investment you can make in yourself.'
+  },
+  {
+    tr: 'Her ter damlası, başarıya giden yolda bir adımdır.',
+    en: 'Every drop of sweat is a step toward success.'
+  },
+  {
+    tr: 'Güçlü olmak bir seçimdir, zayıf olmak değil.',
+    en: 'Being strong is a choice, not being weak.'
+  },
+  {
+    tr: 'Hedeflerin için mücadele et, pes etme.',
+    en: 'Fight for your goals, never give up.'
+  },
+  {
+    tr: 'Spor yapmak, hayat kalitesini artırır.',
+    en: 'Exercise improves your quality of life.'
+  },
+  {
+    tr: 'Küçük başlangıçlar, büyük sonuçlar doğurur.',
+    en: 'Small beginnings lead to great results.'
+  },
+  {
+    tr: 'Her gün bir fırsattır, onu değerlendir.',
+    en: 'Every day is an opportunity, make the most of it.'
+  },
+  {
+    tr: 'Başarı, tutarlılığın çocuğudur.',
+    en: 'Success is the child of consistency.'
+  },
+  {
+    tr: 'Vücudunun sınırlarını keşfet, sonra onları aş.',
+    en: 'Discover your body\'s limits, then exceed them.'
+  },
+  {
+    tr: 'Spor yapmak, zihinsel gücü de geliştirir.',
+    en: 'Exercise also develops mental strength.'
+  },
+  {
+    tr: 'Her antrenman, seni daha iyi bir versiyona dönüştürür.',
+    en: 'Every workout transforms you into a better version.'
+  },
+  {
+    tr: 'Hedeflerin için çalışmak, hayallerin için değil.',
+    en: 'Work for your goals, not your dreams.'
+  },
+  {
+    tr: 'Güçlü olmak, zorlu günlerde ortaya çıkar.',
+    en: 'Strength shows itself in tough days.'
+  },
+  {
+    tr: 'Spor yapmak, kendine verdiğin bir sözdür.',
+    en: 'Exercise is a promise you make to yourself.'
+  },
+  {
+    tr: 'Her gün biraz daha güçlü ol.',
+    en: 'Get a little stronger every day.'
+  },
+  {
+    tr: 'Başarı, hazırlık ve fırsatın buluşmasıdır.',
+    en: 'Success is when preparation meets opportunity.'
+  },
+  {
+    tr: 'Vücudunun sınırlarını zorla, zihninin sınırlarını aş.',
+    en: 'Push your body\'s limits, exceed your mind\'s boundaries.'
+  },
+  {
+    tr: 'Her adım, hedefe giden yolda bir zaferdir.',
+    en: 'Every step is a victory on the path to your goal.'
+  },
+  {
+    tr: 'Spor yapmak, kendine yapabileceğin en iyi yatırımdır.',
+    en: 'Exercise is the best investment you can make in yourself.'
+  },
+  {
+    tr: 'Disiplin, motivasyon bittiğinde devreye girer.',
+    en: 'Discipline kicks in when motivation runs out.'
+  },
+  {
+    tr: 'Her gün yeni bir başlangıç, yeni bir fırsat.',
+    en: 'Every day is a new beginning, a new opportunity.'
+  },
+  {
+    tr: 'Başarı, küçük çabaların tekrarıdır.',
+    en: 'Success is the repetition of small efforts.'
+  },
+  {
+    tr: 'Kendini zorla, çünkü kimse senin için yapmayacak.',
+    en: 'Push yourself, because no one else will do it for you.'
+  },
+  {
+    tr: 'Her şey imkansız görünür, ta ki yapılana kadar.',
+    en: 'Everything seems impossible until it\'s done.'
+  },
+  {
+    tr: 'Spor yapmak, hayat kalitesini artırır.',
+    en: 'Exercise improves your quality of life.'
+  },
+  {
+    tr: 'Güçlü olmak bir seçimdir, zayıf olmak değil.',
+    en: 'Being strong is a choice, not being weak.'
+  },
+  {
+    tr: 'Her ter damlası, başarıya giden yolda bir adımdır.',
+    en: 'Every drop of sweat is a step toward success.'
+  },
+  {
+    tr: 'Küçük başlangıçlar, büyük sonuçlar doğurur.',
+    en: 'Small beginnings lead to great results.'
+  },
+  {
+    tr: 'Başarı, tutarlılığın çocuğudur.',
+    en: 'Success is the child of consistency.'
+  },
+  {
+    tr: 'Her antrenman, seni daha iyi bir versiyona dönüştürür.',
+    en: 'Every workout transforms you into a better version.'
+  },
+  {
+    tr: 'Spor yapmak, kendine verdiğin bir sözdür.',
+    en: 'Exercise is a promise you make to yourself.'
+  },
+  {
+    tr: 'Her gün biraz daha güçlü ol.',
+    en: 'Get a little stronger every day.'
+  },
+  {
+    tr: 'Vücudunun sınırlarını keşfet, sonra onları aş.',
+    en: 'Discover your body\'s limits, then exceed them.'
+  },
+  {
+    tr: 'Spor yapmak, zihinsel gücü de geliştirir.',
+    en: 'Exercise also develops mental strength.'
+  },
+  {
+    tr: 'Güçlü olmak, zorlu günlerde ortaya çıkar.',
+    en: 'Strength shows itself in tough days.'
+  },
+  {
+    tr: 'Her gün yeni bir başlangıç, yeni bir fırsat.',
+    en: 'Every day is a new beginning, a new opportunity.'
+  },
+  {
+    tr: 'Zorlu antrenmanlar, güçlü karakterler yaratır.',
+    en: 'Tough workouts build strong characters.'
+  },
+  {
+    tr: 'Bugün yapmadığın şey, yarın seni geride bırakır.',
+    en: 'What you don\'t do today will leave you behind tomorrow.'
+  },
+  {
+    tr: 'Vücudun bir tapınaktır, ona saygı göster.',
+    en: 'Your body is a temple, respect it.'
+  },
+  {
+    tr: 'Hedeflerin için mücadele et, pes etme.',
+    en: 'Fight for your goals, never give up.'
+  },
+  {
+    tr: 'Her gün bir fırsattır, onu değerlendir.',
+    en: 'Every day is an opportunity, make the most of it.'
   }
 ];
 

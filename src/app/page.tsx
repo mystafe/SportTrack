@@ -24,8 +24,16 @@ export default function HomePage() {
     ? t('header.greeting', { name: settings!.name })
     : t('header.overviewTitle');
   
-  // Random quote on mount
-  const [quote] = useState(() => getRandomQuote());
+  // Random quote on mount and rotate every 10 seconds
+  const [quote, setQuote] = useState(() => getRandomQuote());
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setQuote(getRandomQuote());
+    }, 10000); // Rotate quote every 10 seconds
+    
+    return () => clearInterval(interval);
+  }, []);
   
   // Motivational message based on progress
   const todayActivities = useMemo(() => {
@@ -74,22 +82,54 @@ export default function HomePage() {
         </Link>
       </div>
       
-      {/* Motivational Quote */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700/50 bg-gradient-to-r from-brand/10 via-brand/8 to-brand/5 dark:from-brand/20 dark:via-brand/15 dark:to-brand/10 p-4 shadow-card card-entrance backdrop-blur-sm float-animation">
-        <p className="text-sm sm:text-base text-gray-700 dark:text-gray-200 italic text-center">
-          "{lang === 'tr' ? quote.tr : quote.en}"
-        </p>
+      {/* Motivational Quote - Extraordinary Design */}
+      <div className="quote-card glow-border relative rounded-xl border-2 border-brand/30 dark:border-brand/40 p-6 sm:p-8 shadow-2xl card-entrance backdrop-blur-sm overflow-hidden">
+        {/* Decorative elements */}
+        <div className="quote-dots"></div>
+        <div className="pattern-overlay"></div>
+        <div className="quote-shimmer"></div>
+        
+        {/* Sparkle particles */}
+        <div className="sparkle"></div>
+        <div className="sparkle"></div>
+        <div className="sparkle"></div>
+        <div className="sparkle"></div>
+        <div className="sparkle"></div>
+        
+        {/* Quote marks */}
+        <span className="quote-mark quote-mark-left">"</span>
+        <span className="quote-mark quote-mark-right">"</span>
+        
+        {/* Quote text */}
+        <div className="relative z-10">
+          <p className="text-base sm:text-lg md:text-xl text-gray-800 dark:text-gray-100 italic text-center font-medium leading-relaxed text-reveal rotate-quote">
+            {lang === 'tr' ? quote.tr : quote.en}
+          </p>
+        </div>
+        
+        {/* Decorative icon */}
+        <div className="absolute top-4 right-4 text-2xl opacity-20 icon-rotate">
+          ✨
+        </div>
       </div>
       
-      {/* Motivational Message */}
+      {/* Motivational Message - Enhanced Design */}
       {motivationalMessage && showMessage && (
-        <div className={`rounded-xl border-2 border-brand/30 dark:border-brand/40 bg-gradient-to-r from-brand/5 to-brand/10 dark:from-brand/10 dark:to-brand/15 p-4 shadow-lg animate-slide-in-right transition-all duration-500 backdrop-blur-sm ${showMessage ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{motivationalMessage.emoji}</span>
-            <p className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-100 flex-1">
+        <div className={`motivational-card glow-border rounded-xl border-2 border-brand/40 dark:border-brand/50 p-5 sm:p-6 shadow-2xl animate-slide-in-right transition-all duration-500 backdrop-blur-sm overflow-hidden relative ${showMessage ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
+          {/* Decorative elements */}
+          <div className="pattern-overlay"></div>
+          <div className="quote-shimmer"></div>
+          
+          <div className="flex items-center gap-4 relative z-10">
+            <span className="text-3xl sm:text-4xl emoji-bounce flex-shrink-0">{motivationalMessage.emoji}</span>
+            <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 dark:text-gray-100 flex-1 leading-relaxed">
               {lang === 'tr' ? motivationalMessage.tr : motivationalMessage.en}
             </p>
           </div>
+          
+          {/* Decorative sparkles */}
+          <div className="sparkle"></div>
+          <div className="sparkle"></div>
         </div>
       )}
       

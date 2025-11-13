@@ -680,3 +680,304 @@ html {
   perspective: 1000px;
 }
 
+/* ============================================
+   EXTRAORDINARY QUOTE ANIMATIONS & EFFECTS
+   ============================================ */
+
+/* Quote card with animated gradient */
+.quote-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(2, 132, 199, 0.15) 50%, rgba(14, 165, 233, 0.1) 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+.dark .quote-card {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(2, 132, 199, 0.25) 50%, rgba(14, 165, 233, 0.2) 100%);
+  background-size: 200% 200%;
+}
+
+/* Quote mark decorations */
+.quote-mark {
+  position: absolute;
+  font-size: 4rem;
+  line-height: 1;
+  opacity: 0.15;
+  font-family: Georgia, serif;
+  color: currentColor;
+  pointer-events: none;
+}
+
+.quote-mark-left {
+  top: -0.5rem;
+  left: 0.5rem;
+  transform: rotate(-15deg);
+  animation: quoteMarkFloat 4s ease-in-out infinite;
+}
+
+.quote-mark-right {
+  bottom: -1rem;
+  right: 0.5rem;
+  transform: rotate(15deg);
+  animation: quoteMarkFloat 4s ease-in-out infinite 2s;
+}
+
+@keyframes quoteMarkFloat {
+  0%, 100% {
+    transform: rotate(-15deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-15deg) translateY(-5px);
+  }
+}
+
+.quote-mark-right {
+  animation-name: quoteMarkFloatRight;
+}
+
+@keyframes quoteMarkFloatRight {
+  0%, 100% {
+    transform: rotate(15deg) translateY(0);
+  }
+  50% {
+    transform: rotate(15deg) translateY(-5px);
+  }
+}
+
+/* Text reveal animation */
+@keyframes textReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.text-reveal {
+  animation: textReveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Glowing border effect */
+@keyframes glowBorder {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(14, 165, 233, 0.3), inset 0 0 5px rgba(14, 165, 233, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.6), inset 0 0 10px rgba(14, 165, 233, 0.2);
+  }
+}
+
+.glow-border {
+  animation: glowBorder 3s ease-in-out infinite;
+}
+
+.dark .glow-border {
+  animation: glowBorderDark 3s ease-in-out infinite;
+}
+
+@keyframes glowBorderDark {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(96, 165, 250, 0.4), inset 0 0 10px rgba(96, 165, 250, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(96, 165, 250, 0.7), inset 0 0 15px rgba(96, 165, 250, 0.25);
+  }
+}
+
+/* Sparkle particles */
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+.sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.sparkle:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+.sparkle:nth-child(2) { top: 20%; right: 15%; animation-delay: 0.3s; }
+.sparkle:nth-child(3) { bottom: 15%; left: 20%; animation-delay: 0.6s; }
+.sparkle:nth-child(4) { bottom: 25%; right: 10%; animation-delay: 0.9s; }
+.sparkle:nth-child(5) { top: 50%; left: 50%; animation-delay: 1.2s; }
+
+/* Typography animation */
+@keyframes letterReveal {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.letter-reveal {
+  display: inline-block;
+  animation: letterReveal 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+/* Rotating quote animation */
+@keyframes rotateQuote {
+  from {
+    opacity: 0;
+    transform: rotateY(90deg) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(0deg) scale(1);
+  }
+}
+
+.rotate-quote {
+  animation: rotateQuote 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Shimmer overlay */
+.quote-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmerOverlay 3s ease-in-out infinite;
+}
+
+@keyframes shimmerOverlay {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.dark .quote-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+}
+
+/* Pulse glow effect */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Decorative dots pattern */
+.quote-dots {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle, rgba(14, 165, 233, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.dark .quote-dots {
+  background-image: radial-gradient(circle, rgba(96, 165, 250, 0.15) 1px, transparent 1px);
+}
+
+/* Icon rotation */
+@keyframes iconRotate {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.icon-rotate {
+  animation: iconRotate 20s linear infinite;
+}
+
+.icon-rotate:hover {
+  animation-duration: 2s;
+}
+
+/* Enhanced motivational message card */
+.motivational-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(2, 132, 199, 0.2) 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+}
+
+.dark .motivational-card {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.25) 0%, rgba(2, 132, 199, 0.3) 100%);
+  background-size: 200% 200%;
+}
+
+/* Emoji bounce */
+@keyframes emojiBounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(5deg);
+  }
+}
+
+.emoji-bounce {
+  animation: emojiBounce 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* Background pattern overlay */
+.pattern-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: 
+    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(14, 165, 233, 0.1) 10px, rgba(14, 165, 233, 0.1) 20px);
+  pointer-events: none;
+}
+
+.dark .pattern-overlay {
+  opacity: 0.1;
+  background-image: 
+    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(96, 165, 250, 0.15) 10px, rgba(96, 165, 250, 0.15) 20px);
+}
+
