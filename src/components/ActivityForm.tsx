@@ -259,10 +259,10 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     return String(def.defaultAmount);
                   });
                 }}
-                className={`text-left rounded-xl border px-3 py-2 shadow-card transition-all duration-200 backdrop-blur-sm ${
+                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left rounded-xl border px-3 py-2 shadow-card backdrop-blur-sm ${
                   active
-                    ? 'border-brand dark:border-brand/60 ring-2 ring-brand/30 dark:ring-brand/20 bg-brand/5 dark:bg-brand/10 scale-105'
-                    : 'border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:scale-102 hover:shadow-md'
+                    ? 'active border-brand dark:border-brand/60 ring-2 ring-brand/30 dark:ring-brand/20 scale-105'
+                    : 'border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 scale-on-interact'
                 }`}
                 aria-pressed={active}
                 aria-label={t('form.selectActivityLabel', { activity: getActivityLabel(def, lang) })}
@@ -275,13 +275,13 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <div className="text-xl">{def.icon}</div>
-                  <div className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800">
+                  <div className={`text-xl transition-transform duration-300 ${active ? 'activity-icon-pulse' : ''}`}>{def.icon}</div>
+                  <div className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 font-semibold">
                     {def.multiplier}x
                   </div>
                 </div>
-                <div className="mt-2 text-sm font-medium">{getActivityLabel(def, lang)}</div>
-                <div className="text-xs text-gray-500">
+                <div className="mt-2 text-sm font-medium transition-colors">{getActivityLabel(def, lang)}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
                   {def.defaultAmount} {getActivityUnit(def, lang)}
                 </div>
               </button>
@@ -291,12 +291,12 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="space-y-1 min-w-0 max-w-full">
-          <div className="text-sm text-gray-700">{t('form.datetime')}</div>
+          <div className="text-sm text-gray-700 dark:text-gray-300">{t('form.datetime')}</div>
           <input
             type="datetime-local"
             value={performedAt}
             onChange={(e) => setPerformedAt(e.target.value)}
-            className="w-full border rounded-lg px-3 py-3 min-h-[44px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0 max-w-full text-sm"
+            className="input-enhanced w-full border rounded-lg px-3 py-3 min-h-[44px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0 max-w-full text-sm transition-all duration-200"
             required
           />
         </label>
@@ -312,7 +312,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             step={1}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full border rounded-lg px-3 py-3 min-h-[44px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-sm"
+            className="input-enhanced w-full border rounded-lg px-3 py-3 min-h-[44px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-sm transition-all duration-200"
             required
             aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
             aria-describedby={getActivityDescription(definition, lang) ? 'amount-description' : undefined}
@@ -355,7 +355,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="w-full border rounded-lg px-3 py-3 min-h-[88px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-sm"
+          className="input-enhanced w-full border rounded-lg px-3 py-3 min-h-[88px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-sm transition-all duration-200"
           rows={3}
           placeholder={t('form.notePlaceholder')}
           aria-label={t('form.noteOptional')}
@@ -365,7 +365,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         <button
           type="submit"
           disabled={loading}
-          className={`${isMobile && !isEditing ? 'w-full' : ''} px-4 py-3 min-h-[44px] rounded-lg bg-brand text-white hover:bg-brand-dark text-sm font-medium disabled:opacity-50 shadow transition-all duration-200 active:scale-95 disabled:hover:scale-100`}
+          className={`btn-enhanced ripple-effect button-glow ${isMobile && !isEditing ? 'w-full' : ''} px-4 py-3 min-h-[44px] rounded-lg bg-brand text-white hover:bg-brand-dark text-sm font-medium disabled:opacity-50 shadow transition-all duration-200 scale-on-interact disabled:hover:scale-100`}
           aria-label={loading ? t('form.loading') : isEditing ? t('form.save') : t('form.add')}
           aria-busy={loading}
         >

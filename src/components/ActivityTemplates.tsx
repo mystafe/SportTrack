@@ -101,7 +101,7 @@ export function ActivityTemplates() {
                 type="button"
                 onClick={() => handleTemplateClick(template)}
                 disabled={isAdding}
-                className="relative flex flex-col items-start gap-3 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700/50 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900/80 dark:to-gray-800/80 backdrop-blur-sm hover:border-brand dark:hover:border-brand/60 hover:shadow-lg hover:shadow-brand/20 dark:hover:shadow-brand/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
+                className="stagger-item template-card-enhanced ripple-effect magnetic-hover tilt-3d relative flex flex-col items-start gap-3 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700/50 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900/80 dark:to-gray-800/80 backdrop-blur-sm hover:border-brand dark:hover:border-brand/60 hover:shadow-lg hover:shadow-brand/20 dark:hover:shadow-brand/30 transition-all duration-300 scale-on-interact disabled:opacity-50 disabled:cursor-not-allowed group gpu-accelerated"
               >
                 <div className="flex items-start gap-3 w-full">
                   <div className="text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300">

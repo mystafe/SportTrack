@@ -151,41 +151,41 @@ export default function StatsPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <h1 className="text-2xl font-semibold flex items-center gap-2">
-        <span>📊</span>
-        <span>{t('nav.stats')}</span>
+    <div className="space-y-4 sm:space-y-6 page-transition">
+      <h1 className="stats-title text-2xl font-semibold flex items-center gap-2">
+        <span className="icon-rotate">📊</span>
+        <span className="text-gradient-animated">{t('nav.stats')}</span>
       </h1>
 
       {/* Summary Cards */}
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${isMobile ? 'gap-2' : 'gap-4'}`}>
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card hover-lift transition-smooth`}>
+        <div className={`stagger-item card-entrance stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
           <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.totalActivities')}</div>
-          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>{numberFormatter.format(activities.length)}</div>
+          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold number-transition`}>{numberFormatter.format(activities.length)}</div>
         </div>
         
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card hover-lift transition-smooth`}>
+        <div className={`stagger-item card-entrance stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
           <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.totalSessions')}</div>
-          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>{numberFormatter.format(allDays.length)}</div>
+          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold number-transition`}>{numberFormatter.format(allDays.length)}</div>
         </div>
         
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card hover-lift transition-smooth`}>
+        <div className={`stagger-item card-entrance stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
           <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.averagePerDay')}</div>
-          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>
+          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold number-transition`}>
             {allDays.length > 0
               ? numberFormatter.format(Math.round(allDays.reduce((sum, day) => sum + day.points, 0) / allDays.length))
               : '0'} {t('list.pointsUnit')}
           </div>
         </div>
         
-        <div className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card hover-lift transition-smooth`}>
+        <div className={`stagger-item card-entrance stats-highlight-card rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 ${isMobile ? 'p-2.5' : 'p-4'} shadow-card gpu-accelerated`}>
           <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 mb-1`}>{t('stats.detailed.bestStreak')}</div>
-          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>{bestStreak} {bestStreak === 1 ? t('stats.highlight.sessions') : t('stats.highlight.sessions')}</div>
+          <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold number-transition`}>{bestStreak} {bestStreak === 1 ? t('stats.highlight.sessions') : t('stats.highlight.sessions')}</div>
         </div>
       </div>
 
       {/* Activity Breakdown */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
+      <div className="chart-container card-entrance slide-in-left rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card magnetic-hover gpu-accelerated">
         <h2 className="text-lg font-semibold mb-4">{t('stats.detailed.activityBreakdown')}</h2>
         {activityBreakdown.length === 0 ? (
           <p className="text-sm text-gray-600 dark:text-gray-400">{t('stats.detailed.noActivities')}</p>
@@ -243,13 +243,13 @@ export default function StatsPage() {
       {/* Charts Row */}
       <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-4 sm:gap-6`}>
         {/* Bar Chart */}
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
+        <div className="chart-container card-entrance slide-in-left rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card magnetic-hover gpu-accelerated">
           <h2 className="text-lg font-semibold mb-4">{t('stats.detailed.activityComparison')}</h2>
           <ActivityBarChart activities={activities} />
         </div>
 
         {/* Pie Chart */}
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card">
+        <div className="chart-container card-entrance slide-in-right rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-6 shadow-card magnetic-hover gpu-accelerated">
           <h2 className="text-lg font-semibold mb-4">{t('stats.detailed.activityDistribution')}</h2>
           <ActivityPieChart activities={activities} />
         </div>

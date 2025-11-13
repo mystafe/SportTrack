@@ -2,6 +2,48 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.10.3] - 2025-01
+
+### Added
+- **Enhanced Activity Form Animations**:
+  - Activity selection buttons with gradient backgrounds
+  - Icon pulse animation on selection
+  - Enhanced input focus states with glow effects
+  - Ripple and magnetic hover effects
+  - Stagger animations for activity buttons
+  - Enhanced submit button with glow animation
+
+- **Stats Page Visual Enhancements**:
+  - Animated page title with gradient text
+  - Rotating stats icon
+  - Chart containers with hover effects
+  - Summary cards with enhanced hover animations
+  - Activity breakdown items with stagger animations
+  - Number transition animations
+  - Slide-in animations for charts
+
+- **Stats Highlights Cards Enhanced**:
+  - Shimmer sweep effect on hover
+  - Enhanced hover scale and glow
+  - Number transition animations
+  - Bouncing emoji animations
+  - Card entrance animations
+
+- **Activity Templates Enhanced**:
+  - Gradient border animations on hover
+  - Enhanced template card effects
+  - Ripple and magnetic hover
+  - 3D tilt effects
+
+### Changed
+- **Visual Improvements**:
+  - All input fields now have enhanced focus states
+  - All buttons have glow effects
+  - All cards have magnetic hover effects
+  - Improved number display animations
+  - Better contrast and readability
+  - Enhanced dark mode effects
+
 ## [0.10.2] - 2025-01
 
 ### Added

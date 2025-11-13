@@ -981,3 +981,357 @@ html {
     repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(96, 165, 250, 0.15) 10px, rgba(96, 165, 250, 0.15) 20px);
 }
 
+/* ============================================
+   ENHANCED ACTIVITY FORM & STATS ANIMATIONS
+   ============================================ */
+
+/* Activity selection button enhanced */
+.activity-select-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.activity-select-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(2, 132, 199, 0.15));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.activity-select-btn:hover::before {
+  opacity: 1;
+}
+
+.activity-select-btn.active {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(2, 132, 199, 0.2));
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3), inset 0 0 0 1px rgba(14, 165, 233, 0.2);
+}
+
+.dark .activity-select-btn.active {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(2, 132, 199, 0.3));
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.4), inset 0 0 0 1px rgba(96, 165, 250, 0.3);
+}
+
+/* Icon pulse on activity selection */
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.activity-icon-pulse {
+  animation: iconPulse 0.5s ease-out;
+}
+
+/* Stats page title animation */
+@keyframes titleSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.stats-title {
+  animation: titleSlide 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Chart container animations */
+.chart-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.05), rgba(2, 132, 199, 0.08));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.chart-container:hover::before {
+  opacity: 1;
+}
+
+/* Enhanced input focus */
+.input-enhanced:focus {
+  outline: none;
+  border-color: rgba(14, 165, 233, 0.5);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+.dark .input-enhanced:focus {
+  border-color: rgba(96, 165, 250, 0.6);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+}
+
+/* Button glow effect */
+@keyframes buttonGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(14, 165, 233, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.6), 0 0 30px rgba(14, 165, 233, 0.3);
+  }
+}
+
+.button-glow {
+  animation: buttonGlow 2s ease-in-out infinite;
+}
+
+.dark .button-glow {
+  animation: buttonGlowDark 2s ease-in-out infinite;
+}
+
+@keyframes buttonGlowDark {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(96, 165, 250, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(96, 165, 250, 0.7), 0 0 40px rgba(96, 165, 250, 0.4);
+  }
+}
+
+/* Stats highlight card enhanced */
+.stats-highlight-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stats-highlight-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.stats-highlight-card:hover::after {
+  left: 100%;
+}
+
+.stats-highlight-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(14, 165, 233, 0.1);
+}
+
+.dark .stats-highlight-card:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(96, 165, 250, 0.2);
+}
+
+/* Number counter animation */
+@keyframes numberCount {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.number-count {
+  animation: numberCount 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Progress bar enhanced */
+.progress-bar-enhanced {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar-enhanced::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: progressShine 2s ease-in-out infinite;
+}
+
+@keyframes progressShine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Badge unlock animation */
+@keyframes badgeUnlock {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(0deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.badge-unlock {
+  animation: badgeUnlock 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Template card enhanced */
+.template-card-enhanced {
+  position: relative;
+  overflow: hidden;
+}
+
+.template-card-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(45deg, rgba(14, 165, 233, 0.3), rgba(2, 132, 199, 0.3), rgba(14, 165, 233, 0.3));
+  background-size: 200% 200%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  animation: gradientShift 3s ease infinite;
+}
+
+.template-card-enhanced:hover::before {
+  opacity: 1;
+}
+
+/* Loading spinner enhanced */
+@keyframes spinEnhanced {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  to {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.spinner-enhanced {
+  animation: spinEnhanced 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Section divider animation */
+@keyframes dividerExpand {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+.divider-animated {
+  animation: dividerExpand 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card stack effect */
+.card-stack {
+  position: relative;
+}
+
+.card-stack::before,
+.card-stack::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  opacity: 0.3;
+  z-index: -1;
+  transform: translateY(4px) scale(0.95);
+}
+
+.card-stack::after {
+  transform: translateY(8px) scale(0.9);
+  opacity: 0.2;
+}
+
+/* Hover scale with glow */
+.hover-scale-glow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale-glow:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+}
+
+.dark .hover-scale-glow:hover {
+  box-shadow: 0 10px 40px rgba(96, 165, 250, 0.4);
+}
+
+/* Text gradient animation */
+@keyframes textGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.text-gradient-animated {
+  background: linear-gradient(90deg, #0ea5e9, #0284c7, #0ea5e9);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textGradient 3s linear infinite;
+}
+
+/* Background blur effect */
+.backdrop-blur-enhanced {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Smooth number transition */
+.number-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.number-transition:hover {
+  transform: scale(1.1);
+  color: #0ea5e9;
+}
+
+.dark .number-transition:hover {
+  color: #60a5fa;
+}
+
