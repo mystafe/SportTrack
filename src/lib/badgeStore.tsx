@@ -57,15 +57,20 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Check for new badges
+  // Check for new badges (only returns badges that are actually new)
   const checkNewBadges = useCallback((): Badge[] => {
     if (!hydrated || activities.length === 0) return [];
 
+    const existingBadgeIds = new Set(badges.map((b) => b.id));
     const newBadges = checkBadges(activities, settings, target, badges);
-    if (newBadges.length > 0) {
-      const updatedBadges = [...badges, ...newBadges];
+
+    // Filter out badges that already exist
+    const trulyNewBadges = newBadges.filter((badge) => !existingBadgeIds.has(badge.id));
+
+    if (trulyNewBadges.length > 0) {
+      const updatedBadges = [...badges, ...trulyNewBadges];
       saveBadges(updatedBadges);
-      return newBadges;
+      return trulyNewBadges;
     }
     return [];
   }, [activities, settings, target, badges, hydrated, saveBadges]);

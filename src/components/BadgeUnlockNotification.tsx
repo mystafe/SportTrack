@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBadges } from '@/lib/badgeStore';
 import { useI18n } from '@/lib/i18n';
@@ -16,16 +16,26 @@ export function BadgeUnlockNotification() {
   const [currentBadge, setCurrentBadge] = useState<Badge | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const [shownBadgeIds, setShownBadgeIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const newBadges = checkNewBadges();
     if (newBadges.length > 0) {
-      setUnlockedBadges((prev) => [...prev, ...newBadges]);
+      // Only add badges that haven't been shown yet
+      const unseenBadges = newBadges.filter((badge) => !shownBadgeIds.has(badge.id));
+      if (unseenBadges.length > 0) {
+        setUnlockedBadges((prev) => [...prev, ...unseenBadges]);
+        setShownBadgeIds((prev) => {
+          const newSet = new Set(prev);
+          unseenBadges.forEach((badge) => newSet.add(badge.id));
+          return newSet;
+        });
+      }
     }
-  }, [badges, checkNewBadges]);
+  }, [badges, checkNewBadges, shownBadgeIds]);
 
   useEffect(() => {
-    if (unlockedBadges.length > 0 && !currentBadge) {
+    if (unlockedBadges.length > 0 && !currentBadge && !isVisible) {
       const nextBadge = unlockedBadges[0];
       setCurrentBadge(nextBadge);
       setIsVisible(true);
@@ -38,9 +48,9 @@ export function BadgeUnlockNotification() {
 
       return () => clearTimeout(autoHideTimer);
     }
-  }, [unlockedBadges, currentBadge]);
+  }, [unlockedBadges, currentBadge, isVisible, handleDismiss]);
 
-  const handleDismiss = () => {
+  const handleDismiss = useCallback(() => {
     setIsExiting(true);
     setTimeout(() => {
       setIsVisible(false);
@@ -48,7 +58,7 @@ export function BadgeUnlockNotification() {
       setUnlockedBadges((prev) => prev.slice(1));
       setIsExiting(false);
     }, 300);
-  };
+  }, []);
 
   const handleClick = () => {
     handleDismiss();
