@@ -6,6 +6,7 @@ import { LanguageToggle } from '@/components/LanguageToggle';
 import { SettingsDialog } from '@/components/SettingsDialog';
 import { DataExportImport } from '@/components/DataExportImport';
 import { Logo } from '@/components/Logo';
+import { CloudSyncIndicator } from '@/components/CloudSyncIndicator';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
