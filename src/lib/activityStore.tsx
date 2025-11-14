@@ -17,6 +17,7 @@ import {
 import { startOfDay, subDays } from 'date-fns';
 import { STORAGE_KEYS, TIMEOUTS } from '@/lib/constants';
 import { useDebounce } from '@/lib/hooks/useDebounce';
+import { isQuotaError } from '@/lib/errorHandler';
 
 const STORAGE_KEY = STORAGE_KEYS.ACTIVITIES;
 
