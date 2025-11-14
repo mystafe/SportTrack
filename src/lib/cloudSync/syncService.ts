@@ -16,7 +16,7 @@ export class CloudSyncService {
   private userId: string | null = null;
   private syncListeners: Map<string, () => void> = new Map();
 
-  setUserId(userId: string) {
+  setUserId(userId: string | null) {
     this.userId = userId;
   }
 
