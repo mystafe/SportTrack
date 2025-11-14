@@ -21,18 +21,33 @@ let auth: Auth | null = null;
 let db: Firestore | null = null;
 
 // Initialize Firebase only once
-if (typeof window !== 'undefined' && getApps().length === 0) {
-  try {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-  } catch (error) {
-    console.error('Firebase initialization error:', error);
+if (typeof window !== 'undefined') {
+  // Only initialize if config is valid
+  const hasValidConfig =
+    firebaseConfig.apiKey &&
+    firebaseConfig.projectId &&
+    firebaseConfig.apiKey !== '' &&
+    firebaseConfig.projectId !== '';
+
+  if (hasValidConfig) {
+    if (getApps().length === 0) {
+      try {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+      } catch (error) {
+        console.error('Firebase initialization error:', error);
+        // Set to null if initialization fails
+        app = null;
+        auth = null;
+        db = null;
+      }
+    } else {
+      app = getApps()[0];
+      auth = getAuth(app);
+      db = getFirestore(app);
+    }
   }
-} else if (getApps().length > 0) {
-  app = getApps()[0];
-  auth = getAuth(app);
-  db = getFirestore(app);
 }
 
 export { app, auth, db };

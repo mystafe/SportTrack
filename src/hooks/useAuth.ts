@@ -31,21 +31,28 @@ export function useAuth() {
       return;
     }
 
-    // Get initial user
-    const currentUser = getCurrentUser();
-    if (currentUser) {
-      setUser(convertUser(currentUser));
-    }
-    setLoading(false);
-
-    // Subscribe to auth state changes
-    const unsubscribe = onAuthStateChange((authUser) => {
-      setUser(authUser);
+    // Small delay to ensure Firebase is initialized
+    const timer = setTimeout(() => {
+      // Get initial user
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        setUser(convertUser(currentUser));
+      }
       setLoading(false);
-    });
+
+      // Subscribe to auth state changes
+      const unsubscribe = onAuthStateChange((authUser) => {
+        setUser(authUser);
+        setLoading(false);
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }, 100);
 
     return () => {
-      unsubscribe();
+      clearTimeout(timer);
     };
   }, [isConfigured]);
 

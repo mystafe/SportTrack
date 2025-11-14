@@ -11,6 +11,9 @@ import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
 import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
+import { resolveConflicts, saveLocalLastModified } from '@/lib/cloudSync/conflictResolver';
+import { ConflictResolutionDialog } from './ConflictResolutionDialog';
+import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
 
 export function CloudSyncSettings() {
   const { user, isAuthenticated, logout, isConfigured } = useAuth();
@@ -24,6 +27,21 @@ export function CloudSyncSettings() {
   const { showToast } = useToaster();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [showConflictDialog, setShowConflictDialog] = useState(false);
+  const [conflictData, setConflictData] = useState<{
+    local: {
+      activities: unknown[];
+      settings: unknown | null;
+      badges: unknown[];
+      challenges: unknown[];
+    };
+    cloud: {
+      activities: unknown[];
+      settings: unknown | null;
+      badges: unknown[];
+      challenges: unknown[];
+    };
+  } | null>(null);
 
   if (!isConfigured) {
     return (
