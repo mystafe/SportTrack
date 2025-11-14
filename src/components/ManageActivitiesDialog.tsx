@@ -198,9 +198,11 @@ export function ManageActivitiesDialog() {
       <button
         type="button"
         onClick={openDialog}
-        className="px-2 py-1 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold"
+        className={`px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 via-purple-600 to-indigo-600 dark:from-purple-600 dark:via-purple-700 dark:to-indigo-700 text-white hover:from-purple-600 hover:via-indigo-600 hover:to-purple-600 dark:hover:from-purple-700 dark:hover:via-indigo-700 dark:hover:to-purple-700 text-xs sm:text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'} active:scale-95 flex items-center gap-1.5`}
+        aria-label={t('activities.custom.manageButton')}
       >
-        {t('activities.custom.manageButton')}
+        <span className="text-sm">⚙️</span>
+        <span>{t('activities.custom.manageButton')}</span>
       </button>
       {open ? (
         <div 

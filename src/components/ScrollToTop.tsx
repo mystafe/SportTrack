@@ -17,28 +17,45 @@ export function ScrollToTop() {
   useEffect(() => {
     if (!mounted || typeof window === 'undefined') return;
 
-    const handleScroll = () => {
+    const checkVisibility = () => {
       const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
-      // Lower threshold for better visibility - show after scrolling just 100px
-      setIsVisible(scrollY > 100);
+      const documentHeight = document.documentElement.scrollHeight;
+      const viewportHeight = window.innerHeight;
+      
+      // More aggressive: Show if page is scrollable and user has scrolled at least 30px
+      // OR if content is significantly taller than viewport (more than 150px difference)
+      const canScroll = documentHeight > viewportHeight + 50;
+      const hasScrolled = scrollY > 30;
+      const isLongPage = documentHeight > viewportHeight + 150;
+      
+      // Show button if page is scrollable and (user scrolled OR it's a long page)
+      const shouldShow = canScroll && (hasScrolled || isLongPage);
+      setIsVisible(shouldShow);
     };
 
     // Initial check immediately
-    handleScroll();
+    checkVisibility();
 
-    // Listen to scroll events with multiple methods
-    window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
-    window.addEventListener('wheel', handleScroll, { passive: true });
-    window.addEventListener('touchmove', handleScroll, { passive: true });
+    // Listen to scroll events
+    window.addEventListener('scroll', checkVisibility, { passive: true, capture: true });
+    window.addEventListener('wheel', checkVisibility, { passive: true });
+    window.addEventListener('touchmove', checkVisibility, { passive: true });
+    window.addEventListener('resize', checkVisibility, { passive: true });
     
-    // Also check on resize
-    window.addEventListener('resize', handleScroll, { passive: true });
+    // Check multiple times to catch dynamic content
+    const timeouts = [
+      setTimeout(checkVisibility, 100),
+      setTimeout(checkVisibility, 500),
+      setTimeout(checkVisibility, 1000),
+      setTimeout(checkVisibility, 2000),
+    ];
     
     return () => {
-      window.removeEventListener('scroll', handleScroll, true);
-      window.removeEventListener('wheel', handleScroll);
-      window.removeEventListener('touchmove', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('scroll', checkVisibility, true);
+      window.removeEventListener('wheel', checkVisibility);
+      window.removeEventListener('touchmove', checkVisibility);
+      window.removeEventListener('resize', checkVisibility);
+      timeouts.forEach(timeout => clearTimeout(timeout));
     };
   }, [mounted]);
 
@@ -54,9 +71,8 @@ export function ScrollToTop() {
 
   // Calculate position above QuoteTicker
   // QuoteTicker height: ~50-60px (mobile) or ~60-70px (desktop) + safe-bottom
-  // Use larger offset to ensure visibility - account for safe-bottom
-  // Increased offset to ensure button is always visible
-  const bottomOffset = isMobile ? 'bottom-44' : 'bottom-40';
+  // Position button higher to ensure visibility - moved up by 20px
+  const bottomOffset = isMobile ? 'bottom-52' : 'bottom-48';
 
   return (
     <div
@@ -64,8 +80,7 @@ export function ScrollToTop() {
       style={{ 
         willChange: 'opacity, transform',
         position: 'fixed',
-        // Ensure button is always visible
-        visibility: mounted ? 'visible' : 'hidden',
+        visibility: isVisible ? 'visible' : 'hidden',
       }}
     >
       <button

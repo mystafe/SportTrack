@@ -2,6 +2,34 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.14.8] - 2025-01
+
+### Fixed
+- **ScrollToTop Button Visibility**:
+  - Improved visibility detection logic with multiple checks
+  - Button now appears higher on screen (bottom-52 mobile, bottom-48 desktop)
+  - Better handling of dynamic content loading
+  - More reliable visibility on homepage and all pages
+
+### Changed
+- **QuoteTicker Improvements**:
+  - Reduced height for more compact design (py-2.5 mobile, py-3 desktop)
+  - Improved vertical alignment of text and separators
+  - Larger text size on desktop (text-base instead of text-sm)
+  - Better visual balance with reduced padding
+
+### Improved
+- **Manage Activities Button**:
+  - Enhanced design with purple-indigo gradient
+  - Added gear icon (⚙️) for better visual recognition
+  - Improved touch targets and hover effects
+  - Better mobile and desktop responsiveness
+
+- **Install Prompt**:
+  - Smaller text sizes for more compact design
+  - Better spacing and padding adjustments
+  - Improved mobile layout
+
 ## [0.14.7] - 2025-01
 
 ### Fixed
