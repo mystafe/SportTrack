@@ -2,6 +2,29 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.14.7] - 2025-01
+
+### Fixed
+- **Badge Unlock Notification Animation**:
+  - Fixed badge notification appearing in top-left corner before centering
+  - Badge now appears directly centered on screen from the start
+  - Improved animation smoothness and visual consistency
+  - Added exit animation when badge is dismissed or clicked
+
+### Changed
+- **Badge Unlock Notification Interaction**:
+  - Badge notification is now clickable
+  - Clicking badge navigates to achievements page
+  - Badge disappears smoothly when clicked
+  - Added hint text: "Click to view your badges"
+  - Improved visual feedback with cursor pointer
+
+### Improved
+- **Page Transitions**:
+  - Added smooth scroll behavior to HTML element
+  - Page transitions are now consistent and smooth
+  - Better user experience when navigating between pages
+
 ## [0.14.6] - 2025-01
 
 ### Fixed

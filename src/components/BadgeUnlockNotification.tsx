@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useBadges } from '@/lib/badgeStore';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -9,10 +10,12 @@ import type { Badge } from '@/lib/badges';
 export function BadgeUnlockNotification() {
   const { badges, checkNewBadges } = useBadges();
   const { lang } = useI18n();
+  const router = useRouter();
   const isMobile = useIsMobile();
   const [unlockedBadges, setUnlockedBadges] = useState<Badge[]>([]);
   const [currentBadge, setCurrentBadge] = useState<Badge | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     const newBadges = checkNewBadges();
@@ -26,23 +29,46 @@ export function BadgeUnlockNotification() {
       const nextBadge = unlockedBadges[0];
       setCurrentBadge(nextBadge);
       setIsVisible(true);
+      setIsExiting(false);
       
-      // Hide after animation
-      setTimeout(() => {
-        setIsVisible(false);
-        setTimeout(() => {
-          setCurrentBadge(null);
-          setUnlockedBadges(prev => prev.slice(1));
-        }, 500);
-      }, 4000);
+      // Auto-hide after 5 seconds if not clicked
+      const autoHideTimer = setTimeout(() => {
+        handleDismiss();
+      }, 5000);
+      
+      return () => clearTimeout(autoHideTimer);
     }
   }, [unlockedBadges, currentBadge]);
+
+  const handleDismiss = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      setIsVisible(false);
+      setCurrentBadge(null);
+      setUnlockedBadges(prev => prev.slice(1));
+      setIsExiting(false);
+    }, 300);
+  };
+
+  const handleClick = () => {
+    handleDismiss();
+    // Smooth page transition
+    setTimeout(() => {
+      router.push('/achievements');
+    }, 150);
+  };
 
   if (!currentBadge || !isVisible) return null;
 
   return (
-    <div className={`fixed ${isMobile ? 'top-20' : 'top-24'} left-1/2 transform -translate-x-1/2 z-[100] badge-unlock-notification`}>
-      <div className={`${isMobile ? 'px-4 py-3' : 'px-6 py-4'} rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-400 dark:from-yellow-500 dark:via-amber-500 dark:to-orange-500 shadow-2xl border-4 border-yellow-300 dark:border-yellow-400 animate-badge-unlock`}>
+    <div 
+      className={`fixed inset-0 z-[100] flex items-center justify-center pointer-events-none`}
+      onClick={handleClick}
+    >
+      <div 
+        className={`${isMobile ? 'px-4 py-3' : 'px-6 py-4'} rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-400 dark:from-yellow-500 dark:via-amber-500 dark:to-orange-500 shadow-2xl border-4 border-yellow-300 dark:border-yellow-400 cursor-pointer pointer-events-auto transform transition-all duration-300 ${isExiting ? 'opacity-0 scale-90' : 'opacity-100 scale-100'} animate-badge-unlock-center`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex flex-col items-center gap-2">
           <div className={`${isMobile ? 'text-5xl' : 'text-6xl'} animate-badge-bounce`}>
             {currentBadge.icon}
@@ -58,6 +84,9 @@ export function BadgeUnlockNotification() {
               {currentBadge.description[lang]}
             </div>
           )}
+          <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-white/70 text-center mt-1 italic`}>
+            {lang === 'tr' ? 'Tıklayarak rozetlerini gör' : 'Click to view your badges'}
+          </div>
         </div>
         {/* Sparkles */}
         {Array.from({ length: 12 }).map((_, i) => (
