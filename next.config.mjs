@@ -7,6 +7,14 @@ const withBundleAnalyzer = (await import('@next/bundle-analyzer')).default({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Enable static export for Firebase Hosting
+  output: process.env.FIREBASE_DEPLOY === 'true' ? 'export' : undefined,
+  // Disable image optimization for static export
+  images: process.env.FIREBASE_DEPLOY === 'true' ? {
+    unoptimized: true,
+  } : {
+    formats: ['image/avif', 'image/webp'],
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb'
@@ -15,10 +23,6 @@ const nextConfig = {
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
-  // Optimize images if added in future
-  images: {
-    formats: ['image/avif', 'image/webp'],
-  },
 };
 
 const pwaConfig = withPWA({

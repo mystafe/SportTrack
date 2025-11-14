@@ -17,6 +17,7 @@ import { BadgeUnlockNotification } from '@/components/BadgeUnlockNotification';
 import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AutoSyncProvider } from '@/components/AutoSyncProvider';
+import { NameDialog } from '@/components/NameDialog';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -36,6 +37,7 @@ export function Providers({ children }: { children: ReactNode }) {
                       <KeyboardShortcuts />
                       <BadgeUnlockNotification />
                       <OnlineStatusIndicator />
+                      <NameDialog />
                       {children}
                     </AutoSyncProvider>
                   </ToasterProvider>

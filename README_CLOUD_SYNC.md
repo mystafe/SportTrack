@@ -55,10 +55,22 @@ service cloud.firestore {
 
 ### 5. Enable Authentication Providers
 
-In Firebase Console, go to Authentication > Sign-in method and enable:
+In Firebase Console, go to **Authentication** → **Sign-in method** and enable:
 
-- **Email/Password**
-- **Google** (optional, for Google Sign-In)
+#### Email/Password
+
+1. Click on **Email/Password**
+2. Enable **Email/Password** toggle
+3. Click **Save**
+
+#### Google Sign-In (Required for Google authentication)
+
+1. Click on **Google**
+2. Enable the toggle
+3. Select a **Project support email** (default project email can be used)
+4. Click **Save**
+
+**Important**: If you try to sign in with Google before enabling it in Firebase Console, you will get a "CONFIGURATION_NOT_FOUND" error. Make sure to enable Google Sign-In provider first!
 
 ## Features
 

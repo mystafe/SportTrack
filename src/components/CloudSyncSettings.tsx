@@ -19,7 +19,7 @@ export function CloudSyncSettings() {
   const { user, isAuthenticated, logout, isConfigured } = useAuth();
   const { syncState, syncToCloud, syncFromCloud } = useCloudSync();
   const { activities } = useActivities();
-  const { settings } = useSettings();
+  const { settings, saveSettings } = useSettings();
   const { badges } = useBadges();
   const { challenges } = useChallenges();
   const { t, lang } = useI18n();
@@ -163,6 +163,13 @@ export function CloudSyncSettings() {
   const handleLogout = async () => {
     try {
       await logout();
+      // Clear name from settings when user logs out
+      saveSettings({
+        name: '',
+        dailyTarget: settings?.dailyTarget ?? 10000,
+        customActivities: settings?.customActivities ?? [],
+        mood: settings?.mood,
+      });
       showToast(lang === 'tr' ? 'Çıkış yapıldı' : 'Logged out', 'success');
     } catch (error) {
       showToast(lang === 'tr' ? 'Çıkış hatası' : 'Logout error', 'error');

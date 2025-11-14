@@ -50,7 +50,7 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
             {toasts.map((toast) => (
               <div
                 key={toast.id}
-                className={`${isMobile ? 'w-full' : ''} px-4 py-4 rounded-lg shadow-lg text-base font-medium animate-slide-in-right transition-all duration-300 ${
+                className={`${isMobile ? 'w-full max-w-sm' : 'max-w-md'} px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-slide-in-right transition-all duration-300 whitespace-pre-line ${
                   toast.type === 'success'
                     ? 'bg-green-500 text-white'
                     : toast.type === 'error'

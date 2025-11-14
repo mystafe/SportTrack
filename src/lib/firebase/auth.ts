@@ -84,19 +84,49 @@ export async function signInWithGoogle(): Promise<AuthUser> {
     throw new Error('Firebase auth not initialized');
   }
 
-  const provider = new GoogleAuthProvider();
-  const userCredential = await signInWithPopup(auth, provider);
-  const user = userCredential.user;
+  try {
+    const provider = new GoogleAuthProvider();
+    // Add additional scopes if needed
+    provider.addScope('profile');
+    provider.addScope('email');
 
-  // Set user ID for cloud sync
-  cloudSyncService.setUserId(user.uid);
+    const userCredential = await signInWithPopup(auth, provider);
+    const user = userCredential.user;
 
-  return {
-    uid: user.uid,
-    email: user.email,
-    displayName: user.displayName,
-    photoURL: user.photoURL,
-  };
+    // Set user ID for cloud sync
+    cloudSyncService.setUserId(user.uid);
+
+    return {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+    };
+  } catch (error: any) {
+    // Handle specific Firebase errors
+    if (error?.code === 'auth/popup-closed-by-user') {
+      throw new Error('Popup closed by user');
+    }
+    if (error?.code === 'auth/popup-blocked') {
+      throw new Error('Popup blocked by browser');
+    }
+    // Check for CONFIGURATION_NOT_FOUND in various error formats
+    const errorMessage = error?.message || error?.error?.message || '';
+    const errorCode = error?.code || error?.error?.code || '';
+
+    if (
+      errorMessage.includes('CONFIGURATION_NOT_FOUND') ||
+      errorCode === 'CONFIGURATION_NOT_FOUND' ||
+      errorMessage.includes('configuration not found') ||
+      (error?.error?.errors &&
+        error.error.errors.some((e: any) => e.message === 'CONFIGURATION_NOT_FOUND'))
+    ) {
+      throw new Error(
+        'GOOGLE_SIGNIN_NOT_ENABLED: Google Sign-In is not enabled in Firebase Console. Please go to Firebase Console → Authentication → Sign-in method → Google → Enable → Save'
+      );
+    }
+    throw error;
+  }
 }
 
 /**

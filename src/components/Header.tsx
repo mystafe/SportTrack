@@ -12,11 +12,13 @@ import { AuthDialog } from '@/components/AuthDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useSettings } from '@/lib/settingsStore';
 
 export function Header() {
   const { t } = useI18n();
   const isMobile = useIsMobile();
   const { isAuthenticated, isConfigured } = useAuth();
+  const { settings } = useSettings();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   return (
     <header className="border-b-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 backdrop-blur sticky top-0 z-40 safe-top">
@@ -105,9 +107,10 @@ export function Header() {
               <DataExportImport />
               <LanguageToggle />
               <ThemeToggle />
+              <SettingsDialog />
             </>
           )}
-          <SettingsDialog />
+          {isMobile && <SettingsDialog />}
         </div>
       </nav>
       {showAuthDialog && (

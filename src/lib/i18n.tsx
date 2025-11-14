@@ -15,6 +15,8 @@ const translations: Translations = {
   'nav.challenges': { tr: 'Hedefler', en: 'Goals' },
   'nav.main': { tr: 'Ana navigasyon', en: 'Main navigation' },
   'nav.home': { tr: 'Ana sayfa', en: 'Home page' },
+  'nav.login': { tr: 'Giriş Yap', en: 'Login' },
+  'nav.logout': { tr: 'Çıkış Yap', en: 'Logout' },
   scrollToTop: { tr: 'Yukarı çık', en: 'Scroll to top' },
   'header.overviewTitle': { tr: 'Genel Bakış', en: 'Overview' },
   'header.overviewSubtitle': {
@@ -719,6 +721,9 @@ const translations: Translations = {
     tr: '? tuşuna basarak kısayolları görebilirsiniz',
     en: 'Press ? to view keyboard shortcuts',
   },
+
+  'auth.signUp': { tr: 'Kayıt Ol', en: 'Sign Up' },
+  'auth.signIn': { tr: 'Giriş Yap', en: 'Sign In' },
 };
 
 type I18nContextValue = {

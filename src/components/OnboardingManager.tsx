@@ -34,14 +34,12 @@ export function OnboardingManager() {
 
   const handleComplete = () => {
     localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
-    localStorage.setItem('show_profile_dialog', 'true');
     setShowTour(false);
     setHasCompletedOnboarding(true);
   };
 
   const handleSkip = () => {
     localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
-    localStorage.setItem('show_profile_dialog', 'true');
     setShowTour(false);
     setHasCompletedOnboarding(true);
   };

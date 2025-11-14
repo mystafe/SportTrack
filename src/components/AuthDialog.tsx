@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -18,12 +19,23 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { login, register, loginWithGoogle, resetPasswordEmail } = useAuth();
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
   const { showToast } = useToaster();
 
-  if (!open) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      setMode(initialMode);
+    }
+  }, [open, initialMode]);
+
+  if (!open || !mounted) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,25 +78,43 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
       showToast(lang === 'tr' ? 'Giriş başarılı!' : 'Login successful!', 'success');
       onClose();
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : lang === 'tr'
-            ? 'Google ile giriş başarısız'
-            : 'Google login failed';
+      let errorMessage = '';
+      if (error instanceof Error) {
+        if (
+          error.message.includes('GOOGLE_SIGNIN_NOT_ENABLED') ||
+          error.message.includes('CONFIGURATION_NOT_FOUND') ||
+          error.message.includes('not enabled')
+        ) {
+          errorMessage =
+            lang === 'tr'
+              ? '❌ Google Sign-In etkinleştirilmemiş!\n\nFirebase Console → Authentication → Sign-in method → Google → Enable → Save'
+              : '❌ Google Sign-In not enabled!\n\nFirebase Console → Authentication → Sign-in method → Google → Enable → Save';
+        } else if (error.message.includes('Popup closed')) {
+          errorMessage = lang === 'tr' ? 'Giriş penceresi kapatıldı' : 'Sign-in popup was closed';
+        } else if (error.message.includes('Popup blocked')) {
+          errorMessage =
+            lang === 'tr'
+              ? 'Giriş penceresi tarayıcı tarafından engellendi. Lütfen popup engelleyiciyi kapatın.'
+              : 'Sign-in popup was blocked by browser. Please disable popup blocker.';
+        } else {
+          errorMessage = error.message;
+        }
+      } else {
+        errorMessage = lang === 'tr' ? 'Google ile giriş başarısız' : 'Google login failed';
+      }
       showToast(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
+  const dialog = (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 py-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className={`${isMobile ? 'w-full mx-4' : 'w-full max-w-md'} bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 p-6`}
+        className={`${isMobile ? 'w-full' : 'w-full max-w-md'} bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 p-6 my-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
@@ -246,4 +276,6 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
       </div>
     </div>
   );
+
+  return typeof window !== 'undefined' ? createPortal(dialog, document.body) : null;
 }
