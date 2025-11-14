@@ -51,23 +51,34 @@ export function CloudSyncSettings() {
       return;
     }
 
-    // Check if there's a pending conflict from initial sync
-    const conflictStr =
-      typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
-    if (conflictStr) {
-      try {
-        const conflict = JSON.parse(conflictStr);
-        setConflictData(conflict);
-        setShowConflictDialog(true);
-      } catch (error) {
-        console.error('Failed to parse conflict data:', error);
-        // Clear invalid conflict data
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem(CONFLICT_STORAGE_KEY);
+    // Small delay to ensure stores are hydrated
+    const checkConflict = () => {
+      const conflictStr =
+        typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
+      if (conflictStr) {
+        try {
+          const conflict = JSON.parse(conflictStr);
+          setConflictData(conflict);
+          // Show conflict dialog after a short delay to ensure UI is ready
+          setTimeout(() => {
+            setShowConflictDialog(true);
+            showToast(t('cloudSync.conflictDetected'), 'info');
+          }, 500);
+        } catch (error) {
+          console.error('Failed to parse conflict data:', error);
+          // Clear invalid conflict data
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(CONFLICT_STORAGE_KEY);
+          }
         }
       }
-    }
-  }, [isAuthenticated, isConfigured]);
+    };
+
+    // Check immediately and also after a delay to catch late conflicts
+    checkConflict();
+    const timeoutId = setTimeout(checkConflict, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [isAuthenticated, isConfigured, showToast, t]);
 
   if (!isConfigured) {
     return (

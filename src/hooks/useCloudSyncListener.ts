@@ -13,6 +13,8 @@ import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
 import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
+import { useToaster } from '@/components/Toaster';
+import { useI18n } from '@/lib/i18n';
 import type { CloudData } from '@/lib/cloudSync/types';
 
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
@@ -62,6 +64,8 @@ export function useCloudSyncListener() {
   const { settings, hydrated: settingsHydrated, saveSettings } = useSettings();
   const { badges, hydrated: badgesHydrated } = useBadges();
   const { challenges, hydrated: challengesHydrated } = useChallenges();
+  const { showToast } = useToaster();
+  const { t } = useI18n();
 
   // Use refs to avoid re-subscribing on every change
   const activitiesRef = useRef(activities);
@@ -69,6 +73,8 @@ export function useCloudSyncListener() {
   const badgesRef = useRef(badges);
   const challengesRef = useRef(challenges);
   const saveSettingsRef = useRef(saveSettings);
+  const showToastRef = useRef(showToast);
+  const tRef = useRef(t);
   const initialSyncDoneRef = useRef(false);
 
   // Update refs when values change
@@ -91,6 +97,14 @@ export function useCloudSyncListener() {
   useEffect(() => {
     saveSettingsRef.current = saveSettings;
   }, [saveSettings]);
+
+  useEffect(() => {
+    showToastRef.current = showToast;
+  }, [showToast]);
+
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
 
   const allHydrated =
     activitiesHydrated && settingsHydrated && badgesHydrated && challengesHydrated;
@@ -196,6 +210,7 @@ export function useCloudSyncListener() {
           if (cloudData.settings) {
             currentSaveSettings(cloudData.settings as any);
           }
+          showToastRef.current(tRef.current('cloudSync.syncedFromCloud'), 'success');
           // Note: Activities, badges, challenges would need bulk update methods
         } else if (!cloudHasData && localHasData) {
           // Local has data, cloud doesn't - use local (useAutoSync will upload)
@@ -231,6 +246,7 @@ export function useCloudSyncListener() {
 
         if (cloudSettingsStr !== localSettingsStr) {
           currentSaveSettings(cloudData.settings as any);
+          showToastRef.current(tRef.current('cloudSync.syncedFromCloud'), 'info');
         }
       }
 

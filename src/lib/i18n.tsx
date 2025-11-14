@@ -578,6 +578,27 @@ const translations: Translations = {
     tr: 'Büyük dosya tespit edildi ({size}MB). İşlem biraz zaman alabilir. Devam etmek istiyor musunuz?',
     en: 'Large file detected ({size}MB). Processing may take some time. Do you want to continue?',
   },
+
+  'cloudSync.syncing': {
+    tr: 'Verileriniz senkronize ediliyor...',
+    en: 'Syncing your data...',
+  },
+  'cloudSync.syncedToCloud': {
+    tr: 'Verileriniz buluta yüklendi',
+    en: 'Your data has been uploaded to cloud',
+  },
+  'cloudSync.syncedFromCloud': {
+    tr: 'Verileriniz buluttan indirildi',
+    en: 'Your data has been downloaded from cloud',
+  },
+  'cloudSync.syncFailed': {
+    tr: 'Senkronizasyon başarısız oldu',
+    en: 'Sync failed',
+  },
+  'cloudSync.conflictDetected': {
+    tr: 'Veri çakışması tespit edildi',
+    en: 'Data conflict detected',
+  },
   'appleHealth.processing': {
     tr: 'İşleniyor: {processed} / {total} kayıt ({percentage}%)',
     en: 'Processing: {processed} / {total} records ({percentage}%)',

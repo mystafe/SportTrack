@@ -338,8 +338,11 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             required
             autoComplete="off"
             data-form-type="other"
+            data-lpignore="true"
+            data-1p-ignore="true"
             aria-autocomplete="none"
             role="textbox"
+            name=""
           />
         </label>
       </div>
@@ -360,12 +363,15 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             required
             autoComplete="off"
             data-form-type="other"
+            data-lpignore="true"
+            data-1p-ignore="true"
             aria-autocomplete="none"
             role="spinbutton"
             aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
             aria-describedby={
               getActivityDescription(definition, lang) ? 'amount-description' : undefined
             }
+            name=""
           />
           {getActivityDescription(definition, lang) ? (
             <div
@@ -402,8 +408,11 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           aria-label={t('form.noteOptional')}
           autoComplete="off"
           data-form-type="other"
+          data-lpignore="true"
+          data-1p-ignore="true"
           aria-autocomplete="none"
           role="textbox"
+          name=""
         />
       </label>
       <div

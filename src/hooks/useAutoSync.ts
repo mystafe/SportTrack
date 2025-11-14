@@ -12,10 +12,14 @@ import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
 import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
+import { useToaster } from '@/components/Toaster';
+import { useI18n } from '@/lib/i18n';
 
-const SYNC_DEBOUNCE_MS = 2000; // Wait 2 seconds after last change before syncing
+const SYNC_DEBOUNCE_MS = 3000; // Wait 3 seconds after last change before syncing
+const SYNC_THROTTLE_MS = 10000; // Minimum 10 seconds between syncs
 const INITIAL_SYNC_COMPLETE_KEY = 'sporttrack_initial_sync_complete';
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
+const LAST_SYNC_TIME_KEY = 'sporttrack_last_sync_time';
 
 // Helper function to create a hash from array length and first/last item IDs
 function createArrayHash(arr: any[], maxItems: number = 5): string {
@@ -41,6 +45,8 @@ export function useAutoSync() {
   const { settings, hydrated: settingsHydrated } = useSettings();
   const { badges, hydrated: badgesHydrated } = useBadges();
   const { challenges, hydrated: challengesHydrated } = useChallenges();
+  const { showToast } = useToaster();
+  const { t } = useI18n();
 
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSyncRef = useRef<{
@@ -50,6 +56,7 @@ export function useAutoSync() {
     challengesHash: string;
   } | null>(null);
   const isInitialSyncRef = useRef(true);
+  const isSyncingRef = useRef(false);
 
   const allHydrated =
     activitiesHydrated && settingsHydrated && badgesHydrated && challengesHydrated;
@@ -112,19 +119,54 @@ export function useAutoSync() {
 
     // Set new timeout for debounced sync
     syncTimeoutRef.current = setTimeout(() => {
+      // Check throttle - don't sync if last sync was too recent
+      const lastSyncTime =
+        typeof window !== 'undefined'
+          ? parseInt(localStorage.getItem(LAST_SYNC_TIME_KEY) || '0', 10)
+          : 0;
+      const now = Date.now();
+      const timeSinceLastSync = now - lastSyncTime;
+
+      if (timeSinceLastSync < SYNC_THROTTLE_MS && lastSyncTime > 0) {
+        // Too soon, reschedule
+        syncTimeoutRef.current = setTimeout(() => {
+          syncTimeoutRef.current = null;
+        }, SYNC_THROTTLE_MS - timeSinceLastSync);
+        return;
+      }
+
+      // Prevent concurrent syncs
+      if (isSyncingRef.current) {
+        return;
+      }
+
       const settingsStr = settings ? JSON.stringify(settings) : null;
       const finalActivitiesHash = createArrayHash(activities);
       const finalBadgesHash = createArrayHash(badges);
       const finalChallengesHash = createArrayHash(challenges);
 
+      isSyncingRef.current = true;
       syncToCloud({
         activities,
         settings,
         badges,
         challenges,
-      }).catch((error) => {
-        console.error('❌ Auto-sync failed:', error);
-      });
+      })
+        .then(() => {
+          // Update last sync time
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(LAST_SYNC_TIME_KEY, String(Date.now()));
+          }
+          // Show success toast
+          showToast(t('cloudSync.syncedToCloud'), 'success');
+        })
+        .catch((error) => {
+          console.error('❌ Auto-sync failed:', error);
+          showToast(t('cloudSync.syncFailed'), 'error');
+        })
+        .finally(() => {
+          isSyncingRef.current = false;
+        });
 
       // Update last sync ref with current hashes
       lastSyncRef.current = {
