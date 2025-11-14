@@ -18,6 +18,7 @@ import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AutoSyncProvider } from '@/components/AutoSyncProvider';
 import { NameDialog } from '@/components/NameDialog';
+import { ConflictResolutionManager } from '@/components/ConflictResolutionManager';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -38,6 +39,7 @@ export function Providers({ children }: { children: ReactNode }) {
                       <BadgeUnlockNotification />
                       <OnlineStatusIndicator />
                       <NameDialog />
+                      <ConflictResolutionManager />
                       {children}
                     </AutoSyncProvider>
                   </ToasterProvider>

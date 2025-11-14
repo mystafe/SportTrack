@@ -45,40 +45,8 @@ export function CloudSyncSettings() {
     };
   } | null>(null);
 
-  // Check for pending conflict on mount and when authenticated
-  useEffect(() => {
-    if (!isAuthenticated || !isConfigured) {
-      return;
-    }
-
-    // Small delay to ensure stores are hydrated
-    const checkConflict = () => {
-      const conflictStr =
-        typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
-      if (conflictStr) {
-        try {
-          const conflict = JSON.parse(conflictStr);
-          setConflictData(conflict);
-          // Show conflict dialog after a short delay to ensure UI is ready
-          setTimeout(() => {
-            setShowConflictDialog(true);
-            showToast(t('cloudSync.conflictDetected'), 'info');
-          }, 500);
-        } catch (error) {
-          console.error('Failed to parse conflict data:', error);
-          // Clear invalid conflict data
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem(CONFLICT_STORAGE_KEY);
-          }
-        }
-      }
-    };
-
-    // Check immediately and also after a delay to catch late conflicts
-    checkConflict();
-    const timeoutId = setTimeout(checkConflict, 1000);
-    return () => clearTimeout(timeoutId);
-  }, [isAuthenticated, isConfigured, showToast, t]);
+  // Note: Initial conflict resolution on login is now handled by ConflictResolutionManager component
+  // This conflict dialog is only used for manual download conflicts
 
   if (!isConfigured) {
     return (
@@ -153,26 +121,36 @@ export function CloudSyncSettings() {
     const localData = { activities, settings, badges, challenges };
     const resolution = resolveConflicts(localData, cloudData, strategy);
 
-    // Apply resolved data
+    // Apply resolved data locally
     // Apply settings
     if (resolution.resolvedData.settings) {
       saveSettings(resolution.resolvedData.settings as any);
     }
 
-    // Sync resolved data to cloud
-    await syncToCloud({
-      activities: resolution.resolvedData.activities as any[],
-      settings: resolution.resolvedData.settings,
-      badges: resolution.resolvedData.badges as any[],
-      challenges: resolution.resolvedData.challenges as any[],
-    });
+    // Only sync to cloud if strategy is NOT "cloud" (cloud strategy means use cloud data, don't overwrite it)
+    // For "local" strategy: upload local data to cloud
+    // For "merge" or "newest": upload merged/resolved data to cloud
+    // For "cloud" strategy: just apply cloud data locally, don't upload anything
+    if (strategy !== 'cloud') {
+      await syncToCloud({
+        activities: resolution.resolvedData.activities as any[],
+        settings: resolution.resolvedData.settings,
+        badges: resolution.resolvedData.badges as any[],
+        challenges: resolution.resolvedData.challenges as any[],
+      });
+    }
 
     saveLocalLastModified();
 
-    showToast(
-      lang === 'tr' ? 'Veriler uygulandı ve senkronize edildi!' : 'Data applied and synced!',
-      'success'
-    );
+    const message =
+      strategy === 'cloud'
+        ? lang === 'tr'
+          ? 'Bulut verileri uygulandı'
+          : 'Cloud data applied'
+        : lang === 'tr'
+          ? 'Veriler uygulandı ve senkronize edildi!'
+          : 'Data applied and synced!';
+    showToast(message, 'success');
   };
 
   const handleConflictResolve = async (strategy: ConflictStrategy) => {
