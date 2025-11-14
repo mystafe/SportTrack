@@ -1,6 +1,6 @@
 import withPWA from 'next-pwa';
 
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+const withBundleAnalyzer = (await import('@next/bundle-analyzer')).default({
   enabled: process.env.ANALYZE === 'true',
 });
 
