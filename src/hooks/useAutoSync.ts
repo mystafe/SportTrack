@@ -17,6 +17,23 @@ const SYNC_DEBOUNCE_MS = 2000; // Wait 2 seconds after last change before syncin
 const INITIAL_SYNC_COMPLETE_KEY = 'sporttrack_initial_sync_complete';
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 
+// Helper function to create a hash from array length and first/last item IDs
+function createArrayHash(arr: any[], maxItems: number = 5): string {
+  if (arr.length === 0) return 'empty';
+  const ids = arr
+    .slice(0, maxItems)
+    .map((item) => item.id || JSON.stringify(item))
+    .join(',');
+  const lastIds =
+    arr.length > maxItems
+      ? arr
+          .slice(-maxItems)
+          .map((item) => item.id || JSON.stringify(item))
+          .join(',')
+      : '';
+  return `${arr.length}:${ids}${lastIds ? `:${lastIds}` : ''}`;
+}
+
 export function useAutoSync() {
   const { isAuthenticated, isConfigured } = useAuth();
   const { syncToCloud } = useCloudSync();
@@ -27,10 +44,10 @@ export function useAutoSync() {
 
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSyncRef = useRef<{
-    activities: number;
+    activitiesHash: string;
     settings: string | null;
-    badges: number;
-    challenges: number;
+    badgesHash: string;
+    challengesHash: string;
   } | null>(null);
   const isInitialSyncRef = useRef(true);
 
@@ -55,20 +72,22 @@ export function useAutoSync() {
 
     // Don't sync if initial sync is not complete or if there's a pending conflict
     if (!initialSyncComplete || hasPendingConflict) {
-      console.log('⏸️ Auto-sync paused:', {
-        initialSyncComplete,
-        hasPendingConflict,
-      });
       return;
     }
+
+    // Create current hashes
+    const currentActivitiesHash = createArrayHash(activities);
+    const currentSettingsStr = settings ? JSON.stringify(settings) : null;
+    const currentBadgesHash = createArrayHash(badges);
+    const currentChallengesHash = createArrayHash(challenges);
 
     // Initialize lastSyncRef on first sync
     if (lastSyncRef.current === null) {
       lastSyncRef.current = {
-        activities: activities.length,
-        settings: settings ? JSON.stringify(settings) : null,
-        badges: badges.length,
-        challenges: challenges.length,
+        activitiesHash: currentActivitiesHash,
+        settings: currentSettingsStr,
+        badgesHash: currentBadgesHash,
+        challengesHash: currentChallengesHash,
       };
       // Don't sync on initial load, wait for changes
       isInitialSyncRef.current = false;
@@ -76,15 +95,13 @@ export function useAutoSync() {
     }
 
     // Check if anything changed
-    const activitiesChanged = activities.length !== lastSyncRef.current.activities;
-    const currentSettingsStr = settings ? JSON.stringify(settings) : null;
+    const activitiesChanged = currentActivitiesHash !== lastSyncRef.current.activitiesHash;
     const settingsChanged = currentSettingsStr !== lastSyncRef.current.settings;
-    const badgesChanged = badges.length !== lastSyncRef.current.badges;
-    const challengesChanged = challenges.length !== lastSyncRef.current.challenges;
+    const badgesChanged = currentBadgesHash !== lastSyncRef.current.badgesHash;
+    const challengesChanged = currentChallengesHash !== lastSyncRef.current.challengesHash;
 
     // If nothing changed, don't sync (prevents infinite loops)
     if (!activitiesChanged && !settingsChanged && !badgesChanged && !challengesChanged) {
-      console.log('⏭️ No changes detected, skipping sync');
       return;
     }
 
@@ -96,13 +113,9 @@ export function useAutoSync() {
     // Set new timeout for debounced sync
     syncTimeoutRef.current = setTimeout(() => {
       const settingsStr = settings ? JSON.stringify(settings) : null;
-
-      console.log('🔄 Auto-sync triggered:', {
-        activities: activities.length,
-        settings: settings ? 'present' : 'null',
-        badges: badges.length,
-        challenges: challenges.length,
-      });
+      const finalActivitiesHash = createArrayHash(activities);
+      const finalBadgesHash = createArrayHash(badges);
+      const finalChallengesHash = createArrayHash(challenges);
 
       syncToCloud({
         activities,
@@ -113,12 +126,12 @@ export function useAutoSync() {
         console.error('❌ Auto-sync failed:', error);
       });
 
-      // Update last sync ref
+      // Update last sync ref with current hashes
       lastSyncRef.current = {
-        activities: activities.length,
+        activitiesHash: finalActivitiesHash,
         settings: settingsStr,
-        badges: badges.length,
-        challenges: challenges.length,
+        badgesHash: finalBadgesHash,
+        challengesHash: finalChallengesHash,
       };
     }, SYNC_DEBOUNCE_MS);
 

@@ -250,7 +250,13 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   }
 
   return (
-    <form onSubmit={submit} className={isMobile ? 'space-y-3' : 'space-y-5'} autoComplete="off">
+    <form
+      onSubmit={submit}
+      className={isMobile ? 'space-y-3' : 'space-y-5'}
+      autoComplete="off"
+      data-form-type="other"
+      noValidate
+    >
       <div className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
         <div
           className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -332,6 +338,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             required
             autoComplete="off"
             data-form-type="other"
+            aria-autocomplete="none"
+            role="textbox"
           />
         </label>
       </div>
@@ -352,6 +360,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             required
             autoComplete="off"
             data-form-type="other"
+            aria-autocomplete="none"
+            role="spinbutton"
             aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
             aria-describedby={
               getActivityDescription(definition, lang) ? 'amount-description' : undefined
@@ -392,6 +402,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           aria-label={t('form.noteOptional')}
           autoComplete="off"
           data-form-type="other"
+          aria-autocomplete="none"
+          role="textbox"
         />
       </label>
       <div

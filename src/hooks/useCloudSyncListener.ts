@@ -111,11 +111,8 @@ export function useCloudSyncListener() {
       return;
     }
 
-    console.log('👂 Setting up cloud sync listener...');
-
     const unsubscribe = cloudSyncService.subscribeToCloud((cloudData: CloudData | null) => {
       if (!cloudData) {
-        console.log('📭 No cloud data available');
         // If no cloud data and local has data, mark initial sync as complete
         // useAutoSync will handle uploading local data
         if (!initialSyncDoneRef.current) {
@@ -126,13 +123,6 @@ export function useCloudSyncListener() {
         }
         return;
       }
-
-      console.log('📥 Cloud data received:', {
-        activities: cloudData.activities?.length || 0,
-        settings: cloudData.settings ? 'present' : 'null',
-        badges: cloudData.badges?.length || 0,
-        challenges: cloudData.challenges?.length || 0,
-      });
 
       // Use refs to get current values without causing re-renders
       const currentActivities = activitiesRef.current;
@@ -154,8 +144,6 @@ export function useCloudSyncListener() {
         typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
 
       if (isInitialSync && !initialSyncComplete) {
-        console.log('🔍 Initial sync: Checking for conflicts...');
-
         // Check if both local and cloud have data
         const localHasData =
           localData.activities.length > 0 ||
@@ -172,7 +160,6 @@ export function useCloudSyncListener() {
           // Both have data, check for conflicts
           const conflicts = hasConflicts(localData, cloudData);
           if (conflicts) {
-            console.log('⚠️ Conflict detected on initial sync! Storing conflict data...');
             // Store conflict data for CloudSyncSettings to handle
             if (typeof window !== 'undefined') {
               localStorage.setItem(
@@ -205,7 +192,6 @@ export function useCloudSyncListener() {
         // No conflict or one side is empty
         if (cloudHasData && !localHasData) {
           // Cloud has data, local doesn't - use cloud
-          console.log('📥 Initial sync: Using cloud data (local is empty)');
           // Apply cloud data
           if (cloudData.settings) {
             currentSaveSettings(cloudData.settings as any);
@@ -213,10 +199,8 @@ export function useCloudSyncListener() {
           // Note: Activities, badges, challenges would need bulk update methods
         } else if (!cloudHasData && localHasData) {
           // Local has data, cloud doesn't - use local (useAutoSync will upload)
-          console.log('📤 Initial sync: Using local data (cloud is empty)');
         } else {
           // Both empty or same - no action needed
-          console.log('✅ Initial sync: No data or already in sync');
         }
 
         initialSyncDoneRef.current = true;
@@ -246,15 +230,8 @@ export function useCloudSyncListener() {
         const localSettingsStr = JSON.stringify(normalizedLocal);
 
         if (cloudSettingsStr !== localSettingsStr) {
-          console.log('🔄 Updating settings from cloud (different from local)');
-          console.log('Cloud:', normalizedCloud);
-          console.log('Local:', normalizedLocal);
           currentSaveSettings(cloudData.settings as any);
-        } else {
-          console.log('✅ Settings already in sync (no update needed)');
         }
-      } else {
-        console.log('ℹ️ No settings in cloud data');
       }
 
       // Note: Activities, badges, and challenges sync would require bulk update methods
@@ -262,7 +239,6 @@ export function useCloudSyncListener() {
     });
 
     return () => {
-      console.log('🔇 Cleaning up cloud sync listener');
       unsubscribe();
     };
   }, [isAuthenticated, isConfigured, allHydrated]); // Removed activities, settings, badges, challenges, saveSettings from dependencies
