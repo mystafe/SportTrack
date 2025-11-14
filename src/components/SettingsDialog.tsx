@@ -293,10 +293,11 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2.5 py-1.5 text-xs' : 'px-3 py-2 text-sm sm:px-4 sm:py-2.5 sm:text-base'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
+                    className={`input-enhanced w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-3 py-2.5 text-base min-h-[44px]' : 'px-3 py-2 text-sm sm:px-4 sm:py-2.5 sm:text-base min-h-[44px]'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
                     placeholder={lang === 'tr' ? 'İsminiz' : 'Your name'}
                     autoComplete="off"
                     data-form-type="other"
+                    inputMode="text"
                   />
                 </label>
 

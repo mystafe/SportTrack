@@ -80,14 +80,16 @@ export default function HomePage() {
             {t('header.overviewSubtitle')}
           </p>
         </div>
-        <Link
-          href="/add"
-          className={`px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-xs sm:text-sm shadow self-start sm:self-auto btn-enhanced ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'ripple-effect'} scale-on-interact`}
-          aria-label={t('actions.addActivity')}
-          data-tour-id="add-activity"
-        >
-          {t('actions.addActivity')}
-        </Link>
+        {!isMobile && (
+          <Link
+            href="/add"
+            className={`px-3 py-2 rounded bg-brand text-white hover:bg-brand-dark text-xs sm:text-sm shadow self-start sm:self-auto btn-enhanced ripple-effect scale-on-interact`}
+            aria-label={t('actions.addActivity')}
+            data-tour-id="add-activity"
+          >
+            {t('actions.addActivity')}
+          </Link>
+        )}
       </div>
 
       {/* Motivational Message - Enhanced Design */}

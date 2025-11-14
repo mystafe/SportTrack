@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useBadges } from '@/lib/badgeStore';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 import type { Badge } from '@/lib/badges';
 
 export function BadgeUnlockNotification() {
@@ -12,6 +13,7 @@ export function BadgeUnlockNotification() {
   const { lang } = useI18n();
   const router = useRouter();
   const isMobile = useIsMobile();
+  const { triggerHaptic } = useHapticFeedback();
   const [unlockedBadges, setUnlockedBadges] = useState<Badge[]>([]);
   const [currentBadge, setCurrentBadge] = useState<Badge | null>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -50,8 +52,10 @@ export function BadgeUnlockNotification() {
       setCurrentBadge(nextBadge);
       setIsVisible(true);
       setIsExiting(false);
+      // Trigger haptic feedback when badge appears
+      triggerHaptic('success');
     }
-  }, [unlockedBadges, currentBadge, isVisible]);
+  }, [unlockedBadges, currentBadge, isVisible, triggerHaptic]);
 
   // Auto-hide timer - runs when badge is visible
   useEffect(() => {

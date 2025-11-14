@@ -30,7 +30,7 @@ export function Header() {
           <div className="flex items-center gap-0.5 sm:gap-0.5 flex-shrink-0">
             <Link
               href="/activities"
-              className={`nav-icon nav-icon-activities ${isMobile ? 'touch-feedback mobile-press' : ''} min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
+              className={`nav-icon nav-icon-activities ${isMobile ? 'touch-feedback mobile-press' : ''} ${isMobile ? 'min-h-[44px] min-w-[44px]' : 'min-h-[40px] min-w-[40px]'} flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
               aria-label={t('nav.activities')}
               data-tour-id="activities"
             >
@@ -47,7 +47,7 @@ export function Header() {
             </span>
             <Link
               href="/stats"
-              className={`nav-icon nav-icon-stats ${isMobile ? 'touch-feedback mobile-press' : ''} min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
+              className={`nav-icon nav-icon-stats ${isMobile ? 'touch-feedback mobile-press' : ''} ${isMobile ? 'min-h-[44px] min-w-[44px]' : 'min-h-[40px] min-w-[40px]'} flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
               aria-label={t('nav.stats')}
               data-tour-id="stats"
             >
@@ -64,7 +64,7 @@ export function Header() {
             </span>
             <Link
               href="/achievements"
-              className={`nav-icon nav-icon-achievements ${isMobile ? 'touch-feedback mobile-press' : ''} min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
+              className={`nav-icon nav-icon-achievements ${isMobile ? 'touch-feedback mobile-press' : ''} ${isMobile ? 'min-h-[44px] min-w-[44px]' : 'min-h-[40px] min-w-[40px]'} flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
               aria-label={t('nav.achievements')}
               data-tour-id="achievements"
             >
@@ -81,7 +81,7 @@ export function Header() {
             </span>
             <Link
               href="/challenges"
-              className={`nav-icon nav-icon-challenges ${isMobile ? 'touch-feedback mobile-press' : ''} min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
+              className={`nav-icon nav-icon-challenges ${isMobile ? 'touch-feedback mobile-press' : ''} ${isMobile ? 'min-h-[44px] min-w-[44px]' : 'min-h-[40px] min-w-[40px]'} flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
               aria-label={t('nav.challenges')}
               data-tour-id="challenges"
             >

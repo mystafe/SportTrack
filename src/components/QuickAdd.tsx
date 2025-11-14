@@ -246,6 +246,7 @@ export const QuickAdd = memo(function QuickAdd() {
                 p-4 sm:p-5 rounded-xl border-2
                 transition-all duration-300
                 min-h-[90px] sm:min-h-[110px] min-w-[90px] sm:min-w-[110px]
+                touch-target
                 gpu-accelerated
                 ${
                   isAddingThis

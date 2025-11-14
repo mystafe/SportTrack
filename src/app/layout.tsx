@@ -1,4 +1,6 @@
 import './globals.css';
+import { BottomNavigation } from '@/components/BottomNavigation';
+import { FloatingActionButton } from '@/components/FloatingActionButton';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { Providers } from '@/components/Providers';
@@ -83,10 +85,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         <Providers>
           <Header />
-          <main className="container py-4 sm:py-6 pb-20 sm:pb-24 mb-4 sm:mb-6">{children}</main>
+          <main className="container py-4 sm:py-6 pb-24 sm:pb-6 mb-4 sm:mb-6 page-transition-wrapper">
+            {children}
+          </main>
           <Footer />
           <ScrollToTop />
           <QuoteTicker />
+          <BottomNavigation />
+          <FloatingActionButton />
         </Providers>
       </body>
     </html>

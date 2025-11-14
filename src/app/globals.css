@@ -1628,6 +1628,247 @@ html {
   background: linear-gradient(to right, rgba(17, 24, 39, 1), rgba(31, 41, 55, 1));
 }
 
+/* Mobile-specific input improvements */
+@media (max-width: 640px) {
+  /* Prevent zoom on input focus (iOS) */
+  input[type='text'],
+  input[type='number'],
+  input[type='datetime-local'],
+  input[type='date'],
+  input[type='time'],
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents iOS zoom */
+  }
+
+  /* Better touch targets for inputs */
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+
+  /* Improved focus states for mobile */
+  .input-enhanced:focus {
+    border-width: 2px;
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+  }
+
+  /* Date/time picker improvements */
+  input[type='datetime-local'],
+  input[type='date'],
+  input[type='time'] {
+    position: relative;
+  }
+
+  input[type='datetime-local']::-webkit-calendar-picker-indicator,
+  input[type='date']::-webkit-calendar-picker-indicator,
+  input[type='time']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+    padding: 4px;
+    margin-left: 4px;
+  }
+
+  input[type='datetime-local']::-webkit-calendar-picker-indicator:hover,
+  input[type='date']::-webkit-calendar-picker-indicator:hover,
+  input[type='time']::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+}
+
+/* Enhanced Progress Bar Animations */
+@keyframes progressFill {
+  0% {
+    width: 0%;
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes progressShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-progress {
+  animation: progressFill 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  background-size: 200% 100%;
+  background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.progress-fill-mobile {
+  animation: progressFill 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7, #34d399, #10b981);
+  background-size: 200% 100%;
+  animation: progressShimmer 2s ease-in-out infinite;
+}
+
+/* Circular Progress Indicator */
+@keyframes circularProgress {
+  0% {
+    stroke-dashoffset: 283;
+  }
+}
+
+.circular-progress {
+  transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: circularProgress 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Toast Notification Animations */
+@keyframes toastEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  50% {
+    transform: translateY(2px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+}
+
+.toast-entrance {
+  animation: toastEntrance 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.toast-exit {
+  animation: toastExit 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Success toast pulse */
+@keyframes toastSuccessPulse {
+  0%,
+  100% {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+  }
+}
+
+.toast-success-pulse {
+  animation: toastSuccessPulse 2s ease-in-out infinite;
+}
+
+/* Error toast shake */
+@keyframes toastErrorShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+.toast-error-shake {
+  animation: toastErrorShake 0.5s ease-in-out;
+}
+
+/* Page Transition Animations */
+@keyframes pageTransitionIn {
+  0% {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pageTransitionOut {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+
+@keyframes mobilePageTransitionIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mobilePageTransitionOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.page-transition-wrapper {
+  animation: pageTransitionIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.page-transition-out {
+  animation: pageTransitionOut 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.page-transition-in {
+  animation: pageTransitionIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.mobile-transition.page-transition-wrapper {
+  animation: mobilePageTransitionIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.mobile-transition.page-transition-out {
+  animation: mobilePageTransitionOut 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.mobile-transition.page-transition-in {
+  animation: mobilePageTransitionIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 /* Enhanced button hover effects */
 .btn-enhanced:hover {
   transform: translateY(-1px);
@@ -2584,5 +2825,55 @@ html {
 
   .nav-icon:active::after {
     animation: touchRipple 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Ensure main content has enough padding for bottom navigation */
+  main {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Touch target size utility - minimum 44x44px for iOS, 48x48dp for Android */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Ensure all interactive buttons meet touch target requirements */
+  button:not(.no-touch-target),
+  a:not(.no-touch-target) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Icon-only buttons need padding to meet touch target */
+  .icon-button {
+    padding: 10px;
+  }
+
+  /* Enhanced card shadows for mobile */
+  .activity-card-entrance,
+  .card-entrance {
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.1),
+      0 2px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  .dark .activity-card-entrance,
+  .dark .card-entrance {
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.4),
+      0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Enhanced card hover/touch states */
+  .activity-card-entrance:active,
+  .card-entrance:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .dark .activity-card-entrance:active,
+  .dark .card-entrance:active {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
   }
 }
