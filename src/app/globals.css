@@ -11,6 +11,7 @@ html, body {
 html {
   background-color: #ffffff;
   min-height: 100%;
+  scroll-behavior: smooth;
 }
 
 html.dark {
