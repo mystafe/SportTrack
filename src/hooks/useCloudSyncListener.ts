@@ -46,8 +46,45 @@ function isCloudEmpty(cloud: CloudData): boolean {
 }
 
 /**
+ * Normalize settings for comparison (handle undefined vs null, remove undefined fields)
+ */
+function normalizeSettingsForComparison(settings: unknown | null): string {
+  if (!settings || typeof settings !== 'object') {
+    return JSON.stringify({ name: '', dailyTarget: 10000, customActivities: [], mood: null });
+  }
+  const s = settings as Record<string, unknown>;
+  return JSON.stringify({
+    name: s.name || '',
+    dailyTarget: s.dailyTarget || 10000,
+    customActivities: Array.isArray(s.customActivities) ? s.customActivities : [],
+    mood: s.mood !== undefined ? s.mood : null,
+  });
+}
+
+/**
+ * Check if two arrays contain the same items (by ID)
+ */
+function arraysEqualById<T extends { id?: string }>(arr1: T[], arr2: T[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+  const ids1 = new Set(arr1.map((item) => item.id).filter(Boolean));
+  const ids2 = new Set(arr2.map((item) => item.id).filter(Boolean));
+  if (ids1.size !== ids2.size) {
+    return false;
+  }
+  for (const id of ids1) {
+    if (!ids2.has(id)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * Check if local and cloud data have conflicts
  * Returns false if local is empty (0 activities, 0 badges, 0 challenges) - no conflict, use cloud
+ * Returns false if data is identical (same IDs and content) - no conflict
  */
 function hasConflicts(
   local: {
@@ -68,13 +105,50 @@ function hasConflicts(
     return false;
   }
 
-  // Both have data, check if they differ
-  return (
-    local.activities.length !== (cloud.activities?.length || 0) ||
-    local.badges.length !== (cloud.badges?.length || 0) ||
-    local.challenges.length !== (cloud.challenges?.length || 0) ||
-    JSON.stringify(local.settings) !== JSON.stringify(cloud.settings)
-  );
+  // Both have data, check if they are actually different
+  // First check lengths (quick check)
+  const cloudActivitiesLength = cloud.activities?.length || 0;
+  const cloudBadgesLength = cloud.badges?.length || 0;
+  const cloudChallengesLength = cloud.challenges?.length || 0;
+
+  if (
+    local.activities.length !== cloudActivitiesLength ||
+    local.badges.length !== cloudBadgesLength ||
+    local.challenges.length !== cloudChallengesLength
+  ) {
+    return true; // Different lengths = conflict
+  }
+
+  // Check if activities are the same (by ID)
+  const localActivities = local.activities as Array<{ id?: string }>;
+  const cloudActivities = (cloud.activities || []) as Array<{ id?: string }>;
+  if (!arraysEqualById(localActivities, cloudActivities)) {
+    return true; // Different activities = conflict
+  }
+
+  // Check if badges are the same (by ID)
+  const localBadges = local.badges as Array<{ id?: string }>;
+  const cloudBadges = (cloud.badges || []) as Array<{ id?: string }>;
+  if (!arraysEqualById(localBadges, cloudBadges)) {
+    return true; // Different badges = conflict
+  }
+
+  // Check if challenges are the same (by ID)
+  const localChallenges = local.challenges as Array<{ id?: string }>;
+  const cloudChallenges = (cloud.challenges || []) as Array<{ id?: string }>;
+  if (!arraysEqualById(localChallenges, cloudChallenges)) {
+    return true; // Different challenges = conflict
+  }
+
+  // Check settings (normalize first to handle undefined vs null)
+  const normalizedLocalSettings = normalizeSettingsForComparison(local.settings);
+  const normalizedCloudSettings = normalizeSettingsForComparison(cloud.settings);
+  if (normalizedLocalSettings !== normalizedCloudSettings) {
+    return true; // Different settings = conflict
+  }
+
+  // All checks passed - data is identical, no conflict
+  return false;
 }
 
 export function useCloudSyncListener() {

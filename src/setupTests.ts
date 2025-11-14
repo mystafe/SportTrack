@@ -76,6 +76,53 @@ Object.defineProperty(global, 'crypto', {
 // Mock window.scrollTo
 window.scrollTo = jest.fn();
 
+// Mock fetch and Response for Firebase (Node.js environment doesn't have these by default)
+if (typeof global.fetch === 'undefined') {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({}),
+      text: () => Promise.resolve(''),
+    } as unknown as Response)
+  );
+}
+
+// Mock Response class
+if (typeof global.Response === 'undefined') {
+  global.Response = class MockResponse {
+    ok = true;
+    status = 200;
+    json() {
+      return Promise.resolve({});
+    }
+    text() {
+      return Promise.resolve('');
+    }
+  } as unknown as typeof Response;
+}
+
+// Mock Firebase modules to prevent initialization errors in tests
+jest.mock('firebase/app', () => ({
+  initializeApp: jest.fn(() => ({})),
+  getApps: jest.fn(() => []),
+}));
+
+jest.mock('firebase/auth', () => ({
+  getAuth: jest.fn(() => ({})),
+}));
+
+jest.mock('firebase/firestore', () => ({
+  getFirestore: jest.fn(() => ({})),
+}));
+
+// Mock Firebase environment variables for tests
+process.env.NEXT_PUBLIC_FIREBASE_API_KEY = 'test-api-key';
+process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = 'test.firebaseapp.com';
+process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = 'test-project';
+process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET = 'test.appspot.com';
+process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = '123456789';
+process.env.NEXT_PUBLIC_FIREBASE_APP_ID = 'test-app-id';
+
 // Reset localStorage before each test
 beforeEach(() => {
   localStorage.clear();
