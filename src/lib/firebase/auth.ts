@@ -31,18 +31,40 @@ export async function signIn(email: string, password: string): Promise<AuthUser>
     throw new Error('Firebase auth not initialized');
   }
 
-  const userCredential = await signInWithEmailAndPassword(auth, email, password);
-  const user = userCredential.user;
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-  // Set user ID for cloud sync
-  cloudSyncService.setUserId(user.uid);
+    // Set user ID for cloud sync
+    cloudSyncService.setUserId(user.uid);
 
-  return {
-    uid: user.uid,
-    email: user.email,
-    displayName: user.displayName,
-    photoURL: user.photoURL,
-  };
+    return {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+    };
+  } catch (error: any) {
+    // Handle Firebase auth errors
+    const errorCode = error?.code || '';
+
+    switch (errorCode) {
+      case 'auth/user-not-found':
+        throw new Error('AUTH_USER_NOT_FOUND');
+      case 'auth/wrong-password':
+        throw new Error('AUTH_WRONG_PASSWORD');
+      case 'auth/invalid-email':
+        throw new Error('AUTH_INVALID_EMAIL');
+      case 'auth/user-disabled':
+        throw new Error('AUTH_USER_DISABLED');
+      case 'auth/too-many-requests':
+        throw new Error('AUTH_TOO_MANY_REQUESTS');
+      case 'auth/network-request-failed':
+        throw new Error('AUTH_NETWORK_ERROR');
+      default:
+        throw error;
+    }
+  }
 }
 
 /**
@@ -57,23 +79,43 @@ export async function signUp(
     throw new Error('Firebase auth not initialized');
   }
 
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  const user = userCredential.user;
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-  // Update display name if provided
-  if (displayName && auth.currentUser) {
-    await updateProfile(auth.currentUser, { displayName });
+    // Update display name if provided
+    if (displayName && auth.currentUser) {
+      await updateProfile(auth.currentUser, { displayName });
+    }
+
+    // Set user ID for cloud sync
+    cloudSyncService.setUserId(user.uid);
+
+    return {
+      uid: user.uid,
+      email: user.email,
+      displayName: displayName || user.displayName,
+      photoURL: user.photoURL,
+    };
+  } catch (error: any) {
+    // Handle Firebase auth errors
+    const errorCode = error?.code || '';
+
+    switch (errorCode) {
+      case 'auth/email-already-in-use':
+        throw new Error('AUTH_EMAIL_ALREADY_IN_USE');
+      case 'auth/invalid-email':
+        throw new Error('AUTH_INVALID_EMAIL');
+      case 'auth/weak-password':
+        throw new Error('AUTH_WEAK_PASSWORD');
+      case 'auth/operation-not-allowed':
+        throw new Error('AUTH_OPERATION_NOT_ALLOWED');
+      case 'auth/network-request-failed':
+        throw new Error('AUTH_NETWORK_ERROR');
+      default:
+        throw error;
+    }
   }
-
-  // Set user ID for cloud sync
-  cloudSyncService.setUserId(user.uid);
-
-  return {
-    uid: user.uid,
-    email: user.email,
-    displayName: displayName || user.displayName,
-    photoURL: user.photoURL,
-  };
 }
 
 /**
@@ -150,7 +192,25 @@ export async function resetPassword(email: string): Promise<void> {
     throw new Error('Firebase auth not initialized');
   }
 
-  await sendPasswordResetEmail(auth, email);
+  try {
+    await sendPasswordResetEmail(auth, email);
+  } catch (error: any) {
+    // Handle Firebase auth errors
+    const errorCode = error?.code || '';
+
+    switch (errorCode) {
+      case 'auth/user-not-found':
+        throw new Error('AUTH_USER_NOT_FOUND');
+      case 'auth/invalid-email':
+        throw new Error('AUTH_INVALID_EMAIL');
+      case 'auth/too-many-requests':
+        throw new Error('AUTH_TOO_MANY_REQUESTS');
+      case 'auth/network-request-failed':
+        throw new Error('AUTH_NETWORK_ERROR');
+      default:
+        throw error;
+    }
+  }
 }
 
 /**

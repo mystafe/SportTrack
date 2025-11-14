@@ -47,12 +47,36 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             __html: `
               (function() {
                 try {
+                  // Use the same key as ThemeToggle component
                   const saved = localStorage.getItem('theme');
                   const theme = saved || 'system';
+                  
+                  // Check system preference immediately
                   const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                   const isDark = theme === 'dark' || (theme === 'system' && systemPrefersDark);
+                  
+                  // Apply theme before page renders to prevent flash
                   document.documentElement.classList.toggle('dark', isDark);
-                } catch (e) {}
+                  
+                  // Listen for system theme changes if using system theme
+                  if (theme === 'system') {
+                    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                    const handleChange = (e) => {
+                      document.documentElement.classList.toggle('dark', e.matches);
+                    };
+                    // Modern browsers
+                    if (mediaQuery.addEventListener) {
+                      mediaQuery.addEventListener('change', handleChange);
+                    } else {
+                      // Fallback for older browsers
+                      mediaQuery.addListener(handleChange);
+                    }
+                  }
+                } catch (e) {
+                  // Fallback: check system preference if localStorage fails
+                  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  document.documentElement.classList.toggle('dark', systemPrefersDark);
+                }
               })();
             `,
           }}

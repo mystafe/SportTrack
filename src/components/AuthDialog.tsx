@@ -59,12 +59,73 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
         setMode('login');
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : lang === 'tr'
-            ? 'Bir hata oluştu'
-            : 'An error occurred';
+      let errorMessage = '';
+      if (error instanceof Error) {
+        const errorCode = error.message;
+
+        // Handle specific Firebase auth errors
+        switch (errorCode) {
+          case 'AUTH_USER_NOT_FOUND':
+            errorMessage =
+              lang === 'tr'
+                ? 'Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı. Lütfen e-posta adresinizi kontrol edin veya kayıt olun.'
+                : 'No user found with this email address. Please check your email or sign up.';
+            break;
+          case 'AUTH_WRONG_PASSWORD':
+            errorMessage =
+              lang === 'tr'
+                ? 'Hatalı parola. Lütfen parolanızı kontrol edin.'
+                : 'Wrong password. Please check your password.';
+            break;
+          case 'AUTH_INVALID_EMAIL':
+            errorMessage =
+              lang === 'tr'
+                ? 'Geçersiz e-posta adresi. Lütfen geçerli bir e-posta adresi girin.'
+                : 'Invalid email address. Please enter a valid email address.';
+            break;
+          case 'AUTH_EMAIL_ALREADY_IN_USE':
+            errorMessage =
+              lang === 'tr'
+                ? 'Bu e-posta adresi zaten kullanılıyor. Lütfen giriş yapın veya farklı bir e-posta adresi kullanın.'
+                : 'This email address is already in use. Please sign in or use a different email address.';
+            break;
+          case 'AUTH_WEAK_PASSWORD':
+            errorMessage =
+              lang === 'tr'
+                ? 'Parola çok zayıf. Lütfen en az 6 karakterden oluşan güçlü bir parola seçin.'
+                : 'Password is too weak. Please choose a strong password with at least 6 characters.';
+            break;
+          case 'AUTH_USER_DISABLED':
+            errorMessage =
+              lang === 'tr'
+                ? 'Bu hesap devre dışı bırakılmış. Lütfen destek ekibi ile iletişime geçin.'
+                : 'This account has been disabled. Please contact support.';
+            break;
+          case 'AUTH_TOO_MANY_REQUESTS':
+            errorMessage =
+              lang === 'tr'
+                ? 'Çok fazla başarısız deneme. Lütfen bir süre sonra tekrar deneyin.'
+                : 'Too many failed attempts. Please try again later.';
+            break;
+          case 'AUTH_NETWORK_ERROR':
+            errorMessage =
+              lang === 'tr'
+                ? 'Ağ hatası. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.'
+                : 'Network error. Please check your internet connection and try again.';
+            break;
+          case 'AUTH_OPERATION_NOT_ALLOWED':
+            errorMessage =
+              lang === 'tr'
+                ? 'Bu işlem şu anda izin verilmiyor. Lütfen daha sonra tekrar deneyin.'
+                : 'This operation is not allowed at the moment. Please try again later.';
+            break;
+          default:
+            errorMessage =
+              error.message || (lang === 'tr' ? 'Bir hata oluştu' : 'An error occurred');
+        }
+      } else {
+        errorMessage = lang === 'tr' ? 'Bir hata oluştu' : 'An error occurred';
+      }
       showToast(errorMessage, 'error');
     } finally {
       setLoading(false);
