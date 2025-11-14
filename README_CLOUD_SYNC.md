@@ -19,19 +19,23 @@ To enable Cloud Sync functionality, you need to set up Firebase:
 
 ### 3. Set Environment Variables
 
-The `.env.local` file has been created with your Firebase configuration. If you need to update it, edit the file in the project root:
+Create a `.env.local` file in the project root with your Firebase configuration:
 
 ```env
-NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyCcTFviw8VTA1eVaYpxyIktcwKGQHJkfMU
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=sporttrack-c3b18.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=sporttrack-c3b18
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=sporttrack-c3b18.firebasestorage.app
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=816124129314
-NEXT_PUBLIC_FIREBASE_APP_ID=1:816124129314:web:eb485fd313edf3974dda7b
-NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-MHW3XBLHNB
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key_here
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 ```
 
-**Note:** The `.env.local` file is already in `.gitignore` and will not be committed to the repository.
+**Important:**
+
+- The `.env.local` file is in `.gitignore` and will NOT be committed to the repository
+- Never commit your Firebase credentials to version control
+- Keep your API keys secure and private
 
 ### 4. Configure Firestore Security Rules
 
