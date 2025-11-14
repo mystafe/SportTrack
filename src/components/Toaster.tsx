@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { TIMEOUTS } from '@/lib/constants';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
-type ToastType = 'success' | 'error' | 'info';
+type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 type Toast = {
   id: string;
@@ -55,7 +55,9 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
                     ? 'bg-green-500 text-white'
                     : toast.type === 'error'
                       ? 'bg-red-500 text-white'
-                      : 'bg-blue-500 text-white'
+                      : toast.type === 'warning'
+                        ? 'bg-yellow-500 text-white'
+                        : 'bg-blue-500 text-white'
                 }`}
                 role="alert"
                 aria-live={toast.type === 'error' ? 'assertive' : 'polite'}

@@ -123,11 +123,15 @@ function mergeData(
  * Check if data is empty (0 activities, 0 badges, 0 challenges)
  */
 function isEmpty(data: {
-  activities: ActivityRecord[];
-  badges: Badge[];
-  challenges: Challenge[];
+  activities: ActivityRecord[] | unknown[];
+  badges: Badge[] | unknown[];
+  challenges: Challenge[] | unknown[];
 }): boolean {
-  return data.activities.length === 0 && data.badges.length === 0 && data.challenges.length === 0;
+  return (
+    (data.activities?.length || 0) === 0 &&
+    (data.badges?.length || 0) === 0 &&
+    (data.challenges?.length || 0) === 0
+  );
 }
 
 /**
