@@ -14,6 +14,7 @@ import { NotificationManager } from '@/components/NotificationManager';
 import { OnboardingManager } from '@/components/OnboardingManager';
 import { KeyboardShortcuts } from '@/components/KeyboardShortcuts';
 import { BadgeUnlockNotification } from '@/components/BadgeUnlockNotification';
+import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -32,6 +33,7 @@ export function Providers({ children }: { children: ReactNode }) {
                     <OnboardingManager />
                     <KeyboardShortcuts />
                     <BadgeUnlockNotification />
+                    <OnlineStatusIndicator />
                     {children}
                   </ToasterProvider>
                 </BadgeProvider>

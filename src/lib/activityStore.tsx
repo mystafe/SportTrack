@@ -163,7 +163,7 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(debouncedActivities));
       setStorageError(null);
     } catch (error) {
-      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      if (isQuotaError(error)) {
         setStorageError('quota');
       } else {
         console.error('Failed to save activities to storage', error);
