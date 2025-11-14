@@ -40,7 +40,11 @@ export function useAuth() {
         const authUser = convertUser(currentUser);
         setUser(authUser);
         // Set user ID for cloud sync on initial load
-        cloudSyncService.setUserId(authUser.uid);
+        if (authUser) {
+          cloudSyncService.setUserId(authUser.uid);
+        } else {
+          cloudSyncService.setUserId(null);
+        }
       } else {
         cloudSyncService.setUserId(null);
       }
