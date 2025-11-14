@@ -46,18 +46,35 @@ function isCloudEmpty(cloud: CloudData): boolean {
 }
 
 /**
- * Normalize settings for comparison (handle undefined vs null, remove undefined fields)
+ * Normalize settings for comparison (handle undefined vs null, remove undefined fields, ignore metadata)
+ * Also sorts customActivities arrays for consistent comparison
  */
 function normalizeSettingsForComparison(settings: unknown | null): string {
   if (!settings || typeof settings !== 'object') {
     return JSON.stringify({ name: '', dailyTarget: 10000, customActivities: [], mood: null });
   }
   const s = settings as Record<string, unknown>;
+
+  // Sort customActivities by id for consistent comparison
+  const customActivities = Array.isArray(s.customActivities) ? s.customActivities : [];
+  const sortedCustomActivities = customActivities
+    .map((item) => {
+      if (typeof item === 'object' && item !== null && 'id' in item) {
+        return item;
+      }
+      return item;
+    })
+    .sort((a, b) => {
+      const aId = typeof a === 'object' && a !== null && 'id' in a ? String(a.id) : '';
+      const bId = typeof b === 'object' && b !== null && 'id' in b ? String(b.id) : '';
+      return aId.localeCompare(bId);
+    });
+
   return JSON.stringify({
-    name: s.name || '',
-    dailyTarget: s.dailyTarget || 10000,
-    customActivities: Array.isArray(s.customActivities) ? s.customActivities : [],
-    mood: s.mood !== undefined ? s.mood : null,
+    name: String(s.name || '').trim(),
+    dailyTarget: Number(s.dailyTarget || 10000),
+    customActivities: sortedCustomActivities,
+    mood: s.mood !== undefined && s.mood !== null ? String(s.mood) : null,
   });
 }
 
@@ -385,12 +402,21 @@ export function useCloudSyncListener() {
         if (localHasData && cloudHasData && !localIsEmpty && !cloudIsEmpty) {
           // Both have data, check for conflicts
           const conflicts = hasConflicts(localData, cloudData);
+          const localSettingsNormalized = normalizeSettingsForComparison(localData.settings);
+          const cloudSettingsNormalized = normalizeSettingsForComparison(cloudData.settings);
+          const settingsMatch = localSettingsNormalized === cloudSettingsNormalized;
+
           console.log('🔍 Initial sync conflict check:', {
             conflicts,
             localActivities: localData.activities.length,
             cloudActivities: cloudData.activities?.length || 0,
             localBadges: localData.badges.length,
             cloudBadges: cloudData.badges?.length || 0,
+            localChallenges: localData.challenges.length,
+            cloudChallenges: cloudData.challenges?.length || 0,
+            settingsMatch,
+            localSettings: localSettingsNormalized,
+            cloudSettings: cloudSettingsNormalized,
           });
 
           if (conflicts) {

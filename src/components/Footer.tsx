@@ -20,7 +20,7 @@ export function Footer() {
         © {new Date().getFullYear()} SportTrack · {t('footer.byName')}
       </span>
       <span className="font-semibold">
-        v0.18.0 <span className="uppercase tracking-wide">beta</span>
+        v0.18.1 <span className="uppercase tracking-wide">beta</span>
       </span>
     </footer>
   );
