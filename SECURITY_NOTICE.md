@@ -32,10 +32,16 @@ The following Firebase credentials were visible in the repository:
 
 ### Security Measures Taken
 
-- ✅ `.env.local` has been removed from git history
+- ⚠️ `.env.local` was committed in commit `bbeadde` - **needs manual cleanup**
 - ✅ `.env.local` is now in `.gitignore`
 - ✅ README has been updated to use placeholders
 - ✅ Future commits will not include sensitive data
+
+**Note:** To completely remove `.env.local` from git history, you need to:
+
+1. Use `git filter-branch` or BFG Repo-Cleaner (requires clean working directory)
+2. Force push to remote: `git push --force-with-lease origin main`
+3. Inform all collaborators to re-clone the repository
 
 ### Best Practices Going Forward
 
