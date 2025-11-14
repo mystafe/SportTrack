@@ -13,6 +13,13 @@
 /out/
 /build
 
+# Firebase build output in public folder (should not be committed)
+/public/_next/
+/public/*.html
+/public/*.txt
+/public/sw*.js
+/public/workbox*.js
+
 # production
 /build
 
