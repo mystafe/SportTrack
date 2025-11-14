@@ -34,6 +34,16 @@ export function BadgeUnlockNotification() {
     }
   }, [badges, checkNewBadges, shownBadgeIds]);
 
+  const handleDismiss = useCallback(() => {
+    setIsExiting(true);
+    setTimeout(() => {
+      setIsVisible(false);
+      setCurrentBadge(null);
+      setUnlockedBadges((prev) => prev.slice(1));
+      setIsExiting(false);
+    }, 300);
+  }, []);
+
   useEffect(() => {
     if (unlockedBadges.length > 0 && !currentBadge && !isVisible) {
       const nextBadge = unlockedBadges[0];
@@ -49,16 +59,6 @@ export function BadgeUnlockNotification() {
       return () => clearTimeout(autoHideTimer);
     }
   }, [unlockedBadges, currentBadge, isVisible, handleDismiss]);
-
-  const handleDismiss = useCallback(() => {
-    setIsExiting(true);
-    setTimeout(() => {
-      setIsVisible(false);
-      setCurrentBadge(null);
-      setUnlockedBadges((prev) => prev.slice(1));
-      setIsExiting(false);
-    }, 300);
-  }, []);
 
   const handleClick = () => {
     handleDismiss();
