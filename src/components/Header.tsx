@@ -85,6 +85,7 @@ export function Header() {
           </div>
           {!isMobile && (
             <>
+              <CloudSyncIndicator />
               <DataExportImport />
               <LanguageToggle />
               <ThemeToggle />
