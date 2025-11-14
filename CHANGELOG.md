@@ -2,6 +2,21 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.14.5] - 2025-01
+
+### Fixed
+- **ScrollToTop Button Visibility**:
+  - Reduced scroll threshold from 200px to 100px for better visibility
+  - Increased bottom offset (mobile: bottom-44, desktop: bottom-40) to ensure button is always above QuoteTicker
+  - Added explicit visibility style to ensure button appears correctly
+  - Button now appears earlier when scrolling, making it more accessible on homepage
+
+### Changed
+- **Activity Templates Mobile Layout**:
+  - Changed mobile grid layout from 1 column to 2 columns
+  - Activity template cards now display side-by-side on mobile devices
+  - Improved space utilization and visual balance on mobile screens
+
 ## [0.14.4] - 2025-01
 
 ### Fixed

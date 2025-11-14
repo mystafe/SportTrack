@@ -94,7 +94,7 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
             <span className={`inline-block w-1 ${isMobile ? 'h-3' : 'h-4'} bg-brand rounded-full`}></span>
             {t(`templates.category.${category}`)}
           </h4>
-          <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2' : 'gap-3 sm:gap-4'}`}>
+          <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2' : 'gap-3 sm:gap-4'}`}>
             {templates.map((template) => (
               <button
                 key={template.id}

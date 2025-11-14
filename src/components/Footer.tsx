@@ -15,7 +15,7 @@ export function Footer() {
   return (
     <footer className={`container py-10 ${marginBottom} safe-bottom text-sm text-gray-500 dark:text-gray-400 flex flex-row items-center justify-between gap-2`}>
       <span className="font-medium">© {new Date().getFullYear()} SportTrack · {t('footer.byName')}</span>
-      <span className="font-semibold">v0.14.4 <span className="uppercase tracking-wide">beta</span></span>
+      <span className="font-semibold">v0.14.5 <span className="uppercase tracking-wide">beta</span></span>
     </footer>
   );
 }

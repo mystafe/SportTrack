@@ -19,8 +19,8 @@ export function ScrollToTop() {
 
     const handleScroll = () => {
       const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
-      // Lower threshold for better visibility
-      setIsVisible(scrollY > 200);
+      // Lower threshold for better visibility - show after scrolling just 100px
+      setIsVisible(scrollY > 100);
     };
 
     // Initial check immediately
@@ -55,7 +55,8 @@ export function ScrollToTop() {
   // Calculate position above QuoteTicker
   // QuoteTicker height: ~50-60px (mobile) or ~60-70px (desktop) + safe-bottom
   // Use larger offset to ensure visibility - account for safe-bottom
-  const bottomOffset = isMobile ? 'bottom-40' : 'bottom-36';
+  // Increased offset to ensure button is always visible
+  const bottomOffset = isMobile ? 'bottom-44' : 'bottom-40';
 
   return (
     <div
@@ -63,6 +64,8 @@ export function ScrollToTop() {
       style={{ 
         willChange: 'opacity, transform',
         position: 'fixed',
+        // Ensure button is always visible
+        visibility: mounted ? 'visible' : 'hidden',
       }}
     >
       <button
