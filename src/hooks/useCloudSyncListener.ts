@@ -158,7 +158,7 @@ export function useCloudSyncListener() {
   const { badges, hydrated: badgesHydrated } = useBadges();
   const { challenges, hydrated: challengesHydrated } = useChallenges();
   const { showToast } = useToaster();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   // Use refs to avoid re-subscribing on every change
   const activitiesRef = useRef(activities);
@@ -358,8 +358,31 @@ export function useCloudSyncListener() {
           }
         }
 
+        // If cloud is empty and local has data, automatically upload local to cloud - no conflict
+        if (cloudIsEmpty && localHasData && !localIsEmpty) {
+          console.log(
+            '📤 Initial sync: Cloud is empty (0 activities/badges/challenges), local has data - uploading local data to cloud automatically'
+          );
+
+          // Mark initial sync as complete and let auto-sync handle the upload
+          initialSyncDoneRef.current = true;
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
+          }
+
+          // Show info toast
+          showToastRef.current(
+            lang === 'tr'
+              ? 'Yerel verileriniz buluta yüklenecek'
+              : 'Your local data will be uploaded to cloud',
+            'info'
+          );
+
+          return; // Exit early, auto-sync will upload
+        }
+
         // If both have data, check for conflicts (but only if local is not empty)
-        if (localHasData && cloudHasData && !localIsEmpty) {
+        if (localHasData && cloudHasData && !localIsEmpty && !cloudIsEmpty) {
           // Both have data, check for conflicts
           const conflicts = hasConflicts(localData, cloudData);
           console.log('🔍 Initial sync conflict check:', {

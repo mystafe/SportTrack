@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { I18nProvider } from '@/lib/i18n';
 import { ActivitiesProvider } from '@/lib/activityStore';
 import { SettingsProvider } from '@/lib/settingsStore';
@@ -19,11 +19,15 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AutoSyncProvider } from '@/components/AutoSyncProvider';
 import { NameDialog } from '@/components/NameDialog';
 import { ConflictResolutionManager } from '@/components/ConflictResolutionManager';
-// Import console helpers to make them available in browser console
-import '@/lib/consoleHelpers';
-import '@/lib/syncDebug';
 
 export function Providers({ children }: { children: ReactNode }) {
+  // Import console helpers to make them available in browser console (only in browser)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      import('@/lib/consoleHelpers');
+      import('@/lib/syncDebug');
+    }
+  }, []);
   return (
     <ErrorBoundary>
       <I18nProvider>
