@@ -62,25 +62,27 @@ export function InstallPrompt() {
   if (!showPrompt || !deferredPrompt) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-[10001] safe-bottom animate-slide-in-right">
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-xl p-4 flex items-center justify-between gap-4">
-        <div className="flex-1">
-          <div className="font-semibold text-sm mb-1">{t('pwa.installTitle')}</div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">{t('pwa.installDescription')}</div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleDismiss}
-            className="px-3 py-1.5 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            {t('pwa.dismiss')}
-          </button>
-          <button
-            onClick={handleInstall}
-            className="px-4 py-1.5 text-xs rounded bg-brand text-white hover:bg-brand-dark transition-colors font-medium"
-          >
-            {t('pwa.install')}
-          </button>
+    <div className="fixed bottom-4 left-4 right-4 z-[10001] safe-bottom animate-slide-in-right flex justify-center">
+      <div className="w-full max-w-md mx-auto">
+        <div className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-xl shadow-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-sm mb-1 text-gray-950 dark:text-white">{t('pwa.installTitle')}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{t('pwa.installDescription')}</div>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              onClick={handleDismiss}
+              className="flex-1 sm:flex-none px-3 py-2 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold text-gray-700 dark:text-gray-300"
+            >
+              {t('pwa.dismiss')}
+            </button>
+            <button
+              onClick={handleInstall}
+              className="flex-1 sm:flex-none px-4 py-2 text-xs rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+            >
+              {t('pwa.install')}
+            </button>
+          </div>
         </div>
       </div>
     </div>

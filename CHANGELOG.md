@@ -2,6 +2,23 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.14.6] - 2025-01
+
+### Fixed
+- **Install Prompt Layout**:
+  - Install prompt no longer spans full screen width
+  - Added max-width constraint (max-w-md) to center the prompt
+  - Improved responsive layout: stacked on mobile, horizontal on desktop
+  - Enhanced button styling with gradients and better spacing
+  - Better visual hierarchy and readability
+
+### Changed
+- **Install Prompt Design**:
+  - Changed from full-width to centered card with max-width
+  - Improved button layout: full-width on mobile, auto-width on desktop
+  - Enhanced borders and shadows for better visual appeal
+  - Better text contrast and spacing
+
 ## [0.14.5] - 2025-01
 
 ### Fixed
