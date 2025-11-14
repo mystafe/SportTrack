@@ -16,6 +16,7 @@ import { KeyboardShortcuts } from '@/components/KeyboardShortcuts';
 import { BadgeUnlockNotification } from '@/components/BadgeUnlockNotification';
 import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { useAutoSync } from '@/hooks/useAutoSync';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
