@@ -42,9 +42,24 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         className="min-h-screen h-full bg-white dark:bg-black overflow-x-hidden safe-top safe-bottom"
         suppressHydrationWarning
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const saved = localStorage.getItem('theme');
+                  const theme = saved || 'system';
+                  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  const isDark = theme === 'dark' || (theme === 'system' && systemPrefersDark);
+                  document.documentElement.classList.toggle('dark', isDark);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <Providers>
           <Header />
-          <main className="container py-4 sm:py-6 pb-20 sm:pb-24">{children}</main>
+          <main className="container py-4 sm:py-6 pb-20 sm:pb-24 mb-4 sm:mb-6">{children}</main>
           <Footer />
           <ScrollToTop />
           <QuoteTicker />

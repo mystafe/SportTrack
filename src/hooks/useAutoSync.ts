@@ -29,29 +29,45 @@ export function useAutoSync() {
     settings: string | null;
     badges: number;
     challenges: number;
-  }>({
-    activities: 0,
-    settings: null,
-    badges: 0,
-    challenges: 0,
-  });
+  } | null>(null);
+  const isInitialSyncRef = useRef(true);
 
   const allHydrated =
     activitiesHydrated && settingsHydrated && badgesHydrated && challengesHydrated;
 
   useEffect(() => {
     if (!isAuthenticated || !isConfigured || !allHydrated) {
+      // Reset lastSyncRef when not authenticated
+      if (!isAuthenticated || !isConfigured) {
+        lastSyncRef.current = null;
+        isInitialSyncRef.current = true;
+      }
+      return;
+    }
+
+    // Initialize lastSyncRef on first sync
+    if (lastSyncRef.current === null) {
+      lastSyncRef.current = {
+        activities: activities.length,
+        settings: settings ? JSON.stringify(settings) : null,
+        badges: badges.length,
+        challenges: challenges.length,
+      };
+      // Don't sync on initial load, wait for changes
+      isInitialSyncRef.current = false;
       return;
     }
 
     // Check if anything changed
     const activitiesChanged = activities.length !== lastSyncRef.current.activities;
-    const settingsChanged =
-      settings !== null && JSON.stringify(settings) !== lastSyncRef.current.settings;
+    const currentSettingsStr = settings ? JSON.stringify(settings) : null;
+    const settingsChanged = currentSettingsStr !== lastSyncRef.current.settings;
     const badgesChanged = badges.length !== lastSyncRef.current.badges;
     const challengesChanged = challenges.length !== lastSyncRef.current.challenges;
 
+    // If nothing changed, don't sync (prevents infinite loops)
     if (!activitiesChanged && !settingsChanged && !badgesChanged && !challengesChanged) {
+      console.log('⏭️ No changes detected, skipping sync');
       return;
     }
 
@@ -62,19 +78,28 @@ export function useAutoSync() {
 
     // Set new timeout for debounced sync
     syncTimeoutRef.current = setTimeout(() => {
+      const settingsStr = settings ? JSON.stringify(settings) : null;
+
+      console.log('🔄 Auto-sync triggered:', {
+        activities: activities.length,
+        settings: settings ? 'present' : 'null',
+        badges: badges.length,
+        challenges: challenges.length,
+      });
+
       syncToCloud({
         activities,
         settings,
         badges,
         challenges,
       }).catch((error) => {
-        console.error('Auto-sync failed:', error);
+        console.error('❌ Auto-sync failed:', error);
       });
 
       // Update last sync ref
       lastSyncRef.current = {
         activities: activities.length,
-        settings: settings ? JSON.stringify(settings) : null,
+        settings: settingsStr,
         badges: badges.length,
         challenges: challenges.length,
       };

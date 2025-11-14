@@ -44,13 +44,18 @@ body {
     left: 0;
     right: 0;
     height: env(safe-area-inset-top);
-    background-color: #ffffff;
+    background-color: inherit;
     z-index: 999999;
     pointer-events: none;
+    transition: background-color 0.3s ease;
   }
 
   html.dark::before {
     background-color: #000000;
+  }
+
+  html.light::before {
+    background-color: #ffffff;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -66,13 +71,18 @@ body {
     left: 0;
     right: 0;
     height: env(safe-area-inset-bottom);
-    background-color: #ffffff;
+    background-color: inherit;
     z-index: 999999;
     pointer-events: none;
+    transition: background-color 0.3s ease;
   }
 
   html.dark::after {
     background-color: #000000;
+  }
+
+  html.light::after {
+    background-color: #ffffff;
   }
 
   @media (prefers-color-scheme: dark) {

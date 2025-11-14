@@ -18,6 +18,7 @@ import {
   type AuthUser,
 } from '@/lib/firebase/auth';
 import { isFirebaseConfigured } from '@/lib/firebase/config';
+import { cloudSyncService } from '@/lib/cloudSync/syncService';
 
 export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -36,11 +37,17 @@ export function useAuth() {
       // Get initial user
       const currentUser = getCurrentUser();
       if (currentUser) {
-        setUser(convertUser(currentUser));
+        const authUser = convertUser(currentUser);
+        setUser(authUser);
+        // Set user ID for cloud sync on initial load
+        cloudSyncService.setUserId(authUser.uid);
+      } else {
+        cloudSyncService.setUserId(null);
       }
       setLoading(false);
 
       // Subscribe to auth state changes
+      // Note: onAuthStateChange also calls cloudSyncService.setUserId() on changes
       const unsubscribe = onAuthStateChange((authUser) => {
         setUser(authUser);
         setLoading(false);

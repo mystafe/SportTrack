@@ -11,6 +11,7 @@ import {
   type ParseProgress,
 } from '@/lib/appleHealthParser';
 import { BASE_ACTIVITY_MAP } from '@/lib/activityConfig';
+import { STORAGE_KEYS } from '@/lib/constants';
 import { startOfDay } from 'date-fns';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -154,6 +155,11 @@ export function AppleHealthImport() {
         });
       });
 
+      // Save last import timestamp
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEYS.APPLE_HEALTH_LAST_IMPORT, Date.now().toString());
+      }
+
       showToast(
         t('appleHealth.importSuccess', {
           count: String(parseResult.data.length),
@@ -184,7 +190,7 @@ export function AppleHealthImport() {
   return (
     <>
       <label
-        className={`px-2 py-1 ${isMobile ? 'min-h-[36px] min-w-[80px]' : ''} text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer touch-feedback mobile-press flex items-center justify-center`}
+        className={`px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold`}
       >
         <input
           ref={fileInputRef}
@@ -197,7 +203,7 @@ export function AppleHealthImport() {
         />
         <span className="flex items-center gap-1">
           {isImporting ? '⏳' : '📱'}
-          <span className={isMobile ? 'text-[9px]' : ''}>{t('appleHealth.import')}</span>
+          <span>{lang === 'tr' ? 'Sağlık Verisi İçe Aktar' : 'Import Health Data'}</span>
         </span>
       </label>
 

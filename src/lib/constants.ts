@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   LEVELS: 'sporttrack.levels.v1',
   CHALLENGES: 'sporttrack.challenges.v1',
   ONBOARDING_COMPLETED: 'sporttrack.onboarding.completed',
+  APPLE_HEALTH_LAST_IMPORT: 'sporttrack.appleHealth.lastImport',
 } as const;
 
 export const TIMEOUTS = {

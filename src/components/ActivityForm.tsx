@@ -250,7 +250,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   }
 
   return (
-    <form onSubmit={submit} className={isMobile ? 'space-y-3' : 'space-y-5'}>
+    <form onSubmit={submit} className={isMobile ? 'space-y-3' : 'space-y-5'} autoComplete="off">
       <div className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
         <div
           className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -330,6 +330,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             onChange={(e) => setPerformedAt(e.target.value)}
             className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2.5 py-2 min-h-[40px] text-xs' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 min-w-0 max-w-full transition-all duration-200`}
             required
+            autoComplete="off"
+            data-form-type="other"
           />
         </label>
       </div>
@@ -348,6 +350,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             onChange={(e) => setAmount(e.target.value)}
             className={`input-enhanced w-full border ${isMobile ? 'rounded-md px-2.5 py-2 min-h-[40px] text-xs' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 transition-all duration-200`}
             required
+            autoComplete="off"
+            data-form-type="other"
             aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
             aria-describedby={
               getActivityDescription(definition, lang) ? 'amount-description' : undefined
@@ -386,6 +390,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           rows={isMobile ? 2 : 3}
           placeholder={t('form.notePlaceholder')}
           aria-label={t('form.noteOptional')}
+          autoComplete="off"
+          data-form-type="other"
         />
       </label>
       <div

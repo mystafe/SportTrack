@@ -35,15 +35,17 @@ export function useCloudSync() {
       settings: unknown | null;
       badges: unknown[];
       challenges: unknown[];
-    }) => {
+    }): Promise<void> => {
       if (!isConfigured || !isOnline) {
         updateStatus('offline');
-        return;
+        throw new Error('Cloud sync not configured or offline');
       }
 
       try {
         updateStatus('syncing');
+        console.log('🔄 Starting cloud sync...');
         await cloudSyncService.uploadToCloud(data as any);
+        console.log('✅ Cloud sync completed successfully');
         updateStatus('synced');
         setSyncState((prev) => ({
           ...prev,
@@ -52,7 +54,9 @@ export function useCloudSync() {
         }));
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Sync failed';
+        console.error('❌ Cloud sync failed:', errorMessage, error);
         updateStatus('error', errorMessage);
+        throw error; // Re-throw to allow caller to handle
       }
     },
     [isConfigured, isOnline, updateStatus]
@@ -85,6 +89,16 @@ export function useCloudSync() {
       updateStatus('offline');
     }
   }, [isOnline, syncState.status, updateStatus]);
+
+  // Auto-reset 'synced' status to 'idle' after 3 seconds
+  useEffect(() => {
+    if (syncState.status === 'synced') {
+      const timer = setTimeout(() => {
+        updateStatus('idle');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [syncState.status, updateStatus]);
 
   return {
     syncState,

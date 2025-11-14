@@ -14,11 +14,35 @@ export function InstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
+    // Check if dismissed within the last hour before showing
+    const checkDismissed = () => {
+      const dismissedTime = localStorage.getItem('pwa-install-dismissed');
+      if (dismissedTime) {
+        const dismissTimestamp = parseInt(dismissedTime, 10);
+        const now = Date.now();
+        // If dismissed time is in the future (still within 1 hour), don't show
+        if (dismissTimestamp > now) {
+          return false;
+        } else {
+          // 1 hour has passed, clear the dismissed flag
+          localStorage.removeItem('pwa-install-dismissed');
+        }
+      }
+      return true;
+    };
+
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      // Show prompt after a delay to not interrupt user
-      setTimeout(() => setShowPrompt(true), 3000);
+      // Show prompt after a delay to not interrupt user, but only if not dismissed
+      if (checkDismissed()) {
+        setTimeout(() => {
+          // Check again before showing (in case user dismissed during delay)
+          if (checkDismissed()) {
+            setShowPrompt(true);
+          }
+        }, 3000);
+      }
     };
 
     window.addEventListener('beforeinstallprompt', handler);
@@ -48,14 +72,25 @@ export function InstallPrompt() {
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    // Don't show again for this session
-    sessionStorage.setItem('pwa-install-dismissed', 'true');
+    // Don't show again for 1 hour (3600000 ms)
+    const dismissTime = Date.now() + 3600000; // 1 hour from now
+    localStorage.setItem('pwa-install-dismissed', String(dismissTime));
   };
 
-  // Don't show if dismissed in this session
+  // Don't show if dismissed within the last hour
   useEffect(() => {
-    if (sessionStorage.getItem('pwa-install-dismissed') === 'true') {
-      setShowPrompt(false);
+    const dismissedTime = localStorage.getItem('pwa-install-dismissed');
+    if (dismissedTime) {
+      const dismissTimestamp = parseInt(dismissedTime, 10);
+      const now = Date.now();
+      // If dismissed time is in the future (still within 1 hour), don't show
+      if (dismissTimestamp > now) {
+        setShowPrompt(false);
+        setDeferredPrompt(null); // Also clear deferred prompt
+      } else {
+        // 1 hour has passed, clear the dismissed flag
+        localStorage.removeItem('pwa-install-dismissed');
+      }
     }
   }, []);
 

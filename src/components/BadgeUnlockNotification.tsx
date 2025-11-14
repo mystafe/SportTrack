@@ -50,7 +50,12 @@ export function BadgeUnlockNotification() {
       setCurrentBadge(nextBadge);
       setIsVisible(true);
       setIsExiting(false);
+    }
+  }, [unlockedBadges, currentBadge, isVisible]);
 
+  // Auto-hide timer - runs when badge is visible
+  useEffect(() => {
+    if (currentBadge && isVisible && !isExiting) {
       // Auto-hide after 5 seconds if not clicked
       const autoHideTimer = setTimeout(() => {
         handleDismiss();
@@ -58,9 +63,9 @@ export function BadgeUnlockNotification() {
 
       return () => clearTimeout(autoHideTimer);
     }
-  }, [unlockedBadges, currentBadge, isVisible, handleDismiss]);
+  }, [currentBadge, isVisible, isExiting, handleDismiss]);
 
-  const handleClick = () => {
+  const handleBadgeClick = () => {
     handleDismiss();
     // Smooth page transition
     setTimeout(() => {
@@ -68,16 +73,24 @@ export function BadgeUnlockNotification() {
     }, 150);
   };
 
+  const handleBackdropClick = () => {
+    // Close when clicking outside the badge
+    handleDismiss();
+  };
+
   if (!currentBadge || !isVisible) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex items-center justify-center pointer-events-none`}
-      onClick={handleClick}
+      className={`fixed inset-0 z-[100] flex items-center justify-center pointer-events-auto`}
+      onClick={handleBackdropClick}
     >
       <div
         className={`${isMobile ? 'px-4 py-3' : 'px-6 py-4'} rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-400 dark:from-yellow-500 dark:via-amber-500 dark:to-orange-500 shadow-2xl border-4 border-yellow-300 dark:border-yellow-400 cursor-pointer pointer-events-auto transform transition-all duration-300 ${isExiting ? 'opacity-0 scale-90' : 'opacity-100 scale-100'} animate-badge-unlock-center`}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleBadgeClick();
+        }}
       >
         <div className="flex flex-col items-center gap-2">
           <div className={`${isMobile ? 'text-5xl' : 'text-6xl'} animate-badge-bounce`}>

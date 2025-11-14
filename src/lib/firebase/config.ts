@@ -36,8 +36,12 @@ if (typeof window !== 'undefined') {
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         db = getFirestore(app);
+
+        // Enable offline persistence for better reliability
+        // Note: This might cause writes to be queued if offline
+        console.log('✅ Firebase initialized successfully');
       } catch (error) {
-        console.error('Firebase initialization error:', error);
+        console.error('❌ Firebase initialization error:', error);
         // Set to null if initialization fails
         app = null;
         auth = null;

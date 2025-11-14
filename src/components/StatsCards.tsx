@@ -25,9 +25,6 @@ export const StatsCards = memo(function StatsCards() {
   );
   const dateLocale = lang === 'tr' ? tr : enUS;
   const isMobile = useIsMobile();
-  const [activeMobileSection, setActiveMobileSection] = useState<'breakdown' | 'lastSeven'>(
-    'breakdown'
-  );
   const [overviewOpen, setOverviewOpen] = useState(true);
   const [breakdownOpen, setBreakdownOpen] = useState(true);
   const [lastSevenOpen, setLastSevenOpen] = useState(true);
@@ -38,41 +35,19 @@ export const StatsCards = memo(function StatsCards() {
     isOpen: boolean,
     setIsOpen: (open: boolean) => void
   ) => {
-    if (!isMobile) {
-      return (
-        <button
-          type="button"
-          className="flex w-full items-center justify-between text-sm font-bold text-gray-900 dark:text-white mb-3 transition-all duration-200 hover:text-brand"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-expanded={isOpen}
-          aria-controls={`stats-section-${id}`}
-        >
-          <span className="font-bold">{title}</span>
-          <span
-            className="ml-2 text-lg font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light"
-            aria-hidden
-            style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
-          >
-            ▼
-          </span>
-        </button>
-      );
-    }
-    const isActive = activeMobileSection === id;
     return (
       <button
         type="button"
-        className="flex w-full items-center justify-between text-sm text-gray-800 dark:text-gray-200 font-semibold mb-3 transition-all duration-200 hover:text-gray-950 dark:hover:text-white"
-        onClick={() => setActiveMobileSection(id)}
-        aria-expanded={isActive}
+        className="flex w-full items-center justify-between text-sm font-bold text-gray-900 dark:text-white mb-3 transition-all duration-200 hover:text-brand"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
         aria-controls={`stats-section-${id}`}
-        aria-label={t('stats.sectionToggle', { section: title })}
       >
-        <span>{title}</span>
+        <span className="font-bold">{title}</span>
         <span
           className="ml-2 text-lg font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light"
           aria-hidden
-          style={{ transform: isActive ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+          style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
         >
           ▼
         </span>
@@ -138,7 +113,7 @@ export const StatsCards = memo(function StatsCards() {
   };
 
   return (
-    <div className="spacing-lg">
+    <div>
       {showConfetti && (
         <>
           {Array.from({ length: 30 }).map((_, i) => (
@@ -274,7 +249,7 @@ export const StatsCards = memo(function StatsCards() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
         <div className="card-entrance slide-in-left rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
           {renderSectionHeader(
             'breakdown',
@@ -282,7 +257,7 @@ export const StatsCards = memo(function StatsCards() {
             breakdownOpen,
             setBreakdownOpen
           )}
-          {(isMobile ? activeMobileSection === 'breakdown' : breakdownOpen) && (
+          {breakdownOpen && (
             <div id="stats-section-breakdown">
               {summary.breakdownToday.length === 0 ? (
                 <div className="text-sm text-gray-700 dark:text-gray-300">
@@ -318,7 +293,7 @@ export const StatsCards = memo(function StatsCards() {
         </div>
         <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300 hover-lift transition-smooth">
           {renderSectionHeader('lastSeven', t('stats.lastSeven'), lastSevenOpen, setLastSevenOpen)}
-          {(isMobile ? activeMobileSection === 'lastSeven' : lastSevenOpen) && (
+          {lastSevenOpen && (
             <div id="stats-section-lastSeven">
               {summary.lastSevenDays.length === 0 ? (
                 <div className="text-sm text-gray-700 dark:text-gray-300">{t('stats.noData')}</div>

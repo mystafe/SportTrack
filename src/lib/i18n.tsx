@@ -388,6 +388,10 @@ const translations: Translations = {
     tr: 'Tanıtım Turunu Tekrar Göster',
     en: 'Show Onboarding Tour Again',
   },
+  'settings.clearData': {
+    tr: 'Tüm Verileri Temizle',
+    en: 'Clear All Data',
+  },
 
   'footer.byName': { tr: 'Mustafa Evleksiz', en: 'Mustafa Evleksiz' },
 

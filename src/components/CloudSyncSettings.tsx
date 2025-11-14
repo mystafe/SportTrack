@@ -57,18 +57,34 @@ export function CloudSyncSettings() {
       return;
     }
 
+    console.log('🔄 handleSyncToCloud called');
     setSyncing(true);
     try {
+      console.log('📊 Data to sync:', {
+        activities: activities.length,
+        settings: settings ? 'present' : 'null',
+        badges: badges.length,
+        challenges: challenges.length,
+      });
+
       await syncToCloud({
         activities,
         settings,
         badges,
         challenges,
       });
+
+      console.log('✅ Sync completed, showing toast');
       showToast(lang === 'tr' ? 'Buluta senkronize edildi!' : 'Synced to cloud!', 'success');
     } catch (error) {
-      showToast(lang === 'tr' ? 'Senkronizasyon hatası' : 'Sync error', 'error');
+      console.error('❌ Sync error in handleSyncToCloud:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      showToast(
+        lang === 'tr' ? `Senkronizasyon hatası: ${errorMessage}` : `Sync error: ${errorMessage}`,
+        'error'
+      );
     } finally {
+      console.log('🏁 handleSyncToCloud finally, setting syncing to false');
       setSyncing(false);
     }
   };
@@ -170,7 +186,19 @@ export function CloudSyncSettings() {
         customActivities: settings?.customActivities ?? [],
         mood: settings?.mood,
       });
-      showToast(lang === 'tr' ? 'Çıkış yapıldı' : 'Logged out', 'success');
+      // Clear all localStorage cache
+      if (typeof window !== 'undefined') {
+        // Clear all SportTrack related localStorage items
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith('sporttrack.') || key === 'theme' || key === 'lang') {
+            localStorage.removeItem(key);
+          }
+        });
+      }
+      showToast(
+        lang === 'tr' ? 'Çıkış yapıldı ve önbellek temizlendi' : 'Logged out and cache cleared',
+        'success'
+      );
     } catch (error) {
       showToast(lang === 'tr' ? 'Çıkış hatası' : 'Logout error', 'error');
     }
@@ -178,16 +206,20 @@ export function CloudSyncSettings() {
 
   return (
     <>
-      <div className="space-y-3">
+      <div className={`${isMobile ? 'space-y-2' : 'space-y-2.5'}`}>
         <div className="flex items-center justify-between">
-          <div>
-            <div className="font-bold text-sm text-gray-950 dark:text-white">
+          <div className="flex-1 min-w-0">
+            <div
+              className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-gray-950 dark:text-white`}
+            >
               {lang === 'tr' ? 'Cloud Sync' : 'Cloud Sync'}
             </div>
-            <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">
+            <div
+              className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-400 ${isMobile ? 'mt-0.5' : 'mt-1'} truncate`}
+            >
               {isAuthenticated
                 ? user?.email
-                  ? `${lang === 'tr' ? 'Giriş yapıldı: ' : 'Signed in: '}${user.email}`
+                  ? `${lang === 'tr' ? 'Giriş: ' : 'Signed in: '}${user.email}`
                   : lang === 'tr'
                     ? 'Giriş yapıldı'
                     : 'Signed in'
@@ -196,71 +228,105 @@ export function CloudSyncSettings() {
                   : 'Store your data in the cloud'}
             </div>
           </div>
-          <div
-            className={`text-xs px-2 py-1 rounded ${
-              isAuthenticated
-                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-            }`}
-          >
-            {isAuthenticated
-              ? lang === 'tr'
-                ? 'Bağlı'
-                : 'Connected'
-              : lang === 'tr'
-                ? 'Bağlı Değil'
-                : 'Not Connected'}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {isAuthenticated && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleSyncToCloud}
+                  disabled={syncing || syncState.status === 'syncing'}
+                  className={`${isMobile ? 'p-1.5' : 'p-2'} rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${isMobile ? 'text-sm' : 'text-base'} flex items-center justify-center`}
+                  title={
+                    syncing || syncState.status === 'syncing'
+                      ? lang === 'tr'
+                        ? 'Senkronize ediliyor...'
+                        : 'Syncing...'
+                      : lang === 'tr'
+                        ? 'Yükle'
+                        : 'Upload'
+                  }
+                  aria-label={lang === 'tr' ? 'Yükle' : 'Upload'}
+                >
+                  {syncing || syncState.status === 'syncing'
+                    ? '⏳'
+                    : syncState.status === 'synced'
+                      ? '✅'
+                      : '⬆️'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSyncFromCloud}
+                  disabled={syncing || syncState.status === 'syncing'}
+                  className={`${isMobile ? 'p-1.5' : 'p-2'} rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${isMobile ? 'text-sm' : 'text-base'} flex items-center justify-center`}
+                  title={
+                    syncing || syncState.status === 'syncing'
+                      ? lang === 'tr'
+                        ? 'Senkronize ediliyor...'
+                        : 'Syncing...'
+                      : lang === 'tr'
+                        ? 'İndir'
+                        : 'Download'
+                  }
+                  aria-label={lang === 'tr' ? 'İndir' : 'Download'}
+                >
+                  {syncing || syncState.status === 'syncing'
+                    ? '⏳'
+                    : syncState.status === 'synced'
+                      ? '✅'
+                      : '⬇️'}
+                </button>
+              </>
+            )}
+            <div
+              className={`${isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-[10px] px-2 py-1'} rounded ${
+                isAuthenticated
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+              }`}
+            >
+              {isAuthenticated
+                ? lang === 'tr'
+                  ? 'Bağlı'
+                  : 'Connected'
+                : lang === 'tr'
+                  ? 'Bağlı Değil'
+                  : 'Not Connected'}
+            </div>
           </div>
         </div>
 
-        {!isAuthenticated ? (
+        {!isAuthenticated && (
           <button
             type="button"
             onClick={() => setShowAuthDialog(true)}
-            className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300"
+            className={`w-full ${isMobile ? 'px-2.5 py-1.5 text-[10px]' : 'px-3 py-2 text-xs sm:text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
           >
             {lang === 'tr' ? 'Giriş Yap / Kayıt Ol' : 'Sign In / Sign Up'}
           </button>
-        ) : (
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={handleSyncToCloud}
-                disabled={syncing || syncState.status === 'syncing'}
-                className="flex-1 px-3 py-2 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 text-gray-700 dark:text-gray-300 font-semibold disabled:opacity-50"
-              >
-                {syncing || syncState.status === 'syncing'
-                  ? '...'
-                  : lang === 'tr'
-                    ? 'Yükle'
-                    : 'Upload'}
-              </button>
-              <button
-                type="button"
-                onClick={handleSyncFromCloud}
-                disabled={syncing || syncState.status === 'syncing'}
-                className="flex-1 px-3 py-2 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 text-gray-700 dark:text-gray-300 font-semibold disabled:opacity-50"
-              >
-                {syncing || syncState.status === 'syncing'
-                  ? '...'
-                  : lang === 'tr'
-                    ? 'İndir'
-                    : 'Download'}
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full px-3 py-2 text-xs rounded-lg border-2 border-red-200 dark:border-red-800 bg-gradient-to-r from-red-50 to-white dark:from-red-900/20 dark:to-red-900/10 hover:from-red-100 hover:to-red-50 dark:hover:from-red-800/30 transition-all duration-200 text-red-700 dark:text-red-400 font-semibold"
-            >
-              {lang === 'tr' ? 'Çıkış Yap' : 'Sign Out'}
-            </button>
-          </div>
         )}
 
-        {syncState.status === 'error' && syncState.error && (
-          <div className="text-xs text-red-500 dark:text-red-400">{syncState.error}</div>
+        {/* Sync Status Display */}
+        {isAuthenticated && (
+          <div
+            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} ${
+              syncState.status === 'syncing'
+                ? 'text-blue-500 dark:text-blue-400'
+                : syncState.status === 'synced'
+                  ? 'text-green-500 dark:text-green-400'
+                  : syncState.status === 'error'
+                    ? 'text-red-500 dark:text-red-400'
+                    : 'text-gray-500 dark:text-gray-400'
+            }`}
+          >
+            {syncState.status === 'syncing' &&
+              (lang === 'tr' ? 'Senkronize ediliyor...' : 'Syncing...')}
+            {syncState.status === 'synced' &&
+              syncState.lastSyncAt &&
+              (lang === 'tr'
+                ? `Son senkronizasyon: ${new Date(syncState.lastSyncAt).toLocaleTimeString('tr-TR')}`
+                : `Last synced: ${new Date(syncState.lastSyncAt).toLocaleTimeString('en-US')}`)}
+            {syncState.status === 'error' && syncState.error && <span>{syncState.error}</span>}
+          </div>
         )}
       </div>
 

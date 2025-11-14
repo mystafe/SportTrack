@@ -11,6 +11,7 @@ import { ActivityDefinition } from '@/lib/activityConfig';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 
 export const QuickAdd = memo(function QuickAdd() {
+  const [isOpen, setIsOpen] = useState(true);
   const { t, lang } = useI18n();
   const { addActivity } = useActivities();
   const { showToast } = useToaster();
@@ -84,32 +85,44 @@ export const QuickAdd = memo(function QuickAdd() {
     return null;
   }
 
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3
-          className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-950 dark:text-white`}
-        >
-          {t('quickAdd.title')}
-        </h3>
-        <span
-          className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-semibold`}
-        >
-          {t('quickAdd.subtitle')}
-        </span>
-      </div>
-      <div
-        className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-6'} gap-3 sm:gap-4`}
+  const renderHeader = () => {
+    return (
+      <button
+        type="button"
+        className="flex w-full items-center justify-between text-sm font-bold text-gray-900 dark:text-white mb-3 transition-all duration-200 hover:text-brand"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-controls="quick-add"
       >
-        {mostUsedActivities.map(({ definition }) => {
-          const isAddingThis = isAdding === definition.key;
-          return (
-            <button
-              key={definition.key}
-              type="button"
-              onClick={() => handleQuickAddClick(definition)}
-              disabled={isAddingThis}
-              className={`
+        <span className="font-bold">{t('quickAdd.title')}</span>
+        <span
+          className="ml-2 text-lg font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light"
+          aria-hidden
+          style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+        >
+          ▼
+        </span>
+      </button>
+    );
+  };
+
+  return (
+    <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300">
+      {renderHeader()}
+      {isOpen && (
+        <div id="quick-add" className="space-y-3">
+          <div
+            className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-6'} gap-3 sm:gap-4`}
+          >
+            {mostUsedActivities.map(({ definition }) => {
+              const isAddingThis = isAdding === definition.key;
+              return (
+                <button
+                  key={definition.key}
+                  type="button"
+                  onClick={() => handleQuickAddClick(definition)}
+                  disabled={isAddingThis}
+                  className={`
                 stagger-item touch-feedback mobile-press mobile-card-lift fade-in-scale-mobile
                 relative flex flex-col items-center justify-center gap-2
                 p-4 sm:p-5 rounded-xl border-2
@@ -123,40 +136,42 @@ export const QuickAdd = memo(function QuickAdd() {
                 }
                 disabled:opacity-50 disabled:cursor-not-allowed group
               `}
-              aria-label={t('quickAdd.addActivityLabel', {
-                activity: getActivityLabel(definition, lang),
-              })}
-              aria-busy={isAddingThis}
-              aria-disabled={isAddingThis}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  if (!isAddingThis) {
-                    handleQuickAddClick(definition);
-                  }
-                }
-              }}
-            >
-              <div
-                className={`text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300 ${isAddingThis ? 'icon-wiggle-mobile' : ''}`}
-              >
-                {definition.icon}
-              </div>
-              <div className="text-xs sm:text-sm font-bold text-center text-gray-950 dark:text-gray-100 line-clamp-2 group-hover:text-brand transition-colors">
-                {getActivityLabel(definition, lang)}
-              </div>
-              <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-semibold">
-                {definition.defaultAmount} {getActivityUnit(definition, lang)}
-              </div>
-              {isAddingThis && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-xl ">
-                  <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent"></div>
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
+                  aria-label={t('quickAdd.addActivityLabel', {
+                    activity: getActivityLabel(definition, lang),
+                  })}
+                  aria-busy={isAddingThis}
+                  aria-disabled={isAddingThis}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      if (!isAddingThis) {
+                        handleQuickAddClick(definition);
+                      }
+                    }
+                  }}
+                >
+                  <div
+                    className={`text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300 ${isAddingThis ? 'icon-wiggle-mobile' : ''}`}
+                  >
+                    {definition.icon}
+                  </div>
+                  <div className="text-xs sm:text-sm font-bold text-center text-gray-950 dark:text-gray-100 line-clamp-2 group-hover:text-brand transition-colors">
+                    {getActivityLabel(definition, lang)}
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-semibold">
+                    {definition.defaultAmount} {getActivityUnit(definition, lang)}
+                  </div>
+                  {isAddingThis && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-xl ">
+                      <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent"></div>
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <ConfirmDialog
         open={!!confirmActivity}

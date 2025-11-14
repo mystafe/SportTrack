@@ -129,8 +129,10 @@ export default function HomePage() {
         </div>
       </div>
 
-      <QuickAdd />
-      <ActivityTemplates />
+      <div className="space-y-4 sm:space-y-6">
+        <QuickAdd />
+        <ActivityTemplates />
+      </div>
     </div>
   );
 }
