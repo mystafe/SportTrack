@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageToggle } from '@/components/LanguageToggle';
@@ -7,12 +8,16 @@ import { SettingsDialog } from '@/components/SettingsDialog';
 import { DataExportImport } from '@/components/DataExportImport';
 import { Logo } from '@/components/Logo';
 import { CloudSyncIndicator } from '@/components/CloudSyncIndicator';
+import { AuthDialog } from '@/components/AuthDialog';
+import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 export function Header() {
   const { t } = useI18n();
   const isMobile = useIsMobile();
+  const { isAuthenticated, isConfigured } = useAuth();
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   return (
     <header className="border-b-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 backdrop-blur sticky top-0 z-40 safe-top">
       <nav
@@ -85,6 +90,17 @@ export function Header() {
           </div>
           {!isMobile && (
             <>
+              {isConfigured && (
+                <button
+                  onClick={() => setShowAuthDialog(true)}
+                  className={`flex items-center gap-1.5 ${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors`}
+                  aria-label={
+                    isAuthenticated ? t('nav.logout') || 'Logout' : t('nav.login') || 'Login'
+                  }
+                >
+                  {isAuthenticated ? '👤' : '🔐'}
+                </button>
+              )}
               <CloudSyncIndicator />
               <DataExportImport />
               <LanguageToggle />
@@ -94,6 +110,9 @@ export function Header() {
           <SettingsDialog />
         </div>
       </nav>
+      {showAuthDialog && (
+        <AuthDialog open={showAuthDialog} onClose={() => setShowAuthDialog(false)} />
+      )}
     </header>
   );
 }

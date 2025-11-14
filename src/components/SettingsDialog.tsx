@@ -13,6 +13,7 @@ import { NotificationSettings } from '@/components/NotificationSettings';
 import { LevelDisplay } from '@/components/LevelDisplay';
 import { AppleHealthImport } from '@/components/AppleHealthImport';
 import { AppleHealthGuide } from '@/components/AppleHealthGuide';
+import { CloudSyncSettings } from '@/components/CloudSyncSettings';
 import { useKeyboardShortcuts } from '@/components/KeyboardShortcuts';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
@@ -149,6 +150,9 @@ export function SettingsDialog() {
             )}
             <div>
               <NotificationSettings />
+            </div>
+            <div>
+              <CloudSyncSettings />
             </div>
             <div>
               <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">

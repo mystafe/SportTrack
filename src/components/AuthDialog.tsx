@@ -1,0 +1,249 @@
+'use client';
+
+import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useI18n } from '@/lib/i18n';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useToaster } from './Toaster';
+
+interface AuthDialogProps {
+  open: boolean;
+  onClose: () => void;
+  initialMode?: 'login' | 'signup';
+}
+
+export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogProps) {
+  const [mode, setMode] = useState<'login' | 'signup' | 'reset'>(initialMode);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login, register, loginWithGoogle, resetPasswordEmail } = useAuth();
+  const { t, lang } = useI18n();
+  const isMobile = useIsMobile();
+  const { showToast } = useToaster();
+
+  if (!open) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (mode === 'login') {
+        await login(email, password);
+        showToast(lang === 'tr' ? 'Giriş başarılı!' : 'Login successful!', 'success');
+        onClose();
+      } else if (mode === 'signup') {
+        await register(email, password, displayName || undefined);
+        showToast(lang === 'tr' ? 'Kayıt başarılı!' : 'Registration successful!', 'success');
+        onClose();
+      } else if (mode === 'reset') {
+        await resetPasswordEmail(email);
+        showToast(
+          lang === 'tr' ? 'Şifre sıfırlama e-postası gönderildi' : 'Password reset email sent',
+          'success'
+        );
+        setMode('login');
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : lang === 'tr'
+            ? 'Bir hata oluştu'
+            : 'An error occurred';
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+      showToast(lang === 'tr' ? 'Giriş başarılı!' : 'Login successful!', 'success');
+      onClose();
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : lang === 'tr'
+            ? 'Google ile giriş başarısız'
+            : 'Google login failed';
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className={`${isMobile ? 'w-full mx-4' : 'w-full max-w-md'} bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 p-6`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2
+            className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-gray-950 dark:text-white`}
+          >
+            {mode === 'login'
+              ? lang === 'tr'
+                ? 'Giriş Yap'
+                : 'Sign In'
+              : mode === 'signup'
+                ? lang === 'tr'
+                  ? 'Kayıt Ol'
+                  : 'Sign Up'
+                : lang === 'tr'
+                  ? 'Şifre Sıfırla'
+                  : 'Reset Password'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
+            aria-label={lang === 'tr' ? 'Kapat' : 'Close'}
+          >
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {mode === 'signup' && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                {lang === 'tr' ? 'İsim' : 'Name'}
+              </label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="w-full px-3 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-950 dark:text-white focus:border-brand dark:focus:border-brand/60 focus:ring-2 focus:ring-brand/20"
+                placeholder={lang === 'tr' ? 'İsim (opsiyonel)' : 'Name (optional)'}
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+              {lang === 'tr' ? 'E-posta' : 'Email'}
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-3 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-950 dark:text-white focus:border-brand dark:focus:border-brand/60 focus:ring-2 focus:ring-brand/20"
+              placeholder={lang === 'tr' ? 'ornek@email.com' : 'example@email.com'}
+            />
+          </div>
+
+          {mode !== 'reset' && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                {lang === 'tr' ? 'Şifre' : 'Password'}
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="w-full px-3 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-950 dark:text-white focus:border-brand dark:focus:border-brand/60 focus:ring-2 focus:ring-brand/20"
+                placeholder={lang === 'tr' ? 'Şifre (min. 6 karakter)' : 'Password (min. 6 chars)'}
+              />
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-2.5 px-4 bg-gradient-to-r from-brand to-brand-dark text-white rounded-lg font-semibold hover:from-brand-dark hover:to-brand transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${isMobile ? 'touch-feedback mobile-press' : ''}`}
+          >
+            {loading
+              ? '...'
+              : mode === 'login'
+                ? lang === 'tr'
+                  ? 'Giriş Yap'
+                  : 'Sign In'
+                : mode === 'signup'
+                  ? lang === 'tr'
+                    ? 'Kayıt Ol'
+                    : 'Sign Up'
+                  : lang === 'tr'
+                    ? 'Gönder'
+                    : 'Send'}
+          </button>
+        </form>
+
+        {mode === 'login' && (
+          <>
+            <div className="my-4 flex items-center gap-2">
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {lang === 'tr' ? 'veya' : 'or'}
+              </span>
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+            </div>
+
+            <button
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              className="w-full py-2.5 px-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <span>🔵</span>
+              {lang === 'tr' ? 'Google ile Giriş' : 'Sign in with Google'}
+            </button>
+          </>
+        )}
+
+        <div className="mt-4 text-center">
+          {mode === 'login' ? (
+            <>
+              <button
+                onClick={() => setMode('reset')}
+                className="text-sm text-brand hover:text-brand-dark dark:text-brand-light"
+              >
+                {lang === 'tr' ? 'Şifremi unuttum' : 'Forgot password?'}
+              </button>
+              <div className="mt-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {lang === 'tr' ? 'Hesabın yok mu? ' : "Don't have an account? "}
+                </span>
+                <button
+                  onClick={() => setMode('signup')}
+                  className="text-sm text-brand hover:text-brand-dark dark:text-brand-light font-semibold"
+                >
+                  {lang === 'tr' ? 'Kayıt ol' : 'Sign up'}
+                </button>
+              </div>
+            </>
+          ) : mode === 'signup' ? (
+            <div>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {lang === 'tr' ? 'Zaten hesabın var mı? ' : 'Already have an account? '}
+              </span>
+              <button
+                onClick={() => setMode('login')}
+                className="text-sm text-brand hover:text-brand-dark dark:text-brand-light font-semibold"
+              >
+                {lang === 'tr' ? 'Giriş yap' : 'Sign in'}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setMode('login')}
+              className="text-sm text-brand hover:text-brand-dark dark:text-brand-light"
+            >
+              {lang === 'tr' ? '← Geri dön' : '← Back'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
