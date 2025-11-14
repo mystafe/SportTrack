@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useChallenges } from '@/lib/challengeStore';
 import { Challenge, ChallengeType } from '@/lib/challenges';
-import { ChallengeCard } from '@/components/ChallengeCard';
-import { ChallengeDialog } from '@/components/ChallengeDialog';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { PageSkeleton, ChallengeCardSkeleton } from '@/components/LoadingSkeleton';
+
+// Lazy load challenge components
+const ChallengeCard = lazy(() => import('@/components/ChallengeCard').then(m => ({ default: m.ChallengeCard })));
+const ChallengeDialog = lazy(() => import('@/components/ChallengeDialog').then(m => ({ default: m.ChallengeDialog })));
 
 export default function ChallengesPage() {
   const { challenges, hydrated, addChallenge, updateChallenge, deleteChallenge } = useChallenges();
@@ -112,12 +114,13 @@ export default function ChallengesPage() {
               </h2>
               <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
                 {activeChallenges.map(challenge => (
-                  <ChallengeCard
-                    key={challenge.id}
-                    challenge={challenge}
-                    onEdit={() => handleEditChallenge(challenge)}
-                    onDelete={() => handleDeleteChallenge(challenge)}
-                  />
+                  <Suspense key={challenge.id} fallback={<ChallengeCardSkeleton />}>
+                    <ChallengeCard
+                      challenge={challenge}
+                      onEdit={() => handleEditChallenge(challenge)}
+                      onDelete={() => handleDeleteChallenge(challenge)}
+                    />
+                  </Suspense>
                 ))}
               </div>
             </div>
@@ -130,12 +133,13 @@ export default function ChallengesPage() {
               </h2>
               <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
                 {completedChallenges.map(challenge => (
-                  <ChallengeCard
-                    key={challenge.id}
-                    challenge={challenge}
-                    onEdit={() => handleEditChallenge(challenge)}
-                    onDelete={() => handleDeleteChallenge(challenge)}
-                  />
+                  <Suspense key={challenge.id} fallback={<ChallengeCardSkeleton />}>
+                    <ChallengeCard
+                      challenge={challenge}
+                      onEdit={() => handleEditChallenge(challenge)}
+                      onDelete={() => handleDeleteChallenge(challenge)}
+                    />
+                  </Suspense>
                 ))}
               </div>
             </div>
@@ -148,12 +152,13 @@ export default function ChallengesPage() {
               </h2>
               <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
                 {expiredChallenges.map(challenge => (
-                  <ChallengeCard
-                    key={challenge.id}
-                    challenge={challenge}
-                    onEdit={() => handleEditChallenge(challenge)}
-                    onDelete={() => handleDeleteChallenge(challenge)}
-                  />
+                  <Suspense key={challenge.id} fallback={<ChallengeCardSkeleton />}>
+                    <ChallengeCard
+                      challenge={challenge}
+                      onEdit={() => handleEditChallenge(challenge)}
+                      onDelete={() => handleDeleteChallenge(challenge)}
+                    />
+                  </Suspense>
                 ))}
               </div>
             </div>
@@ -161,15 +166,19 @@ export default function ChallengesPage() {
         </div>
       )}
 
-      <ChallengeDialog
-        open={showDialog}
-        challenge={editingChallenge}
-        onClose={() => {
-          setShowDialog(false);
-          setEditingChallenge(null);
-        }}
-        onSave={handleSaveChallenge}
-      />
+      {showDialog && (
+        <Suspense fallback={null}>
+          <ChallengeDialog
+            open={showDialog}
+            challenge={editingChallenge}
+            onClose={() => {
+              setShowDialog(false);
+              setEditingChallenge(null);
+            }}
+            onSave={handleSaveChallenge}
+          />
+        </Suspense>
+      )}
 
       <ConfirmDialog
         open={!!deletingChallenge}

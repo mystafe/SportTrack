@@ -9,7 +9,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage --maxWorkers=2"
+    "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "analyze": "ANALYZE=true npm run build"
   },
   "dependencies": {
     "autoprefixer": "^10.4.20",
@@ -25,6 +26,7 @@
     "tailwindcss": "^3.4.13"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.0.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",

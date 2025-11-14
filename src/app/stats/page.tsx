@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, lazy, Suspense } from 'react';
 import { format, startOfDay, parseISO, eachDayOfInterval, subDays, isSameDay } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
@@ -9,16 +9,19 @@ import { useSettings } from '@/lib/settingsStore';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
-import { TrendChart } from '@/components/charts/TrendChart';
-import { ActivityBarChart } from '@/components/charts/ActivityBarChart';
-import { ActivityPieChart } from '@/components/charts/ActivityPieChart';
-import { ActivityHeatmap } from '@/components/charts/ActivityHeatmap';
-import { PersonalRecords } from '@/components/PersonalRecords';
-import { ActivityTimeAnalysis } from '@/components/ActivityTimeAnalysis';
-import { PeriodComparison } from '@/components/PeriodComparison';
-import { DurationStats } from '@/components/DurationStats';
-import { ActivityTypeTrend } from '@/components/ActivityTypeTrend';
 import { PageSkeleton } from '@/components/LoadingSkeleton';
+import { ChartSkeleton } from '@/components/ChartSkeleton';
+
+// Lazy load chart components for better performance
+const TrendChart = lazy(() => import('@/components/charts/TrendChart').then(m => ({ default: m.TrendChart })));
+const ActivityBarChart = lazy(() => import('@/components/charts/ActivityBarChart').then(m => ({ default: m.ActivityBarChart })));
+const ActivityPieChart = lazy(() => import('@/components/charts/ActivityPieChart').then(m => ({ default: m.ActivityPieChart })));
+const ActivityHeatmap = lazy(() => import('@/components/charts/ActivityHeatmap').then(m => ({ default: m.ActivityHeatmap })));
+const PersonalRecords = lazy(() => import('@/components/PersonalRecords').then(m => ({ default: m.PersonalRecords })));
+const ActivityTimeAnalysis = lazy(() => import('@/components/ActivityTimeAnalysis').then(m => ({ default: m.ActivityTimeAnalysis })));
+const PeriodComparison = lazy(() => import('@/components/PeriodComparison').then(m => ({ default: m.PeriodComparison })));
+const DurationStats = lazy(() => import('@/components/DurationStats').then(m => ({ default: m.DurationStats })));
+const ActivityTypeTrend = lazy(() => import('@/components/ActivityTypeTrend').then(m => ({ default: m.ActivityTypeTrend })));
 
 export default function StatsPage() {
   const { t, lang } = useI18n();
@@ -243,7 +246,9 @@ export default function StatsPage() {
             ))}
           </div>
         </div>
-        <TrendChart activities={activities} target={target} days={trendDays} />
+        <Suspense fallback={<ChartSkeleton />}>
+          <TrendChart activities={activities} target={target} days={trendDays} />
+        </Suspense>
       </div>
 
       {/* Charts Row */}
@@ -251,20 +256,26 @@ export default function StatsPage() {
         {/* Bar Chart */}
         <div className="chart-container card-entrance slide-in-left rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
           <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">{t('stats.detailed.activityComparison')}</h2>
-          <ActivityBarChart activities={activities} />
+          <Suspense fallback={<ChartSkeleton />}>
+            <ActivityBarChart activities={activities} />
+          </Suspense>
         </div>
 
         {/* Pie Chart */}
         <div className="chart-container card-entrance slide-in-right rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
           <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">{t('stats.detailed.activityDistribution')}</h2>
-          <ActivityPieChart activities={activities} />
+          <Suspense fallback={<ChartSkeleton />}>
+            <ActivityPieChart activities={activities} />
+          </Suspense>
         </div>
       </div>
 
       {/* Heatmap */}
       <div className="rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
         <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">{t('stats.detailed.activityHeatmap')}</h2>
-        <ActivityHeatmap activities={activities} target={target} />
+        <Suspense fallback={<ChartSkeleton />}>
+          <ActivityHeatmap activities={activities} target={target} />
+        </Suspense>
       </div>
 
       {/* Daily Statistics */}
@@ -396,19 +407,29 @@ export default function StatsPage() {
       </div>
 
       {/* Personal Records */}
-      <PersonalRecords />
+      <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+        <PersonalRecords />
+      </Suspense>
 
       {/* Activity Time Analysis */}
-      <ActivityTimeAnalysis activities={activities} />
+      <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+        <ActivityTimeAnalysis activities={activities} />
+      </Suspense>
 
       {/* Period Comparison */}
-      <PeriodComparison />
+      <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+        <PeriodComparison />
+      </Suspense>
 
       {/* Duration Stats */}
-      <DurationStats />
+      <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+        <DurationStats />
+      </Suspense>
 
       {/* Activity Type Trend */}
-      <ActivityTypeTrend />
+      <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+        <ActivityTypeTrend />
+      </Suspense>
     </div>
   );
 }

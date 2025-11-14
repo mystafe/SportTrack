@@ -1,5 +1,9 @@
 import withPWA from 'next-pwa';
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -7,7 +11,14 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '2mb'
     }
-  }
+  },
+  // Performance optimizations
+  compress: true,
+  poweredByHeader: false,
+  // Optimize images if added in future
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
 };
 
 const pwaConfig = withPWA({
@@ -29,5 +40,5 @@ const pwaConfig = withPWA({
   ],
 });
 
-export default pwaConfig(nextConfig);
+export default withBundleAnalyzer(pwaConfig(nextConfig));
 
