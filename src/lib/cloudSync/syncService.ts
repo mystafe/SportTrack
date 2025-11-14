@@ -25,7 +25,7 @@ export class CloudSyncService {
   }
 
   isConfigured(): boolean {
-    return isFirebaseConfigured() && !!this.userId;
+    return Boolean(isFirebaseConfigured() && this.userId);
   }
 
   /**
