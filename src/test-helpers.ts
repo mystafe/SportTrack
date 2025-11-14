@@ -64,7 +64,6 @@ export function createMockCustomActivity(overrides?: Partial<CustomActivityDefin
     defaultAmount: 5,
     description: 'Test description',
     descriptionEn: 'Test description',
-    category: 'cardio',
     ...overrides,
   }
 }

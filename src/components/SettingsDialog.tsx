@@ -106,8 +106,8 @@ export function SettingsDialog() {
             <button
               type="button"
               onClick={() => {
-                if (typeof window !== 'undefined' && (window as any).resetOnboarding) {
-                  (window as any).resetOnboarding();
+                if (typeof window !== 'undefined' && window.resetOnboarding) {
+                  window.resetOnboarding();
                   setShowAppSettings(false);
                 }
               }}

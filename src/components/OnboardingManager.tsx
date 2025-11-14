@@ -57,7 +57,7 @@ export function OnboardingManager() {
 
   // Expose reset function globally for settings dialog
   if (typeof window !== 'undefined') {
-    (window as any).resetOnboarding = resetOnboarding;
+    window.resetOnboarding = resetOnboarding;
   }
 
   const getTourSteps = (): TourStep[] => {
