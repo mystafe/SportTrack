@@ -1,19 +1,12 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   ActivityDefinition,
   ActivityKey,
   BASE_ACTIVITY_DEFINITIONS,
   BASE_ACTIVITY_MAP,
-  DEFAULT_DAILY_TARGET
+  DEFAULT_DAILY_TARGET,
 } from '@/lib/activityConfig';
 
 import { STORAGE_KEYS } from '@/lib/constants';
@@ -42,9 +35,7 @@ export type UserSettings = {
   mood?: Mood;
 };
 
-function dedupeCustomActivities(
-  list?: CustomActivityDefinition[]
-): CustomActivityDefinition[] {
+function dedupeCustomActivities(list?: CustomActivityDefinition[]): CustomActivityDefinition[] {
   if (!Array.isArray(list)) return [];
   const seen = new Set<string>();
   const result: CustomActivityDefinition[] = [];
@@ -62,10 +53,7 @@ type SettingsContextValue = {
   hydrated: boolean;
   saveSettings: (settings: UserSettings) => void;
   addCustomActivity: (activity: CustomActivityDefinition) => void;
-  updateCustomActivity: (
-    id: ActivityKey,
-    updates: Partial<CustomActivityDefinition>
-  ) => void;
+  updateCustomActivity: (id: ActivityKey, updates: Partial<CustomActivityDefinition>) => void;
   removeCustomActivity: (id: ActivityKey) => void;
 };
 
@@ -92,8 +80,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           setSettings({
             name: parsed.name,
             dailyTarget: parsed.dailyTarget,
-            customActivities: dedupeCustomActivities(parsed.customActivities as CustomActivityDefinition[]),
-            mood: parsed.mood ?? undefined
+            customActivities: dedupeCustomActivities(
+              parsed.customActivities as CustomActivityDefinition[]
+            ),
+            mood: parsed.mood ?? undefined,
           });
         }
       }
@@ -107,7 +97,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const persist = useCallback((next: UserSettings) => {
     const normalized: UserSettings = {
       ...next,
-      customActivities: dedupeCustomActivities(next.customActivities)
+      customActivities: dedupeCustomActivities(next.customActivities),
     };
     setSettings(normalized);
     if (typeof window !== 'undefined') {
@@ -120,8 +110,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       persist({
         ...next,
         customActivities:
-          next.customActivities ??
-          dedupeCustomActivities(settings?.customActivities)
+          next.customActivities ?? dedupeCustomActivities(settings?.customActivities),
       }),
     [persist, settings]
   );
@@ -132,11 +121,14 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         const base: UserSettings = prev ?? {
           name: '',
           dailyTarget: DEFAULT_DAILY_TARGET,
-          customActivities: []
+          customActivities: [],
         };
         const next: UserSettings = {
           ...base,
-          customActivities: [activity, ...base.customActivities.filter((existing) => existing.id !== activity.id)]
+          customActivities: [
+            activity,
+            ...base.customActivities.filter((existing) => existing.id !== activity.id),
+          ],
         };
         persist(next);
         return next;
@@ -153,7 +145,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           ...prev,
           customActivities: prev.customActivities.map((activity) =>
             activity.id === id ? { ...activity, ...updates } : activity
-          )
+          ),
         };
         persist(next);
         return next;
@@ -168,7 +160,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         if (!prev) return prev;
         const next: UserSettings = {
           ...prev,
-          customActivities: prev.customActivities.filter((activity) => activity.id !== id)
+          customActivities: prev.customActivities.filter((activity) => activity.id !== id),
         };
         persist(next);
         return next;
@@ -184,9 +176,16 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       saveSettings,
       addCustomActivity,
       updateCustomActivity,
-      removeCustomActivity
+      removeCustomActivity,
     }),
-    [settings, hydrated, saveSettings, addCustomActivity, updateCustomActivity, removeCustomActivity]
+    [
+      settings,
+      hydrated,
+      saveSettings,
+      addCustomActivity,
+      updateCustomActivity,
+      removeCustomActivity,
+    ]
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
@@ -214,7 +213,7 @@ export function useActivityDefinitions(): ActivityDefinition[] {
       ordered.set(activity.id, {
         ...activity,
         key: activity.id,
-        isCustom: true
+        isCustom: true,
       });
     }
 
@@ -231,9 +230,8 @@ export function findActivityDefinition(
     return {
       ...custom,
       key: custom.id,
-      isCustom: true
+      isCustom: true,
     };
   }
   return BASE_ACTIVITY_MAP[key];
 }
-

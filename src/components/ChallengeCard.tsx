@@ -14,7 +14,11 @@ interface ChallengeCardProps {
   onDelete: () => void;
 }
 
-export const ChallengeCard = memo(function ChallengeCard({ challenge, onEdit, onDelete }: ChallengeCardProps) {
+export const ChallengeCard = memo(function ChallengeCard({
+  challenge,
+  onEdit,
+  onDelete,
+}: ChallengeCardProps) {
   const { t, lang } = useI18n();
   const { getChallengeProgress } = useChallenges();
   const progress = getChallengeProgress(challenge.id);
@@ -53,12 +57,18 @@ export const ChallengeCard = memo(function ChallengeCard({ challenge, onEdit, on
     : null;
 
   return (
-    <div className={`card-entrance rounded-xl border-2 ${isMobile ? 'p-3' : 'p-4'} ${getStatusColor()} transition-all duration-300 hover:shadow-xl shadow-md bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95`}>
+    <div
+      className={`card-entrance rounded-xl border-2 ${isMobile ? 'p-3' : 'p-4'} ${getStatusColor()} transition-all duration-300 hover:shadow-xl shadow-md bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95`}
+    >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className={`${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'} emoji-bounce`}>{getStatusIcon()}</span>
+          <span className={`${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'} emoji-bounce`}>
+            {getStatusIcon()}
+          </span>
           <div>
-            <h3 className={`text-heading-3 text-gray-950 dark:text-white ${isMobile ? 'text-sm' : ''}`}>
+            <h3
+              className={`text-heading-3 text-gray-950 dark:text-white ${isMobile ? 'text-sm' : ''}`}
+            >
               {challenge.name[lang]}
             </h3>
             <p className="text-label text-gray-700 dark:text-gray-300">
@@ -102,31 +112,38 @@ export const ChallengeCard = memo(function ChallengeCard({ challenge, onEdit, on
           </span>
         </div>
 
-        <div className={`w-full ${isMobile ? 'h-2.5' : 'h-3'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner`}>
+        <div
+          className={`w-full ${isMobile ? 'h-2.5' : 'h-3'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner`}
+        >
           <div
             className={`h-full transition-all duration-500 shadow-sm ${
               challenge.status === 'completed'
                 ? 'bg-gradient-to-r from-green-500 to-emerald-500'
                 : challenge.status === 'expired' || challenge.status === 'failed'
-                ? 'bg-gradient-to-r from-red-500 to-rose-500'
-                : 'bg-gradient-to-r from-brand to-brand-dark'
+                  ? 'bg-gradient-to-r from-red-500 to-rose-500'
+                  : 'bg-gradient-to-r from-brand to-brand-dark'
             }`}
             style={{ width: `${Math.min(100, progress.percentage)}%` }}
           />
         </div>
 
-        <div className={`flex items-center justify-between ${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-600 dark:text-gray-400`}>
+        <div
+          className={`flex items-center justify-between ${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-600 dark:text-gray-400`}
+        >
           <span>{Math.round(progress.percentage)}%</span>
           {progress.daysRemaining !== undefined && progress.daysRemaining > 0 && (
-            <span>{progress.daysRemaining} {t('challenges.daysRemaining')}</span>
+            <span>
+              {progress.daysRemaining} {t('challenges.daysRemaining')}
+            </span>
           )}
         </div>
 
-        <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-700`}>
+        <div
+          className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-700`}
+        >
           {startDate} {endDate && `- ${endDate}`}
         </div>
       </div>
     </div>
   );
 });
-

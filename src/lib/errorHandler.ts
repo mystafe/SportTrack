@@ -3,12 +3,7 @@
  * Centralized error handling and logging
  */
 
-export type ErrorType = 
-  | 'storage'
-  | 'network'
-  | 'validation'
-  | 'parse'
-  | 'unknown';
+export type ErrorType = 'storage' | 'network' | 'validation' | 'parse' | 'unknown';
 
 export interface AppError {
   type: ErrorType;
@@ -45,10 +40,7 @@ export function createError(
  * Check if error is a storage quota error
  */
 export function isQuotaError(error: unknown): boolean {
-  return (
-    error instanceof DOMException &&
-    error.name === 'QuotaExceededError'
-  );
+  return error instanceof DOMException && error.name === 'QuotaExceededError';
 }
 
 /**
@@ -149,4 +141,3 @@ export function handleError(
   logError(appError);
   return getUserFriendlyMessage(appError, lang);
 }
-

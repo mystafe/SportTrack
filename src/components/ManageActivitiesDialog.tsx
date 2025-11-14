@@ -2,22 +2,20 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
-import {
-  CustomActivityDefinition,
-  useSettings,
-  useActivityDefinitions
-} from '@/lib/settingsStore';
+import { CustomActivityDefinition, useSettings, useActivityDefinitions } from '@/lib/settingsStore';
 import { ActivityDefinition } from '@/lib/activityConfig';
 import { useActivities } from '@/lib/activityStore';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || `custom-${Date.now()}`;
+  return (
+    value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || `custom-${Date.now()}`
+  );
 }
 
 type FormState = {
@@ -43,14 +41,13 @@ const INITIAL_FORM: FormState = {
   multiplier: 1,
   defaultAmount: '10',
   description: '',
-  descriptionEn: ''
+  descriptionEn: '',
 };
 
 export function ManageActivitiesDialog() {
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
-  const { settings, addCustomActivity, updateCustomActivity, removeCustomActivity } =
-    useSettings();
+  const { settings, addCustomActivity, updateCustomActivity, removeCustomActivity } = useSettings();
   const { activities } = useActivities();
   const definitions = useActivityDefinitions();
   const customActivities = useMemo(() => {
@@ -107,14 +104,14 @@ export function ManageActivitiesDialog() {
       multiplier: activity.multiplier,
       defaultAmount: String(activity.defaultAmount),
       description: activity.description ?? '',
-      descriptionEn: activity.descriptionEn ?? ''
+      descriptionEn: activity.descriptionEn ?? '',
     });
     setOpen(true);
   }
 
   function handleDelete(id: string) {
     // Prevent deletion of base/default activities
-    const isBaseActivity = baseDefinitions.some(def => def.key === id);
+    const isBaseActivity = baseDefinitions.some((def) => def.key === id);
     if (isBaseActivity) {
       alert(t('activities.custom.errors.cannotDeleteBase'));
       return;
@@ -165,12 +162,12 @@ export function ManageActivitiesDialog() {
         return;
       }
     }
-    
+
     // Use first language value if second language is empty
     const labelEn = form.labelEn.trim() || trimmedLabel;
     const unitEn = form.unitEn.trim() || form.unit.trim();
     const descriptionEn = form.descriptionEn.trim() || form.description.trim() || undefined;
-    
+
     const payload: CustomActivityDefinition = {
       id,
       label: trimmedLabel,
@@ -181,7 +178,7 @@ export function ManageActivitiesDialog() {
       multiplier: Math.round(form.multiplier * 10) / 10,
       defaultAmount: Math.round(defaultAmountValue),
       description: form.description.trim() || undefined,
-      descriptionEn: descriptionEn
+      descriptionEn: descriptionEn,
     };
 
     if (isEditing) {
@@ -205,7 +202,7 @@ export function ManageActivitiesDialog() {
         <span>{t('activities.custom.manageButton')}</span>
       </button>
       {open ? (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-3 sm:px-4 py-4 overflow-y-auto"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
@@ -216,7 +213,9 @@ export function ManageActivitiesDialog() {
           <div className="w-full max-w-2xl rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-b-2 border-gray-200 dark:border-gray-700">
               <div>
-                <h2 className="text-sm sm:text-base font-bold text-gray-950 dark:text-white">{t('activities.custom.title')}</h2>
+                <h2 className="text-sm sm:text-base font-bold text-gray-950 dark:text-white">
+                  {t('activities.custom.title')}
+                </h2>
                 <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-0.5">
                   {t('activities.custom.subtitle')}
                 </p>
@@ -232,10 +231,17 @@ export function ManageActivitiesDialog() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 px-3 sm:px-4 py-3">
               <form className="space-y-3" onSubmit={submit}>
                 {/* Activity Name - Turkish and English side by side */}
-                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}>
+                <div
+                  className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}
+                >
                   <div>
-                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
-                      {t('activities.custom.fields.label')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
+                    <label
+                      className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}
+                    >
+                      {t('activities.custom.fields.label')}{' '}
+                      <span className="text-[7px] font-normal">
+                        ({lang === 'tr' ? 'TR' : 'EN'})
+                      </span>
                     </label>
                     <input
                       type="text"
@@ -248,7 +254,9 @@ export function ManageActivitiesDialog() {
                         }
                       }}
                       className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.label') : 'e.g. Swimming'}
+                      placeholder={
+                        lang === 'tr' ? t('activities.custom.placeholders.label') : 'e.g. Swimming'
+                      }
                       required
                     />
                     {/* TR alanı için hint - Türkçe */}
@@ -259,8 +267,13 @@ export function ManageActivitiesDialog() {
                     )}
                   </div>
                   <div>
-                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
-                      {t('activities.custom.fields.label')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
+                    <label
+                      className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}
+                    >
+                      {t('activities.custom.fields.label')}{' '}
+                      <span className="text-[7px] font-normal">
+                        ({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})
+                      </span>
                     </label>
                     <input
                       type="text"
@@ -308,7 +321,7 @@ export function ManageActivitiesDialog() {
                       onChange={(e) =>
                         setForm((prev) => ({
                           ...prev,
-                          multiplier: Number(e.target.value)
+                          multiplier: Number(e.target.value),
                         }))
                       }
                       className="mt-1 w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1.5 text-sm bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
@@ -325,7 +338,7 @@ export function ManageActivitiesDialog() {
                       onChange={(e) =>
                         setForm((prev) => ({
                           ...prev,
-                          defaultAmount: e.target.value
+                          defaultAmount: e.target.value,
                         }))
                       }
                       className="mt-1 w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1.5 text-sm bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
@@ -335,10 +348,17 @@ export function ManageActivitiesDialog() {
                 </div>
 
                 {/* Unit - Turkish and English side by side */}
-                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}>
+                <div
+                  className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}
+                >
                   <div>
-                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
-                      {t('activities.custom.fields.unit')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
+                    <label
+                      className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}
+                    >
+                      {t('activities.custom.fields.unit')}{' '}
+                      <span className="text-[7px] font-normal">
+                        ({lang === 'tr' ? 'TR' : 'EN'})
+                      </span>
                     </label>
                     <input
                       type="text"
@@ -351,7 +371,9 @@ export function ManageActivitiesDialog() {
                         }
                       }}
                       className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.unit') : 'e.g. minutes'}
+                      placeholder={
+                        lang === 'tr' ? t('activities.custom.placeholders.unit') : 'e.g. minutes'
+                      }
                       required
                     />
                     {/* TR alanı için hint - Türkçe */}
@@ -362,8 +384,13 @@ export function ManageActivitiesDialog() {
                     )}
                   </div>
                   <div>
-                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
-                      {t('activities.custom.fields.unit')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
+                    <label
+                      className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}
+                    >
+                      {t('activities.custom.fields.unit')}{' '}
+                      <span className="text-[7px] font-normal">
+                        ({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})
+                      </span>
                     </label>
                     <input
                       type="text"
@@ -388,10 +415,17 @@ export function ManageActivitiesDialog() {
                 </div>
 
                 {/* Description - Turkish and English side by side */}
-                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}>
+                <div
+                  className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}
+                >
                   <div>
-                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
-                      {t('activities.custom.fields.description')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'TR' : 'EN'})</span>
+                    <label
+                      className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}
+                    >
+                      {t('activities.custom.fields.description')}{' '}
+                      <span className="text-[7px] font-normal">
+                        ({lang === 'tr' ? 'TR' : 'EN'})
+                      </span>
                     </label>
                     <textarea
                       value={lang === 'tr' ? form.description : form.descriptionEn}
@@ -404,12 +438,21 @@ export function ManageActivitiesDialog() {
                       }}
                       rows={isMobile ? 1 : 2}
                       className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced resize-none`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.description') : t('activities.custom.placeholders.descriptionEn')}
+                      placeholder={
+                        lang === 'tr'
+                          ? t('activities.custom.placeholders.description')
+                          : t('activities.custom.placeholders.descriptionEn')
+                      }
                     />
                   </div>
                   <div>
-                    <label className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}>
-                      {t('activities.custom.fields.description')} <span className="text-[7px] font-normal">({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})</span>
+                    <label
+                      className={`block ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300 mb-1 whitespace-nowrap`}
+                    >
+                      {t('activities.custom.fields.description')}{' '}
+                      <span className="text-[7px] font-normal">
+                        ({lang === 'tr' ? 'EN' : 'TR'} - {t('activities.custom.fields.optional')})
+                      </span>
                     </label>
                     <textarea
                       value={lang === 'tr' ? form.descriptionEn : form.description}
@@ -422,7 +465,11 @@ export function ManageActivitiesDialog() {
                       }}
                       rows={isMobile ? 1 : 2}
                       className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1.5 py-1 text-[11px]' : 'px-2.5 py-1.5 text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced resize-none`}
-                      placeholder={lang === 'tr' ? t('activities.custom.placeholders.descriptionEn') : 'Açıklama girin'}
+                      placeholder={
+                        lang === 'tr'
+                          ? t('activities.custom.placeholders.descriptionEn')
+                          : 'Açıklama girin'
+                      }
                     />
                   </div>
                 </div>
@@ -430,7 +477,9 @@ export function ManageActivitiesDialog() {
                   const isTr = lang === 'tr';
                   const trDesc = form.description.trim();
                   const enDesc = form.descriptionEn.trim();
-                  const showHint = isTr ? (enDesc === '' && trDesc !== '') : (trDesc === '' && enDesc !== '');
+                  const showHint = isTr
+                    ? enDesc === '' && trDesc !== ''
+                    : trDesc === '' && enDesc !== '';
                   return showHint ? (
                     <p className="text-[10px] text-gray-500 -mt-1">
                       {t('activities.custom.fields.descriptionHint')}
@@ -476,7 +525,8 @@ export function ManageActivitiesDialog() {
                               <span className="truncate">{getActivityLabel(activity, lang)}</span>
                             </div>
                             <div className="text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-400">
-                              {activity.multiplier}x • {activity.defaultAmount} {getActivityUnit(activity, lang)}
+                              {activity.multiplier}x • {activity.defaultAmount}{' '}
+                              {getActivityUnit(activity, lang)}
                             </div>
                           </div>
                           <div className="flex items-center gap-1.5 text-[10px] sm:text-xs flex-shrink-0">
@@ -514,7 +564,8 @@ export function ManageActivitiesDialog() {
                             <span>{getActivityLabel(activity, lang)}</span>
                           </div>
                           <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
-                            {activity.multiplier}x • {activity.defaultAmount} {getActivityUnit(activity, lang)}
+                            {activity.multiplier}x • {activity.defaultAmount}{' '}
+                            {getActivityUnit(activity, lang)}
                           </div>
                         </div>
                         <div className="flex items-center gap-1.5 text-[10px] sm:text-xs flex-shrink-0">
@@ -537,4 +588,3 @@ export function ManageActivitiesDialog() {
     </>
   );
 }
-

@@ -5,20 +5,31 @@ import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
 import { parseISO } from 'date-fns';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from 'recharts';
 
 interface ActivityTimeAnalysisProps {
   activities: Array<{ performedAt: string; points: number }>;
 }
 
-export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activities }: ActivityTimeAnalysisProps) {
+export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({
+  activities,
+}: ActivityTimeAnalysisProps) {
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
 
   // Analyze by hour (0-23)
   const hourlyData = useMemo(() => {
     const hourMap = new Map<number, { count: number; points: number }>();
-    
+
     // Initialize all hours
     for (let i = 0; i < 24; i++) {
       hourMap.set(i, { count: 0, points: 0 });
@@ -37,15 +48,15 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
         hour,
         hourLabel: `${hour}:00`,
         count: data.count,
-        points: data.points
+        points: data.points,
       }))
-      .filter(item => item.count > 0 || item.points > 0);
+      .filter((item) => item.count > 0 || item.points > 0);
   }, [activities]);
 
   // Analyze by day of week (0=Sunday, 1=Monday, ..., 6=Saturday)
   const dayOfWeekData = useMemo(() => {
     const dayMap = new Map<number, { count: number; points: number }>();
-    
+
     // Initialize all days
     for (let i = 0; i < 7; i++) {
       dayMap.set(i, { count: 0, points: 0 });
@@ -59,16 +70,17 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
       existing.points += activity.points;
     }
 
-    const dayNames = lang === 'tr'
-      ? ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi']
-      : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayNames =
+      lang === 'tr'
+        ? ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi']
+        : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     return Array.from(dayMap.entries())
       .map(([day, data]) => ({
         day,
         dayLabel: dayNames[day],
         count: data.count,
-        points: data.points
+        points: data.points,
       }))
       .sort((a, b) => {
         // Reorder: Monday=0, Tuesday=1, ..., Sunday=6
@@ -81,17 +93,13 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
   // Find most active hour
   const mostActiveHour = useMemo(() => {
     if (hourlyData.length === 0) return null;
-    return hourlyData.reduce((best, current) =>
-      current.points > best.points ? current : best
-    );
+    return hourlyData.reduce((best, current) => (current.points > best.points ? current : best));
   }, [hourlyData]);
 
   // Find most active day
   const mostActiveDay = useMemo(() => {
     if (dayOfWeekData.length === 0) return null;
-    return dayOfWeekData.reduce((best, current) =>
-      current.points > best.points ? current : best
-    );
+    return dayOfWeekData.reduce((best, current) => (current.points > best.points ? current : best));
   }, [dayOfWeekData]);
 
   if (activities.length === 0) {
@@ -117,11 +125,10 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
               <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                 {t('timeAnalysis.mostActiveHour')}
               </div>
-              <div className="text-lg font-bold text-brand">
-                {mostActiveHour.hourLabel}
-              </div>
+              <div className="text-lg font-bold text-brand">{mostActiveHour.hourLabel}</div>
               <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                {mostActiveHour.points.toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US')} {t('level.xp')} • {mostActiveHour.count} {t('timeAnalysis.activities')}
+                {mostActiveHour.points.toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US')}{' '}
+                {t('level.xp')} • {mostActiveHour.count} {t('timeAnalysis.activities')}
               </div>
             </div>
           )}
@@ -130,11 +137,10 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
               <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                 {t('timeAnalysis.mostActiveDay')}
               </div>
-              <div className="text-lg font-bold text-brand">
-                {mostActiveDay.dayLabel}
-              </div>
+              <div className="text-lg font-bold text-brand">{mostActiveDay.dayLabel}</div>
               <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                {mostActiveDay.points.toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US')} {t('level.xp')} • {mostActiveDay.count} {t('timeAnalysis.activities')}
+                {mostActiveDay.points.toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US')}{' '}
+                {t('level.xp')} • {mostActiveDay.count} {t('timeAnalysis.activities')}
               </div>
             </div>
           )}
@@ -161,10 +167,14 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
               <Tooltip
                 formatter={(value: number) => [
                   `${value.toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US')} ${t('level.xp')}`,
-                  t('timeAnalysis.points')
+                  t('timeAnalysis.points'),
                 ]}
                 labelStyle={{ color: '#374151' }}
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                contentStyle={{
+                  backgroundColor: '#fff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                }}
               />
               <Bar dataKey="points" fill="#3b82f6">
                 {hourlyData.map((entry, index) => (
@@ -199,10 +209,14 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
               <Tooltip
                 formatter={(value: number) => [
                   `${value.toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US')} ${t('level.xp')}`,
-                  t('timeAnalysis.points')
+                  t('timeAnalysis.points'),
                 ]}
                 labelStyle={{ color: '#374151' }}
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                contentStyle={{
+                  backgroundColor: '#fff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                }}
               />
               <Bar dataKey="points" fill="#3b82f6">
                 {dayOfWeekData.map((entry, index) => (
@@ -219,4 +233,3 @@ export const ActivityTimeAnalysis = memo(function ActivityTimeAnalysis({ activit
     </div>
   );
 });
-

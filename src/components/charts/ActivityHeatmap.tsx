@@ -1,7 +1,15 @@
 'use client';
 
 import { useMemo } from 'react';
-import { format, startOfYear, endOfYear, eachDayOfInterval, startOfDay, parseISO, isSameDay } from 'date-fns';
+import {
+  format,
+  startOfYear,
+  endOfYear,
+  eachDayOfInterval,
+  startOfDay,
+  parseISO,
+  isSameDay,
+} from 'date-fns';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord } from '@/lib/activityStore';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -20,35 +28,49 @@ export function ActivityHeatmap({ activities, target }: ActivityHeatmapProps) {
     const yearStart = startOfYear(today);
     const yearEnd = endOfYear(today);
     const allYearDays = eachDayOfInterval({ start: yearStart, end: yearEnd });
-    
+
     const pointsMap = new Map<string, number>();
     for (const activity of activities) {
       const date = startOfDay(parseISO(activity.performedAt));
       const key = format(date, 'yyyy-MM-dd');
       pointsMap.set(key, (pointsMap.get(key) || 0) + activity.points);
     }
-    
-    return allYearDays.map(day => {
+
+    return allYearDays.map((day) => {
       const key = format(day, 'yyyy-MM-dd');
       const points = pointsMap.get(key) || 0;
-      const intensity = points >= target ? 4 : points >= target * 0.75 ? 3 : points >= target * 0.5 ? 2 : points > 0 ? 1 : 0;
-      
+      const intensity =
+        points >= target
+          ? 4
+          : points >= target * 0.75
+            ? 3
+            : points >= target * 0.5
+              ? 2
+              : points > 0
+                ? 1
+                : 0;
+
       return {
         date: day,
         key,
         points,
-        intensity
+        intensity,
       };
     });
   }, [activities, target]);
 
   const getIntensityColor = (intensity: number) => {
     switch (intensity) {
-      case 4: return 'bg-green-600 dark:bg-green-500'; // Goal achieved
-      case 3: return 'bg-green-400 dark:bg-green-600'; // 75%+
-      case 2: return 'bg-yellow-400 dark:bg-yellow-600'; // 50%+
-      case 1: return 'bg-gray-300 dark:bg-gray-600'; // Some activity
-      default: return 'bg-gray-100 dark:bg-gray-800'; // No activity
+      case 4:
+        return 'bg-green-600 dark:bg-green-500'; // Goal achieved
+      case 3:
+        return 'bg-green-400 dark:bg-green-600'; // 75%+
+      case 2:
+        return 'bg-yellow-400 dark:bg-yellow-600'; // 50%+
+      case 1:
+        return 'bg-gray-300 dark:bg-gray-600'; // Some activity
+      default:
+        return 'bg-gray-100 dark:bg-gray-800'; // No activity
     }
   };
 
@@ -56,17 +78,18 @@ export function ActivityHeatmap({ activities, target }: ActivityHeatmapProps) {
   const weeks = useMemo(() => {
     const weekGroups: Array<typeof yearData> = [];
     let currentWeek: typeof yearData = [];
-    
+
     for (const day of yearData) {
       const dayOfWeek = day.date.getDay();
       currentWeek.push(day);
-      
-      if (dayOfWeek === 6 || day === yearData[yearData.length - 1]) { // Saturday or last day
+
+      if (dayOfWeek === 6 || day === yearData[yearData.length - 1]) {
+        // Saturday or last day
         weekGroups.push([...currentWeek]);
         currentWeek = [];
       }
     }
-    
+
     return weekGroups;
   }, [yearData]);
 
@@ -81,7 +104,9 @@ export function ActivityHeatmap({ activities, target }: ActivityHeatmapProps) {
   return (
     <div className="overflow-x-auto">
       <div className="inline-block min-w-full">
-        <div className={`grid ${isMobile ? 'grid-cols-7' : 'grid-cols-[repeat(53,minmax(0,1fr))]'} gap-1`}>
+        <div
+          className={`grid ${isMobile ? 'grid-cols-7' : 'grid-cols-[repeat(53,minmax(0,1fr))]'} gap-1`}
+        >
           {weeks.map((week, weekIndex) => (
             <div key={weekIndex} className="flex flex-col gap-1">
               {week.map((day, dayIndex) => (
@@ -109,4 +134,3 @@ export function ActivityHeatmap({ activities, target }: ActivityHeatmapProps) {
     </div>
   );
 }
-

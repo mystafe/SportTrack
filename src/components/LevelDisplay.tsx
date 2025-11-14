@@ -28,7 +28,9 @@ export function LevelDisplay() {
       </div>
       <div className="space-y-1">
         <div className="flex items-center justify-between text-[10px] text-gray-500 dark:text-gray-400">
-          <span>{levelInfo.currentXP.toLocaleString()} / {xpNeeded.toLocaleString()} {t('level.xp')}</span>
+          <span>
+            {levelInfo.currentXP.toLocaleString()} / {xpNeeded.toLocaleString()} {t('level.xp')}
+          </span>
           <span>{Math.round(levelInfo.progress * 100)}%</span>
         </div>
         <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
@@ -39,13 +41,16 @@ export function LevelDisplay() {
         </div>
         <div className="text-[10px] text-gray-500 dark:text-gray-400">
           {xpRemaining > 0 ? (
-            <span>{xpRemaining.toLocaleString()} {t('level.xpNeeded')} {t('level.nextLevel')}</span>
+            <span>
+              {xpRemaining.toLocaleString()} {t('level.xpNeeded')} {t('level.nextLevel')}
+            </span>
           ) : (
-            <span>{t('level.level')} {levelInfo.level}</span>
+            <span>
+              {t('level.level')} {levelInfo.level}
+            </span>
           )}
         </div>
       </div>
     </div>
   );
 }
-

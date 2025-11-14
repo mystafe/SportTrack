@@ -24,23 +24,24 @@ export const ACTIVITY_TEMPLATES: ActivityTemplate[] = [
     name: { tr: 'Sabah Yürüyüşü', en: 'Morning Walk' },
     description: { tr: 'Güne başlamak için ideal', en: 'Perfect way to start the day' },
     icon: '🌅',
-    activities: [
-      { activityKey: 'WALKING', amount: 1.0 }
-    ],
+    activities: [{ activityKey: 'WALKING', amount: 1.0 }],
     estimatedPoints: 1000,
-    category: 'cardio'
+    category: 'cardio',
   },
   {
     id: 'quick-cardio',
     name: { tr: 'Hızlı Kardiyo', en: 'Quick Cardio' },
-    description: { tr: 'Kısa süreli kardiyovasküler antrenman', en: 'Short cardiovascular workout' },
+    description: {
+      tr: 'Kısa süreli kardiyovasküler antrenman',
+      en: 'Short cardiovascular workout',
+    },
     icon: '⚡',
     activities: [
       { activityKey: 'RUNNING', amount: 0.5 },
-      { activityKey: 'WALKING', amount: 0.5 }
+      { activityKey: 'WALKING', amount: 0.5 },
     ],
     estimatedPoints: 1500,
-    category: 'cardio'
+    category: 'cardio',
   },
   {
     id: 'strength-basics',
@@ -49,10 +50,10 @@ export const ACTIVITY_TEMPLATES: ActivityTemplate[] = [
     icon: '💪',
     activities: [
       { activityKey: 'PUSH_UP', amount: 1.0 },
-      { activityKey: 'SIT_UP', amount: 1.0 }
+      { activityKey: 'SIT_UP', amount: 1.0 },
     ],
     estimatedPoints: 600,
-    category: 'strength'
+    category: 'strength',
   },
   {
     id: 'full-body',
@@ -63,32 +64,28 @@ export const ACTIVITY_TEMPLATES: ActivityTemplate[] = [
       { activityKey: 'WALKING', amount: 0.5 },
       { activityKey: 'PUSH_UP', amount: 1.0 },
       { activityKey: 'SIT_UP', amount: 1.0 },
-      { activityKey: 'WEIGHT_LIFTING', amount: 0.5 }
+      { activityKey: 'WEIGHT_LIFTING', amount: 0.5 },
     ],
     estimatedPoints: 2000,
-    category: 'mixed'
+    category: 'mixed',
   },
   {
     id: 'swim-session',
     name: { tr: 'Yüzme Seansı', en: 'Swimming Session' },
     description: { tr: 'Yüzme antrenmanı', en: 'Swimming workout' },
     icon: '🏊',
-    activities: [
-      { activityKey: 'SWIMMING', amount: 1.0 }
-    ],
+    activities: [{ activityKey: 'SWIMMING', amount: 1.0 }],
     estimatedPoints: 100,
-    category: 'cardio'
+    category: 'cardio',
   },
   {
     id: 'stair-climbing',
     name: { tr: 'Merdiven Çıkma', en: 'Stair Climbing' },
     description: { tr: 'Merdiven çıkma antrenmanı', en: 'Stair climbing workout' },
     icon: '🪜',
-    activities: [
-      { activityKey: 'STAIRS', amount: 1.0 }
-    ],
+    activities: [{ activityKey: 'STAIRS', amount: 1.0 }],
     estimatedPoints: 1000,
-    category: 'cardio'
+    category: 'cardio',
   },
   {
     id: 'quick-strength',
@@ -97,10 +94,10 @@ export const ACTIVITY_TEMPLATES: ActivityTemplate[] = [
     icon: '⚡💪',
     activities: [
       { activityKey: 'PUSH_UP', amount: 0.5 },
-      { activityKey: 'SIT_UP', amount: 0.5 }
+      { activityKey: 'SIT_UP', amount: 0.5 },
     ],
     estimatedPoints: 300,
-    category: 'quick'
+    category: 'quick',
   },
   {
     id: 'cardio-plus',
@@ -109,21 +106,19 @@ export const ACTIVITY_TEMPLATES: ActivityTemplate[] = [
     icon: '🏃💨',
     activities: [
       { activityKey: 'RUNNING', amount: 1.0 },
-      { activityKey: 'WALKING', amount: 1.0 }
+      { activityKey: 'WALKING', amount: 1.0 },
     ],
     estimatedPoints: 2500,
-    category: 'cardio'
+    category: 'cardio',
   },
   {
     id: 'weight-training',
     name: { tr: 'Ağırlık Antrenmanı', en: 'Weight Training' },
     description: { tr: 'Ağırlık çalışması', en: 'Weight lifting session' },
     icon: '🏋️',
-    activities: [
-      { activityKey: 'WEIGHT_LIFTING', amount: 1.0 }
-    ],
+    activities: [{ activityKey: 'WEIGHT_LIFTING', amount: 1.0 }],
     estimatedPoints: 300,
-    category: 'strength'
+    category: 'strength',
   },
   {
     id: 'active-day',
@@ -132,15 +127,16 @@ export const ACTIVITY_TEMPLATES: ActivityTemplate[] = [
     icon: '🌟',
     activities: [
       { activityKey: 'WALKING', amount: 2.0 },
-      { activityKey: 'STAIRS', amount: 0.5 }
+      { activityKey: 'STAIRS', amount: 0.5 },
     ],
     estimatedPoints: 3000,
-    category: 'mixed'
-  }
+    category: 'mixed',
+  },
 ];
 
-export function getTemplatesByCategory(category?: ActivityTemplate['category']): ActivityTemplate[] {
+export function getTemplatesByCategory(
+  category?: ActivityTemplate['category']
+): ActivityTemplate[] {
   if (!category) return ACTIVITY_TEMPLATES;
-  return ACTIVITY_TEMPLATES.filter(t => t.category === category);
+  return ACTIVITY_TEMPLATES.filter((t) => t.category === category);
 }
-

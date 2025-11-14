@@ -20,18 +20,18 @@ export default function AchievementsPage() {
       streak: [],
       points: [],
       activities: [],
-      special: []
+      special: [],
     };
 
-    const unlockedIds = new Set(badges.map(b => b.id));
+    const unlockedIds = new Set(badges.map((b) => b.id));
 
     // Add unlocked badges
-    badges.forEach(badge => {
+    badges.forEach((badge) => {
       categories[badge.category].push(badge);
     });
 
     // Add locked badges
-    Object.values(BADGE_DEFINITIONS).forEach(definition => {
+    Object.values(BADGE_DEFINITIONS).forEach((definition) => {
       if (!unlockedIds.has(definition.id)) {
         categories[definition.category].push(definition as Badge);
       }
@@ -74,7 +74,7 @@ export default function AchievementsPage() {
     streak: lang === 'tr' ? 'Seriler' : 'Streaks',
     points: lang === 'tr' ? 'Puanlar' : 'Points',
     activities: lang === 'tr' ? 'Aktiviteler' : 'Activities',
-    special: lang === 'tr' ? 'Özel' : 'Special'
+    special: lang === 'tr' ? 'Özel' : 'Special',
   };
 
   if (!hydrated) {
@@ -87,7 +87,9 @@ export default function AchievementsPage() {
             <div className="h-full w-1/3 bg-gray-300 dark:bg-gray-700 rounded-full skeleton" />
           </div>
         </div>
-        <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'} gap-3 sm:gap-4`}>
+        <div
+          className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'} gap-3 sm:gap-4`}
+        >
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <BadgeCardSkeleton key={i} />
           ))}
@@ -103,8 +105,12 @@ export default function AchievementsPage() {
   return (
     <div className="space-y-6 page-transition">
       <div>
-        <h1 className={`text-2xl sm:text-3xl font-bold flex items-center gap-2 ${isMobile ? 'title-entrance' : ''}`}>
-          <span className={`text-2xl sm:text-3xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>🏆</span>
+        <h1
+          className={`text-2xl sm:text-3xl font-bold flex items-center gap-2 ${isMobile ? 'title-entrance' : ''}`}
+        >
+          <span className={`text-2xl sm:text-3xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>
+            🏆
+          </span>
           <span className="text-gray-950 dark:text-white">{t('achievements.title')}</span>
         </h1>
         <p className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mt-2 leading-relaxed">
@@ -134,11 +140,18 @@ export default function AchievementsPage() {
       </div>
 
       {/* Badges by Category */}
-      {(['streak', 'points', 'activities', 'special'] as const).map(category => (
-        <div key={category} className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white mb-4">{categoryLabels[category]}</h2>
-          <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'} gap-3 sm:gap-4`}>
-            {badgesByCategory[category].map(badge => {
+      {(['streak', 'points', 'activities', 'special'] as const).map((category) => (
+        <div
+          key={category}
+          className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300"
+        >
+          <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white mb-4">
+            {categoryLabels[category]}
+          </h2>
+          <div
+            className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'} gap-3 sm:gap-4`}
+          >
+            {badgesByCategory[category].map((badge) => {
               const isUnlocked = !!badge.unlockedAt;
               return (
                 <div
@@ -154,27 +167,35 @@ export default function AchievementsPage() {
                       <div className="text-4xl opacity-30">🔒</div>
                     </div>
                   )}
-                  <div className={`text-4xl sm:text-5xl mb-2 ${!isUnlocked ? 'opacity-30' : isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>
+                  <div
+                    className={`text-4xl sm:text-5xl mb-2 ${!isUnlocked ? 'opacity-30' : isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}
+                  >
                     {badge.icon}
                   </div>
-                  <div className={`text-sm sm:text-base font-bold mb-1 text-gray-950 dark:text-gray-100 ${!isUnlocked ? 'opacity-30' : ''}`}>
+                  <div
+                    className={`text-sm sm:text-base font-bold mb-1 text-gray-950 dark:text-gray-100 ${!isUnlocked ? 'opacity-30' : ''}`}
+                  >
                     {badge.name[lang]}
                   </div>
-                  <div className={`text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${!isUnlocked ? 'opacity-30' : ''}`}>
+                  <div
+                    className={`text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${!isUnlocked ? 'opacity-30' : ''}`}
+                  >
                     {badge.description[lang]}
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      isUnlocked
-                        ? badge.rarity === 'common'
-                          ? 'bg-gray-200 dark:bg-gray-700'
-                          : badge.rarity === 'rare'
-                          ? 'bg-blue-200 dark:bg-blue-800'
-                          : badge.rarity === 'epic'
-                          ? 'bg-purple-200 dark:bg-purple-800'
-                          : 'bg-yellow-200 dark:bg-yellow-800'
-                        : 'bg-gray-200 dark:bg-gray-700'
-                    }`}>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${
+                        isUnlocked
+                          ? badge.rarity === 'common'
+                            ? 'bg-gray-200 dark:bg-gray-700'
+                            : badge.rarity === 'rare'
+                              ? 'bg-blue-200 dark:bg-blue-800'
+                              : badge.rarity === 'epic'
+                                ? 'bg-purple-200 dark:bg-purple-800'
+                                : 'bg-yellow-200 dark:bg-yellow-800'
+                          : 'bg-gray-200 dark:bg-gray-700'
+                      }`}
+                    >
                       {getRarityLabel(badge.rarity)}
                     </span>
                     {isUnlocked && badge.unlockedAt && (
@@ -192,4 +213,3 @@ export default function AchievementsPage() {
     </div>
   );
 }
-

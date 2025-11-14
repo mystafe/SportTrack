@@ -33,8 +33,10 @@ export function SettingsDialog() {
   useEffect(() => {
     if (!hydrated) return;
     // Show dialog if onboarding tour was just completed
-    const showProfileDialog = typeof window !== 'undefined' && localStorage.getItem('show_profile_dialog') === 'true';
-    const onboardingCompleted = typeof window !== 'undefined' && localStorage.getItem('onboarding_completed') === 'true';
+    const showProfileDialog =
+      typeof window !== 'undefined' && localStorage.getItem('show_profile_dialog') === 'true';
+    const onboardingCompleted =
+      typeof window !== 'undefined' && localStorage.getItem('onboarding_completed') === 'true';
     if (showProfileDialog && onboardingCompleted) {
       localStorage.removeItem('show_profile_dialog');
       // Small delay to ensure tour is fully closed
@@ -72,105 +74,108 @@ export function SettingsDialog() {
       name: trimmedName,
       dailyTarget: Math.round(targetValue),
       customActivities: settings?.customActivities ?? [],
-      mood: mood ?? undefined
+      mood: mood ?? undefined,
     });
     setOpen(false);
     setError(null);
   }
 
   // Mobile: Show app settings dialog
-  const appSettingsDialog = isMobile && showAppSettings ? (
-    <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-4 overflow-y-auto"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          setShowAppSettings(false);
-        }
-      }}
-    >
-      <div className="relative w-full max-w-md rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 space-y-4 my-auto">
-        <div>
-          <h2 className="text-lg font-bold text-gray-950 dark:text-white">{t('settings.appSettings')}</h2>
-          <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">
-            {t('settings.appSettingsSubtitle')}
-          </p>
-        </div>
-        <div className="space-y-4">
+  const appSettingsDialog =
+    isMobile && showAppSettings ? (
+      <div
+        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-4 overflow-y-auto"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowAppSettings(false);
+          }
+        }}
+      >
+        <div className="relative w-full max-w-md rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 space-y-4 my-auto">
           <div>
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
-              {t('data.export')} / {t('data.import')}
-            </span>
-            <DataExportImport />
+            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+              {t('settings.appSettings')}
+            </h2>
+            <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">
+              {t('settings.appSettingsSubtitle')}
+            </p>
           </div>
-          <div>
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== 'undefined' && window.resetOnboarding) {
-                  window.resetOnboarding();
-                  setShowAppSettings(false);
-                }
-              }}
-              className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 text-gray-700 dark:text-gray-300 font-semibold"
-            >
-              🎓 {t('settings.showOnboarding') || 'Show Onboarding Tour'}
-            </button>
-          </div>
-          <div>
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
-              {t('nav.main')}
-            </span>
-            <div className="flex items-center gap-3">
-              <LanguageToggle />
-              <ThemeToggle />
-            </div>
-          </div>
-          {keyboardShortcuts && (
+          <div className="space-y-4">
             <div>
               <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
-                {t('settings.keyboardShortcuts')}
+                {t('data.export')} / {t('data.import')}
               </span>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                {t('settings.keyboardShortcutsHint')}
-              </p>
+              <DataExportImport />
+            </div>
+            <div>
               <button
                 type="button"
-                onClick={() => keyboardShortcuts.showHelp()}
-                className="px-3 py-2 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold"
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.resetOnboarding) {
+                    window.resetOnboarding();
+                    setShowAppSettings(false);
+                  }
+                }}
+                className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 text-gray-700 dark:text-gray-300 font-semibold"
               >
-                {t('settings.keyboardShortcuts')}
+                🎓 {t('settings.showOnboarding') || 'Show Onboarding Tour'}
               </button>
             </div>
-          )}
-          <div>
-            <NotificationSettings />
-          </div>
-          <div>
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
-              {t('appleHealth.import')}
-            </span>
-            <div className="space-y-3">
-              <AppleHealthImport />
-              <AppleHealthGuide />
+            <div>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+                {t('nav.main')}
+              </span>
+              <div className="flex items-center gap-3">
+                <LanguageToggle />
+                <ThemeToggle />
+              </div>
+            </div>
+            {keyboardShortcuts && (
+              <div>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+                  {t('settings.keyboardShortcuts')}
+                </span>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  {t('settings.keyboardShortcutsHint')}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => keyboardShortcuts.showHelp()}
+                  className="px-3 py-2 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold"
+                >
+                  {t('settings.keyboardShortcuts')}
+                </button>
+              </div>
+            )}
+            <div>
+              <NotificationSettings />
+            </div>
+            <div>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
+                {t('appleHealth.import')}
+              </span>
+              <div className="space-y-3">
+                <AppleHealthImport />
+                <AppleHealthGuide />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="flex items-center justify-end gap-2 pt-2">
-          <button
-            type="button"
-            className="px-3 py-2 text-xs rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300"
-            onClick={() => setShowAppSettings(false)}
-          >
-            OK
-          </button>
+          <div className="flex items-center justify-end gap-2 pt-2">
+            <button
+              type="button"
+              className="px-3 py-2 text-xs rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300"
+              onClick={() => setShowAppSettings(false)}
+            >
+              OK
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  ) : null;
+    ) : null;
 
   // Profile dialog
   const profileDialog = open ? (
-    <div 
+    <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-4 overflow-y-auto"
       onClick={(e) => {
         if (e.target === e.currentTarget && settings) {
@@ -183,14 +188,22 @@ export function SettingsDialog() {
     >
       <div className="relative w-full max-w-md rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 space-y-4 my-auto">
         <div>
-          <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-white`}>{t('settings.title')}</h2>
-          <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-600 dark:text-gray-400 mt-0.5`}>
+          <h2
+            className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-white`}
+          >
+            {t('settings.title')}
+          </h2>
+          <p
+            className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-600 dark:text-gray-400 mt-0.5`}
+          >
             {t('settings.subtitle')}
           </p>
         </div>
         <form className={`${isMobile ? 'space-y-2.5' : 'space-y-3'}`} onSubmit={submit}>
           <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
-            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300`}>
+            <span
+              className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300`}
+            >
               {t('settings.nameLabel')}
             </span>
             <input
@@ -202,13 +215,15 @@ export function SettingsDialog() {
             />
           </label>
           <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
-            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300`}>
+            <span
+              className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300`}
+            >
               {t('settings.goalLabel')}
             </span>
             <input
               type="number"
-                    min={LIMITS.DAILY_TARGET_MIN}
-                    max={LIMITS.DAILY_TARGET_MAX}
+              min={LIMITS.DAILY_TARGET_MIN}
+              max={LIMITS.DAILY_TARGET_MAX}
               step={100}
               value={dailyTarget}
               onChange={(e) => setDailyTarget(e.target.value)}
@@ -217,7 +232,9 @@ export function SettingsDialog() {
             />
           </label>
           <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
-            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300`}>
+            <span
+              className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-300`}
+            >
               {t('settings.moodLabel')}
             </span>
             <select
@@ -241,7 +258,7 @@ export function SettingsDialog() {
           {error ? (
             <p className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-red-500`}>{error}</p>
           ) : null}
-          
+
           <div className={`${isMobile ? 'pt-2' : 'pt-3'} flex ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
             <button
               type="submit"
@@ -264,7 +281,7 @@ export function SettingsDialog() {
               {t('form.cancel')}
             </button>
           </div>
-          
+
           {/* Desktop: Export/Import, Language, Theme */}
           {!isMobile && (
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
@@ -303,7 +320,11 @@ export function SettingsDialog() {
             data-tour-id="profile"
           >
             <span className="truncate text-[10px] sm:text-xs">
-              {settings?.name ? (settings.name.length > 8 ? settings.name.substring(0, 8) + '...' : settings.name) : '👤'}
+              {settings?.name
+                ? settings.name.length > 8
+                  ? settings.name.substring(0, 8) + '...'
+                  : settings.name
+                : '👤'}
             </span>
           </button>
           <button
@@ -335,4 +356,3 @@ export function SettingsDialog() {
     </>
   );
 }
-

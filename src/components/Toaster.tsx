@@ -42,11 +42,11 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
       {mounted &&
         typeof window !== 'undefined' &&
         createPortal(
-          <div className={`fixed z-[10000] flex flex-col gap-2 ${
-            isMobile 
-              ? 'bottom-4 left-4 right-4 safe-bottom' 
-              : 'bottom-4 right-4'
-          }`}>
+          <div
+            className={`fixed z-[10000] flex flex-col gap-2 ${
+              isMobile ? 'bottom-4 left-4 right-4 safe-bottom' : 'bottom-4 right-4'
+            }`}
+          >
             {toasts.map((toast) => (
               <div
                 key={toast.id}
@@ -54,8 +54,8 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
                   toast.type === 'success'
                     ? 'bg-green-500 text-white'
                     : toast.type === 'error'
-                    ? 'bg-red-500 text-white'
-                    : 'bg-blue-500 text-white'
+                      ? 'bg-red-500 text-white'
+                      : 'bg-blue-500 text-white'
                 }`}
                 role="alert"
                 aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
@@ -78,4 +78,3 @@ export function useToaster() {
   }
   return ctx;
 }
-

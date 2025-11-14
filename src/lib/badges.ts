@@ -2,7 +2,7 @@ import { ActivityRecord } from '@/lib/activityStore';
 import { UserSettings } from '@/lib/settingsStore';
 import { startOfDay, parseISO, isSameDay, subDays } from 'date-fns';
 
-export type BadgeId = 
+export type BadgeId =
   | 'first_activity'
   | 'streak_7'
   | 'streak_30'
@@ -38,31 +38,40 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: 'İlk aktiviteni ekle', en: 'Add your first activity' },
     icon: '🎯',
     category: 'special',
-    rarity: 'common'
+    rarity: 'common',
   },
   streak_7: {
     id: 'streak_7',
     name: { tr: '7 Günlük Seri', en: '7 Day Streak' },
-    description: { tr: '7 gün üst üste hedefini tamamla', en: 'Complete your goal 7 days in a row' },
+    description: {
+      tr: '7 gün üst üste hedefini tamamla',
+      en: 'Complete your goal 7 days in a row',
+    },
     icon: '🔥',
     category: 'streak',
-    rarity: 'common'
+    rarity: 'common',
   },
   streak_30: {
     id: 'streak_30',
     name: { tr: '30 Günlük Seri', en: '30 Day Streak' },
-    description: { tr: '30 gün üst üste hedefini tamamla', en: 'Complete your goal 30 days in a row' },
+    description: {
+      tr: '30 gün üst üste hedefini tamamla',
+      en: 'Complete your goal 30 days in a row',
+    },
     icon: '💪',
     category: 'streak',
-    rarity: 'rare'
+    rarity: 'rare',
   },
   streak_100: {
     id: 'streak_100',
     name: { tr: '100 Günlük Seri', en: '100 Day Streak' },
-    description: { tr: '100 gün üst üste hedefini tamamla', en: 'Complete your goal 100 days in a row' },
+    description: {
+      tr: '100 gün üst üste hedefini tamamla',
+      en: 'Complete your goal 100 days in a row',
+    },
     icon: '👑',
     category: 'streak',
-    rarity: 'legendary'
+    rarity: 'legendary',
   },
   points_10k: {
     id: 'points_10k',
@@ -70,7 +79,7 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: 'Toplamda 10.000 puan kazan', en: 'Earn 10,000 total points' },
     icon: '⭐',
     category: 'points',
-    rarity: 'common'
+    rarity: 'common',
   },
   points_50k: {
     id: 'points_50k',
@@ -78,7 +87,7 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: 'Toplamda 50.000 puan kazan', en: 'Earn 50,000 total points' },
     icon: '🌟',
     category: 'points',
-    rarity: 'rare'
+    rarity: 'rare',
   },
   points_100k: {
     id: 'points_100k',
@@ -86,7 +95,7 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: 'Toplamda 100.000 puan kazan', en: 'Earn 100,000 total points' },
     icon: '💫',
     category: 'points',
-    rarity: 'epic'
+    rarity: 'epic',
   },
   points_500k: {
     id: 'points_500k',
@@ -94,7 +103,7 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: 'Toplamda 500.000 puan kazan', en: 'Earn 500,000 total points' },
     icon: '🏆',
     category: 'points',
-    rarity: 'legendary'
+    rarity: 'legendary',
   },
   activities_100: {
     id: 'activities_100',
@@ -102,7 +111,7 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: '100 aktivite ekle', en: 'Add 100 activities' },
     icon: '📝',
     category: 'activities',
-    rarity: 'common'
+    rarity: 'common',
   },
   activities_500: {
     id: 'activities_500',
@@ -110,7 +119,7 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: '500 aktivite ekle', en: 'Add 500 activities' },
     icon: '📊',
     category: 'activities',
-    rarity: 'rare'
+    rarity: 'rare',
   },
   activities_1000: {
     id: 'activities_1000',
@@ -118,7 +127,7 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: '1000 aktivite ekle', en: 'Add 1000 activities' },
     icon: '🎖️',
     category: 'activities',
-    rarity: 'epic'
+    rarity: 'epic',
   },
   all_activities: {
     id: 'all_activities',
@@ -126,7 +135,7 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: 'Tüm aktivite türlerini dene', en: 'Try all activity types' },
     icon: '🎯',
     category: 'special',
-    rarity: 'rare'
+    rarity: 'rare',
   },
   weekend_warrior: {
     id: 'weekend_warrior',
@@ -134,7 +143,7 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: 'Hafta sonu aktiviteleri yap', en: 'Do activities on weekends' },
     icon: '🏋️',
     category: 'special',
-    rarity: 'common'
+    rarity: 'common',
   },
   early_bird: {
     id: 'early_bird',
@@ -142,7 +151,7 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: 'Sabah 6-9 arası aktivite yap', en: 'Do activities between 6-9 AM' },
     icon: '🌅',
     category: 'special',
-    rarity: 'common'
+    rarity: 'common',
   },
   night_owl: {
     id: 'night_owl',
@@ -150,24 +159,30 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     description: { tr: 'Gece 21-24 arası aktivite yap', en: 'Do activities between 9 PM-12 AM' },
     icon: '🦉',
     category: 'special',
-    rarity: 'common'
+    rarity: 'common',
   },
   perfect_week: {
     id: 'perfect_week',
     name: { tr: 'Mükemmel Hafta', en: 'Perfect Week' },
-    description: { tr: 'Bir hafta boyunca her gün hedefini tamamla', en: 'Complete your goal every day for a week' },
+    description: {
+      tr: 'Bir hafta boyunca her gün hedefini tamamla',
+      en: 'Complete your goal every day for a week',
+    },
     icon: '✨',
     category: 'special',
-    rarity: 'rare'
+    rarity: 'rare',
   },
   perfect_month: {
     id: 'perfect_month',
     name: { tr: 'Mükemmel Ay', en: 'Perfect Month' },
-    description: { tr: 'Bir ay boyunca her gün hedefini tamamla', en: 'Complete your goal every day for a month' },
+    description: {
+      tr: 'Bir ay boyunca her gün hedefini tamamla',
+      en: 'Complete your goal every day for a month',
+    },
     icon: '💎',
     category: 'special',
-    rarity: 'epic'
-  }
+    rarity: 'epic',
+  },
 };
 
 export function checkBadges(
@@ -177,7 +192,7 @@ export function checkBadges(
   existingBadges: Badge[] = []
 ): Badge[] {
   const unlockedBadges: Badge[] = [];
-  const existingBadgeIds = new Set(existingBadges.map(b => b.id));
+  const existingBadgeIds = new Set(existingBadges.map((b) => b.id));
 
   if (activities.length === 0) {
     return unlockedBadges;
@@ -186,7 +201,7 @@ export function checkBadges(
   // Calculate statistics
   const totalPoints = activities.reduce((sum, a) => sum + a.points, 0);
   const totalActivities = activities.length;
-  const uniqueActivityKeys = new Set(activities.map(a => a.activityKey));
+  const uniqueActivityKeys = new Set(activities.map((a) => a.activityKey));
 
   // Calculate streak
   const daysWithActivities = new Map<string, number>();
@@ -203,7 +218,10 @@ export function checkBadges(
   let currentStreak = 0;
   const today = startOfDay(new Date());
   for (const day of sortedDays) {
-    if (isSameDay(day.date, today) || isSameDay(day.date, startOfDay(subDays(today, currentStreak)))) {
+    if (
+      isSameDay(day.date, today) ||
+      isSameDay(day.date, startOfDay(subDays(today, currentStreak)))
+    ) {
       if (day.points >= target) {
         currentStreak++;
       } else {
@@ -271,7 +289,7 @@ export function checkBadges(
         break;
 
       case 'weekend_warrior':
-        unlocked = activities.some(a => {
+        unlocked = activities.some((a) => {
           const date = parseISO(a.performedAt);
           const dayOfWeek = date.getDay();
           return dayOfWeek === 0 || dayOfWeek === 6; // Sunday or Saturday
@@ -279,7 +297,7 @@ export function checkBadges(
         break;
 
       case 'early_bird':
-        unlocked = activities.some(a => {
+        unlocked = activities.some((a) => {
           const date = parseISO(a.performedAt);
           const hour = date.getHours();
           return hour >= 6 && hour < 9;
@@ -287,7 +305,7 @@ export function checkBadges(
         break;
 
       case 'night_owl':
-        unlocked = activities.some(a => {
+        unlocked = activities.some((a) => {
           const date = parseISO(a.performedAt);
           const hour = date.getHours();
           return hour >= 21 || hour < 24;
@@ -297,7 +315,7 @@ export function checkBadges(
       case 'perfect_week':
         // Check if last 7 days all have activities >= target
         const last7Days = Array.from({ length: 7 }, (_, i) => startOfDay(subDays(today, i)));
-        unlocked = last7Days.every(day => {
+        unlocked = last7Days.every((day) => {
           const dayKey = day.toISOString();
           const dayPoints = daysWithActivities.get(dayKey) || 0;
           return dayPoints >= target;
@@ -307,7 +325,7 @@ export function checkBadges(
       case 'perfect_month':
         // Check if last 30 days all have activities >= target
         const last30Days = Array.from({ length: 30 }, (_, i) => startOfDay(subDays(today, i)));
-        unlocked = last30Days.every(day => {
+        unlocked = last30Days.every((day) => {
           const dayKey = day.toISOString();
           const dayPoints = daysWithActivities.get(dayKey) || 0;
           return dayPoints >= target;
@@ -318,11 +336,10 @@ export function checkBadges(
     if (unlocked) {
       unlockedBadges.push({
         ...definition,
-        unlockedAt: new Date()
+        unlockedAt: new Date(),
       });
     }
   }
 
   return unlockedBadges;
 }
-

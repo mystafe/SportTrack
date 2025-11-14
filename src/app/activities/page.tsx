@@ -33,8 +33,12 @@ export default function ActivitiesPage() {
   return (
     <div className="space-y-4 sm:space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className={`text-2xl sm:text-3xl font-bold flex items-center gap-2 ${isMobile ? 'title-entrance' : ''}`}>
-          <span className={`text-2xl sm:text-3xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>📝</span>
+        <h1
+          className={`text-2xl sm:text-3xl font-bold flex items-center gap-2 ${isMobile ? 'title-entrance' : ''}`}
+        >
+          <span className={`text-2xl sm:text-3xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>
+            📝
+          </span>
           <span className="text-gray-950 dark:text-white">{t('nav.activities')}</span>
         </h1>
         <div className="flex items-center gap-2">
@@ -59,13 +63,16 @@ function ActivitiesClient() {
   const { activities, deleteActivity, hydrated } = useActivities();
   const { showToast } = useToaster();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; activity: ActivityRecord } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    id: string;
+    activity: ActivityRecord;
+  } | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     dateRange: 'all',
     activityType: 'all',
     category: 'all',
     searchQuery: '',
-    sortBy: 'date-desc'
+    sortBy: 'date-desc',
   });
   const filteredActivities = useFilteredActivities(filters);
 
@@ -77,7 +84,7 @@ function ActivitiesClient() {
     () =>
       new Intl.DateTimeFormat(lang === 'tr' ? 'tr-TR' : 'en-US', {
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       }),
     [lang]
   );
@@ -85,7 +92,7 @@ function ActivitiesClient() {
   const todayKey = useMemo(() => startOfDay(new Date()).toISOString(), []);
 
   const editing = useMemo(
-    () => (editingId ? activities.find((activity) => activity.id === editingId) ?? null : null),
+    () => (editingId ? (activities.find((activity) => activity.id === editingId) ?? null) : null),
     [activities, editingId]
   );
 
@@ -98,9 +105,7 @@ function ActivitiesClient() {
     return Array.from(grouped.entries())
       .map(([day, acts]) => ({
         day,
-        acts: acts.sort(
-          (a, b) => +new Date(b.performedAt) - +new Date(a.performedAt)
-        )
+        acts: acts.sort((a, b) => +new Date(b.performedAt) - +new Date(a.performedAt)),
       }))
       .sort((a, b) => +new Date(b.day) - +new Date(a.day));
   }, [filteredActivities]);
@@ -117,14 +122,18 @@ function ActivitiesClient() {
       <ActivityFilters filters={filters} onFiltersChange={setFilters} />
 
       {/* Compact Filtered Stats Summary */}
-      {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.category !== 'all' || filters.searchQuery) && (
+      {(filters.dateRange !== 'all' ||
+        filters.activityType !== 'all' ||
+        filters.category !== 'all' ||
+        filters.searchQuery) && (
         <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 px-3 py-2 shadow-md hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between text-xs">
             <span className="font-semibold text-gray-800 dark:text-gray-200">
               {t('filters.results')}
             </span>
             <div className="text-gray-700 dark:text-gray-200 font-semibold">
-              {filteredStats.totalCount} {t('filters.activities')} · {numberFormatter.format(filteredStats.totalPoints)} {t('list.pointsUnit')}
+              {filteredStats.totalCount} {t('filters.activities')} ·{' '}
+              {numberFormatter.format(filteredStats.totalPoints)} {t('list.pointsUnit')}
             </div>
           </div>
         </div>
@@ -142,12 +151,20 @@ function ActivitiesClient() {
         <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
           {filteredActivities.length === 0 ? (
             <div className="p-12 text-center">
-              <div className={`${isMobile ? 'text-5xl' : 'text-6xl'} mb-4 ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>🔍</div>
-              <p className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 mb-2`}>
+              <div
+                className={`${isMobile ? 'text-5xl' : 'text-6xl'} mb-4 ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}
+              >
+                🔍
+              </div>
+              <p
+                className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 mb-2`}
+              >
                 {t('filters.noResults')}
               </p>
               <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400`}>
-                {lang === 'tr' ? 'Filtreleri değiştirerek tekrar deneyin.' : 'Try changing the filters.'}
+                {lang === 'tr'
+                  ? 'Filtreleri değiştirerek tekrar deneyin.'
+                  : 'Try changing the filters.'}
               </p>
             </div>
           ) : editing ? (
@@ -174,7 +191,7 @@ function ActivitiesClient() {
                     multiplier: editing.multiplier,
                     amount: editing.amount,
                     note: editing.note ?? '',
-                    performedAt: editing.performedAt
+                    performedAt: editing.performedAt,
                   }}
                   onSaved={() => {
                     setEditingId(null);
@@ -187,9 +204,13 @@ function ActivitiesClient() {
           <ConfirmDialog
             open={!!deleteConfirm}
             title={t('list.deleteConfirmTitle')}
-            message={deleteConfirm ? t('list.deleteConfirmMessage', {
-              activity: getActivityLabel(deleteConfirm.activity, lang)
-            }) : ''}
+            message={
+              deleteConfirm
+                ? t('list.deleteConfirmMessage', {
+                    activity: getActivityLabel(deleteConfirm.activity, lang),
+                  })
+                : ''
+            }
             variant="danger"
             confirmLabel={t('list.delete')}
             onConfirm={() => {
@@ -211,7 +232,9 @@ function ActivitiesClient() {
               <div className="h-10 rounded skeleton" />
             </div>
           ) : filteredActivities.length === 0 ? (
-            <div className="p-4 text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium">{t('filters.noResults')}</div>
+            <div className="p-4 text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium">
+              {t('filters.noResults')}
+            </div>
           ) : (
             <div className="space-y-1">
               {groups.map(({ day, acts }, groupIndex) => (
@@ -219,7 +242,9 @@ function ActivitiesClient() {
                   <div className="sticky top-0 z-10 date-header-entrance bg-gradient-to-r from-brand/10 via-brand/5 to-brand/10 dark:from-brand/20 dark:via-brand/10 dark:to-brand/20 backdrop-blur-md px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white border-b-2 border-brand/30 dark:border-brand/40 rounded-t-xl shadow-sm">
                     <div className="flex items-center gap-2">
                       <span className="text-brand dark:text-brand-light">📅</span>
-                      <span className="drop-shadow-sm">{format(new Date(day), 'd MMMM EEEE', { locale: dateLocale })}</span>
+                      <span className="drop-shadow-sm">
+                        {format(new Date(day), 'd MMMM EEEE', { locale: dateLocale })}
+                      </span>
                     </div>
                   </div>
                   <ul className="space-y-2 px-1 pb-2">
@@ -230,32 +255,42 @@ function ActivitiesClient() {
                         <li
                           key={activity.id}
                           className={`activity-card-entrance activity-card-shimmer activity-card-hover activity-ripple gpu-accelerated group relative rounded-2xl ${isToday ? 'ring-4 ring-brand/40 dark:ring-brand/50 shadow-2xl' : 'shadow-lg'} border-2 ${isToday ? 'border-brand/50 dark:border-brand/60' : 'border-gray-300/60 dark:border-gray-600/60'} bg-gradient-to-br ${isToday ? 'from-brand/10 via-white to-brand/5 dark:from-brand/20 dark:via-gray-900 dark:to-brand/10' : 'from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'} px-5 py-4 hover:shadow-2xl transition-all duration-300 overflow-hidden`}
-                          style={{ animationDelay: `${(groupIndex * 0.1) + (actIndex * 0.05)}s` }}
+                          style={{ animationDelay: `${groupIndex * 0.1 + actIndex * 0.05}s` }}
                         >
                           {/* Animated background gradient */}
                           <div className="absolute inset-0 bg-gradient-to-br from-brand/10 via-transparent to-brand/5 dark:from-brand/20 dark:via-transparent dark:to-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
-                          
+
                           {/* Shine effect */}
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-2xl pointer-events-none"></div>
-                          
+
                           <div className="relative z-10">
                             {/* Header Row */}
                             <div className="flex items-start justify-between gap-3 mb-3">
                               <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <div className={`relative ${isMobile ? 'text-3xl' : 'text-4xl'} activity-icon-float ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>
+                                <div
+                                  className={`relative ${isMobile ? 'text-3xl' : 'text-4xl'} activity-icon-float ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}
+                                >
                                   {activity.icon}
                                   {isToday && (
-                                    <span className="absolute -top-1 -right-1 text-xs animate-pulse">⭐</span>
+                                    <span className="absolute -top-1 -right-1 text-xs animate-pulse">
+                                      ⭐
+                                    </span>
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <h3 className={`${isMobile ? 'text-lg' : 'text-xl'} font-black text-gray-950 dark:text-white mb-1 drop-shadow-sm truncate`}>
+                                  <h3
+                                    className={`${isMobile ? 'text-lg' : 'text-xl'} font-black text-gray-950 dark:text-white mb-1 drop-shadow-sm truncate`}
+                                  >
                                     {getActivityLabel(activity, lang)}
                                   </h3>
                                   <div className="inline-flex items-center rounded-full points-badge-animated bg-gradient-to-r from-brand via-brand-dark to-brand text-white px-3 py-1 text-xs sm:text-sm font-black whitespace-nowrap border-2 border-white/30 dark:border-white/20 shadow-xl">
                                     <span className="text-sm drop-shadow-md">✨</span>
-                                    <span className="ml-2 font-black">{numberFormatter.format(activity.points)}</span>
-                                    <span className="ml-1.5 text-[10px] opacity-95 font-bold">{t('list.pointsUnit')}</span>
+                                    <span className="ml-2 font-black">
+                                      {numberFormatter.format(activity.points)}
+                                    </span>
+                                    <span className="ml-1.5 text-[10px] opacity-95 font-bold">
+                                      {t('list.pointsUnit')}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -265,9 +300,11 @@ function ActivitiesClient() {
                                 </span>
                               )}
                             </div>
-                            
+
                             {/* Details Row */}
-                            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 mb-3 font-bold flex items-center gap-2 flex-wrap`}>
+                            <div
+                              className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 mb-3 font-bold flex items-center gap-2 flex-wrap`}
+                            >
                               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-100/80 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 border border-blue-200/50 dark:border-blue-700/50">
                                 <span className="text-base">🕐</span>
                                 <span>{timeFormatter.format(new Date(activity.performedAt))}</span>
@@ -284,20 +321,24 @@ function ActivitiesClient() {
                               {activity.duration && activity.duration > 0 && (
                                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-100/80 dark:bg-cyan-900/40 text-cyan-800 dark:text-cyan-300 border border-cyan-200/50 dark:border-cyan-700/50">
                                   <span className="text-base">⏱️</span>
-                                  <span className="font-black">{formatDuration(activity.duration, lang)}</span>
+                                  <span className="font-black">
+                                    {formatDuration(activity.duration, lang)}
+                                  </span>
                                 </div>
                               )}
                             </div>
-                            
+
                             {/* Note */}
                             {activity.note && (
-                              <div className={`${isMobile ? 'text-xs' : 'text-sm'} mb-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-gray-100/90 to-gray-50/90 dark:from-gray-800/80 dark:to-gray-700/80 border-l-4 border-brand/60 dark:border-brand/70 text-gray-800 dark:text-gray-200 line-clamp-2 font-semibold italic shadow-inner`}>
+                              <div
+                                className={`${isMobile ? 'text-xs' : 'text-sm'} mb-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-gray-100/90 to-gray-50/90 dark:from-gray-800/80 dark:to-gray-700/80 border-l-4 border-brand/60 dark:border-brand/70 text-gray-800 dark:text-gray-200 line-clamp-2 font-semibold italic shadow-inner`}
+                              >
                                 <span className="text-brand dark:text-brand-light mr-1">"</span>
                                 {activity.note}
                                 <span className="text-brand dark:text-brand-light ml-1">"</span>
                               </div>
                             )}
-                            
+
                             {/* Action Buttons */}
                             <div className="flex items-center gap-2 pt-2 border-t border-gray-200/50 dark:border-gray-700/50 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all duration-300">
                               <button

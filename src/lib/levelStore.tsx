@@ -2,7 +2,12 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
 import { useActivities } from '@/lib/activityStore';
-import { calculateXPFromActivities, getLevelInfo, checkLevelUp, type LevelInfo } from './levelSystem';
+import {
+  calculateXPFromActivities,
+  getLevelInfo,
+  checkLevelUp,
+  type LevelInfo,
+} from './levelSystem';
 import { STORAGE_KEYS } from './constants';
 
 type LevelContextValue = {
@@ -67,11 +72,14 @@ export function LevelProvider({ children }: { children: React.ReactNode }) {
     return checkLevelUp(previousTotalXP, totalXP);
   }, [previousTotalXP, totalXP, hydrated]);
 
-  const value = useMemo<LevelContextValue>(() => ({
-    levelInfo,
-    hydrated,
-    checkLevelUp: checkLevelUpCallback
-  }), [levelInfo, hydrated, checkLevelUpCallback]);
+  const value = useMemo<LevelContextValue>(
+    () => ({
+      levelInfo,
+      hydrated,
+      checkLevelUp: checkLevelUpCallback,
+    }),
+    [levelInfo, hydrated, checkLevelUpCallback]
+  );
 
   return <LevelContext.Provider value={value}>{children}</LevelContext.Provider>;
 }
@@ -83,4 +91,3 @@ export function useLevel() {
   }
   return ctx;
 }
-

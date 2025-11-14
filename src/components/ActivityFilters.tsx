@@ -22,7 +22,7 @@ export type FilterState = {
 
 export const ActivityFilters = memo(function ActivityFilters({
   filters,
-  onFiltersChange
+  onFiltersChange,
 }: {
   filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
@@ -34,13 +34,16 @@ export const ActivityFilters = memo(function ActivityFilters({
   const dateLocale = lang === 'tr' ? tr : enUS;
 
   const uniqueActivityKeys = useMemo(() => {
-    const keys = new Set(activities.map(a => a.activityKey));
+    const keys = new Set(activities.map((a) => a.activityKey));
     return Array.from(keys);
   }, [activities]);
 
-  const updateFilter = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
-    onFiltersChange({ ...filters, [key]: value });
-  }, [filters, onFiltersChange]);
+  const updateFilter = useCallback(
+    <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+      onFiltersChange({ ...filters, [key]: value });
+    },
+    [filters, onFiltersChange]
+  );
 
   return (
     <div className="space-y-2.5 sm:space-y-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-2.5 sm:p-3 shadow-md hover:shadow-xl transition-shadow duration-300">
@@ -50,7 +53,9 @@ export const ActivityFilters = memo(function ActivityFilters({
 
       {/* Date Range Filter */}
       <div className="space-y-1.5">
-        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}>
+        <label
+          className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}
+        >
           {t('filters.dateRange')}
         </label>
         <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-5'} gap-1.5`}>
@@ -91,7 +96,9 @@ export const ActivityFilters = memo(function ActivityFilters({
 
       {/* Category Filter */}
       <div className="space-y-1.5">
-        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}>
+        <label
+          className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}
+        >
           {t('filters.category')}
         </label>
         <select
@@ -110,7 +117,9 @@ export const ActivityFilters = memo(function ActivityFilters({
 
       {/* Activity Type Filter */}
       <div className="space-y-1.5">
-        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}>
+        <label
+          className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}
+        >
           {t('filters.activityType')}
         </label>
         <select
@@ -120,7 +129,7 @@ export const ActivityFilters = memo(function ActivityFilters({
         >
           <option value="all">{t('filters.allActivities')}</option>
           {uniqueActivityKeys.map((key) => {
-            const def = definitions.find(d => d.key === key);
+            const def = definitions.find((d) => d.key === key);
             if (!def) return null;
             return (
               <option key={key} value={key}>
@@ -133,7 +142,9 @@ export const ActivityFilters = memo(function ActivityFilters({
 
       {/* Search */}
       <div className="space-y-1.5">
-        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}>
+        <label
+          className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}
+        >
           {t('filters.search')}
         </label>
         <input
@@ -147,7 +158,9 @@ export const ActivityFilters = memo(function ActivityFilters({
 
       {/* Sort */}
       <div className="space-y-1.5">
-        <label className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}>
+        <label
+          className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}
+        >
           {t('filters.sortBy')}
         </label>
         <select
@@ -163,16 +176,21 @@ export const ActivityFilters = memo(function ActivityFilters({
       </div>
 
       {/* Clear Filters */}
-      {(filters.dateRange !== 'all' || filters.activityType !== 'all' || filters.category !== 'all' || filters.searchQuery) && (
+      {(filters.dateRange !== 'all' ||
+        filters.activityType !== 'all' ||
+        filters.category !== 'all' ||
+        filters.searchQuery) && (
         <button
           type="button"
-          onClick={() => onFiltersChange({
-            dateRange: 'all',
-            activityType: 'all',
-            category: 'all',
-            searchQuery: '',
-            sortBy: 'date-desc'
-          })}
+          onClick={() =>
+            onFiltersChange({
+              dateRange: 'all',
+              activityType: 'all',
+              category: 'all',
+              searchQuery: '',
+              sortBy: 'date-desc',
+            })
+          }
           className={`w-full px-2 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
         >
           {t('filters.clear')}
@@ -217,7 +235,7 @@ export function useFilteredActivities(filters: FilterState) {
           return filtered;
       }
 
-      filtered = filtered.filter(activity => {
+      filtered = filtered.filter((activity) => {
         const activityDate = parseISO(activity.performedAt);
         return activityDate >= start && activityDate <= end;
       });
@@ -225,14 +243,14 @@ export function useFilteredActivities(filters: FilterState) {
 
     // Activity type filter
     if (filters.activityType !== 'all') {
-      filtered = filtered.filter(activity => activity.activityKey === filters.activityType);
+      filtered = filtered.filter((activity) => activity.activityKey === filters.activityType);
     }
 
     // Search filter
     if (filters.searchQuery) {
       const query = filters.searchQuery.toLowerCase();
-      filtered = filtered.filter(activity => {
-        const label = lang === 'tr' ? activity.label : (activity.labelEn || activity.label);
+      filtered = filtered.filter((activity) => {
+        const label = lang === 'tr' ? activity.label : activity.labelEn || activity.label;
         return (
           label.toLowerCase().includes(query) ||
           activity.note?.toLowerCase().includes(query) ||
@@ -260,4 +278,3 @@ export function useFilteredActivities(filters: FilterState) {
     return filtered;
   }, [activities, filters, lang]);
 }
-

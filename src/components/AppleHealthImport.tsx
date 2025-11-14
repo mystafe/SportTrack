@@ -5,7 +5,11 @@ import { useI18n } from '@/lib/i18n';
 import { useToaster } from '@/components/Toaster';
 import { useActivities } from '@/lib/activityStore';
 import { useActivityDefinitions } from '@/lib/settingsStore';
-import { parseAppleHealthFile, type AppleHealthStepData, type ParseProgress } from '@/lib/appleHealthParser';
+import {
+  parseAppleHealthFile,
+  type AppleHealthStepData,
+  type ParseProgress,
+} from '@/lib/appleHealthParser';
 import { BASE_ACTIVITY_MAP } from '@/lib/activityConfig';
 import { startOfDay } from 'date-fns';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
@@ -28,7 +32,8 @@ export function AppleHealthImport() {
   } | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const walkingDefinition = definitions.find(d => d.key === 'WALKING') || BASE_ACTIVITY_MAP['WALKING'];
+  const walkingDefinition =
+    definitions.find((d) => d.key === 'WALKING') || BASE_ACTIVITY_MAP['WALKING'];
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -36,21 +41,19 @@ export function AppleHealthImport() {
 
     // Validate file type
     const fileName = file.name.toLowerCase();
-    const isValidType = fileName.endsWith('.csv') || 
-                        fileName.endsWith('.xml') || 
-                        fileName.endsWith('.xml.gz') ||
-                        file.type === 'text/csv' ||
-                        file.type === 'application/csv' ||
-                        file.type === 'text/xml' ||
-                        file.type === 'application/xml' ||
-                        file.type === 'application/gzip' ||
-                        file.type === ''; // Some mobile browsers don't set MIME type
+    const isValidType =
+      fileName.endsWith('.csv') ||
+      fileName.endsWith('.xml') ||
+      fileName.endsWith('.xml.gz') ||
+      file.type === 'text/csv' ||
+      file.type === 'application/csv' ||
+      file.type === 'text/xml' ||
+      file.type === 'application/xml' ||
+      file.type === 'application/gzip' ||
+      file.type === ''; // Some mobile browsers don't set MIME type
 
     if (!isValidType) {
-      showToast(
-        `Invalid file type: ${file.name}. Please select a CSV or XML file.`,
-        'error'
-      );
+      showToast(`Invalid file type: ${file.name}. Please select a CSV or XML file.`, 'error');
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -62,7 +65,7 @@ export function AppleHealthImport() {
     if (sizeMB > 100) {
       const proceed = window.confirm(
         t('appleHealth.largeFileWarning', {
-          size: Math.round(sizeMB).toString()
+          size: Math.round(sizeMB).toString(),
         })
       );
       if (!proceed) {
@@ -77,22 +80,21 @@ export function AppleHealthImport() {
     setParseProgress({ processed: 0, total: 0, percentage: 0 });
 
     try {
-      const result = await parseAppleHealthFile(
-        file,
-        (progress) => {
-          setParseProgress(progress);
-        }
-      );
+      const result = await parseAppleHealthFile(file, (progress) => {
+        setParseProgress(progress);
+      });
 
       setParseProgress(null);
 
       if (!result.success || result.data.length === 0) {
-        const errorMessage = result.errors.length > 0 
-          ? result.errors.slice(0, 3).join(', ')
-          : 'No step data found in file';
-        
+        const errorMessage =
+          result.errors.length > 0
+            ? result.errors.slice(0, 3).join(', ')
+            : 'No step data found in file';
+
         showToast(
-          t('appleHealth.parseFailed', { errors: errorMessage }) || `Failed to parse file: ${errorMessage}`,
+          t('appleHealth.parseFailed', { errors: errorMessage }) ||
+            `Failed to parse file: ${errorMessage}`,
           'error'
         );
         setIsImporting(false);
@@ -106,7 +108,7 @@ export function AppleHealthImport() {
         data: result.data,
         totalRecords: result.totalRecords,
         dateRange: result.dateRange,
-        errors: result.errors
+        errors: result.errors,
       });
       setShowConfirm(true);
       setIsImporting(false);
@@ -115,7 +117,7 @@ export function AppleHealthImport() {
       setParseProgress(null);
       showToast(
         t('appleHealth.parseFailed', {
-          errors: error instanceof Error ? error.message : 'Unknown error'
+          errors: error instanceof Error ? error.message : 'Unknown error',
         }),
         'error'
       );
@@ -131,9 +133,9 @@ export function AppleHealthImport() {
 
     try {
       // Find existing WALKING activities and delete them
-      const existingWalkingActivities = activities.filter(a => a.activityKey === 'WALKING');
-      
-      existingWalkingActivities.forEach(activity => {
+      const existingWalkingActivities = activities.filter((a) => a.activityKey === 'WALKING');
+
+      existingWalkingActivities.forEach((activity) => {
         deleteActivity(activity.id);
       });
 
@@ -148,14 +150,14 @@ export function AppleHealthImport() {
           definition: walkingDefinition,
           amount: stepData.steps,
           performedAt: performedAt,
-          note: stepData.sourceName ? `Apple Health (${stepData.sourceName})` : 'Apple Health'
+          note: stepData.sourceName ? `Apple Health (${stepData.sourceName})` : 'Apple Health',
         });
       });
 
       showToast(
         t('appleHealth.importSuccess', {
           count: String(parseResult.data.length),
-          replaced: String(existingWalkingActivities.length)
+          replaced: String(existingWalkingActivities.length),
         }),
         'success'
       );
@@ -181,7 +183,9 @@ export function AppleHealthImport() {
 
   return (
     <>
-      <label className={`px-2 py-1 ${isMobile ? 'min-h-[36px] min-w-[80px]' : ''} text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer touch-feedback mobile-press flex items-center justify-center`}>
+      <label
+        className={`px-2 py-1 ${isMobile ? 'min-h-[36px] min-w-[80px]' : ''} text-[10px] sm:text-xs rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer touch-feedback mobile-press flex items-center justify-center`}
+      >
         <input
           ref={fileInputRef}
           type="file"
@@ -192,18 +196,18 @@ export function AppleHealthImport() {
           aria-label={t('appleHealth.importLabel')}
         />
         <span className="flex items-center gap-1">
-          {isImporting ? '⏳' : '📱'} 
+          {isImporting ? '⏳' : '📱'}
           <span className={isMobile ? 'text-[9px]' : ''}>{t('appleHealth.import')}</span>
         </span>
       </label>
-      
+
       {isImporting && parseProgress && parseProgress.total > 0 && (
         <div className="mt-2 space-y-1">
           <div className="text-xs text-gray-600 dark:text-gray-400">
             {t('appleHealth.processing', {
               processed: String(parseProgress.processed),
               total: String(parseProgress.total),
-              percentage: String(parseProgress.percentage)
+              percentage: String(parseProgress.percentage),
             })}
           </div>
           <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
@@ -224,7 +228,7 @@ export function AppleHealthImport() {
                 count: String(parseResult.data.length),
                 start: parseResult.dateRange?.start || '',
                 end: parseResult.dateRange?.end || '',
-                existing: String(activities.filter(a => a.activityKey === 'WALKING').length)
+                existing: String(activities.filter((a) => a.activityKey === 'WALKING').length),
               })
             : ''
         }
@@ -236,4 +240,3 @@ export function AppleHealthImport() {
     </>
   );
 }
-

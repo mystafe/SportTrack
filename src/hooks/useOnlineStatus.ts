@@ -34,4 +34,3 @@ export function useOnlineStatus(): {
     isOffline: !isOnline,
   };
 }
-

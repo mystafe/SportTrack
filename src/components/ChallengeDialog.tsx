@@ -4,7 +4,14 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useSettings } from '@/lib/settingsStore';
-import { Challenge, ChallengeType, createDailyChallenge, createWeeklyChallenge, createMonthlyChallenge, createCustomChallenge } from '@/lib/challenges';
+import {
+  Challenge,
+  ChallengeType,
+  createDailyChallenge,
+  createWeeklyChallenge,
+  createMonthlyChallenge,
+  createCustomChallenge,
+} from '@/lib/challenges';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 interface ChallengeDialogProps {
@@ -66,7 +73,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const targetValue = Number(target);
     if (!targetValue || targetValue <= 0) {
       return;
@@ -129,7 +136,9 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
         }
       }}
     >
-      <div className={`relative w-full ${isMobile ? 'max-w-full' : 'max-w-md'} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 space-y-4 my-auto`}>
+      <div
+        className={`relative w-full ${isMobile ? 'max-w-full' : 'max-w-md'} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 space-y-4 my-auto`}
+      >
         <div>
           <h2 className="text-lg font-bold text-gray-950 dark:text-white">
             {challenge ? t('challenges.editChallenge') : t('challenges.addChallenge')}
@@ -139,7 +148,8 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-xs font-semibold text-gray-800 dark:text-gray-200 block mb-2">
-              {t('challenges.custom')} / {t('challenges.daily')} / {t('challenges.weekly')} / {t('challenges.monthly')}
+              {t('challenges.custom')} / {t('challenges.daily')} / {t('challenges.weekly')} /{' '}
+              {t('challenges.monthly')}
             </label>
             <select
               value={type}
@@ -282,4 +292,3 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
 
   return typeof window !== 'undefined' ? createPortal(dialog, document.body) : null;
 }
-

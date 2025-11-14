@@ -23,27 +23,28 @@ export function exportToCSV(
 ): void {
   const locale = options.language === 'tr' ? tr : enUS;
   const dateFormat = options.language === 'tr' ? 'dd.MM.yyyy HH:mm' : 'MM/dd/yyyy HH:mm';
-  
+
   // Filter by date range if provided
   let filteredActivities = activities;
   if (options.dateRange) {
-    filteredActivities = activities.filter(activity => {
+    filteredActivities = activities.filter((activity) => {
       const activityDate = parseISO(activity.performedAt);
       return activityDate >= options.dateRange!.start && activityDate <= options.dateRange!.end;
     });
   }
 
   // CSV Headers
-  const headers = options.language === 'tr'
-    ? ['Tarih', 'Saat', 'Aktivite', 'Miktar', 'Birim', 'Puan', 'Not']
-    : ['Date', 'Time', 'Activity', 'Amount', 'Unit', 'Points', 'Note'];
+  const headers =
+    options.language === 'tr'
+      ? ['Tarih', 'Saat', 'Aktivite', 'Miktar', 'Birim', 'Puan', 'Not']
+      : ['Date', 'Time', 'Activity', 'Amount', 'Unit', 'Points', 'Note'];
 
   // CSV Rows
-  const rows = filteredActivities.map(activity => {
+  const rows = filteredActivities.map((activity) => {
     const date = parseISO(activity.performedAt);
     const dateStr = format(date, dateFormat, { locale });
     const [datePart, timePart] = dateStr.split(' ');
-    
+
     return [
       datePart,
       timePart || '',
@@ -51,7 +52,7 @@ export function exportToCSV(
       String(activity.amount),
       getActivityUnit(activity, options.language),
       String(activity.points),
-      activity.note || ''
+      activity.note || '',
     ];
   });
 
@@ -63,7 +64,7 @@ export function exportToCSV(
   // Combine headers and rows
   const csvContent = [
     headers.join(','),
-    ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')),
   ].join('\n');
 
   // Add BOM for Excel UTF-8 support
@@ -86,14 +87,14 @@ export async function exportToPDF(
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const autoTable = (await import('jspdf-autotable')).default;
-  
+
   const locale = options.language === 'tr' ? tr : enUS;
   const dateFormat = options.language === 'tr' ? 'dd.MM.yyyy HH:mm' : 'MM/dd/yyyy HH:mm';
-  
+
   // Filter by date range if provided
   let filteredActivities = activities;
   if (options.dateRange) {
-    filteredActivities = activities.filter(activity => {
+    filteredActivities = activities.filter((activity) => {
       const activityDate = parseISO(activity.performedAt);
       return activityDate >= options.dateRange!.start && activityDate <= options.dateRange!.end;
     });
@@ -106,7 +107,8 @@ export async function exportToPDF(
   let yPos = margin;
 
   // Title
-  const title = options.language === 'tr' ? 'SportTrack Aktivite Raporu' : 'SportTrack Activity Report';
+  const title =
+    options.language === 'tr' ? 'SportTrack Aktivite Raporu' : 'SportTrack Activity Report';
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
   doc.text(title, margin, yPos);
@@ -121,26 +123,29 @@ export async function exportToPDF(
         ? ` | Ruh Hali: ${settings.mood === 'happy' ? 'Mutlu' : settings.mood === 'cheerful' ? 'Neşeli' : settings.mood === 'sad' ? 'Üzgün' : settings.mood === 'unhappy' ? 'Mutsuz' : settings.mood === 'tired' ? 'Yorgun/Hasta' : ''}`
         : ` | Mood: ${settings.mood === 'happy' ? 'Happy' : settings.mood === 'cheerful' ? 'Cheerful' : settings.mood === 'sad' ? 'Sad' : settings.mood === 'unhappy' ? 'Unhappy' : settings.mood === 'tired' ? 'Tired/Sick' : ''}`
       : '';
-    const userInfo = options.language === 'tr'
-      ? `Kullanıcı: ${settings.name} | Günlük Hedef: ${settings.dailyTarget.toLocaleString()} puan${moodText}`
-      : `User: ${settings.name} | Daily Goal: ${settings.dailyTarget.toLocaleString()} points${moodText}`;
+    const userInfo =
+      options.language === 'tr'
+        ? `Kullanıcı: ${settings.name} | Günlük Hedef: ${settings.dailyTarget.toLocaleString()} puan${moodText}`
+        : `User: ${settings.name} | Daily Goal: ${settings.dailyTarget.toLocaleString()} points${moodText}`;
     doc.text(userInfo, margin, yPos);
     yPos += 8;
   }
 
   // Date range info
   if (options.dateRange) {
-    const dateRangeText = options.language === 'tr'
-      ? `Tarih Aralığı: ${format(options.dateRange.start, 'dd.MM.yyyy', { locale })} - ${format(options.dateRange.end, 'dd.MM.yyyy', { locale })}`
-      : `Date Range: ${format(options.dateRange.start, 'MM/dd/yyyy', { locale })} - ${format(options.dateRange.end, 'MM/dd/yyyy', { locale })}`;
+    const dateRangeText =
+      options.language === 'tr'
+        ? `Tarih Aralığı: ${format(options.dateRange.start, 'dd.MM.yyyy', { locale })} - ${format(options.dateRange.end, 'dd.MM.yyyy', { locale })}`
+        : `Date Range: ${format(options.dateRange.start, 'MM/dd/yyyy', { locale })} - ${format(options.dateRange.end, 'MM/dd/yyyy', { locale })}`;
     doc.text(dateRangeText, margin, yPos);
     yPos += 8;
   }
 
   // Export date
-  const exportDateText = options.language === 'tr'
-    ? `Rapor Tarihi: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale })}`
-    : `Report Date: ${format(new Date(), 'MM/dd/yyyy HH:mm', { locale })}`;
+  const exportDateText =
+    options.language === 'tr'
+      ? `Rapor Tarihi: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale })}`
+      : `Report Date: ${format(new Date(), 'MM/dd/yyyy HH:mm', { locale })}`;
   doc.text(exportDateText, margin, yPos);
   yPos += 10;
 
@@ -148,7 +153,7 @@ export async function exportToPDF(
   const totalActivities = filteredActivities.length;
   const totalPoints = filteredActivities.reduce((sum, a) => sum + a.points, 0);
   const avgPoints = totalActivities > 0 ? Math.round(totalPoints / totalActivities) : 0;
-  
+
   const summaryLabel = options.language === 'tr' ? 'Özet' : 'Summary';
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
@@ -157,40 +162,42 @@ export async function exportToPDF(
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  const summaryText = options.language === 'tr'
-    ? [
-        `Toplam Aktivite: ${totalActivities}`,
-        `Toplam Puan: ${totalPoints.toLocaleString()}`,
-        `Ortalama Puan: ${avgPoints.toLocaleString()}`
-      ]
-    : [
-        `Total Activities: ${totalActivities}`,
-        `Total Points: ${totalPoints.toLocaleString()}`,
-        `Average Points: ${avgPoints.toLocaleString()}`
-      ];
-  
-  summaryText.forEach(text => {
+  const summaryText =
+    options.language === 'tr'
+      ? [
+          `Toplam Aktivite: ${totalActivities}`,
+          `Toplam Puan: ${totalPoints.toLocaleString()}`,
+          `Ortalama Puan: ${avgPoints.toLocaleString()}`,
+        ]
+      : [
+          `Total Activities: ${totalActivities}`,
+          `Total Points: ${totalPoints.toLocaleString()}`,
+          `Average Points: ${avgPoints.toLocaleString()}`,
+        ];
+
+  summaryText.forEach((text) => {
     doc.text(text, margin + 5, yPos);
     yPos += 6;
   });
   yPos += 5;
 
   // Activities table
-  const tableHeaders = options.language === 'tr'
-    ? [['Tarih', 'Aktivite', 'Miktar', 'Birim', 'Puan', 'Not']]
-    : [['Date', 'Activity', 'Amount', 'Unit', 'Points', 'Note']];
+  const tableHeaders =
+    options.language === 'tr'
+      ? [['Tarih', 'Aktivite', 'Miktar', 'Birim', 'Puan', 'Not']]
+      : [['Date', 'Activity', 'Amount', 'Unit', 'Points', 'Note']];
 
-  const tableData = filteredActivities.map(activity => {
+  const tableData = filteredActivities.map((activity) => {
     const date = parseISO(activity.performedAt);
     const dateStr = format(date, dateFormat, { locale });
-    
+
     return [
       dateStr,
       getActivityLabel(activity, options.language),
       String(activity.amount),
       getActivityUnit(activity, options.language),
       String(activity.points),
-      activity.note || ''
+      activity.note || '',
     ];
   });
 
@@ -208,8 +215,8 @@ export async function exportToPDF(
       2: { cellWidth: 20 },
       3: { cellWidth: 25 },
       4: { cellWidth: 20 },
-      5: { cellWidth: 50 }
-    }
+      5: { cellWidth: 50 },
+    },
   });
 
   // Save PDF
@@ -224,7 +231,7 @@ export function exportToJSON(
   // Filter by date range if provided
   let filteredActivities = activities;
   if (options.dateRange) {
-    filteredActivities = activities.filter(activity => {
+    filteredActivities = activities.filter((activity) => {
       const activityDate = parseISO(activity.performedAt);
       return activityDate >= options.dateRange!.start && activityDate <= options.dateRange!.end;
     });
@@ -239,16 +246,19 @@ export function exportToJSON(
     dateRange: options.dateRange
       ? {
           start: options.dateRange.start.toISOString(),
-          end: options.dateRange.end.toISOString()
+          end: options.dateRange.end.toISOString(),
         }
       : null,
     summary: {
       totalActivities: filteredActivities.length,
       totalPoints: filteredActivities.reduce((sum, a) => sum + a.points, 0),
-      averagePoints: filteredActivities.length > 0
-        ? Math.round(filteredActivities.reduce((sum, a) => sum + a.points, 0) / filteredActivities.length)
-        : 0
-    }
+      averagePoints:
+        filteredActivities.length > 0
+          ? Math.round(
+              filteredActivities.reduce((sum, a) => sum + a.points, 0) / filteredActivities.length
+            )
+          : 0,
+    },
   };
 
   // Create JSON blob
@@ -262,4 +272,3 @@ export function exportToJSON(
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-

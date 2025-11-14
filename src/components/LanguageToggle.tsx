@@ -6,7 +6,7 @@ export function LanguageToggle() {
   const { lang, setLang } = useI18n();
   const options: Array<{ code: Language; label: string }> = [
     { code: 'tr', label: 'TR' },
-    { code: 'en', label: 'EN' }
+    { code: 'en', label: 'EN' },
   ];
 
   return (
@@ -25,5 +25,3 @@ export function LanguageToggle() {
     </div>
   );
 }
-
-

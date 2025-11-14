@@ -5,13 +5,16 @@ import { startOfDay, parseISO, subDays, format, eachDayOfInterval } from 'date-f
 
 export interface ActivityTrendData {
   date: string;
-  activities: Map<string, {
-    label: string;
-    icon: string;
-    count: number;
-    totalPoints: number;
-    totalAmount: number;
-  }>;
+  activities: Map<
+    string,
+    {
+      label: string;
+      icon: string;
+      count: number;
+      totalPoints: number;
+      totalAmount: number;
+    }
+  >;
 }
 
 export interface ActivityTypeTrend {
@@ -44,23 +47,29 @@ export function calculateActivityTrends(
 
   // Group activities by type and date
   const activityMap = new Map<string, ActivityTypeTrend>();
-  const dateMap = new Map<string, Map<string, {
-    count: number;
-    points: number;
-    amount: number;
-  }>>();
+  const dateMap = new Map<
+    string,
+    Map<
+      string,
+      {
+        count: number;
+        points: number;
+        amount: number;
+      }
+    >
+  >();
 
   // Initialize date map
-  dateRange.forEach(date => {
+  dateRange.forEach((date) => {
     const dateKey = format(date, 'yyyy-MM-dd');
     dateMap.set(dateKey, new Map());
   });
 
   // Process activities
-  activities.forEach(activity => {
+  activities.forEach((activity) => {
     const activityDate = startOfDay(parseISO(activity.performedAt));
     const dateKey = format(activityDate, 'yyyy-MM-dd');
-    
+
     // Skip if outside date range
     if (activityDate < startDate || activityDate > endDate) return;
 
@@ -76,7 +85,7 @@ export function calculateActivityTrends(
       dateActivities.set(activity.activityKey, {
         count: 1,
         points: activity.points,
-        amount: activity.amount
+        amount: activity.amount,
       });
     }
 
@@ -86,29 +95,29 @@ export function calculateActivityTrends(
         activityKey: activity.activityKey,
         label: activity.label,
         icon: activity.icon,
-        dailyData: dateRange.map(date => ({
+        dailyData: dateRange.map((date) => ({
           date: format(date, 'yyyy-MM-dd'),
           count: 0,
           points: 0,
-          amount: 0
+          amount: 0,
         })),
         totalCount: 0,
         totalPoints: 0,
-        averagePerDay: 0
+        averagePerDay: 0,
       });
     }
   });
 
   // Fill in daily data
-  dateRange.forEach(date => {
+  dateRange.forEach((date) => {
     const dateKey = format(date, 'yyyy-MM-dd');
     const dateActivities = dateMap.get(dateKey);
-    
+
     if (dateActivities) {
       dateActivities.forEach((data, activityKey) => {
         const trend = activityMap.get(activityKey);
         if (trend) {
-          const dayData = trend.dailyData.find(d => d.date === dateKey);
+          const dayData = trend.dailyData.find((d) => d.date === dateKey);
           if (dayData) {
             dayData.count = data.count;
             dayData.points = data.points;
@@ -120,16 +129,16 @@ export function calculateActivityTrends(
   });
 
   // Calculate totals and averages
-  const trends = Array.from(activityMap.values()).map(trend => {
-    const daysWithActivity = trend.dailyData.filter(d => d.count > 0).length;
+  const trends = Array.from(activityMap.values()).map((trend) => {
+    const daysWithActivity = trend.dailyData.filter((d) => d.count > 0).length;
     const totalCount = trend.dailyData.reduce((sum, d) => sum + d.count, 0);
     const totalPoints = trend.dailyData.reduce((sum, d) => sum + d.points, 0);
-    
+
     return {
       ...trend,
       totalCount,
       totalPoints,
-      averagePerDay: daysWithActivity > 0 ? Math.round(totalPoints / daysWithActivity) : 0
+      averagePerDay: daysWithActivity > 0 ? Math.round(totalPoints / daysWithActivity) : 0,
     };
   });
 
@@ -146,4 +155,3 @@ export function getTopActivityTypes(
 ): ActivityTypeTrend[] {
   return trends.slice(0, limit);
 }
-

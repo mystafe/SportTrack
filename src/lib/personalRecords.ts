@@ -23,13 +23,16 @@ export interface PersonalRecords {
   bestMonth: { points: number; startDate: string } | null;
   longestStreak: { days: number; startDate: string; endDate: string } | null;
   fastestGoalCompletion: { hours: number; date: string } | null;
-  
+
   // Activity-specific records
-  activityRecords: Map<string, {
-    bestPoints: { value: number; date: string } | null;
-    bestAmount: { value: number; date: string } | null;
-    totalCount: number;
-  }>;
+  activityRecords: Map<
+    string,
+    {
+      bestPoints: { value: number; date: string } | null;
+      bestAmount: { value: number; date: string } | null;
+      totalCount: number;
+    }
+  >;
 }
 
 /**
@@ -49,7 +52,7 @@ export function calculatePersonalRecords(
     const date = startOfDay(parseISO(activity.performedAt));
     const key = date.toISOString();
     const existing = daysMap.get(key);
-    
+
     if (existing) {
       existing.points += activity.points;
       existing.activities.push(activity);
@@ -57,7 +60,7 @@ export function calculatePersonalRecords(
       daysMap.set(key, {
         date,
         points: activity.points,
-        activities: [activity]
+        activities: [activity],
       });
     }
   }
@@ -66,9 +69,7 @@ export function calculatePersonalRecords(
 
   // Best Day (highest daily points)
   if (days.length > 0) {
-    const bestDay = days.reduce((best, day) => 
-      day.points > best.points ? day : best
-    );
+    const bestDay = days.reduce((best, day) => (day.points > best.points ? day : best));
     records.push({
       id: 'best-day',
       type: 'points',
@@ -76,9 +77,9 @@ export function calculatePersonalRecords(
       date: bestDay.date.toISOString(),
       label: {
         tr: 'En İyi Gün',
-        en: 'Best Day'
+        en: 'Best Day',
       },
-      icon: '⭐'
+      icon: '⭐',
     });
   }
 
@@ -114,22 +115,22 @@ export function calculatePersonalRecords(
       date: streakStart.toISOString(),
       label: {
         tr: 'En Uzun Seri',
-        en: 'Longest Streak'
+        en: 'Longest Streak',
       },
-      icon: '🔥'
+      icon: '🔥',
     });
   }
 
   // Fastest Goal Completion (earliest time of day when goal was reached)
   const fastestCompletions: Array<{ hours: number; date: string }> = [];
-  
+
   for (const day of days) {
     if (day.points >= dailyTarget) {
       // Find the earliest activity that completed the goal
-      const sortedActivities = [...day.activities].sort((a, b) => 
-        parseISO(a.performedAt).getTime() - parseISO(b.performedAt).getTime()
+      const sortedActivities = [...day.activities].sort(
+        (a, b) => parseISO(a.performedAt).getTime() - parseISO(b.performedAt).getTime()
       );
-      
+
       let cumulativePoints = 0;
       for (const activity of sortedActivities) {
         cumulativePoints += activity.points;
@@ -139,7 +140,7 @@ export function calculatePersonalRecords(
           const hours = (activityDate.getTime() - dayStart.getTime()) / (1000 * 60 * 60);
           fastestCompletions.push({
             hours,
-            date: activityDate.toISOString()
+            date: activityDate.toISOString(),
           });
           break;
         }
@@ -158,9 +159,9 @@ export function calculatePersonalRecords(
       date: fastest.date,
       label: {
         tr: 'En Hızlı Hedef Tamamlama',
-        en: 'Fastest Goal Completion'
+        en: 'Fastest Goal Completion',
       },
-      icon: '⚡'
+      icon: '⚡',
     });
   }
 
@@ -194,9 +195,9 @@ export function calculatePersonalRecords(
       date: bestPoints.performedAt,
       label: {
         tr: `${activityList[0].label} - En Yüksek Puan`,
-        en: `${activityList[0].labelEn || activityList[0].label} - Best Points`
+        en: `${activityList[0].labelEn || activityList[0].label} - Best Points`,
       },
-      icon: activityList[0].icon || '🏃'
+      icon: activityList[0].icon || '🏃',
     });
 
     records.push({
@@ -207,9 +208,9 @@ export function calculatePersonalRecords(
       date: bestAmount.performedAt,
       label: {
         tr: `${activityList[0].label} - En Yüksek Miktar`,
-        en: `${activityList[0].labelEn || activityList[0].label} - Best Amount`
+        en: `${activityList[0].labelEn || activityList[0].label} - Best Amount`,
       },
-      icon: activityList[0].icon || '🏃'
+      icon: activityList[0].icon || '🏃',
     });
   }
 
@@ -233,4 +234,3 @@ export function formatRecordValue(record: PersonalRecord, lang: 'tr' | 'en'): st
       return String(record.value);
   }
 }
-

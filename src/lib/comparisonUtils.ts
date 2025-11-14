@@ -4,7 +4,20 @@
  */
 
 import { ActivityRecord } from './activityStore';
-import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfDay, parseISO, isWithinInterval, format, subWeeks, subMonths, eachWeekOfInterval, eachMonthOfInterval } from 'date-fns';
+import {
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  startOfDay,
+  parseISO,
+  isWithinInterval,
+  format,
+  subWeeks,
+  subMonths,
+  eachWeekOfInterval,
+  eachMonthOfInterval,
+} from 'date-fns';
 
 export interface PeriodStats {
   period: string; // Week or month identifier
@@ -51,7 +64,7 @@ export function calculateWeekStats(
   const start = startOfDay(weekStart);
   const end = startOfDay(weekEnd);
 
-  const weekActivities = activities.filter(activity => {
+  const weekActivities = activities.filter((activity) => {
     const activityDate = parseISO(activity.performedAt);
     return isWithinInterval(startOfDay(activityDate), { start, end });
   });
@@ -59,7 +72,10 @@ export function calculateWeekStats(
   const daysMap = new Map<string, { points: number; count: number }>();
   let totalPoints = 0;
   let totalActivities = 0;
-  const activityMap = new Map<string, { label: string; icon: string; points: number; count: number }>();
+  const activityMap = new Map<
+    string,
+    { label: string; icon: string; points: number; count: number }
+  >();
 
   for (const activity of weekActivities) {
     totalPoints += activity.points;
@@ -76,7 +92,7 @@ export function calculateWeekStats(
       label: activity.label,
       icon: activity.icon,
       points: 0,
-      count: 0
+      count: 0,
     };
     actData.points += activity.points;
     actData.count++;
@@ -85,9 +101,10 @@ export function calculateWeekStats(
 
   const daysWithActivities = daysMap.size;
   const daysInWeek = 7;
-  const completedDays = Array.from(daysMap.values()).filter(d => d.points >= target).length;
+  const completedDays = Array.from(daysMap.values()).filter((d) => d.points >= target).length;
   const completionRate = daysInWeek > 0 ? Math.round((completedDays / daysInWeek) * 100) : 0;
-  const averageDailyPoints = daysWithActivities > 0 ? Math.round(totalPoints / daysWithActivities) : 0;
+  const averageDailyPoints =
+    daysWithActivities > 0 ? Math.round(totalPoints / daysWithActivities) : 0;
 
   let topActivity: PeriodStats['topActivity'] = null;
   if (activityMap.size > 0) {
@@ -101,7 +118,7 @@ export function calculateWeekStats(
         label: top.label,
         icon: top.icon,
         points: top.points,
-        count: top.count
+        count: top.count,
       };
     }
   }
@@ -115,7 +132,7 @@ export function calculateWeekStats(
     averageDailyPoints,
     daysWithActivities,
     completionRate,
-    topActivity
+    topActivity,
   };
 }
 
@@ -131,7 +148,7 @@ export function calculateMonthStats(
   const start = startOfDay(monthStart);
   const end = startOfDay(monthEnd);
 
-  const monthActivities = activities.filter(activity => {
+  const monthActivities = activities.filter((activity) => {
     const activityDate = parseISO(activity.performedAt);
     return isWithinInterval(startOfDay(activityDate), { start, end });
   });
@@ -139,7 +156,10 @@ export function calculateMonthStats(
   const daysMap = new Map<string, { points: number; count: number }>();
   let totalPoints = 0;
   let totalActivities = 0;
-  const activityMap = new Map<string, { label: string; icon: string; points: number; count: number }>();
+  const activityMap = new Map<
+    string,
+    { label: string; icon: string; points: number; count: number }
+  >();
 
   for (const activity of monthActivities) {
     totalPoints += activity.points;
@@ -156,7 +176,7 @@ export function calculateMonthStats(
       label: activity.label,
       icon: activity.icon,
       points: 0,
-      count: 0
+      count: 0,
     };
     actData.points += activity.points;
     actData.count++;
@@ -165,9 +185,10 @@ export function calculateMonthStats(
 
   const daysWithActivities = daysMap.size;
   const daysInMonth = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-  const completedDays = Array.from(daysMap.values()).filter(d => d.points >= target).length;
+  const completedDays = Array.from(daysMap.values()).filter((d) => d.points >= target).length;
   const completionRate = daysInMonth > 0 ? Math.round((completedDays / daysInMonth) * 100) : 0;
-  const averageDailyPoints = daysWithActivities > 0 ? Math.round(totalPoints / daysWithActivities) : 0;
+  const averageDailyPoints =
+    daysWithActivities > 0 ? Math.round(totalPoints / daysWithActivities) : 0;
 
   let topActivity: PeriodStats['topActivity'] = null;
   if (activityMap.size > 0) {
@@ -181,7 +202,7 @@ export function calculateMonthStats(
         label: top.label,
         icon: top.icon,
         points: top.points,
-        count: top.count
+        count: top.count,
       };
     }
   }
@@ -195,7 +216,7 @@ export function calculateMonthStats(
     averageDailyPoints,
     daysWithActivities,
     completionRate,
-    topActivity
+    topActivity,
   };
 }
 
@@ -219,21 +240,41 @@ export function compareWeeks(
 
   const change = {
     points: current.totalPoints - previous.totalPoints,
-    pointsPercent: previous.totalPoints > 0
-      ? Math.round(((current.totalPoints - previous.totalPoints) / previous.totalPoints) * 100)
-      : current.totalPoints > 0 ? 100 : 0,
+    pointsPercent:
+      previous.totalPoints > 0
+        ? Math.round(((current.totalPoints - previous.totalPoints) / previous.totalPoints) * 100)
+        : current.totalPoints > 0
+          ? 100
+          : 0,
     activities: current.totalActivities - previous.totalActivities,
-    activitiesPercent: previous.totalActivities > 0
-      ? Math.round(((current.totalActivities - previous.totalActivities) / previous.totalActivities) * 100)
-      : current.totalActivities > 0 ? 100 : 0,
+    activitiesPercent:
+      previous.totalActivities > 0
+        ? Math.round(
+            ((current.totalActivities - previous.totalActivities) / previous.totalActivities) * 100
+          )
+        : current.totalActivities > 0
+          ? 100
+          : 0,
     averageDaily: current.averageDailyPoints - previous.averageDailyPoints,
-    averageDailyPercent: previous.averageDailyPoints > 0
-      ? Math.round(((current.averageDailyPoints - previous.averageDailyPoints) / previous.averageDailyPoints) * 100)
-      : current.averageDailyPoints > 0 ? 100 : 0,
+    averageDailyPercent:
+      previous.averageDailyPoints > 0
+        ? Math.round(
+            ((current.averageDailyPoints - previous.averageDailyPoints) /
+              previous.averageDailyPoints) *
+              100
+          )
+        : current.averageDailyPoints > 0
+          ? 100
+          : 0,
     completionRate: current.completionRate - previous.completionRate,
-    completionRatePercent: previous.completionRate > 0
-      ? Math.round(((current.completionRate - previous.completionRate) / previous.completionRate) * 100)
-      : current.completionRate > 0 ? 100 : 0
+    completionRatePercent:
+      previous.completionRate > 0
+        ? Math.round(
+            ((current.completionRate - previous.completionRate) / previous.completionRate) * 100
+          )
+        : current.completionRate > 0
+          ? 100
+          : 0,
   };
 
   return { current, previous, change };
@@ -259,23 +300,42 @@ export function compareMonths(
 
   const change = {
     points: current.totalPoints - previous.totalPoints,
-    pointsPercent: previous.totalPoints > 0
-      ? Math.round(((current.totalPoints - previous.totalPoints) / previous.totalPoints) * 100)
-      : current.totalPoints > 0 ? 100 : 0,
+    pointsPercent:
+      previous.totalPoints > 0
+        ? Math.round(((current.totalPoints - previous.totalPoints) / previous.totalPoints) * 100)
+        : current.totalPoints > 0
+          ? 100
+          : 0,
     activities: current.totalActivities - previous.totalActivities,
-    activitiesPercent: previous.totalActivities > 0
-      ? Math.round(((current.totalActivities - previous.totalActivities) / previous.totalActivities) * 100)
-      : current.totalActivities > 0 ? 100 : 0,
+    activitiesPercent:
+      previous.totalActivities > 0
+        ? Math.round(
+            ((current.totalActivities - previous.totalActivities) / previous.totalActivities) * 100
+          )
+        : current.totalActivities > 0
+          ? 100
+          : 0,
     averageDaily: current.averageDailyPoints - previous.averageDailyPoints,
-    averageDailyPercent: previous.averageDailyPoints > 0
-      ? Math.round(((current.averageDailyPoints - previous.averageDailyPoints) / previous.averageDailyPoints) * 100)
-      : current.averageDailyPoints > 0 ? 100 : 0,
+    averageDailyPercent:
+      previous.averageDailyPoints > 0
+        ? Math.round(
+            ((current.averageDailyPoints - previous.averageDailyPoints) /
+              previous.averageDailyPoints) *
+              100
+          )
+        : current.averageDailyPoints > 0
+          ? 100
+          : 0,
     completionRate: current.completionRate - previous.completionRate,
-    completionRatePercent: previous.completionRate > 0
-      ? Math.round(((current.completionRate - previous.completionRate) / previous.completionRate) * 100)
-      : current.completionRate > 0 ? 100 : 0
+    completionRatePercent:
+      previous.completionRate > 0
+        ? Math.round(
+            ((current.completionRate - previous.completionRate) / previous.completionRate) * 100
+          )
+        : current.completionRate > 0
+          ? 100
+          : 0,
   };
 
   return { current, previous, change };
 }
-

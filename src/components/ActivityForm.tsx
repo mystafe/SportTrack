@@ -55,7 +55,7 @@ function asDefinitionFromRecord(record: ActivityFormInitial): ActivityDefinition
     unitEn: record.unitEn,
     multiplier: record.multiplier ?? 1,
     defaultAmount: record.amount ?? 10,
-    isCustom: record.isCustom ?? true
+    isCustom: record.isCustom ?? true,
   };
 }
 
@@ -107,7 +107,9 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
     initial?.performedAt ? toLocalInputValue(new Date(initial.performedAt)) : ''
   );
   const [amount, setAmount] = useState<string>(
-    initial?.amount ? String(initial.amount) : String(fallbackDefinition?.defaultAmount ?? definitions[0]?.defaultAmount ?? 10)
+    initial?.amount
+      ? String(initial.amount)
+      : String(fallbackDefinition?.defaultAmount ?? definitions[0]?.defaultAmount ?? 10)
   );
   const [note, setNote] = useState<string>(initial?.note ?? '');
   const [loading, setLoading] = useState(false);
@@ -123,10 +125,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   }
 
   const amountNumeric = Number(amount) || 0;
-  const pointsNumeric = Math.max(
-    0,
-    Math.round(amountNumeric * definition.multiplier)
-  );
+  const pointsNumeric = Math.max(0, Math.round(amountNumeric * definition.multiplier));
   const pointsDisplay = numberFormatter.format(pointsNumeric);
   const isEditing = Boolean(initial?.id);
 
@@ -159,16 +158,18 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       : new Date().toISOString();
     try {
       if (!definition) {
-        const errorMsg = lang === 'tr' ? 'Lütfen bir aktivite seçin.' : 'Please select an activity.';
+        const errorMsg =
+          lang === 'tr' ? 'Lütfen bir aktivite seçin.' : 'Please select an activity.';
         showToast(errorMsg, 'error');
         setLoading(false);
         return;
       }
       const amountValue = Number(amount) || 0;
       if (amountValue <= 0) {
-        const errorMsg = lang === 'tr' 
-          ? 'Miktar 0\'dan büyük bir sayı olmalıdır.' 
-          : 'Amount must be a number greater than 0.';
+        const errorMsg =
+          lang === 'tr'
+            ? "Miktar 0'dan büyük bir sayı olmalıdır."
+            : 'Amount must be a number greater than 0.';
         showToast(errorMsg, 'error');
         setLoading(false);
         return;
@@ -178,7 +179,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           definition,
           amount: amountValue,
           note: note || undefined,
-          performedAt: performedAtISO
+          performedAt: performedAtISO,
         });
         showToast(t('toast.activityUpdated'), 'success');
         onSaved?.();
@@ -188,40 +189,48 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           definition,
           amount: amountValue,
           note: note || undefined,
-          performedAt: performedAtISO
+          performedAt: performedAtISO,
         });
         showToast(t('toast.activityAdded'), 'success');
-        
+
         // Check for new badges and level up
         setTimeout(() => {
           const newBadges = checkNewBadges();
           if (newBadges.length > 0) {
             // Badge unlock notification will be shown by BadgeUnlockNotification component
-            newBadges.forEach(badge => {
-              notificationService.showBadgeUnlocked(lang as 'tr' | 'en', badge.name[lang], badge.icon);
+            newBadges.forEach((badge) => {
+              notificationService.showBadgeUnlocked(
+                lang as 'tr' | 'en',
+                badge.name[lang],
+                badge.icon
+              );
             });
           }
-          
+
           // Check for level up
           const newLevel = checkLevelUpCallback();
           if (newLevel) {
             showToast(`${t('level.levelUp')} ${t('level.level')} ${newLevel}! 🎉`, 'success');
             notificationService.showLevelUp(lang as 'tr' | 'en', newLevel);
           }
-          
+
           // Check for completed challenges
           const completedChallenges = checkCompletedChallenges();
           if (completedChallenges.length > 0) {
-            completedChallenges.forEach(challenge => {
+            completedChallenges.forEach((challenge) => {
               showToast(
                 `${challenge.icon || '🎯'} ${t('challenges.completedMessage', { name: challenge.name[lang] })}`,
                 'success'
               );
-              notificationService.showChallengeCompleted(lang as 'tr' | 'en', challenge.name[lang], challenge.icon || '🎯');
+              notificationService.showChallengeCompleted(
+                lang as 'tr' | 'en',
+                challenge.name[lang],
+                challenge.icon || '🎯'
+              );
             });
           }
         }, 500);
-        
+
         setAmount(String(definition.defaultAmount));
         setNote('');
         setPerformedAt(toLocalInputValue(new Date()));
@@ -243,7 +252,11 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   return (
     <form onSubmit={submit} className={isMobile ? 'space-y-3' : 'space-y-5'}>
       <div className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
-        <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('form.selectActivity')}</div>
+        <div
+          className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
+        >
+          {t('form.selectActivity')}
+        </div>
         <div className={`grid grid-cols-2 sm:grid-cols-3 ${isMobile ? 'gap-2' : 'gap-3'}`}>
           {definitions.map((def) => {
             const active = def.key === activityKey;
@@ -266,7 +279,9 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     : 'border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 hover:from-gray-100 hover:via-gray-50 hover:to-gray-100 dark:hover:from-gray-800 dark:hover:via-gray-700 dark:hover:to-gray-800 scale-on-interact'
                 }`}
                 aria-pressed={active}
-                aria-label={t('form.selectActivityLabel', { activity: getActivityLabel(def, lang) })}
+                aria-label={t('form.selectActivityLabel', {
+                  activity: getActivityLabel(def, lang),
+                })}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -276,13 +291,25 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <div className={`${isMobile ? 'text-lg' : 'text-xl'} transition-transform duration-300 ${active ? 'activity-icon-pulse' : ''}`}>{def.icon}</div>
-                  <div className={`${isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-[10px] px-2 py-0.5'} rounded-full bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 font-bold border border-gray-200 dark:border-gray-700`}>
+                  <div
+                    className={`${isMobile ? 'text-lg' : 'text-xl'} transition-transform duration-300 ${active ? 'activity-icon-pulse' : ''}`}
+                  >
+                    {def.icon}
+                  </div>
+                  <div
+                    className={`${isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-[10px] px-2 py-0.5'} rounded-full bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 font-bold border border-gray-200 dark:border-gray-700`}
+                  >
                     {def.multiplier}x
                   </div>
                 </div>
-                <div className={`${isMobile ? 'mt-1' : 'mt-2'} ${isMobile ? 'text-xs' : 'text-sm'} font-bold transition-colors text-gray-950 dark:text-gray-100`}>{getActivityLabel(def, lang)}</div>
-                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}>
+                <div
+                  className={`${isMobile ? 'mt-1' : 'mt-2'} ${isMobile ? 'text-xs' : 'text-sm'} font-bold transition-colors text-gray-950 dark:text-gray-100`}
+                >
+                  {getActivityLabel(def, lang)}
+                </div>
+                <div
+                  className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}
+                >
                   {def.defaultAmount} {getActivityUnit(def, lang)}
                 </div>
               </button>
@@ -292,7 +319,11 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       </div>
       <div className={`grid grid-cols-1 sm:grid-cols-2 ${isMobile ? 'gap-2' : 'gap-3'}`}>
         <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} min-w-0 max-w-full`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('form.datetime')}</div>
+          <div
+            className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
+          >
+            {t('form.datetime')}
+          </div>
           <input
             type="datetime-local"
             value={performedAt}
@@ -304,7 +335,9 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       </div>
       <div className={isMobile ? 'space-y-2' : 'space-y-3'}>
         <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>
+          <div
+            className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
+          >
             {t('form.amount')} ({getActivityUnit(definition, lang)})
           </div>
           <input
@@ -316,22 +349,36 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             className={`input-enhanced w-full border ${isMobile ? 'rounded-md px-2.5 py-2 min-h-[40px] text-xs' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 transition-all duration-200`}
             required
             aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
-            aria-describedby={getActivityDescription(definition, lang) ? 'amount-description' : undefined}
+            aria-describedby={
+              getActivityDescription(definition, lang) ? 'amount-description' : undefined
+            }
           />
           {getActivityDescription(definition, lang) ? (
-            <div id="amount-description" className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`} role="note">
+            <div
+              id="amount-description"
+              className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`}
+              role="note"
+            >
               {getActivityDescription(definition, lang)}
             </div>
           ) : null}
-          <div className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-gray-500 dark:text-gray-400 ${isMobile ? 'mt-0.5' : 'mt-1'} flex items-center gap-2`}>
+          <div
+            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-gray-500 dark:text-gray-400 ${isMobile ? 'mt-0.5' : 'mt-1'} flex items-center gap-2`}
+          >
             <span>{definition.multiplier}x</span>
             <span>·</span>
-            <span>{t('form.points')}: {pointsDisplay}</span>
+            <span>
+              {t('form.points')}: {pointsDisplay}
+            </span>
           </div>
         </label>
       </div>
       <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
-          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}>{t('form.noteOptional')}</div>
+        <div
+          className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
+        >
+          {t('form.noteOptional')}
+        </div>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
@@ -341,7 +388,9 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           aria-label={t('form.noteOptional')}
         />
       </label>
-      <div className={`flex items-center ${isMobile ? 'gap-1.5' : 'gap-2'} ${isMobile && !isEditing ? 'flex-col' : ''}`}>
+      <div
+        className={`flex items-center ${isMobile ? 'gap-1.5' : 'gap-2'} ${isMobile && !isEditing ? 'flex-col' : ''}`}
+      >
         <button
           type="submit"
           disabled={loading}
@@ -364,4 +413,3 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
     </form>
   );
 }
-

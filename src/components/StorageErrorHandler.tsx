@@ -12,7 +12,7 @@ export function StorageErrorHandler() {
 
   useEffect(() => {
     if (!activities.storageError) return;
-    
+
     let message = '';
     switch (activities.storageError) {
       case 'parse':
@@ -25,7 +25,7 @@ export function StorageErrorHandler() {
         message = t('errors.storageSaveFailed');
         break;
     }
-    
+
     if (message) {
       showToast(message, 'error');
       activities.clearStorageError();
@@ -34,4 +34,3 @@ export function StorageErrorHandler() {
 
   return null;
 }
-

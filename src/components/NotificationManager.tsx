@@ -11,9 +11,8 @@ import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 export function NotificationManager() {
   const { lang } = useI18n();
   const { settings } = useSettings();
-  const target = settings?.dailyTarget && settings.dailyTarget > 0
-    ? settings.dailyTarget
-    : DEFAULT_DAILY_TARGET;
+  const target =
+    settings?.dailyTarget && settings.dailyTarget > 0 ? settings.dailyTarget : DEFAULT_DAILY_TARGET;
   const summary = useActivitiesSummary(target);
 
   useEffect(() => {
@@ -32,32 +31,32 @@ export function NotificationManager() {
 
     // Start daily reminder check if enabled
     if (notificationSettings.enabled && notificationSettings.dailyReminder) {
-      notificationService.startDailyReminderCheck(
-        notificationSettings,
-        lang as 'tr' | 'en',
-        () => {
-          notificationService.showDailyReminder(lang as 'tr' | 'en');
-        }
-      );
+      notificationService.startDailyReminderCheck(notificationSettings, lang as 'tr' | 'en', () => {
+        notificationService.showDailyReminder(lang as 'tr' | 'en');
+      });
     }
 
     // Check for streak reminder
-    if (notificationSettings.enabled && notificationSettings.streakReminder && summary.streakDays > 0) {
+    if (
+      notificationSettings.enabled &&
+      notificationSettings.streakReminder &&
+      summary.streakDays > 0
+    ) {
       const checkStreakReminder = () => {
         const now = new Date();
         const [hours, minutes] = notificationSettings.streakReminderTime.split(':').map(Number);
         const reminderTime = new Date();
         reminderTime.setHours(hours, minutes, 0, 0);
-        
+
         const timeDiff = Math.abs(now.getTime() - reminderTime.getTime());
         if (timeDiff < 60000) {
           notificationService.showStreakReminder(lang as 'tr' | 'en', summary.streakDays);
         }
       };
-      
+
       const streakInterval = setInterval(checkStreakReminder, 60000);
       checkStreakReminder(); // Check immediately
-      
+
       return () => {
         clearInterval(streakInterval);
         notificationService.stopDailyReminderCheck();
@@ -71,4 +70,3 @@ export function NotificationManager() {
 
   return null;
 }
-

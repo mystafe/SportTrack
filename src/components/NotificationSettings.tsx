@@ -3,7 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useSettings } from '@/lib/settingsStore';
-import { notificationService, NotificationSettings as NotificationSettingsType, DEFAULT_NOTIFICATION_SETTINGS } from '@/lib/notificationService';
+import {
+  notificationService,
+  NotificationSettings as NotificationSettingsType,
+  DEFAULT_NOTIFICATION_SETTINGS,
+} from '@/lib/notificationService';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -13,7 +17,9 @@ export function NotificationSettings() {
   const { settings } = useSettings();
   const { showToast } = useToaster();
   const isMobile = useIsMobile();
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettingsType>(DEFAULT_NOTIFICATION_SETTINGS);
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSettingsType>(
+    DEFAULT_NOTIFICATION_SETTINGS
+  );
   const [permission, setPermission] = useState<'default' | 'granted' | 'denied'>('default');
   const [isSupported, setIsSupported] = useState(false);
 
@@ -21,7 +27,7 @@ export function NotificationSettings() {
     if (typeof window !== 'undefined') {
       setIsSupported('Notification' in window);
       setPermission(notificationService.getPermission());
-      
+
       // Load saved settings
       try {
         const saved = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
@@ -38,16 +44,12 @@ export function NotificationSettings() {
     try {
       localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(newSettings));
       setNotificationSettings(newSettings);
-      
+
       // Start/stop reminder check based on settings
       if (newSettings.enabled && newSettings.dailyReminder) {
-        notificationService.startDailyReminderCheck(
-          newSettings,
-          lang as 'tr' | 'en',
-          () => {
-            notificationService.showDailyReminder(lang as 'tr' | 'en');
-          }
-        );
+        notificationService.startDailyReminderCheck(newSettings, lang as 'tr' | 'en', () => {
+          notificationService.showDailyReminder(lang as 'tr' | 'en');
+        });
       } else {
         notificationService.stopDailyReminderCheck();
       }
@@ -60,7 +62,7 @@ export function NotificationSettings() {
   const handleRequestPermission = async () => {
     const newPermission = await notificationService.requestPermission();
     setPermission(newPermission);
-    
+
     if (newPermission === 'granted') {
       showToast(t('notifications.permissionGranted'), 'success');
       saveSettings({ ...notificationSettings, enabled: true });
@@ -89,7 +91,9 @@ export function NotificationSettings() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <div className="font-bold text-sm text-gray-950 dark:text-white">{t('notifications.title')}</div>
+          <div className="font-bold text-sm text-gray-950 dark:text-white">
+            {t('notifications.title')}
+          </div>
           <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">
             {t('notifications.subtitle')}
           </div>
@@ -98,7 +102,9 @@ export function NotificationSettings() {
           type="button"
           onClick={() => updateSetting('enabled', !notificationSettings.enabled)}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
-            notificationSettings.enabled ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md' : 'bg-gray-300 dark:bg-gray-700'
+            notificationSettings.enabled
+              ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md'
+              : 'bg-gray-300 dark:bg-gray-700'
           }`}
         >
           <span
@@ -124,12 +130,16 @@ export function NotificationSettings() {
           {/* Daily Reminder */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">{t('notifications.dailyReminder')}</label>
+              <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                {t('notifications.dailyReminder')}
+              </label>
               <button
                 type="button"
                 onClick={() => updateSetting('dailyReminder', !notificationSettings.dailyReminder)}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 ${
-                  notificationSettings.dailyReminder ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md' : 'bg-gray-300 dark:bg-gray-700'
+                  notificationSettings.dailyReminder
+                    ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md'
+                    : 'bg-gray-300 dark:bg-gray-700'
                 }`}
               >
                 <span
@@ -151,12 +161,16 @@ export function NotificationSettings() {
 
           {/* Goal Completion */}
           <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">{t('notifications.goalCompletion')}</label>
+            <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+              {t('notifications.goalCompletion')}
+            </label>
             <button
               type="button"
               onClick={() => updateSetting('goalCompletion', !notificationSettings.goalCompletion)}
               className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 ${
-                notificationSettings.goalCompletion ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md' : 'bg-gray-300 dark:bg-gray-700'
+                notificationSettings.goalCompletion
+                  ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md'
+                  : 'bg-gray-300 dark:bg-gray-700'
               }`}
             >
               <span
@@ -170,12 +184,18 @@ export function NotificationSettings() {
           {/* Streak Reminder */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">{t('notifications.streakReminder')}</label>
+              <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                {t('notifications.streakReminder')}
+              </label>
               <button
                 type="button"
-                onClick={() => updateSetting('streakReminder', !notificationSettings.streakReminder)}
+                onClick={() =>
+                  updateSetting('streakReminder', !notificationSettings.streakReminder)
+                }
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 ${
-                  notificationSettings.streakReminder ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md' : 'bg-gray-300 dark:bg-gray-700'
+                  notificationSettings.streakReminder
+                    ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md'
+                    : 'bg-gray-300 dark:bg-gray-700'
                 }`}
               >
                 <span
@@ -199,4 +219,3 @@ export function NotificationSettings() {
     </div>
   );
 }
-

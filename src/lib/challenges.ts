@@ -4,7 +4,17 @@
  */
 
 import { ActivityRecord } from './activityStore';
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, parseISO, isWithinInterval, format } from 'date-fns';
+import {
+  startOfDay,
+  endOfDay,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  parseISO,
+  isWithinInterval,
+  format,
+} from 'date-fns';
 
 export type ChallengeType = 'daily' | 'weekly' | 'monthly' | 'custom';
 export type ChallengeStatus = 'active' | 'completed' | 'failed' | 'expired';
@@ -41,9 +51,9 @@ export function calculateChallengeProgress(
 ): ChallengeProgress {
   const start = parseISO(challenge.startDate);
   const end = challenge.endDate ? parseISO(challenge.endDate) : new Date();
-  
+
   // Filter activities within challenge period
-  const relevantActivities = activities.filter(activity => {
+  const relevantActivities = activities.filter((activity) => {
     const activityDate = parseISO(activity.performedAt);
     return isWithinInterval(activityDate, { start, end });
   });
@@ -67,7 +77,7 @@ export function calculateChallengeProgress(
     target,
     percentage,
     isCompleted,
-    daysRemaining
+    daysRemaining,
   };
 }
 
@@ -88,13 +98,13 @@ export function updateChallengeStatus(
         ...challenge,
         status: 'completed',
         progress: progress.current,
-        completedAt: endDate.toISOString()
+        completedAt: endDate.toISOString(),
       };
     } else {
       return {
         ...challenge,
         status: 'expired',
-        progress: progress.current
+        progress: progress.current,
       };
     }
   }
@@ -105,14 +115,14 @@ export function updateChallengeStatus(
       ...challenge,
       status: 'completed',
       progress: progress.current,
-      completedAt: now.toISOString()
+      completedAt: now.toISOString(),
     };
   }
 
   // Update progress
   return {
     ...challenge,
-    progress: progress.current
+    progress: progress.current,
   };
 }
 
@@ -134,7 +144,7 @@ export function createDailyChallenge(
     name,
     description: {
       tr: `Bugün ${target.toLocaleString('tr-TR')} puan hedefi`,
-      en: `Today's ${target.toLocaleString('en-US')} points goal`
+      en: `Today's ${target.toLocaleString('en-US')} points goal`,
     },
     target,
     startDate: start.toISOString(),
@@ -142,7 +152,7 @@ export function createDailyChallenge(
     status: 'active',
     progress: 0,
     createdAt: new Date().toISOString(),
-    icon: icon || '🎯'
+    icon: icon || '🎯',
   };
 }
 
@@ -164,7 +174,7 @@ export function createWeeklyChallenge(
     name,
     description: {
       tr: `Bu hafta ${target.toLocaleString('tr-TR')} puan hedefi`,
-      en: `This week's ${target.toLocaleString('en-US')} points goal`
+      en: `This week's ${target.toLocaleString('en-US')} points goal`,
     },
     target,
     startDate: start.toISOString(),
@@ -172,7 +182,7 @@ export function createWeeklyChallenge(
     status: 'active',
     progress: 0,
     createdAt: new Date().toISOString(),
-    icon: icon || '📅'
+    icon: icon || '📅',
   };
 }
 
@@ -194,7 +204,7 @@ export function createMonthlyChallenge(
     name,
     description: {
       tr: `Bu ay ${target.toLocaleString('tr-TR')} puan hedefi`,
-      en: `This month's ${target.toLocaleString('en-US')} points goal`
+      en: `This month's ${target.toLocaleString('en-US')} points goal`,
     },
     target,
     startDate: start.toISOString(),
@@ -202,7 +212,7 @@ export function createMonthlyChallenge(
     status: 'active',
     progress: 0,
     createdAt: new Date().toISOString(),
-    icon: icon || '📆'
+    icon: icon || '📆',
   };
 }
 
@@ -228,7 +238,7 @@ export function createCustomChallenge(
     status: 'active',
     progress: 0,
     createdAt: new Date().toISOString(),
-    icon: icon || '🏆'
+    icon: icon || '🏆',
   };
 }
 
@@ -239,7 +249,7 @@ export function getDefaultDailyChallenge(dailyTarget: number): Challenge {
   return createDailyChallenge(
     {
       tr: 'Günlük Hedef',
-      en: 'Daily Goal'
+      en: 'Daily Goal',
     },
     dailyTarget,
     new Date(),
@@ -254,11 +264,10 @@ export function getDefaultWeeklyChallenge(): Challenge {
   return createWeeklyChallenge(
     {
       tr: 'Haftalık Hedef',
-      en: 'Weekly Goal'
+      en: 'Weekly Goal',
     },
     50000,
     new Date(),
     '🔥'
   );
 }
-

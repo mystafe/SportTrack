@@ -18,42 +18,45 @@ export default function HomePage() {
   const { settings } = useSettings();
   const { activities } = useActivities();
   const isMobile = useIsMobile();
-  const dailyTarget = settings?.dailyTarget && settings.dailyTarget > 0 ? settings.dailyTarget : 10_000;
+  const dailyTarget =
+    settings?.dailyTarget && settings.dailyTarget > 0 ? settings.dailyTarget : 10_000;
   const summary = useActivitiesSummary(dailyTarget);
   const hasName = settings?.name;
   const greeting = hasName
     ? t('header.greeting', { name: settings!.name })
     : t('header.overviewTitle');
-  
-  
+
   // Motivational message based on progress - client-side only to avoid hydration mismatch
   const todayActivities = useMemo(() => {
     const today = startOfDay(new Date());
-    return activities.filter(activity => 
+    return activities.filter((activity) =>
       isSameDay(startOfDay(new Date(activity.performedAt)), today)
     );
   }, [activities]);
-  
-  const progress = dailyTarget > 0 
-    ? Math.min(100, Math.round((summary.todayPoints / dailyTarget) * 100))
-    : 0;
-  
+
+  const progress =
+    dailyTarget > 0 ? Math.min(100, Math.round((summary.todayPoints / dailyTarget) * 100)) : 0;
+
   const [mounted, setMounted] = useState(false);
   const [motivationalMessage, setMotivationalMessage] = useState<MotivationalMessage | null>(null);
-  
+
   useEffect(() => {
     setMounted(true);
   }, []);
-  
+
   useEffect(() => {
     if (mounted) {
-      const message = getMotivationalMessage(progress, todayActivities.length > 0, settings?.mood ?? null);
+      const message = getMotivationalMessage(
+        progress,
+        todayActivities.length > 0,
+        settings?.mood ?? null
+      );
       setMotivationalMessage(message);
     }
   }, [mounted, progress, todayActivities.length, settings?.mood]);
-  
+
   const [showMessage, setShowMessage] = useState(true);
-  
+
   useEffect(() => {
     if (motivationalMessage && mounted) {
       setShowMessage(true);
@@ -63,12 +66,16 @@ export default function HomePage() {
       return () => clearTimeout(timer);
     }
   }, [motivationalMessage, mounted]);
-  
+
   return (
     <div className="space-y-4 sm:space-y-6 page-transition">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className={isMobile ? 'title-entrance' : ''}>
-          <h1 className={`text-2xl sm:text-3xl font-bold ${isMobile ? 'text-brand dark:text-brand-light' : 'text-gray-950 dark:text-white'}`}>{greeting}</h1>
+          <h1
+            className={`text-2xl sm:text-3xl font-bold ${isMobile ? 'text-brand dark:text-brand-light' : 'text-gray-950 dark:text-white'}`}
+          >
+            {greeting}
+          </h1>
           <p className="text-sm sm:text-base text-gray-700 dark:text-gray-200 font-medium leading-relaxed">
             {t('header.overviewSubtitle')}
           </p>
@@ -82,27 +89,36 @@ export default function HomePage() {
           {t('actions.addActivity')}
         </Link>
       </div>
-      
+
       {/* Motivational Message - Enhanced Design */}
       {motivationalMessage && showMessage && (
-        <div className={`motivational-card glow-border rounded-xl border-2 border-brand/40 dark:border-brand/50 p-5 sm:p-6 shadow-2xl ${isMobile ? 'motivational-entrance slide-in-bottom-mobile' : 'animate-slide-in-right'} transition-all duration-500 overflow-hidden relative ${showMessage ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
+        <div
+          className={`motivational-card glow-border rounded-xl border-2 border-brand/40 dark:border-brand/50 p-5 sm:p-6 shadow-2xl ${isMobile ? 'motivational-entrance slide-in-bottom-mobile' : 'animate-slide-in-right'} transition-all duration-500 overflow-hidden relative ${showMessage ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}
+        >
           {/* Decorative elements */}
           <div className="pattern-overlay"></div>
           <div className="quote-shimmer"></div>
-          
+
           <div className="flex items-center gap-4 relative z-50">
-            <span className={`text-3xl sm:text-4xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'} flex-shrink-0`}>{motivationalMessage.emoji}</span>
-            <p className="text-sm sm:text-base md:text-lg font-bold text-gray-950 dark:text-white flex-1 leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}>
+            <span
+              className={`text-3xl sm:text-4xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'} flex-shrink-0`}
+            >
+              {motivationalMessage.emoji}
+            </span>
+            <p
+              className="text-sm sm:text-base md:text-lg font-bold text-gray-950 dark:text-white flex-1 leading-relaxed"
+              style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}
+            >
               {lang === 'tr' ? motivationalMessage.tr : motivationalMessage.en}
             </p>
           </div>
-          
+
           {/* Decorative sparkles */}
           <div className="sparkle sparkle-enhanced"></div>
           <div className="sparkle sparkle-enhanced"></div>
         </div>
       )}
-      
+
       {/* Stats Cards and Highlights Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="lg:col-span-1">
@@ -112,7 +128,7 @@ export default function HomePage() {
           <StatsHighlights />
         </div>
       </div>
-      
+
       <QuickAdd />
       <ActivityTemplates />
     </div>

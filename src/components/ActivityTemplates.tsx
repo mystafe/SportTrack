@@ -32,16 +32,16 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
       let addedCount = 0;
 
       for (const templateActivity of selectedTemplate.activities) {
-        const definition = definitions.find(d => d.key === templateActivity.activityKey);
+        const definition = definitions.find((d) => d.key === templateActivity.activityKey);
         if (!definition) continue;
 
         const amount = Math.round(definition.defaultAmount * templateActivity.amount);
-        
+
         addActivity({
           definition,
           amount,
           performedAt,
-          note: `${selectedTemplate.name[lang]} (${t('templates.template')})`
+          note: `${selectedTemplate.name[lang]} (${t('templates.template')})`,
         });
         addedCount++;
       }
@@ -66,35 +66,47 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
   // Get unique categories from templates
   const categories = useMemo(() => {
     const uniqueCategories = new Set<ActivityTemplate['category']>();
-    ACTIVITY_TEMPLATES.forEach(t => uniqueCategories.add(t.category));
+    ACTIVITY_TEMPLATES.forEach((t) => uniqueCategories.add(t.category));
     return Array.from(uniqueCategories);
   }, []);
-  
+
   const templatesByCategory = useMemo(() => {
-    return categories.map(cat => ({
-      category: cat,
-      templates: ACTIVITY_TEMPLATES.filter(t => t.category === cat)
-    })).filter(group => group.templates.length > 0);
+    return categories
+      .map((cat) => ({
+        category: cat,
+        templates: ACTIVITY_TEMPLATES.filter((t) => t.category === cat),
+      }))
+      .filter((group) => group.templates.length > 0);
   }, [categories]);
 
   return (
     <div className={isMobile ? 'space-y-3' : 'space-y-4'}>
       <div className="flex items-center justify-between">
-        <h3 className={`${isMobile ? 'text-base' : 'text-lg sm:text-xl'} font-bold text-gray-950 dark:text-white`}>
+        <h3
+          className={`${isMobile ? 'text-base' : 'text-lg sm:text-xl'} font-bold text-gray-950 dark:text-white`}
+        >
           {t('templates.title')}
         </h3>
-        <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-semibold`}>
+        <span
+          className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-semibold`}
+        >
           {t('templates.subtitle')}
         </span>
       </div>
 
       {templatesByCategory.map(({ category, templates }) => (
         <div key={category} className={isMobile ? 'space-y-2' : 'space-y-3'}>
-          <h4 className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2`}>
-            <span className={`inline-block w-1 ${isMobile ? 'h-3' : 'h-4'} bg-brand rounded-full`}></span>
+          <h4
+            className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2`}
+          >
+            <span
+              className={`inline-block w-1 ${isMobile ? 'h-3' : 'h-4'} bg-brand rounded-full`}
+            ></span>
             {t(`templates.category.${category}`)}
           </h4>
-          <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2' : 'gap-3 sm:gap-4'}`}>
+          <div
+            className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2' : 'gap-3 sm:gap-4'}`}
+          >
             {templates.map((template) => (
               <button
                 key={template.id}
@@ -115,27 +127,41 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
                 }}
               >
                 <div className={`flex items-start ${isMobile ? 'gap-2' : 'gap-3'} w-full`}>
-                  <div className={`${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl'} transform group-hover:scale-110 transition-transform duration-300`}>
+                  <div
+                    className={`${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl'} transform group-hover:scale-110 transition-transform duration-300`}
+                  >
                     {template.icon}
                   </div>
                   <div className="flex-1 text-left min-w-0">
-                    <div className={`${isMobile ? 'text-sm' : 'text-base'} font-bold text-gray-950 dark:text-white ${isMobile ? 'mb-0.5' : 'mb-1'} group-hover:text-brand transition-colors`}>
+                    <div
+                      className={`${isMobile ? 'text-sm' : 'text-base'} font-bold text-gray-950 dark:text-white ${isMobile ? 'mb-0.5' : 'mb-1'} group-hover:text-brand transition-colors`}
+                    >
                       {template.name[lang]}
                     </div>
-                    <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'leading-tight' : 'leading-relaxed'}`}>
+                    <div
+                      className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'leading-tight' : 'leading-relaxed'}`}
+                    >
                       {template.description[lang]}
                     </div>
                   </div>
                 </div>
-                  <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'} w-full ${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-300 dark:border-gray-600`}>
-                    <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1.5'} ${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-semibold`}>
+                <div
+                  className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'} w-full ${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-300 dark:border-gray-600`}
+                >
+                  <div
+                    className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1.5'} ${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-semibold`}
+                  >
                     <span className="font-bold">{template.activities.length}</span>
                     <span>{t('templates.activities')}</span>
                   </div>
                   <span className="text-gray-300 dark:text-gray-600">•</span>
-                  <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1.5'} ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                  <div
+                    className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1.5'} ${isMobile ? 'text-xs' : 'text-sm'}`}
+                  >
                     <span className="font-bold text-brand">~{template.estimatedPoints}</span>
-                    <span className="text-gray-600 dark:text-gray-400 font-semibold">{t('templates.points')}</span>
+                    <span className="text-gray-600 dark:text-gray-400 font-semibold">
+                      {t('templates.points')}
+                    </span>
                   </div>
                 </div>
                 {isAdding && (
@@ -158,12 +184,12 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
                 template: selectedTemplate.name[lang],
                 count: String(selectedTemplate.activities.length),
                 activities: selectedTemplate.activities
-                  .map(a => {
-                    const def = definitions.find(d => d.key === a.activityKey);
+                  .map((a) => {
+                    const def = definitions.find((d) => d.key === a.activityKey);
                     return def ? getActivityLabel(def, lang) : '';
                   })
                   .filter(Boolean)
-                  .join(', ')
+                  .join(', '),
               })
             : ''
         }
@@ -176,4 +202,3 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
     </div>
   );
 });
-

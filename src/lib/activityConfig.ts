@@ -29,7 +29,7 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     defaultAmount: 1000,
     description: 'Adım sayınızı girin',
     descriptionEn: 'Enter your step count',
-    category: 'cardio'
+    category: 'cardio',
   },
   {
     key: 'RUNNING',
@@ -42,7 +42,7 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     defaultAmount: 500,
     description: 'Koşu adım sayınızı girin',
     descriptionEn: 'Enter your running step count',
-    category: 'cardio'
+    category: 'cardio',
   },
   {
     key: 'SWIMMING',
@@ -55,7 +55,7 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     defaultAmount: 20,
     description: 'Yüzme süresini dakika olarak girin',
     descriptionEn: 'Enter swimming duration in minutes',
-    category: 'cardio'
+    category: 'cardio',
   },
   {
     key: 'PUSH_UP',
@@ -68,7 +68,7 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     defaultAmount: 20,
     description: 'Tamamlanan şınav tekrar sayısı',
     descriptionEn: 'Number of push-up repetitions completed',
-    category: 'strength'
+    category: 'strength',
   },
   {
     key: 'SIT_UP',
@@ -81,7 +81,7 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     defaultAmount: 20,
     description: 'Tamamlanan mekik tekrar sayısı',
     descriptionEn: 'Number of sit-up repetitions completed',
-    category: 'strength'
+    category: 'strength',
   },
   {
     key: 'WEIGHT_LIFTING',
@@ -94,7 +94,7 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     defaultAmount: 30,
     description: 'Toplam süreyi dakika olarak girin',
     descriptionEn: 'Enter total duration in minutes',
-    category: 'strength'
+    category: 'strength',
   },
   {
     key: 'STAIRS',
@@ -107,8 +107,8 @@ export const BASE_ACTIVITY_DEFINITIONS: ActivityDefinition[] = [
     defaultAmount: 50,
     description: 'Çıktığınız toplam basamak sayısı',
     descriptionEn: 'Total number of steps climbed',
-    category: 'cardio'
-  }
+    category: 'cardio',
+  },
 ];
 
 export const BASE_ACTIVITY_MAP: Record<string, ActivityDefinition> = Object.fromEntries(
@@ -118,4 +118,3 @@ export const BASE_ACTIVITY_MAP: Record<string, ActivityDefinition> = Object.from
 import { LIMITS } from '@/lib/constants';
 
 export const DEFAULT_DAILY_TARGET = LIMITS.DEFAULT_DAILY_TARGET;
-

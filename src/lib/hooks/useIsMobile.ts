@@ -24,4 +24,3 @@ export function useIsMobile(): boolean {
 
   return isMobile;
 }
-

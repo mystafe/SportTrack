@@ -94,4 +94,3 @@ export function PageSkeleton() {
     </div>
   );
 }
-

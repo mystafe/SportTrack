@@ -21,7 +21,7 @@ export interface LevelInfo {
  */
 export function getXPForLevel(level: number): number {
   if (level <= 1) return 0;
-  return Math.floor(1000 * level * (level - 1) / 2);
+  return Math.floor((1000 * level * (level - 1)) / 2);
 }
 
 /**
@@ -36,13 +36,13 @@ export function getTotalXPForLevel(level: number): number {
  */
 export function getLevelFromXP(totalXP: number): number {
   if (totalXP < 1000) return 1;
-  
+
   // Solve: totalXP = 1000 * level * (level + 1) / 2
   // level^2 + level - 2*totalXP/1000 = 0
   // Using quadratic formula
   const discriminant = 1 + (8 * totalXP) / 1000;
   const level = Math.floor((-1 + Math.sqrt(discriminant)) / 2);
-  
+
   return Math.max(1, level);
 }
 
@@ -71,7 +71,7 @@ export function getLevelInfo(totalXP: number): LevelInfo {
     xpForCurrentLevel,
     xpForNextLevel,
     progress: Math.min(1, Math.max(0, progress)),
-    totalXP
+    totalXP,
   };
 }
 
@@ -81,11 +81,11 @@ export function getLevelInfo(totalXP: number): LevelInfo {
 export function checkLevelUp(oldTotalXP: number, newTotalXP: number): number | null {
   const oldLevel = getLevelFromXP(oldTotalXP);
   const newLevel = getLevelFromXP(newTotalXP);
-  
+
   if (newLevel > oldLevel) {
     return newLevel;
   }
-  
+
   return null;
 }
 
@@ -109,4 +109,3 @@ export function getLevelTitle(level: number, lang: 'tr' | 'en'): string {
     return lang === 'tr' ? 'Efsanevi' : 'Mythic';
   }
 }
-

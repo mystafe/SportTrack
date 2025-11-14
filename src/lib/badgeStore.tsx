@@ -22,9 +22,8 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
   const [badges, setBadges] = useState<Badge[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
-  const target = settings?.dailyTarget && settings.dailyTarget > 0
-    ? settings.dailyTarget
-    : DEFAULT_DAILY_TARGET;
+  const target =
+    settings?.dailyTarget && settings.dailyTarget > 0 ? settings.dailyTarget : DEFAULT_DAILY_TARGET;
 
   // Load badges from localStorage
   useEffect(() => {
@@ -35,9 +34,9 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
       if (stored) {
         const parsed = JSON.parse(stored) as Badge[];
         // Convert unlockedAt strings back to Date objects
-        const badgesWithDates = parsed.map(badge => ({
+        const badgesWithDates = parsed.map((badge) => ({
           ...badge,
-          unlockedAt: badge.unlockedAt ? new Date(badge.unlockedAt) : undefined
+          unlockedAt: badge.unlockedAt ? new Date(badge.unlockedAt) : undefined,
         }));
         setBadges(badgesWithDates);
       }
@@ -61,7 +60,7 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
   // Check for new badges
   const checkNewBadges = useCallback((): Badge[] => {
     if (!hydrated || activities.length === 0) return [];
-    
+
     const newBadges = checkBadges(activities, settings, target, badges);
     if (newBadges.length > 0) {
       const updatedBadges = [...badges, ...newBadges];
@@ -72,20 +71,26 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
   }, [activities, settings, target, badges, hydrated, saveBadges]);
 
   // Unlock a badge manually (for testing or special cases)
-  const unlockBadge = useCallback((badge: Badge) => {
-    const exists = badges.some(b => b.id === badge.id);
-    if (!exists) {
-      const updatedBadges = [...badges, { ...badge, unlockedAt: new Date() }];
-      saveBadges(updatedBadges);
-    }
-  }, [badges, saveBadges]);
+  const unlockBadge = useCallback(
+    (badge: Badge) => {
+      const exists = badges.some((b) => b.id === badge.id);
+      if (!exists) {
+        const updatedBadges = [...badges, { ...badge, unlockedAt: new Date() }];
+        saveBadges(updatedBadges);
+      }
+    },
+    [badges, saveBadges]
+  );
 
-  const value = useMemo<BadgeContextValue>(() => ({
-    badges,
-    hydrated,
-    checkNewBadges,
-    unlockBadge
-  }), [badges, hydrated, checkNewBadges, unlockBadge]);
+  const value = useMemo<BadgeContextValue>(
+    () => ({
+      badges,
+      hydrated,
+      checkNewBadges,
+      unlockBadge,
+    }),
+    [badges, hydrated, checkNewBadges, unlockBadge]
+  );
 
   return <BadgeContext.Provider value={value}>{children}</BadgeContext.Provider>;
 }
@@ -97,4 +102,3 @@ export function useBadges() {
   }
   return ctx;
 }
-

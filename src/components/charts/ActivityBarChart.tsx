@@ -1,7 +1,17 @@
 'use client';
 
 import { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  Cell,
+} from 'recharts';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord } from '@/lib/activityStore';
 import { getActivityLabel } from '@/lib/activityUtils';
@@ -19,11 +29,11 @@ export function ActivityBarChart({ activities }: ActivityBarChartProps) {
 
   const chartData = useMemo(() => {
     const breakdown = new Map<string, { label: string; points: number; count: number }>();
-    
+
     for (const activity of activities) {
       const key = activity.activityKey;
       const existing = breakdown.get(key);
-      
+
       if (existing) {
         existing.points += activity.points;
         existing.count += 1;
@@ -31,11 +41,11 @@ export function ActivityBarChart({ activities }: ActivityBarChartProps) {
         breakdown.set(key, {
           label: getActivityLabel(activity, lang),
           points: activity.points,
-          count: 1
+          count: 1,
         });
       }
     }
-    
+
     return Array.from(breakdown.values())
       .sort((a, b) => b.points - a.points)
       .slice(0, 7); // Top 7 activities
@@ -53,18 +63,15 @@ export function ActivityBarChart({ activities }: ActivityBarChartProps) {
     <ResponsiveContainer width="100%" height={isMobile ? 250 : 350}>
       <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 60 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-30" />
-        <XAxis 
-          dataKey="label" 
+        <XAxis
+          dataKey="label"
           angle={-45}
           textAnchor="end"
           height={80}
           stroke="currentColor"
           tick={{ fill: 'currentColor', fontSize: 11 }}
         />
-        <YAxis 
-          stroke="currentColor"
-          tick={{ fill: 'currentColor', fontSize: 12 }}
-        />
+        <YAxis stroke="currentColor" tick={{ fill: 'currentColor', fontSize: 12 }} />
         <Tooltip
           contentStyle={{
             backgroundColor: 'var(--tw-bg-white)',
@@ -74,8 +81,8 @@ export function ActivityBarChart({ activities }: ActivityBarChartProps) {
           labelStyle={{ color: 'var(--tw-text-gray-900)' }}
         />
         <Legend />
-        <Bar 
-          dataKey="points" 
+        <Bar
+          dataKey="points"
           name={lang === 'tr' ? 'Toplam Puan' : 'Total Points'}
           radius={[8, 8, 0, 0]}
         >
@@ -87,4 +94,3 @@ export function ActivityBarChart({ activities }: ActivityBarChartProps) {
     </ResponsiveContainer>
   );
 }
-

@@ -3,11 +3,24 @@
 import { useMemo, useState, memo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
-import { calculateActivityTrends, getTopActivityTypes, type ActivityTypeTrend as ActivityTypeTrendData } from '@/lib/activityTrendUtils';
+import {
+  calculateActivityTrends,
+  getTopActivityTypes,
+  type ActivityTypeTrend as ActivityTypeTrendData,
+} from '@/lib/activityTrendUtils';
 import { useActivityDefinitions } from '@/lib/settingsStore';
 import { getActivityLabel } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { format, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 
@@ -33,9 +46,9 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
 
     // Create a map of dates to data points
     const dateMap = new Map<string, Record<string, number | string>>();
-    
-    topTrends.forEach(trend => {
-      trend.dailyData.forEach(day => {
+
+    topTrends.forEach((trend) => {
+      trend.dailyData.forEach((day) => {
         if (!dateMap.has(day.date)) {
           dateMap.set(day.date, { date: day.date });
         }
@@ -46,9 +59,9 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
 
     return Array.from(dateMap.values())
       .sort((a, b) => (a.date as string).localeCompare(b.date as string))
-      .map(item => ({
+      .map((item) => ({
         ...item,
-        dateLabel: format(parseISO(item.date as string), 'd MMM', { locale: dateLocale })
+        dateLabel: format(parseISO(item.date as string), 'd MMM', { locale: dateLocale }),
       }));
   }, [topTrends, dateLocale]);
 
@@ -122,24 +135,18 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
                   fontSize={isMobile ? 10 : 12}
                   tick={{ fill: '#6b7280' }}
                 />
-                <YAxis
-                  stroke="#6b7280"
-                  fontSize={isMobile ? 10 : 12}
-                  tick={{ fill: '#6b7280' }}
-                />
+                <YAxis stroke="#6b7280" fontSize={isMobile ? 10 : 12} tick={{ fill: '#6b7280' }} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'white',
                     border: '1px solid #e5e7eb',
                     borderRadius: '8px',
-                    fontSize: isMobile ? '12px' : '14px'
+                    fontSize: isMobile ? '12px' : '14px',
                   }}
                 />
-                <Legend
-                  wrapperStyle={{ fontSize: isMobile ? '10px' : '12px' }}
-                />
+                <Legend wrapperStyle={{ fontSize: isMobile ? '10px' : '12px' }} />
                 {topTrends.map((trend, index) => {
-                  const definition = definitions.find(d => d.key === trend.activityKey);
+                  const definition = definitions.find((d) => d.key === trend.activityKey);
                   const label = definition ? getActivityLabel(definition, lang) : trend.label;
                   return (
                     <Line
@@ -158,7 +165,9 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
             </ResponsiveContainer>
 
             {/* Summary Cards */}
-            <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-3 mt-4`}>
+            <div
+              className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-3 mt-4`}
+            >
               {topTrends.map((trend, index) => (
                 <div
                   key={trend.activityKey}
@@ -166,9 +175,11 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xl">{trend.icon}</span>
-                    <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-900 dark:text-white`}>
+                    <span
+                      className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-900 dark:text-white`}
+                    >
                       {(() => {
-                        const definition = definitions.find(d => d.key === trend.activityKey);
+                        const definition = definitions.find((d) => d.key === trend.activityKey);
                         return definition ? getActivityLabel(definition, lang) : trend.label;
                       })()}
                     </span>
@@ -180,7 +191,9 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
                     </div>
                     <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                       <span>{t('activityTrend.totalPoints')}</span>
-                      <span className="font-medium text-brand">{trend.totalPoints.toLocaleString()}</span>
+                      <span className="font-medium text-brand">
+                        {trend.totalPoints.toLocaleString()}
+                      </span>
                     </div>
                     <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                       <span>{t('activityTrend.avgPerDay')}</span>
@@ -196,4 +209,3 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
     </section>
   );
 });
-

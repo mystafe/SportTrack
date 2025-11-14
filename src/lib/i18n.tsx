@@ -15,11 +15,11 @@ const translations: Translations = {
   'nav.challenges': { tr: 'Hedefler', en: 'Goals' },
   'nav.main': { tr: 'Ana navigasyon', en: 'Main navigation' },
   'nav.home': { tr: 'Ana sayfa', en: 'Home page' },
-  'scrollToTop': { tr: 'Yukarı çık', en: 'Scroll to top' },
+  scrollToTop: { tr: 'Yukarı çık', en: 'Scroll to top' },
   'header.overviewTitle': { tr: 'Genel Bakış', en: 'Overview' },
   'header.overviewSubtitle': {
     tr: 'Günlük puan hedefin doğrultusunda ilerlemeni takip et.',
-    en: 'Keep track of your progress toward your daily points goal.'
+    en: 'Keep track of your progress toward your daily points goal.',
   },
   'header.greeting': { tr: 'Merhaba, {name}!', en: 'Hello, {name}!' },
   'actions.addActivity': { tr: 'Aktivite Ekle', en: 'Add Activity' },
@@ -38,7 +38,7 @@ const translations: Translations = {
   'form.loading': { tr: 'Yükleniyor...', en: 'Loading...' },
   'form.selectActivityLabel': {
     tr: '{activity} aktivitesini seç',
-    en: 'Select {activity} activity'
+    en: 'Select {activity} activity',
   },
 
   'list.newActivity': { tr: 'Yeni Aktivite', en: 'New Activity' },
@@ -48,19 +48,19 @@ const translations: Translations = {
   'list.delete': { tr: 'Sil', en: 'Delete' },
   'list.deleteConfirm': {
     tr: 'Silmek istediğine emin misin?',
-    en: 'Are you sure you want to delete?'
+    en: 'Are you sure you want to delete?',
   },
   'list.deleteConfirmTitle': {
     tr: 'Aktiviteyi Sil',
-    en: 'Delete Activity'
+    en: 'Delete Activity',
   },
   'list.deleteConfirmMessage': {
     tr: '"{activity}" aktivitesini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.',
-    en: 'Are you sure you want to delete the activity "{activity}"? This action cannot be undone.'
+    en: 'Are you sure you want to delete the activity "{activity}"? This action cannot be undone.',
   },
   'list.deleteDisabled': {
     tr: 'Geçmiş tarihli aktiviteleri silemezsin.',
-    en: 'You cannot delete activities logged on previous days.'
+    en: 'You cannot delete activities logged on previous days.',
   },
   'list.edit': { tr: 'Düzenle', en: 'Edit' },
   'list.editingTitle': { tr: 'Aktiviteyi Düzenle', en: 'Edit Activity' },
@@ -70,58 +70,70 @@ const translations: Translations = {
   'activities.custom.title': { tr: 'Aktivite Listesini Özelleştir', en: 'Customize Activities' },
   'activities.custom.subtitle': {
     tr: 'Standart aktivitelerin yanı sıra kendine özel aktiviteler ekleyebilir, düzenleyebilir veya kaldırabilirsin.',
-    en: 'Add, edit or remove personalised activities alongside the defaults.'
+    en: 'Add, edit or remove personalised activities alongside the defaults.',
   },
   'activities.custom.fields.label': { tr: 'Aktivite Adı', en: 'Activity Name' },
-  'activities.custom.fields.labelEn': { tr: 'Aktivite Adı (EN - opsiyonel)', en: 'Activity Name (TR - optional)' },
+  'activities.custom.fields.labelEn': {
+    tr: 'Aktivite Adı (EN - opsiyonel)',
+    en: 'Activity Name (TR - optional)',
+  },
   'activities.custom.fields.optional': { tr: 'opsiyonel', en: 'optional' },
   'activities.custom.fields.labelEnHint': {
     tr: 'Boş bırakılırsa Türkçe adı kullanılacak.',
-    en: 'If left empty, the Turkish name will be used.'
+    en: 'If left empty, the Turkish name will be used.',
   },
   'activities.custom.fields.icon': { tr: 'Emoji/Sembol', en: 'Emoji/Icon' },
   'activities.custom.fields.unit': { tr: 'Birim', en: 'Unit' },
   'activities.custom.fields.unitEn': { tr: 'Birim (EN - opsiyonel)', en: 'Unit (TR - optional)' },
   'activities.custom.fields.unitEnHint': {
     tr: 'Boş bırakılırsa Türkçe birimi kullanılacak.',
-    en: 'If left empty, the Turkish unit will be used.'
+    en: 'If left empty, the Turkish unit will be used.',
   },
   'activities.custom.fields.multiplier': { tr: 'Çarpan', en: 'Multiplier' },
   'activities.custom.fields.defaultAmount': { tr: 'Varsayılan', en: 'Default' },
   'activities.custom.fields.description': { tr: 'Açıklama', en: 'Description' },
-  'activities.custom.fields.descriptionEn': { tr: 'Açıklama (EN - opsiyonel)', en: 'Description (TR - optional)' },
+  'activities.custom.fields.descriptionEn': {
+    tr: 'Açıklama (EN - opsiyonel)',
+    en: 'Description (TR - optional)',
+  },
   'activities.custom.fields.descriptionHint': {
     tr: 'Boş bırakılırsa Türkçe açıklama kullanılacak.',
-    en: 'If left empty, the English description will be used.'
+    en: 'If left empty, the English description will be used.',
   },
   'activities.custom.placeholders.description': { tr: 'Açıklama girin', en: 'Açıklama girin' },
-  'activities.custom.placeholders.descriptionEn': { tr: 'Enter description', en: 'Enter description' },
+  'activities.custom.placeholders.descriptionEn': {
+    tr: 'Enter description',
+    en: 'Enter description',
+  },
   'activities.custom.placeholders.label': { tr: 'Örn. Yüzme', en: 'e.g. Swimming' },
   'activities.custom.placeholders.labelEn': { tr: 'Örn. Yüzme', en: 'e.g. Swimming' },
   'activities.custom.placeholders.unit': { tr: 'Örn. dakika', en: 'e.g. minutes' },
   'activities.custom.placeholders.unitEn': { tr: 'Örn. dakika', en: 'e.g. minutes' },
-  'activities.custom.errors.label': { tr: 'Aktivite adı gerekli.', en: 'Activity name is required.' },
+  'activities.custom.errors.label': {
+    tr: 'Aktivite adı gerekli.',
+    en: 'Activity name is required.',
+  },
   'activities.custom.errors.icon': { tr: 'Emoji alanı boş olamaz.', en: 'Emoji cannot be empty.' },
   'activities.custom.errors.unit': { tr: 'Birim alanı boş olamaz.', en: 'Unit cannot be empty.' },
   'activities.custom.errors.multiplier': {
     tr: 'Çarpan pozitif bir sayı olmalı.',
-    en: 'Multiplier must be a positive number.'
+    en: 'Multiplier must be a positive number.',
   },
   'activities.custom.errors.defaultAmount': {
     tr: 'Varsayılan miktar pozitif bir tam sayı olmalı.',
-    en: 'Default amount must be a positive integer.'
+    en: 'Default amount must be a positive integer.',
   },
   'activities.custom.errors.cannotDeleteBase': {
     tr: 'Varsayılan aktiviteler silinemez, ancak düzenlenebilir.',
-    en: 'Default activities cannot be deleted, but can be edited.'
+    en: 'Default activities cannot be deleted, but can be edited.',
   },
   'activities.custom.errors.duplicate': {
     tr: 'Bu isimle başka bir aktivite zaten var.',
-    en: 'Another activity already uses this identifier.'
+    en: 'Another activity already uses this identifier.',
   },
   'activities.custom.errors.inUse': {
     tr: 'Bu aktivite geçmiş kayıtlarda kullanıldığı için silinemez.',
-    en: 'This activity already has records and cannot be removed.'
+    en: 'This activity already has records and cannot be removed.',
   },
   'activities.custom.add': { tr: 'Aktiviteyi Ekle', en: 'Add Activity' },
   'activities.custom.save': { tr: 'Aktiviteyi Kaydet', en: 'Save Activity' },
@@ -129,36 +141,36 @@ const translations: Translations = {
   'activities.custom.baseList': { tr: 'Hazır Aktiviteler', en: 'Default Activities' },
   'activities.custom.empty': {
     tr: 'Henüz özel aktivite eklemedin.',
-    en: 'You have not added any custom activities yet.'
+    en: 'You have not added any custom activities yet.',
   },
   'activities.custom.edit': { tr: 'Düzenle', en: 'Edit' },
   'activities.custom.remove': { tr: 'Sil', en: 'Remove' },
   'activities.custom.confirmDelete': {
     tr: 'Bu aktiviteyi silmek istediğine emin misin?',
-    en: 'Are you sure you want to remove this activity?'
+    en: 'Are you sure you want to remove this activity?',
   },
 
   'stats.todayPoints': { tr: 'Bugünkü Puan', en: 'Today’s Points' },
   'stats.totalPoints': { tr: 'Toplam Kazanılan Puan', en: 'Total Points Earned' },
   'stats.totalActivities': {
     tr: 'Toplam {count} aktivite kaydı',
-    en: '{count} total activities'
+    en: '{count} total activities',
   },
   'stats.streak': { tr: 'Hedef Tutma Serisi', en: 'Goal Streak' },
   'stats.streakDesc': {
     tr: 'Günlük 10.000 puan serisi',
-    en: 'Daily 10,000 points streak'
+    en: 'Daily 10,000 points streak',
   },
   'stats.overview': { tr: 'Genel Bakış', en: 'Overview' },
   'stats.breakdownToday': { tr: 'Bugünkü Dağılım', en: "Today's Breakdown" },
   'stats.noActivityToday': {
     tr: 'Bugün henüz aktivite eklenmedi.',
-    en: 'No activity added today.'
+    en: 'No activity added today.',
   },
   'stats.lastSeven': { tr: 'Son 7 Gün', en: 'Last 7 Days' },
   'stats.sectionToggle': {
     tr: '{section} bölümünün görünürlüğünü değiştir',
-    en: 'Toggle {section} section visibility'
+    en: 'Toggle {section} section visibility',
   },
   'stats.noData': { tr: 'Henüz veri yok.', en: 'No data yet.' },
   'stats.target': { tr: 'Hedef', en: 'Target' },
@@ -166,62 +178,62 @@ const translations: Translations = {
   'stats.highlight.bestDay': { tr: 'En yüksek puanlı gün', en: 'Best scoring day' },
   'stats.highlight.bestDayFallback': {
     tr: 'Henüz bir gün kaydı yok.',
-    en: 'No day recorded yet.'
+    en: 'No day recorded yet.',
   },
   'stats.highlight.bestActivity': {
     tr: 'En çok puan getiren aktivite',
-    en: 'Top scoring activity'
+    en: 'Top scoring activity',
   },
   'stats.highlight.bestActivityFallback': {
     tr: 'Henüz aktivite yok.',
-    en: 'No activities yet.'
+    en: 'No activities yet.',
   },
   'stats.highlight.sessions': { tr: 'seans', en: 'sessions' },
   'stats.highlight.currentStreak': { tr: 'Aktif seri', en: 'Current streak' },
   'stats.highlight.totalActivities': {
     tr: '{count} toplam aktivite',
-    en: '{count} total activities'
+    en: '{count} total activities',
   },
   'stats.highlight.averageDaily': {
     tr: 'Ortalama günlük puan',
-    en: 'Average daily points'
+    en: 'Average daily points',
   },
   'stats.averageDaily': {
     tr: 'Ortalama Günlük',
-    en: 'Average Daily'
+    en: 'Average Daily',
   },
   'stats.perActivity': {
     tr: 'Aktivite Başına',
-    en: 'Per Activity'
+    en: 'Per Activity',
   },
   'stats.highlight.totalDays': {
     tr: '{count} gün kayıt',
-    en: '{count} days recorded'
+    en: '{count} days recorded',
   },
   'stats.highlight.totalPoints': {
     tr: 'Toplam puan',
-    en: 'Total points'
+    en: 'Total points',
   },
   'stats.highlight.todayProgress': {
     tr: 'Bugünkü ilerleme',
-    en: 'Today\'s progress'
+    en: "Today's progress",
   },
   'stats.highlight.complete': {
     tr: 'tamamlandı',
-    en: 'complete'
+    en: 'complete',
   },
   'stats.progressLabel': {
     tr: 'İlerleme: {current} / {target} puan',
-    en: 'Progress: {current} / {target} points'
+    en: 'Progress: {current} / {target} points',
   },
   'stats.goalCompleted': {
     tr: 'Hedef Tamamlandı!',
-    en: 'Goal Completed!'
+    en: 'Goal Completed!',
   },
   'stats.detailed.title': { tr: 'Detaylı İstatistikler', en: 'Detailed Statistics' },
   'stats.detailed.subtitle': {
     tr: 'Günlük performansınızı ve aktivite geçmişinizi detaylı olarak görüntüleyin.',
-    en: 'View your daily performance and activity history in detail.'
+    en: 'View your daily performance and activity history in detail.',
   },
   'stats.detailed.dailyStats': { tr: 'Günlük İstatistikler', en: 'Daily Statistics' },
   'stats.detailed.activityBreakdown': { tr: 'Aktivite Dağılımı', en: 'Activity Breakdown' },
@@ -235,13 +247,19 @@ const translations: Translations = {
   'stats.detailed.dayDetails': { tr: 'Gün Detayları', en: 'Day Details' },
   'stats.detailed.activitiesOnDay': { tr: 'Bu günkü aktiviteler', en: 'Activities on this day' },
   'stats.detailed.trendChart': { tr: 'Trend Grafiği', en: 'Trend Chart' },
-  'stats.detailed.activityComparison': { tr: 'Aktivite Karşılaştırması', en: 'Activity Comparison' },
+  'stats.detailed.activityComparison': {
+    tr: 'Aktivite Karşılaştırması',
+    en: 'Activity Comparison',
+  },
   'stats.detailed.activityDistribution': { tr: 'Aktivite Dağılımı', en: 'Activity Distribution' },
-  'stats.detailed.activityHeatmap': { tr: 'Yıllık Aktivite Haritası', en: 'Yearly Activity Heatmap' },
+  'stats.detailed.activityHeatmap': {
+    tr: 'Yıllık Aktivite Haritası',
+    en: 'Yearly Activity Heatmap',
+  },
   'stats.duration.title': { tr: 'Aktivite Süresi Analizi', en: 'Activity Duration Analysis' },
   'stats.duration.subtitle': {
     tr: 'Günlük aktivite sürelerinizi ve ortalamalarınızı görüntüleyin.',
-    en: 'View your daily activity durations and averages.'
+    en: 'View your daily activity durations and averages.',
   },
   'stats.duration.averageDaily': { tr: 'Ortalama Günlük Süre', en: 'Average Daily Duration' },
   'stats.duration.totalDuration': { tr: 'Toplam Süre', en: 'Total Duration' },
@@ -249,57 +267,57 @@ const translations: Translations = {
   'stats.duration.longestDay': { tr: 'En Uzun Gün', en: 'Longest Day' },
   'stats.duration.noDurationData': {
     tr: 'Henüz süre kaydı yok. Aktivite eklerken süre takibi yapabilirsiniz.',
-    en: 'No duration data yet. You can track duration when adding activities.'
+    en: 'No duration data yet. You can track duration when adding activities.',
   },
   'toast.activityAdded': {
     tr: 'Aktivite başarıyla eklendi',
-    en: 'Activity added successfully'
+    en: 'Activity added successfully',
   },
   'toast.activityUpdated': {
     tr: 'Aktivite başarıyla güncellendi',
-    en: 'Activity updated successfully'
+    en: 'Activity updated successfully',
   },
   'toast.activityDeleted': {
     tr: 'Aktivite başarıyla silindi',
-    en: 'Activity deleted successfully'
+    en: 'Activity deleted successfully',
   },
   'errors.storageParseFailed': {
     tr: 'Veri okunamadı. Lütfen sayfayı yenileyin.',
-    en: 'Failed to read data. Please refresh the page.'
+    en: 'Failed to read data. Please refresh the page.',
   },
   'errors.storageQuotaExceeded': {
     tr: 'Depolama alanı dolu. Eski kayıtları silin.',
-    en: 'Storage quota exceeded. Please delete old records.'
+    en: 'Storage quota exceeded. Please delete old records.',
   },
   'errors.storageSaveFailed': {
     tr: 'Veri kaydedilemedi. Lütfen tekrar deneyin.',
-    en: 'Failed to save data. Please try again.'
+    en: 'Failed to save data. Please try again.',
   },
   'data.export': { tr: 'Dışa Aktar', en: 'Export' },
   'data.exportTooltip': {
     tr: 'Tüm verileri JSON dosyası olarak indir',
-    en: 'Download all data as JSON file'
+    en: 'Download all data as JSON file',
   },
   'data.exportSuccess': {
     tr: 'Veriler başarıyla dışa aktarıldı',
-    en: 'Data exported successfully'
+    en: 'Data exported successfully',
   },
   'data.exportFailed': {
     tr: 'Veri dışa aktarma başarısız',
-    en: 'Data export failed'
+    en: 'Data export failed',
   },
   'data.import': { tr: 'İçe Aktar', en: 'Import' },
   'data.importTooltip': {
     tr: 'JSON dosyasından veri yükle',
-    en: 'Load data from JSON file'
+    en: 'Load data from JSON file',
   },
   'data.importConfirm': {
     tr: '{activities} aktivite ve "{settings}" kullanıcı ayarlarını içe aktarmak istediğinize emin misiniz? Mevcut veriler üzerine yazılacaktır.',
-    en: 'Are you sure you want to import {activities} activities and settings for "{settings}"? This will overwrite your current data.'
+    en: 'Are you sure you want to import {activities} activities and settings for "{settings}"? This will overwrite your current data.',
   },
   'data.importFailed': {
     tr: 'Veri içe aktarma başarısız. Dosya formatını kontrol edin.',
-    en: 'Data import failed. Please check the file format.'
+    en: 'Data import failed. Please check the file format.',
   },
 
   'export.title': { tr: 'Veri Dışa Aktar', en: 'Export Data' },
@@ -312,22 +330,34 @@ const translations: Translations = {
   'export.startDate': { tr: 'Başlangıç', en: 'Start Date' },
   'export.endDate': { tr: 'Bitiş', en: 'End Date' },
   'export.export': { tr: 'Dışa Aktar', en: 'Export' },
-  'export.csvSuccess': { tr: 'CSV dosyası başarıyla dışa aktarıldı', en: 'CSV file exported successfully' },
-  'export.pdfSuccess': { tr: 'PDF raporu başarıyla oluşturuldu', en: 'PDF report created successfully' },
-  'export.jsonSuccess': { tr: 'JSON yedek dosyası başarıyla dışa aktarıldı', en: 'JSON backup file exported successfully' },
+  'export.csvSuccess': {
+    tr: 'CSV dosyası başarıyla dışa aktarıldı',
+    en: 'CSV file exported successfully',
+  },
+  'export.pdfSuccess': {
+    tr: 'PDF raporu başarıyla oluşturuldu',
+    en: 'PDF report created successfully',
+  },
+  'export.jsonSuccess': {
+    tr: 'JSON yedek dosyası başarıyla dışa aktarıldı',
+    en: 'JSON backup file exported successfully',
+  },
   'export.failed': { tr: 'Dışa aktarma başarısız', en: 'Export failed' },
-  'export.dateRangeRequired': { tr: 'Lütfen tarih aralığı seçin', en: 'Please select a date range' },
+  'export.dateRangeRequired': {
+    tr: 'Lütfen tarih aralığı seçin',
+    en: 'Please select a date range',
+  },
 
   'settings.setProfile': { tr: 'Profil Ayarla', en: 'Set Profile' },
   'settings.title': { tr: 'Seni Tanıyalım', en: 'Tell Us About You' },
   'settings.subtitle': {
     tr: 'İsmini ve günlük puan hedefini belirle, motivasyonun artsın.',
-    en: 'Set your name and daily points goal to stay motivated.'
+    en: 'Set your name and daily points goal to stay motivated.',
   },
   'settings.appSettings': { tr: 'Uygulama Ayarları', en: 'App Settings' },
   'settings.appSettingsSubtitle': {
     tr: 'Dil, tema ve veri yönetimi ayarları',
-    en: 'Language, theme and data management settings'
+    en: 'Language, theme and data management settings',
   },
   'settings.nameLabel': { tr: 'İsmin', en: 'Your name' },
   'settings.namePlaceholder': { tr: 'Örn. Mustafa', en: 'e.g. Alex' },
@@ -342,19 +372,19 @@ const translations: Translations = {
   'settings.save': { tr: 'Kaydet', en: 'Save' },
   'settings.errors.nameRequired': {
     tr: 'İsim boş olamaz.',
-    en: 'Name cannot be empty.'
+    en: 'Name cannot be empty.',
   },
   'settings.errors.targetPositive': {
-    tr: '0\'dan büyük bir sayı girmelisiniz.',
-    en: 'You must enter a number greater than 0.'
+    tr: "0'dan büyük bir sayı girmelisiniz.",
+    en: 'You must enter a number greater than 0.',
   },
   'settings.errors.targetRange': {
     tr: 'Hedef 1.000 ile 100.000 arasında olmalıdır.',
-    en: 'Goal must be between 1,000 and 100,000.'
+    en: 'Goal must be between 1,000 and 100,000.',
   },
   'settings.showOnboarding': {
     tr: 'Tanıtım Turunu Tekrar Göster',
-    en: 'Show Onboarding Tour Again'
+    en: 'Show Onboarding Tour Again',
   },
 
   'footer.byName': { tr: 'Mustafa Evleksiz', en: 'Mustafa Evleksiz' },
@@ -362,17 +392,17 @@ const translations: Translations = {
   'achievements.title': { tr: 'Başarımlar', en: 'Achievements' },
   'achievements.subtitle': {
     tr: 'Kazandığın rozetleri görüntüle ve yeni hedefler belirle',
-    en: 'View your earned badges and set new goals'
+    en: 'View your earned badges and set new goals',
   },
   'achievements.progress': { tr: 'İlerleme', en: 'Progress' },
 
   'pwa.installTitle': {
-    tr: 'SportTrack\'i Yükle',
-    en: 'Install SportTrack'
+    tr: "SportTrack'i Yükle",
+    en: 'Install SportTrack',
   },
   'pwa.installDescription': {
     tr: 'Daha hızlı erişim ve offline çalışma için uygulamayı yükle',
-    en: 'Install the app for faster access and offline functionality'
+    en: 'Install the app for faster access and offline functionality',
   },
   'pwa.install': { tr: 'Yükle', en: 'Install' },
   'pwa.dismiss': { tr: 'Daha Sonra', en: 'Later' },
@@ -380,39 +410,39 @@ const translations: Translations = {
   'notifications.title': { tr: 'Bildirimler', en: 'Notifications' },
   'notifications.subtitle': {
     tr: 'Aktivite hatırlatıcıları ve başarı bildirimleri',
-    en: 'Activity reminders and achievement notifications'
+    en: 'Activity reminders and achievement notifications',
   },
   'notifications.requestPermission': {
     tr: 'Bildirim İzni İste',
-    en: 'Request Notification Permission'
+    en: 'Request Notification Permission',
   },
   'notifications.permissionGranted': {
     tr: 'Bildirim izni verildi',
-    en: 'Notification permission granted'
+    en: 'Notification permission granted',
   },
   'notifications.permissionDenied': {
     tr: 'Bildirim izni reddedildi',
-    en: 'Notification permission denied'
+    en: 'Notification permission denied',
   },
   'notifications.notSupported': {
     tr: 'Tarayıcınız bildirimleri desteklemiyor',
-    en: 'Your browser does not support notifications'
+    en: 'Your browser does not support notifications',
   },
   'notifications.dailyReminder': {
     tr: 'Günlük Hatırlatıcı',
-    en: 'Daily Reminder'
+    en: 'Daily Reminder',
   },
   'notifications.goalCompletion': {
     tr: 'Hedef Tamamlama Bildirimi',
-    en: 'Goal Completion Notification'
+    en: 'Goal Completion Notification',
   },
   'notifications.streakReminder': {
     tr: 'Seri Hatırlatıcısı',
-    en: 'Streak Reminder'
+    en: 'Streak Reminder',
   },
   'notifications.saveFailed': {
     tr: 'Bildirim ayarları kaydedilemedi',
-    en: 'Failed to save notification settings'
+    en: 'Failed to save notification settings',
   },
 
   'quickAdd.title': { tr: 'Hızlı Ekle', en: 'Quick Add' },
@@ -421,16 +451,16 @@ const translations: Translations = {
   'quickAdd.failed': { tr: 'Aktivite eklenemedi', en: 'Failed to add activity' },
   'quickAdd.addActivity': {
     tr: '{activity} aktivitesini ekle',
-    en: 'Add {activity} activity'
+    en: 'Add {activity} activity',
   },
   'quickAdd.addActivityLabel': {
     tr: '{activity} aktivitesini ekle',
-    en: 'Add {activity} activity'
+    en: 'Add {activity} activity',
   },
   'quickAdd.confirmTitle': { tr: 'Aktivite Ekle', en: 'Add Activity' },
   'quickAdd.confirmMessage': {
     tr: '{activity} aktivitesini {amount} {unit} olarak eklemek istiyor musunuz? ({points} puan)',
-    en: 'Do you want to add {activity} activity with {amount} {unit}? ({points} points)'
+    en: 'Do you want to add {activity} activity with {amount} {unit}? ({points} points)',
   },
   'quickAdd.confirmAdd': { tr: 'Ekle', en: 'Add' },
 
@@ -451,7 +481,10 @@ const translations: Translations = {
   'filters.activityType': { tr: 'Aktivite Türü', en: 'Activity Type' },
   'filters.allActivities': { tr: 'Tüm Aktiviteler', en: 'All Activities' },
   'filters.search': { tr: 'Ara', en: 'Search' },
-  'filters.searchPlaceholder': { tr: 'Aktivite adı veya not ara...', en: 'Search activity name or note...' },
+  'filters.searchPlaceholder': {
+    tr: 'Aktivite adı veya not ara...',
+    en: 'Search activity name or note...',
+  },
   'filters.sortBy': { tr: 'Sırala', en: 'Sort By' },
   'filters.sort.dateDesc': { tr: 'Tarih (Yeni → Eski)', en: 'Date (Newest → Oldest)' },
   'filters.sort.dateAsc': { tr: 'Tarih (Eski → Yeni)', en: 'Date (Oldest → Newest)' },
@@ -460,89 +493,95 @@ const translations: Translations = {
   'filters.clear': { tr: 'Filtreleri Temizle', en: 'Clear Filters' },
   'filters.results': { tr: 'Filtrelenmiş Sonuçlar', en: 'Filtered Results' },
   'filters.activities': { tr: 'aktivite', en: 'activities' },
-  'filters.noResults': { tr: 'Filtrelere uygun aktivite bulunamadı', en: 'No activities match the filters' },
+  'filters.noResults': {
+    tr: 'Filtrelere uygun aktivite bulunamadı',
+    en: 'No activities match the filters',
+  },
 
   'appleHealth.import': { tr: 'Apple Sağlık Verisi', en: 'Apple Health Data' },
   'appleHealth.importLabel': {
     tr: 'Apple Health CSV dosyasını içe aktar',
-    en: 'Import Apple Health CSV file'
+    en: 'Import Apple Health CSV file',
   },
   'appleHealth.parseFailed': {
     tr: 'CSV dosyası parse edilemedi: {errors}',
-    en: 'Failed to parse CSV file: {errors}'
+    en: 'Failed to parse CSV file: {errors}',
   },
   'appleHealth.confirmTitle': {
     tr: 'Apple Health Verilerini İçe Aktar',
-    en: 'Import Apple Health Data'
+    en: 'Import Apple Health Data',
   },
   'appleHealth.confirmMessage': {
     tr: '{count} günlük adım verisi bulundu ({start} - {end}). Mevcut {existing} adım kaydı silinecek ve yenileriyle değiştirilecek. Devam etmek istiyor musunuz?',
-    en: 'Found {count} days of step data ({start} - {end}). Existing {existing} step records will be deleted and replaced. Do you want to continue?'
+    en: 'Found {count} days of step data ({start} - {end}). Existing {existing} step records will be deleted and replaced. Do you want to continue?',
   },
   'appleHealth.confirmImport': { tr: 'İçe Aktar', en: 'Import' },
   'appleHealth.importSuccess': {
     tr: '{count} günlük adım verisi içe aktarıldı ({replaced} kayıt değiştirildi)',
-    en: 'Imported {count} days of step data ({replaced} records replaced)'
+    en: 'Imported {count} days of step data ({replaced} records replaced)',
   },
   'appleHealth.importFailed': {
     tr: 'Apple Health verileri içe aktarılamadı',
-    en: 'Failed to import Apple Health data'
+    en: 'Failed to import Apple Health data',
   },
   'appleHealth.guideTitle': {
     tr: 'Apple Health İçe Aktarma Rehberi',
-    en: 'Apple Health Import Guide'
+    en: 'Apple Health Import Guide',
   },
   'appleHealth.step1': {
-    tr: '1. Apple Health\'tan Veri Dışa Aktarma',
-    en: '1. Export Data from Apple Health'
+    tr: "1. Apple Health'tan Veri Dışa Aktarma",
+    en: '1. Export Data from Apple Health',
   },
   'appleHealth.step1a': {
-    tr: 'iPhone\'unuzda Apple Health uygulamasını açın',
-    en: 'Open the Apple Health app on your iPhone'
+    tr: "iPhone'unuzda Apple Health uygulamasını açın",
+    en: 'Open the Apple Health app on your iPhone',
   },
   'appleHealth.step1b': {
     tr: 'Sağ alt köşedeki "Profil" sekmesine gidin',
-    en: 'Go to the "Profile" tab in the bottom right corner'
+    en: 'Go to the "Profile" tab in the bottom right corner',
   },
   'appleHealth.step1c': {
     tr: '"Verileri Dışa Aktar" seçeneğini bulun ve XML veya CSV formatını seçin',
-    en: 'Find "Export Data" option and select XML or CSV format'
+    en: 'Find "Export Data" option and select XML or CSV format',
   },
   'appleHealth.step2': {
     tr: '2. Dosya Hazırlama',
-    en: '2. Prepare File'
+    en: '2. Prepare File',
   },
   'appleHealth.step2a': {
     tr: 'Dışa aktarılan dosyada "Step Count" (Adım Sayısı) verilerini bulun. CSV veya XML formatında olabilir. Büyük dosyalar (1GB+) için işlem biraz zaman alabilir.',
-    en: 'In the exported file, find "Step Count" data. It can be in CSV or XML format. Large files (1GB+) may take some time to process.'
+    en: 'In the exported file, find "Step Count" data. It can be in CSV or XML format. Large files (1GB+) may take some time to process.',
   },
   'appleHealth.step2b': {
     tr: 'type,sourceName,unit,value,startDate,endDate\nHKQuantityTypeIdentifierStepCount,Health,count,8500,2024-01-01 00:00:00 +0000,2024-01-01 23:59:59 +0000',
-    en: 'type,sourceName,unit,value,startDate,endDate\nHKQuantityTypeIdentifierStepCount,Health,count,8500,2024-01-01 00:00:00 +0000,2024-01-01 23:59:59 +0000'
+    en: 'type,sourceName,unit,value,startDate,endDate\nHKQuantityTypeIdentifierStepCount,Health,count,8500,2024-01-01 00:00:00 +0000,2024-01-01 23:59:59 +0000',
   },
   'appleHealth.step3': {
-    tr: '3. SportTrack\'e İçe Aktarma',
-    en: '3. Import to SportTrack'
+    tr: "3. SportTrack'e İçe Aktarma",
+    en: '3. Import to SportTrack',
   },
   'appleHealth.step3a': {
     tr: 'Ayarlar menüsünden "Apple Health" butonuna tıklayın ve XML veya CSV dosyanızı seçin. Sistem otomatik olarak adım verilerini "Yürüme" aktivitesi olarak içe aktaracaktır. Büyük dosyalar için işlem sırasında ilerleme çubuğu gösterilecektir.',
-    en: 'Click the "Apple Health" button in the settings menu and select your XML or CSV file. The system will automatically import step data as "Walking" activities. A progress bar will be shown for large files.'
+    en: 'Click the "Apple Health" button in the settings menu and select your XML or CSV file. The system will automatically import step data as "Walking" activities. A progress bar will be shown for large files.',
   },
   'appleHealth.note': {
     tr: 'Not: Mevcut yürüme aktiviteleri silinip yenileriyle değiştirilecektir. Bu işlem geri alınamaz.',
-    en: 'Note: Existing walking activities will be deleted and replaced. This action cannot be undone.'
+    en: 'Note: Existing walking activities will be deleted and replaced. This action cannot be undone.',
   },
   'appleHealth.largeFileWarning': {
     tr: 'Büyük dosya tespit edildi ({size}MB). İşlem biraz zaman alabilir. Devam etmek istiyor musunuz?',
-    en: 'Large file detected ({size}MB). Processing may take some time. Do you want to continue?'
+    en: 'Large file detected ({size}MB). Processing may take some time. Do you want to continue?',
   },
   'appleHealth.processing': {
     tr: 'İşleniyor: {processed} / {total} kayıt ({percentage}%)',
-    en: 'Processing: {processed} / {total} records ({percentage}%)'
+    en: 'Processing: {processed} / {total} records ({percentage}%)',
   },
 
   'templates.title': { tr: 'Aktivite Şablonları', en: 'Activity Templates' },
-  'templates.subtitle': { tr: 'Hızlı başlangıç için hazır kombinasyonlar', en: 'Ready combinations for quick start' },
+  'templates.subtitle': {
+    tr: 'Hızlı başlangıç için hazır kombinasyonlar',
+    en: 'Ready combinations for quick start',
+  },
   'templates.category.quick': { tr: 'Hızlı', en: 'Quick' },
   'templates.category.cardio': { tr: 'Kardiyo', en: 'Cardio' },
   'templates.category.strength': { tr: 'Güç', en: 'Strength' },
@@ -553,15 +592,18 @@ const translations: Translations = {
   'templates.confirmTitle': { tr: 'Şablonu Ekle', en: 'Add Template' },
   'templates.confirmMessage': {
     tr: '{template} şablonunu ({count} aktivite: {activities}) eklemek istediğinize emin misiniz?',
-    en: 'Are you sure you want to add the {template} template ({count} activities: {activities})?'
+    en: 'Are you sure you want to add the {template} template ({count} activities: {activities})?',
   },
   'templates.confirmAdd': { tr: 'Ekle', en: 'Add' },
   'templates.added': { tr: 'şablonu eklendi', en: 'template added' },
-  'templates.failed': { tr: 'Şablon aktiviteleri eklenemedi', en: 'Failed to add template activities' },
+  'templates.failed': {
+    tr: 'Şablon aktiviteleri eklenemedi',
+    en: 'Failed to add template activities',
+  },
   'templates.template': { tr: 'şablon', en: 'template' },
   'templates.selectTemplate': {
     tr: '{template} şablonunu seç',
-    en: 'Select {template} template'
+    en: 'Select {template} template',
   },
 
   'export.mood': { tr: 'Ruh Hali', en: 'Mood' },
@@ -592,8 +634,14 @@ const translations: Translations = {
   'challenges.addChallenge': { tr: 'Yeni Hedef Ekle', en: 'Add New Goal' },
   'challenges.editChallenge': { tr: 'Hedefi Düzenle', en: 'Edit Goal' },
   'challenges.deleteChallenge': { tr: 'Hedefi Sil', en: 'Delete Goal' },
-  'challenges.deleteConfirm': { tr: 'Bu hedefi silmek istediğinize emin misiniz?', en: 'Are you sure you want to delete this goal?' },
-  'challenges.completedMessage': { tr: 'Tebrikler! "{name}" hedefini tamamladın!', en: 'Congratulations! You completed the "{name}" goal!' },
+  'challenges.deleteConfirm': {
+    tr: 'Bu hedefi silmek istediğinize emin misiniz?',
+    en: 'Are you sure you want to delete this goal?',
+  },
+  'challenges.completedMessage': {
+    tr: 'Tebrikler! "{name}" hedefini tamamladın!',
+    en: 'Congratulations! You completed the "{name}" goal!',
+  },
   'challenges.name': { tr: 'İsim', en: 'Name' },
   'challenges.description': { tr: 'Açıklama', en: 'Description' },
   'challenges.targetPoints': { tr: 'Hedef Puan', en: 'Target Points' },
@@ -619,21 +667,27 @@ const translations: Translations = {
   'timer.running': { tr: 'Çalışıyor...', en: 'Running...' },
   'timer.paused': { tr: 'Duraklatıldı', en: 'Paused' },
 
-  'activityTrend.title': { tr: 'Aktivite Türleri Trend Analizi', en: 'Activity Type Trend Analysis' },
+  'activityTrend.title': {
+    tr: 'Aktivite Türleri Trend Analizi',
+    en: 'Activity Type Trend Analysis',
+  },
   'activityTrend.subtitle': {
     tr: 'Zaman içinde aktivite türlerinizin performansını görüntüleyin.',
-    en: 'View your activity types performance over time.'
+    en: 'View your activity types performance over time.',
   },
   'activityTrend.noData': {
     tr: 'Henüz trend verisi yok.',
-    en: 'No trend data yet.'
+    en: 'No trend data yet.',
   },
   'activityTrend.totalCount': { tr: 'Toplam', en: 'Total' },
   'activityTrend.totalPoints': { tr: 'Toplam Puan', en: 'Total Points' },
   'activityTrend.avgPerDay': { tr: 'Günlük Ortalama', en: 'Daily Avg' },
 
   'timeAnalysis.title': { tr: 'Zaman Analizi', en: 'Time Analysis' },
-  'timeAnalysis.subtitle': { tr: 'En aktif olduğun saatler ve günler', en: 'Your most active hours and days' },
+  'timeAnalysis.subtitle': {
+    tr: 'En aktif olduğun saatler ve günler',
+    en: 'Your most active hours and days',
+  },
   'timeAnalysis.mostActiveHour': { tr: 'En Aktif Saat', en: 'Most Active Hour' },
   'timeAnalysis.mostActiveDay': { tr: 'En Aktif Gün', en: 'Most Active Day' },
   'timeAnalysis.hourDistribution': { tr: 'Saatlere Göre Dağılım', en: 'Distribution by Hour' },
@@ -642,7 +696,10 @@ const translations: Translations = {
   'timeAnalysis.points': { tr: 'Puan', en: 'Points' },
 
   'comparison.title': { tr: 'Haftalık ve Aylık Karşılaştırma', en: 'Weekly & Monthly Comparison' },
-  'comparison.subtitle': { tr: 'Bu hafta/ay ile geçen hafta/ay karşılaştırması', en: 'Compare this week/month with previous week/month' },
+  'comparison.subtitle': {
+    tr: 'Bu hafta/ay ile geçen hafta/ay karşılaştırması',
+    en: 'Compare this week/month with previous week/month',
+  },
   'comparison.weekly': { tr: 'Haftalık Karşılaştırma', en: 'Weekly Comparison' },
   'comparison.monthly': { tr: 'Aylık Karşılaştırma', en: 'Monthly Comparison' },
   'comparison.totalPoints': { tr: 'Toplam Puan', en: 'Total Points' },
@@ -658,7 +715,10 @@ const translations: Translations = {
   'onboarding.finish': { tr: 'Bitir', en: 'Finish' },
 
   'settings.keyboardShortcuts': { tr: '⌨️ Klavye Kısayolları', en: '⌨️ Keyboard Shortcuts' },
-  'settings.keyboardShortcutsHint': { tr: '? tuşuna basarak kısayolları görebilirsiniz', en: 'Press ? to view keyboard shortcuts' }
+  'settings.keyboardShortcutsHint': {
+    tr: '? tuşuna basarak kısayolları görebilirsiniz',
+    en: 'Press ? to view keyboard shortcuts',
+  },
 };
 
 type I18nContextValue = {
@@ -673,9 +733,9 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLang] = useState<Language>('tr');
 
   useEffect(() => {
-    const saved = (typeof window !== 'undefined'
-      ? localStorage.getItem(STORAGE_KEYS.LANGUAGE)
-      : null) as Language | null;
+    const saved = (
+      typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.LANGUAGE) : null
+    ) as Language | null;
     if (saved === 'tr' || saved === 'en') {
       setLang(saved);
       return;
@@ -712,5 +772,3 @@ export function useI18n() {
   }
   return ctx;
 }
-
-

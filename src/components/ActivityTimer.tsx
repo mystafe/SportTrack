@@ -21,7 +21,7 @@ export function ActivityTimer({ onDurationChange, initialDuration = 0 }: Activit
   const [state, setState] = useState<TimerState>({
     isRunning: false,
     elapsed: initialDuration,
-    startTime: null
+    startTime: null,
   });
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -31,7 +31,7 @@ export function ActivityTimer({ onDurationChange, initialDuration = 0 }: Activit
       intervalRef.current = setInterval(() => {
         const now = Date.now();
         const elapsed = Math.floor((now - state.startTime!) / 1000) + initialDuration;
-        setState(prev => ({ ...prev, elapsed }));
+        setState((prev) => ({ ...prev, elapsed }));
         onDurationChange?.(elapsed);
       }, 100);
     } else {
@@ -50,20 +50,20 @@ export function ActivityTimer({ onDurationChange, initialDuration = 0 }: Activit
 
   const handleStart = () => {
     if (!state.isRunning) {
-      setState(prev => ({
+      setState((prev) => ({
         isRunning: true,
         elapsed: prev.elapsed,
-        startTime: Date.now() - (prev.elapsed * 1000)
+        startTime: Date.now() - prev.elapsed * 1000,
       }));
     }
   };
 
   const handleStop = () => {
     if (state.isRunning) {
-      setState(prev => ({
+      setState((prev) => ({
         isRunning: false,
         elapsed: prev.elapsed,
-        startTime: null
+        startTime: null,
       }));
     }
   };
@@ -72,7 +72,7 @@ export function ActivityTimer({ onDurationChange, initialDuration = 0 }: Activit
     setState({
       isRunning: false,
       elapsed: 0,
-      startTime: null
+      startTime: null,
     });
     onDurationChange?.(0);
   };
@@ -107,9 +107,11 @@ export function ActivityTimer({ onDurationChange, initialDuration = 0 }: Activit
       </div>
 
       <div className="flex items-center justify-between gap-3">
-        <div className={`flex-1 text-center font-mono ${isMobile ? 'text-2xl' : 'text-3xl'} font-bold ${
-          state.isRunning ? 'text-brand' : 'text-gray-700 dark:text-gray-300'
-        }`}>
+        <div
+          className={`flex-1 text-center font-mono ${isMobile ? 'text-2xl' : 'text-3xl'} font-bold ${
+            state.isRunning ? 'text-brand' : 'text-gray-700 dark:text-gray-300'
+          }`}
+        >
           {formatTime(state.elapsed)}
         </div>
 
@@ -144,4 +146,3 @@ export function ActivityTimer({ onDurationChange, initialDuration = 0 }: Activit
     </div>
   );
 }
-

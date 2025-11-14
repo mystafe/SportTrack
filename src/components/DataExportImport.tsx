@@ -28,7 +28,7 @@ export function DataExportImport() {
         activities,
         settings,
         exportDate: new Date().toISOString(),
-        version: '0.7.7'
+        version: '0.7.7',
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -86,7 +86,7 @@ export function DataExportImport() {
       const confirmed = window.confirm(
         t('data.importConfirm', {
           activities: String(validActivities.length),
-          settings: data.settings.name || 'Unknown'
+          settings: data.settings.name || 'Unknown',
         })
       );
 
@@ -106,8 +106,7 @@ export function DataExportImport() {
       window.location.reload();
     } catch (error) {
       console.error('Import failed:', error);
-      const message =
-        error instanceof Error ? error.message : t('data.importFailed');
+      const message = error instanceof Error ? error.message : t('data.importFailed');
       showToast(message, 'error');
       setIsImporting(false);
       if (fileInputRef.current) {
@@ -128,22 +127,21 @@ export function DataExportImport() {
         >
           💾 {t('data.export')}
         </button>
-      <label className="px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          onChange={handleImport}
-          disabled={isImporting}
-          className="hidden"
-          aria-label={t('data.importTooltip')}
-        />
-        {isImporting ? '⏳' : '📥'} {t('data.import')}
-      </label>
-      {!isMobile && <AppleHealthImport />}
+        <label className="px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleImport}
+            disabled={isImporting}
+            className="hidden"
+            aria-label={t('data.importTooltip')}
+          />
+          {isImporting ? '⏳' : '📥'} {t('data.import')}
+        </label>
+        {!isMobile && <AppleHealthImport />}
       </div>
       <ExportDialog open={showExportDialog} onClose={() => setShowExportDialog(false)} />
     </>
   );
 }
-

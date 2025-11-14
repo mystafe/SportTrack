@@ -24,14 +24,14 @@ export const QuickAdd = memo(function QuickAdd() {
   // Get most used activities (top 6)
   const mostUsedActivities = useMemo(() => {
     const activityCounts = new Map<string, { definition: ActivityDefinition; count: number }>();
-    
+
     // Count activities by key
-    activities.forEach(activity => {
+    activities.forEach((activity) => {
       const existing = activityCounts.get(activity.activityKey);
       if (existing) {
         existing.count++;
       } else {
-        const def = definitions.find(d => d.key === activity.activityKey);
+        const def = definitions.find((d) => d.key === activity.activityKey);
         if (def) {
           activityCounts.set(activity.activityKey, { definition: def, count: 1 });
         }
@@ -40,7 +40,7 @@ export const QuickAdd = memo(function QuickAdd() {
 
     // If no activities yet, show default activities
     if (activityCounts.size === 0) {
-      return definitions.slice(0, 6).map(def => ({ definition: def, count: 0 }));
+      return definitions.slice(0, 6).map((def) => ({ definition: def, count: 0 }));
     }
 
     return Array.from(activityCounts.values())
@@ -54,15 +54,15 @@ export const QuickAdd = memo(function QuickAdd() {
 
   const handleConfirmAdd = useCallback(async () => {
     if (!confirmActivity || isAdding) return;
-    
+
     setIsAdding(confirmActivity.key);
     try {
       const record = addActivity({
         definition: confirmActivity,
         amount: confirmActivity.defaultAmount,
-        performedAt: new Date().toISOString()
+        performedAt: new Date().toISOString(),
       });
-      
+
       showToast(
         `${confirmActivity.icon} ${getActivityLabel(confirmActivity, lang)} ${t('quickAdd.added')}`,
         'success'
@@ -87,14 +87,20 @@ export const QuickAdd = memo(function QuickAdd() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-950 dark:text-white`}>
+        <h3
+          className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-950 dark:text-white`}
+        >
           {t('quickAdd.title')}
         </h3>
-        <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-semibold`}>
+        <span
+          className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-200 font-semibold`}
+        >
           {t('quickAdd.subtitle')}
         </span>
       </div>
-      <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-6'} gap-3 sm:gap-4`}>
+      <div
+        className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-6'} gap-3 sm:gap-4`}
+      >
         {mostUsedActivities.map(({ definition }) => {
           const isAddingThis = isAdding === definition.key;
           return (
@@ -117,7 +123,9 @@ export const QuickAdd = memo(function QuickAdd() {
                 }
                 disabled:opacity-50 disabled:cursor-not-allowed group
               `}
-              aria-label={t('quickAdd.addActivityLabel', { activity: getActivityLabel(definition, lang) })}
+              aria-label={t('quickAdd.addActivityLabel', {
+                activity: getActivityLabel(definition, lang),
+              })}
               aria-busy={isAddingThis}
               aria-disabled={isAddingThis}
               onKeyDown={(e) => {
@@ -129,7 +137,9 @@ export const QuickAdd = memo(function QuickAdd() {
                 }
               }}
             >
-              <div className={`text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300 ${isAddingThis ? 'icon-wiggle-mobile' : ''}`}>
+              <div
+                className={`text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300 ${isAddingThis ? 'icon-wiggle-mobile' : ''}`}
+              >
                 {definition.icon}
               </div>
               <div className="text-xs sm:text-sm font-bold text-center text-gray-950 dark:text-gray-100 line-clamp-2 group-hover:text-brand transition-colors">
@@ -157,7 +167,7 @@ export const QuickAdd = memo(function QuickAdd() {
                 activity: getActivityLabel(confirmActivity, lang),
                 amount: String(confirmActivity.defaultAmount),
                 unit: getActivityUnit(confirmActivity, lang),
-                points: String(confirmActivity.defaultAmount * confirmActivity.multiplier)
+                points: String(confirmActivity.defaultAmount * confirmActivity.multiplier),
               })
             : ''
         }
@@ -170,4 +180,3 @@ export const QuickAdd = memo(function QuickAdd() {
     </div>
   );
 });
-

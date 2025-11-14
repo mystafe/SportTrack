@@ -1,18 +1,11 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   ActivityDefinition,
   ActivityKey,
   BASE_ACTIVITY_DEFINITIONS,
-  BASE_ACTIVITY_MAP
+  BASE_ACTIVITY_MAP,
 } from '@/lib/activityConfig';
 import { startOfDay, subDays } from 'date-fns';
 import { STORAGE_KEYS, TIMEOUTS } from '@/lib/constants';
@@ -101,16 +94,14 @@ function buildRecord(
     description: definition.description,
     descriptionEn: definition.descriptionEn,
     isCustom: definition.isCustom ?? false,
-    duration: duration && duration > 0 ? duration : undefined
+    duration: duration && duration > 0 ? duration : undefined,
   };
 }
 
 function normalizeRecord(record: Partial<ActivityRecord>): ActivityRecord {
   const fallback = BASE_DEFINITION_MAP[record.activityKey ?? ''];
   const multiplier =
-    typeof record.multiplier === 'number'
-      ? record.multiplier
-      : fallback?.multiplier ?? 1;
+    typeof record.multiplier === 'number' ? record.multiplier : (fallback?.multiplier ?? 1);
   const amount = record.amount ?? 0;
 
   return {
@@ -123,15 +114,12 @@ function normalizeRecord(record: Partial<ActivityRecord>): ActivityRecord {
     unitEn: record.unitEn ?? fallback?.unitEn,
     multiplier,
     amount,
-    points:
-      typeof record.points === 'number'
-        ? record.points
-        : computePoints(multiplier, amount),
+    points: typeof record.points === 'number' ? record.points : computePoints(multiplier, amount),
     performedAt: record.performedAt ?? new Date().toISOString(),
     note: record.note ?? null,
     description: record.description ?? fallback?.description,
     descriptionEn: record.descriptionEn ?? fallback?.descriptionEn,
-    isCustom: record.isCustom ?? !fallback
+    isCustom: record.isCustom ?? !fallback,
   };
 }
 
@@ -173,56 +161,50 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
     }
   }, [debouncedActivities, hydrated]);
 
-  const addActivity = useCallback(
-    (input: AddActivityInput) => {
-      const record = buildRecord(
-        input.definition,
-        input.amount,
-        input.performedAt,
-        input.note,
-        input.duration
-      );
-      setActivities((prev) => [record, ...prev]);
-      return record;
-    },
-    []
-  );
+  const addActivity = useCallback((input: AddActivityInput) => {
+    const record = buildRecord(
+      input.definition,
+      input.amount,
+      input.performedAt,
+      input.note,
+      input.duration
+    );
+    setActivities((prev) => [record, ...prev]);
+    return record;
+  }, []);
 
-  const updateActivity = useCallback(
-    (id: string, input: UpdateActivityInput) => {
-      let updated: ActivityRecord | null = null;
-      setActivities((prev) =>
-        prev.map((record) => {
-          if (record.id !== id) {
-            return record;
-          }
-          const iso = input.performedAt
-            ? new Date(input.performedAt).toISOString()
-            : record.performedAt;
-          const multiplier = input.definition.multiplier;
-          updated = {
-            ...record,
-            activityKey: input.definition.key,
-            label: input.definition.label,
-            labelEn: input.definition.labelEn,
-            icon: input.definition.icon,
-            unit: input.definition.unit,
-            unitEn: input.definition.unitEn,
-            multiplier,
-            amount: input.amount,
-            performedAt: iso,
-            note: input.note ?? null,
-            points: computePoints(multiplier, input.amount),
-            isCustom: input.definition.isCustom ?? false,
-            duration: input.duration && input.duration > 0 ? input.duration : undefined
-          };
-          return updated;
-        })
-      );
-      return updated;
-    },
-    []
-  );
+  const updateActivity = useCallback((id: string, input: UpdateActivityInput) => {
+    let updated: ActivityRecord | null = null;
+    setActivities((prev) =>
+      prev.map((record) => {
+        if (record.id !== id) {
+          return record;
+        }
+        const iso = input.performedAt
+          ? new Date(input.performedAt).toISOString()
+          : record.performedAt;
+        const multiplier = input.definition.multiplier;
+        updated = {
+          ...record,
+          activityKey: input.definition.key,
+          label: input.definition.label,
+          labelEn: input.definition.labelEn,
+          icon: input.definition.icon,
+          unit: input.definition.unit,
+          unitEn: input.definition.unitEn,
+          multiplier,
+          amount: input.amount,
+          performedAt: iso,
+          note: input.note ?? null,
+          points: computePoints(multiplier, input.amount),
+          isCustom: input.definition.isCustom ?? false,
+          duration: input.duration && input.duration > 0 ? input.duration : undefined,
+        };
+        return updated;
+      })
+    );
+    return updated;
+  }, []);
 
   const deleteActivity = useCallback((id: string) => {
     setActivities((prev) => prev.filter((record) => record.id !== id));
@@ -240,16 +222,20 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
       clearStorageError,
       addActivity,
       updateActivity,
-      deleteActivity
+      deleteActivity,
     }),
-    [activities, hydrated, storageError, clearStorageError, addActivity, updateActivity, deleteActivity]
+    [
+      activities,
+      hydrated,
+      storageError,
+      clearStorageError,
+      addActivity,
+      updateActivity,
+      deleteActivity,
+    ]
   );
 
-  return (
-    <ActivitiesContext.Provider value={value}>
-      {children}
-    </ActivitiesContext.Provider>
-  );
+  return <ActivitiesContext.Provider value={value}>{children}</ActivitiesContext.Provider>;
 }
 
 export function useActivities() {
@@ -288,9 +274,17 @@ export function computeSummary(
   const startForStreak = subDays(startToday, 30);
 
   const pointsPerDay = new Map<string, number>();
-    const breakdownTodayMap = new Map<
+  const breakdownTodayMap = new Map<
     ActivityKey,
-    { label: string; labelEn?: string; icon: string; unit: string; unitEn?: string; amount: number; points: number }
+    {
+      label: string;
+      labelEn?: string;
+      icon: string;
+      unit: string;
+      unitEn?: string;
+      amount: number;
+      points: number;
+    }
   >();
 
   for (const activity of activities) {
@@ -301,16 +295,15 @@ export function computeSummary(
     pointsPerDay.set(dayKey, (pointsPerDay.get(dayKey) ?? 0) + activity.points);
 
     if (performedAt >= startToday) {
-      const bucket =
-        breakdownTodayMap.get(activity.activityKey) ?? {
-          label: activity.label,
-          labelEn: activity.labelEn,
-          icon: activity.icon,
-          unit: activity.unit,
-          unitEn: activity.unitEn,
-          amount: 0,
-          points: 0
-        };
+      const bucket = breakdownTodayMap.get(activity.activityKey) ?? {
+        label: activity.label,
+        labelEn: activity.labelEn,
+        icon: activity.icon,
+        unit: activity.unit,
+        unitEn: activity.unitEn,
+        amount: 0,
+        points: 0,
+      };
       bucket.amount += activity.amount;
       bucket.points += activity.points;
       breakdownTodayMap.set(activity.activityKey, bucket);
@@ -323,7 +316,7 @@ export function computeSummary(
     const key = day.toISOString();
     return {
       date: key,
-      points: pointsPerDay.get(key) ?? 0
+      points: pointsPerDay.get(key) ?? 0,
     };
   }).reverse();
 
@@ -351,7 +344,7 @@ export function computeSummary(
       amount: value.amount,
       unit: value.unit,
       unitEn: value.unitEn,
-      points: value.points
+      points: value.points,
     }))
     .sort((a, b) => b.points - a.points);
 
@@ -364,19 +357,15 @@ export function computeSummary(
     totalActivities: activities.length,
     streakDays,
     lastSevenDays,
-    breakdownToday
+    breakdownToday,
   };
 }
 
 export function useActivitiesSummary(targetPoints: number) {
   const { activities } = useActivities();
-  return useMemo(
-    () => computeSummary(activities, targetPoints),
-    [activities, targetPoints]
-  );
+  return useMemo(() => computeSummary(activities, targetPoints), [activities, targetPoints]);
 }
 
 export function getBaseActivityDefinitions(): ActivityDefinition[] {
   return BASE_ACTIVITY_DEFINITIONS;
 }
-

@@ -10,7 +10,7 @@ import {
   updateChallengeStatus,
   getDefaultDailyChallenge,
   getDefaultWeeklyChallenge,
-  type ChallengeType
+  type ChallengeType,
 } from './challenges';
 import { STORAGE_KEYS } from './constants';
 import { DEFAULT_DAILY_TARGET } from './activityConfig';
@@ -42,7 +42,9 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
       if (stored) {
         const parsed = JSON.parse(stored) as Challenge[];
         // Check if default weekly challenge exists, if not add it
-        const hasWeekly = parsed.some(c => c.type === 'weekly' && c.id.startsWith('weekly-') && c.target === 50000);
+        const hasWeekly = parsed.some(
+          (c) => c.type === 'weekly' && c.id.startsWith('weekly-') && c.target === 50000
+        );
         if (!hasWeekly) {
           const weeklyChallenge = getDefaultWeeklyChallenge();
           setChallenges([...parsed, weeklyChallenge]);
@@ -72,7 +74,7 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!hydrated || !settings?.dailyTarget) return;
 
-    const defaultDaily = challenges.find(c => c.type === 'daily' && c.id.startsWith('daily-'));
+    const defaultDaily = challenges.find((c) => c.type === 'daily' && c.id.startsWith('daily-'));
     if (defaultDaily && defaultDaily.target !== settings.dailyTarget) {
       const today = new Date();
       const todayStr = today.toISOString().split('T')[0];
@@ -80,16 +82,14 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
 
       if (isToday) {
         // Update today's challenge
-        const updated = challenges.map(c =>
-          c.id === defaultDaily.id
-            ? { ...c, target: settings.dailyTarget }
-            : c
+        const updated = challenges.map((c) =>
+          c.id === defaultDaily.id ? { ...c, target: settings.dailyTarget } : c
         );
         setChallenges(updated);
       } else {
         // Create new daily challenge for today
         const newDaily = getDefaultDailyChallenge(settings.dailyTarget);
-        const updated = challenges.filter(c => c.id !== defaultDaily.id);
+        const updated = challenges.filter((c) => c.id !== defaultDaily.id);
         setChallenges([...updated, newDaily]);
       }
     }
@@ -109,7 +109,7 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!hydrated || challenges.length === 0) return;
 
-    const updated = challenges.map(challenge => {
+    const updated = challenges.map((challenge) => {
       const progress = calculateChallengeProgress(challenge, activities);
       return updateChallengeStatus(challenge, progress);
     });
@@ -118,9 +118,7 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
     const hasChanges = updated.some((c, i) => {
       const old = challenges[i];
       return (
-        c.status !== old.status ||
-        c.progress !== old.progress ||
-        c.completedAt !== old.completedAt
+        c.status !== old.status || c.progress !== old.progress || c.completedAt !== old.completedAt
       );
     });
 
@@ -130,54 +128,75 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
   }, [activities, hydrated, challenges, saveChallenges]);
 
   // Add a new challenge
-  const addChallenge = useCallback((challenge: Challenge) => {
-    const updated = [...challenges, challenge];
-    saveChallenges(updated);
-  }, [challenges, saveChallenges]);
+  const addChallenge = useCallback(
+    (challenge: Challenge) => {
+      const updated = [...challenges, challenge];
+      saveChallenges(updated);
+    },
+    [challenges, saveChallenges]
+  );
 
   // Update a challenge
-  const updateChallenge = useCallback((id: string, updates: Partial<Challenge>) => {
-    const updated = challenges.map(c =>
-      c.id === id ? { ...c, ...updates } : c
-    );
-    saveChallenges(updated);
-  }, [challenges, saveChallenges]);
+  const updateChallenge = useCallback(
+    (id: string, updates: Partial<Challenge>) => {
+      const updated = challenges.map((c) => (c.id === id ? { ...c, ...updates } : c));
+      saveChallenges(updated);
+    },
+    [challenges, saveChallenges]
+  );
 
   // Delete a challenge
-  const deleteChallenge = useCallback((id: string) => {
-    // Don't allow deleting default daily challenge
-    const challenge = challenges.find(c => c.id === id);
-    if (challenge?.type === 'daily' && challenge.id.startsWith('daily-')) {
-      return;
-    }
-    const updated = challenges.filter(c => c.id !== id);
-    saveChallenges(updated);
-  }, [challenges, saveChallenges]);
+  const deleteChallenge = useCallback(
+    (id: string) => {
+      // Don't allow deleting default daily challenge
+      const challenge = challenges.find((c) => c.id === id);
+      if (challenge?.type === 'daily' && challenge.id.startsWith('daily-')) {
+        return;
+      }
+      const updated = challenges.filter((c) => c.id !== id);
+      saveChallenges(updated);
+    },
+    [challenges, saveChallenges]
+  );
 
   // Get progress for a specific challenge
-  const getChallengeProgress = useCallback((challengeId: string): ChallengeProgress | null => {
-    const challenge = challenges.find(c => c.id === challengeId);
-    if (!challenge) return null;
-    return calculateChallengeProgress(challenge, activities);
-  }, [challenges, activities]);
+  const getChallengeProgress = useCallback(
+    (challengeId: string): ChallengeProgress | null => {
+      const challenge = challenges.find((c) => c.id === challengeId);
+      if (!challenge) return null;
+      return calculateChallengeProgress(challenge, activities);
+    },
+    [challenges, activities]
+  );
 
   // Check for newly completed challenges
   const checkCompletedChallenges = useCallback((): Challenge[] => {
-    return challenges.filter(c => {
+    return challenges.filter((c) => {
       const progress = calculateChallengeProgress(c, activities);
       return progress.isCompleted && c.status === 'active';
     });
   }, [challenges, activities]);
 
-  const value = useMemo<ChallengeContextValue>(() => ({
-    challenges,
-    hydrated,
-    addChallenge,
-    updateChallenge,
-    deleteChallenge,
-    getChallengeProgress,
-    checkCompletedChallenges
-  }), [challenges, hydrated, addChallenge, updateChallenge, deleteChallenge, getChallengeProgress, checkCompletedChallenges]);
+  const value = useMemo<ChallengeContextValue>(
+    () => ({
+      challenges,
+      hydrated,
+      addChallenge,
+      updateChallenge,
+      deleteChallenge,
+      getChallengeProgress,
+      checkCompletedChallenges,
+    }),
+    [
+      challenges,
+      hydrated,
+      addChallenge,
+      updateChallenge,
+      deleteChallenge,
+      getChallengeProgress,
+      checkCompletedChallenges,
+    ]
+  );
 
   return <ChallengeContext.Provider value={value}>{children}</ChallengeContext.Provider>;
 }
@@ -189,4 +208,3 @@ export function useChallenges() {
   }
   return ctx;
 }
-

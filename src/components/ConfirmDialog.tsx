@@ -24,7 +24,7 @@ export function ConfirmDialog({
   cancelLabel,
   onConfirm,
   onCancel,
-  variant = 'default'
+  variant = 'default',
 }: ConfirmDialogProps) {
   const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
@@ -47,13 +47,13 @@ export function ConfirmDialog({
 
   useEffect(() => {
     if (!open) return;
-    
+
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onCancel();
       }
     };
-    
+
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [open, onCancel]);
@@ -83,7 +83,9 @@ export function ConfirmDialog({
       aria-labelledby="confirm-dialog-title"
       aria-describedby="confirm-dialog-message"
     >
-      <div className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto slide-up-bottom' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4 animate-scale-in'} border-2 border-gray-200 dark:border-gray-700`}>
+      <div
+        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto slide-up-bottom' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4 animate-scale-in'} border-2 border-gray-200 dark:border-gray-700`}
+      >
         <div className={`${isMobile ? 'p-6' : 'p-6'}`}>
           <h2
             id="confirm-dialog-title"
@@ -97,7 +99,9 @@ export function ConfirmDialog({
           >
             {message}
           </p>
-          <div className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-3'}`}>
+          <div
+            className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-3'}`}
+          >
             <button
               type="button"
               onClick={handleCancel}
@@ -127,4 +131,3 @@ export function ConfirmDialog({
 
   return createPortal(dialog, document.body);
 }
-

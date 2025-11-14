@@ -42,24 +42,24 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
         }
         dateRangeOption = {
           start: startOfDay(new Date(customStart)),
-          end: endOfDay(new Date(customEnd))
+          end: endOfDay(new Date(customEnd)),
         };
       } else if (dateRange === '7days') {
         dateRangeOption = {
           start: startOfDay(subDays(new Date(), 7)),
-          end: endOfDay(new Date())
+          end: endOfDay(new Date()),
         };
       } else if (dateRange === '30days') {
         dateRangeOption = {
           start: startOfDay(subDays(new Date(), 30)),
-          end: endOfDay(new Date())
+          end: endOfDay(new Date()),
         };
       }
 
       const options = {
         format: exportFormat,
         dateRange: dateRangeOption,
-        language: lang as 'tr' | 'en'
+        language: lang as 'tr' | 'en',
       };
 
       if (exportFormat === 'csv') {
@@ -96,7 +96,9 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
       aria-modal="true"
       aria-labelledby="export-dialog-title"
     >
-      <div className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4'} border-2 border-gray-200 dark:border-gray-700 animate-scale-in`}>
+      <div
+        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4'} border-2 border-gray-200 dark:border-gray-700 animate-scale-in`}
+      >
         <div className={`${isMobile ? 'p-6' : 'p-6'}`}>
           <h2
             id="export-dialog-title"
@@ -194,7 +196,9 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
           )}
 
           {/* Actions */}
-          <div className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-3'}`}>
+          <div
+            className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-3'}`}
+          >
             <button
               type="button"
               onClick={onClose}
@@ -218,4 +222,3 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
 
   return createPortal(dialog, document.body);
 }
-

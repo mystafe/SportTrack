@@ -66,8 +66,12 @@ export function InstallPrompt() {
       <div className="w-full max-w-md mx-auto">
         <div className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-xl shadow-xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-xs sm:text-sm mb-0.5 sm:mb-1 text-gray-950 dark:text-white">{t('pwa.installTitle')}</div>
-            <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{t('pwa.installDescription')}</div>
+            <div className="font-semibold text-xs sm:text-sm mb-0.5 sm:mb-1 text-gray-950 dark:text-white">
+              {t('pwa.installTitle')}
+            </div>
+            <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+              {t('pwa.installDescription')}
+            </div>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
             <button
@@ -88,4 +92,3 @@ export function InstallPrompt() {
     </div>
   );
 }
-

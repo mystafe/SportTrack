@@ -11,7 +11,18 @@ type ActivityPieChartProps = {
   activities: ActivityRecord[];
 };
 
-const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'];
+const COLORS = [
+  '#0ea5e9',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#ec4899',
+  '#06b6d4',
+  '#84cc16',
+  '#f97316',
+  '#6366f1',
+];
 
 export function ActivityPieChart({ activities }: ActivityPieChartProps) {
   const { lang } = useI18n();
@@ -19,11 +30,11 @@ export function ActivityPieChart({ activities }: ActivityPieChartProps) {
 
   const chartData = useMemo(() => {
     const breakdown = new Map<string, { name: string; value: number; count: number }>();
-    
+
     for (const activity of activities) {
       const key = activity.activityKey;
       const existing = breakdown.get(key);
-      
+
       if (existing) {
         existing.value += activity.points;
         existing.count += 1;
@@ -31,13 +42,12 @@ export function ActivityPieChart({ activities }: ActivityPieChartProps) {
         breakdown.set(key, {
           name: getActivityLabel(activity, lang),
           value: activity.points,
-          count: 1
+          count: 1,
         });
       }
     }
-    
-    return Array.from(breakdown.values())
-      .sort((a, b) => b.value - a.value);
+
+    return Array.from(breakdown.values()).sort((a, b) => b.value - a.value);
   }, [activities, lang]);
 
   if (chartData.length === 0) {
@@ -78,11 +88,11 @@ export function ActivityPieChart({ activities }: ActivityPieChartProps) {
           }}
           labelStyle={{ color: 'var(--tw-text-gray-900)' }}
         />
-        <Legend 
-          verticalAlign="bottom" 
+        <Legend
+          verticalAlign="bottom"
           height={36}
           formatter={(value) => {
-            const item = chartData.find(d => d.name === value);
+            const item = chartData.find((d) => d.name === value);
             return item ? `${value} (${item.count}x)` : value;
           }}
         />
@@ -92,4 +102,3 @@ export function ActivityPieChart({ activities }: ActivityPieChartProps) {
 }
 
 const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-

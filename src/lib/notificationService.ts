@@ -20,7 +20,7 @@ export const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
   dailyReminderTime: '20:00',
   goalCompletion: true,
   streakReminder: true,
-  streakReminderTime: '21:00'
+  streakReminderTime: '21:00',
 };
 
 export class NotificationService {
@@ -68,10 +68,7 @@ export class NotificationService {
     return this.permission === 'granted';
   }
 
-  async showNotification(
-    title: string,
-    options?: NotificationOptions
-  ): Promise<void> {
+  async showNotification(title: string, options?: NotificationOptions): Promise<void> {
     if (!this.canNotify()) {
       return;
     }
@@ -82,7 +79,7 @@ export class NotificationService {
         badge: '/icon-192.png',
         tag: 'sporttrack',
         requireInteraction: false,
-        ...options
+        ...options,
       });
 
       // Auto-close after 5 seconds
@@ -105,17 +102,17 @@ export class NotificationService {
     const messages = {
       tr: {
         title: 'Günlük Hedefin',
-        body: 'Bugün hedefini tamamlamayı unutma! 💪'
+        body: 'Bugün hedefini tamamlamayı unutma! 💪',
       },
       en: {
         title: 'Daily Goal',
-        body: "Don't forget to complete your goal today! 💪"
-      }
+        body: "Don't forget to complete your goal today! 💪",
+      },
     };
 
     await this.showNotification(messages[lang].title, {
       body: messages[lang].body,
-      tag: 'daily-reminder'
+      tag: 'daily-reminder',
     });
   }
 
@@ -125,18 +122,18 @@ export class NotificationService {
     const messages = {
       tr: {
         title: '🎉 Hedef Tamamlandı!',
-        body: `Tebrikler! Bugün ${points.toLocaleString('tr-TR')} puan kazandın!`
+        body: `Tebrikler! Bugün ${points.toLocaleString('tr-TR')} puan kazandın!`,
       },
       en: {
         title: '🎉 Goal Completed!',
-        body: `Congratulations! You earned ${points.toLocaleString('en-US')} points today!`
-      }
+        body: `Congratulations! You earned ${points.toLocaleString('en-US')} points today!`,
+      },
     };
 
     await this.showNotification(messages[lang].title, {
       body: messages[lang].body,
       tag: 'goal-completion',
-      requireInteraction: true
+      requireInteraction: true,
     });
   }
 
@@ -146,17 +143,17 @@ export class NotificationService {
     const messages = {
       tr: {
         title: '🔥 Seri Devam Ediyor!',
-        body: `${streakDays} günlük serin var! Bugün de hedefini tamamla!`
+        body: `${streakDays} günlük serin var! Bugün de hedefini tamamla!`,
       },
       en: {
         title: '🔥 Streak Continues!',
-        body: `You have a ${streakDays}-day streak! Complete your goal today too!`
-      }
+        body: `You have a ${streakDays}-day streak! Complete your goal today too!`,
+      },
     };
 
     await this.showNotification(messages[lang].title, {
       body: messages[lang].body,
-      tag: 'streak-reminder'
+      tag: 'streak-reminder',
     });
   }
 
@@ -166,18 +163,18 @@ export class NotificationService {
     const messages = {
       tr: {
         title: `${badgeIcon} Yeni Rozet Kazandın!`,
-        body: `${badgeName} rozetini kazandın!`
+        body: `${badgeName} rozetini kazandın!`,
       },
       en: {
         title: `${badgeIcon} New Badge Unlocked!`,
-        body: `You earned the ${badgeName} badge!`
-      }
+        body: `You earned the ${badgeName} badge!`,
+      },
     };
 
     await this.showNotification(messages[lang].title, {
       body: messages[lang].body,
       tag: 'badge-unlocked',
-      requireInteraction: true
+      requireInteraction: true,
     });
   }
 
@@ -187,39 +184,43 @@ export class NotificationService {
     const messages = {
       tr: {
         title: '🎉 Seviye Atladın!',
-        body: `Tebrikler! Seviye ${level}'e ulaştın!`
+        body: `Tebrikler! Seviye ${level}'e ulaştın!`,
       },
       en: {
         title: '🎉 Level Up!',
-        body: `Congratulations! You reached level ${level}!`
-      }
+        body: `Congratulations! You reached level ${level}!`,
+      },
     };
 
     await this.showNotification(messages[lang].title, {
       body: messages[lang].body,
       tag: 'level-up',
-      requireInteraction: true
+      requireInteraction: true,
     });
   }
 
-  async showChallengeCompleted(lang: 'tr' | 'en', challengeName: string, icon: string): Promise<void> {
+  async showChallengeCompleted(
+    lang: 'tr' | 'en',
+    challengeName: string,
+    icon: string
+  ): Promise<void> {
     if (!this.canNotify()) return;
 
     const messages = {
       tr: {
         title: `${icon} Zorluk Tamamlandı!`,
-        body: `Tebrikler! "${challengeName}" zorluğunu tamamladın!`
+        body: `Tebrikler! "${challengeName}" zorluğunu tamamladın!`,
       },
       en: {
         title: `${icon} Challenge Completed!`,
-        body: `Congratulations! You completed the "${challengeName}" challenge!`
-      }
+        body: `Congratulations! You completed the "${challengeName}" challenge!`,
+      },
     };
 
     await this.showNotification(messages[lang].title, {
       body: messages[lang].body,
       tag: 'challenge-completed',
-      requireInteraction: true
+      requireInteraction: true,
     });
   }
 
@@ -260,4 +261,3 @@ export class NotificationService {
 }
 
 export const notificationService = NotificationService.getInstance();
-
