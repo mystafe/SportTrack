@@ -16,7 +16,7 @@ import { KeyboardShortcuts } from '@/components/KeyboardShortcuts';
 import { BadgeUnlockNotification } from '@/components/BadgeUnlockNotification';
 import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { useAutoSync } from '@/hooks/useAutoSync';
+import { AutoSyncProvider } from '@/components/AutoSyncProvider';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -28,14 +28,16 @@ export function Providers({ children }: { children: ReactNode }) {
               <ChallengeProvider>
                 <BadgeProvider>
                   <ToasterProvider>
-                    <StorageErrorHandler />
-                    <InstallPrompt />
-                    <NotificationManager />
-                    <OnboardingManager />
-                    <KeyboardShortcuts />
-                    <BadgeUnlockNotification />
-                    <OnlineStatusIndicator />
-                    {children}
+                    <AutoSyncProvider>
+                      <StorageErrorHandler />
+                      <InstallPrompt />
+                      <NotificationManager />
+                      <OnboardingManager />
+                      <KeyboardShortcuts />
+                      <BadgeUnlockNotification />
+                      <OnlineStatusIndicator />
+                      {children}
+                    </AutoSyncProvider>
                   </ToasterProvider>
                 </BadgeProvider>
               </ChallengeProvider>
