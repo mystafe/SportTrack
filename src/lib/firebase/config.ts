@@ -52,7 +52,18 @@ if (typeof window !== 'undefined') {
 
 export { app, auth, db };
 export const isFirebaseConfigured = () => {
-  return !!(
-    process.env.NEXT_PUBLIC_FIREBASE_API_KEY && process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-  );
+  // Check if we're in browser and if Firebase config is available
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  // Check if Firebase config environment variables are set
+  const hasConfig =
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== '' &&
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID !== '';
+
+  // Also check if Firebase app was initialized successfully
+  return hasConfig && !!app && !!auth && !!db;
 };
