@@ -14,6 +14,8 @@ import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 
 const SYNC_DEBOUNCE_MS = 2000; // Wait 2 seconds after last change before syncing
+const INITIAL_SYNC_COMPLETE_KEY = 'sporttrack_initial_sync_complete';
+const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 
 export function useAutoSync() {
   const { isAuthenticated, isConfigured } = useAuth();
@@ -42,6 +44,21 @@ export function useAutoSync() {
         lastSyncRef.current = null;
         isInitialSyncRef.current = true;
       }
+      return;
+    }
+
+    // Check if initial sync is complete and if there's a pending conflict
+    const initialSyncComplete =
+      typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
+    const hasPendingConflict =
+      typeof window !== 'undefined' && localStorage.getItem(CONFLICT_STORAGE_KEY) !== null;
+
+    // Don't sync if initial sync is not complete or if there's a pending conflict
+    if (!initialSyncComplete || hasPendingConflict) {
+      console.log('⏸️ Auto-sync paused:', {
+        initialSyncComplete,
+        hasPendingConflict,
+      });
       return;
     }
 

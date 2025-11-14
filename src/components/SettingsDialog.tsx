@@ -227,7 +227,11 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
           </div>
 
           {/* Form */}
-          <form className={isMobile ? 'space-y-1.5' : 'space-y-2.5'} onSubmit={submit}>
+          <form
+            className={isMobile ? 'space-y-1.5' : 'space-y-2.5'}
+            onSubmit={submit}
+            autoComplete="off"
+          >
             {!isAuthenticated ? (
               <>
                 {/* Non-authenticated users: Login options + Name + Daily Goal + Emotion */}
@@ -260,6 +264,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     onChange={(e) => setName(e.target.value)}
                     className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2.5 py-1.5 text-xs' : 'px-3 py-2 text-sm sm:px-4 sm:py-2.5 sm:text-base'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
                     placeholder={lang === 'tr' ? 'İsminiz' : 'Your name'}
+                    autoComplete="off"
+                    data-form-type="other"
                   />
                 </label>
 
@@ -282,6 +288,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       onChange={(e) => setDailyTarget(e.target.value)}
                       className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
                       placeholder="10000"
+                      autoComplete="off"
+                      data-form-type="other"
                     />
                   </label>
 
@@ -295,6 +303,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       value={mood || ''}
                       onChange={(e) => setMood((e.target.value || null) as Mood)}
                       className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
+                      autoComplete="off"
+                      data-form-type="other"
                     >
                       <option value="">{t('settings.moodNone')}</option>
                       <option value="happy">{t('settings.moodHappy')}</option>
@@ -372,6 +382,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       onChange={(e) => setDailyTarget(e.target.value)}
                       className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
                       placeholder="10000"
+                      autoComplete="off"
+                      data-form-type="other"
                     />
                   </label>
 
@@ -385,6 +397,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       value={mood || ''}
                       onChange={(e) => setMood((e.target.value || null) as Mood)}
                       className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
+                      autoComplete="off"
+                      data-form-type="other"
                     >
                       <option value="">{t('settings.moodNone')}</option>
                       <option value="happy">{t('settings.moodHappy')}</option>

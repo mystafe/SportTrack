@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCloudSync } from '@/hooks/useCloudSync';
 import { useI18n } from '@/lib/i18n';
@@ -14,6 +14,8 @@ import { useChallenges } from '@/lib/challengeStore';
 import { resolveConflicts, saveLocalLastModified } from '@/lib/cloudSync/conflictResolver';
 import { ConflictResolutionDialog } from './ConflictResolutionDialog';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
+
+const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 
 export function CloudSyncSettings() {
   const { user, isAuthenticated, logout, isConfigured } = useAuth();
@@ -42,6 +44,30 @@ export function CloudSyncSettings() {
       challenges: unknown[];
     };
   } | null>(null);
+
+  // Check for pending conflict on mount and when authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !isConfigured) {
+      return;
+    }
+
+    // Check if there's a pending conflict from initial sync
+    const conflictStr =
+      typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
+    if (conflictStr) {
+      try {
+        const conflict = JSON.parse(conflictStr);
+        setConflictData(conflict);
+        setShowConflictDialog(true);
+      } catch (error) {
+        console.error('Failed to parse conflict data:', error);
+        // Clear invalid conflict data
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(CONFLICT_STORAGE_KEY);
+        }
+      }
+    }
+  }, [isAuthenticated, isConfigured]);
 
   if (!isConfigured) {
     return (
@@ -117,11 +143,25 @@ export function CloudSyncSettings() {
     const resolution = resolveConflicts(localData, cloudData, strategy);
 
     // Apply resolved data
-    // Note: This would require store methods to update in bulk
-    // For now, we'll just save the last sync timestamp
+    // Apply settings
+    if (resolution.resolvedData.settings) {
+      saveSettings(resolution.resolvedData.settings as any);
+    }
+
+    // Sync resolved data to cloud
+    await syncToCloud({
+      activities: resolution.resolvedData.activities as any[],
+      settings: resolution.resolvedData.settings,
+      badges: resolution.resolvedData.badges as any[],
+      challenges: resolution.resolvedData.challenges as any[],
+    });
+
     saveLocalLastModified();
 
-    showToast(lang === 'tr' ? 'Veriler uygulandı!' : 'Data applied!', 'success');
+    showToast(
+      lang === 'tr' ? 'Veriler uygulandı ve senkronize edildi!' : 'Data applied and synced!',
+      'success'
+    );
   };
 
   const handleConflictResolve = async (strategy: ConflictStrategy) => {
@@ -131,9 +171,21 @@ export function CloudSyncSettings() {
     setSyncing(true);
 
     try {
+      // Clear conflict storage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(CONFLICT_STORAGE_KEY);
+      }
+
       await applyCloudData(conflictData.cloud, strategy);
     } catch (error) {
-      showToast(lang === 'tr' ? 'Çakışma çözümü hatası' : 'Conflict resolution error', 'error');
+      console.error('Conflict resolution error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      showToast(
+        lang === 'tr'
+          ? `Çakışma çözümü hatası: ${errorMessage}`
+          : `Conflict resolution error: ${errorMessage}`,
+        'error'
+      );
     } finally {
       setSyncing(false);
       setConflictData(null);
@@ -341,6 +393,10 @@ export function CloudSyncSettings() {
           onCancel={() => {
             setShowConflictDialog(false);
             setConflictData(null);
+            // Clear conflict storage on cancel
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem(CONFLICT_STORAGE_KEY);
+            }
           }}
           localCount={{
             activities: conflictData.local.activities.length,

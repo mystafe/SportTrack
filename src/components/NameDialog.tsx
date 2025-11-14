@@ -104,7 +104,7 @@ export function NameDialog() {
         </div>
 
         {/* Form */}
-        <form className="space-y-3" onSubmit={submit}>
+        <form className="space-y-3" onSubmit={submit} autoComplete="off">
           <label className="block space-y-1.5">
             <span
               className={`${isMobile ? 'text-[11px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
@@ -121,6 +121,8 @@ export function NameDialog() {
               className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-3 py-2 text-sm' : 'px-4 py-2.5 text-base'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
               placeholder={lang === 'tr' ? 'İsminiz' : 'Your name'}
               autoFocus
+              autoComplete="off"
+              data-form-type="other"
             />
           </label>
 
