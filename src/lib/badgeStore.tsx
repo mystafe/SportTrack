@@ -12,6 +12,7 @@ type BadgeContextValue = {
   hydrated: boolean;
   checkNewBadges: () => Badge[];
   unlockBadge: (badge: Badge) => void;
+  clearAllBadges: () => void;
 };
 
 const BadgeContext = createContext<BadgeContextValue | null>(null);
@@ -87,14 +88,22 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
     [badges, saveBadges]
   );
 
+  const clearAllBadges = useCallback(() => {
+    setBadges([]);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEYS.BADGES);
+    }
+  }, []);
+
   const value = useMemo<BadgeContextValue>(
     () => ({
       badges,
       hydrated,
       checkNewBadges,
       unlockBadge,
+      clearAllBadges,
     }),
-    [badges, hydrated, checkNewBadges, unlockBadge]
+    [badges, hydrated, checkNewBadges, unlockBadge, clearAllBadges]
   );
 
   return <BadgeContext.Provider value={value}>{children}</BadgeContext.Provider>;

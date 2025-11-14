@@ -1,0 +1,167 @@
+/**
+ * Example Component: Display Firestore Points
+ * Shows how to use the Firestore query hooks in a React component
+ */
+
+'use client';
+
+import { useTotalPoints } from '@/hooks/useFirestoreQueries';
+import { useTodayPoints } from '@/hooks/useFirestoreQueries';
+import { usePointsStatistics } from '@/hooks/useFirestoreQueries';
+import { usePointsByActivityType } from '@/hooks/useFirestoreQueries';
+import { useI18n } from '@/lib/i18n';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
+
+/**
+ * Example 1: Display Total Points
+ */
+export function TotalPointsDisplay() {
+  const { totalPoints, loading, error, refetch } = useTotalPoints();
+  const { t } = useI18n();
+
+  if (loading) {
+    return <div className="text-gray-500">Yükleniyor...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500">
+        Hata: {error}
+        <button onClick={refetch} className="ml-2 underline">
+          Tekrar Dene
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+      <h3 className="text-lg font-bold mb-2">Toplam Points</h3>
+      <p className="text-3xl font-bold text-brand">{totalPoints.toLocaleString()}</p>
+      <button
+        onClick={refetch}
+        className="mt-2 text-sm text-gray-600 dark:text-gray-400 hover:text-brand"
+      >
+        Yenile
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Example 2: Display Today's Points
+ */
+export function TodayPointsDisplay() {
+  const { todayPoints, loading, error } = useTodayPoints();
+  const { t } = useI18n();
+
+  if (loading) {
+    return <div className="text-gray-500">Yükleniyor...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Hata: {error}</div>;
+  }
+
+  return (
+    <div className="p-4 bg-gradient-to-r from-brand to-brand-dark rounded-lg text-white">
+      <h3 className="text-sm font-semibold mb-1">Bugün</h3>
+      <p className="text-2xl font-bold">{todayPoints.toLocaleString()} points</p>
+    </div>
+  );
+}
+
+/**
+ * Example 3: Display Points Statistics
+ */
+export function PointsStatisticsDisplay() {
+  const { statistics, loading, error, refetch } = usePointsStatistics();
+  const { t, lang } = useI18n();
+  const isMobile = useIsMobile();
+
+  if (loading) {
+    return <div className="text-gray-500">İstatistikler yükleniyor...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500">
+        Hata: {error}
+        <button onClick={refetch} className="ml-2 underline">
+          Tekrar Dene
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <h4 className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+          {lang === 'tr' ? 'Toplam' : 'Total'}
+        </h4>
+        <p className="text-xl font-bold">{statistics.total.toLocaleString()}</p>
+      </div>
+      <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <h4 className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+          {lang === 'tr' ? 'Bugün' : 'Today'}
+        </h4>
+        <p className="text-xl font-bold">{statistics.today.toLocaleString()}</p>
+      </div>
+      <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <h4 className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+          {lang === 'tr' ? 'Bu Hafta' : 'This Week'}
+        </h4>
+        <p className="text-xl font-bold">{statistics.thisWeek.toLocaleString()}</p>
+      </div>
+      <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <h4 className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+          {lang === 'tr' ? 'Bu Ay' : 'This Month'}
+        </h4>
+        <p className="text-xl font-bold">{statistics.thisMonth.toLocaleString()}</p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Example 4: Display Points by Activity Type
+ */
+export function PointsByActivityTypeDisplay() {
+  const { pointsByType, loading, error } = usePointsByActivityType();
+  const { t, lang } = useI18n();
+
+  if (loading) {
+    return <div className="text-gray-500">Yükleniyor...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Hata: {error}</div>;
+  }
+
+  if (pointsByType.size === 0) {
+    return <div className="text-gray-500">Henüz aktivite yok</div>;
+  }
+
+  // Convert Map to Array and sort by points
+  const sortedActivities = Array.from(pointsByType.entries())
+    .map(([key, points]) => ({ key, points }))
+    .sort((a, b) => b.points - a.points);
+
+  return (
+    <div className="space-y-2">
+      <h3 className="text-lg font-bold mb-4">
+        {lang === 'tr' ? 'Aktivite Tipine Göre Points' : 'Points by Activity Type'}
+      </h3>
+      {sortedActivities.map(({ key, points }) => (
+        <div
+          key={key}
+          className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow"
+        >
+          <span className="font-semibold">{key}</span>
+          <span className="text-brand font-bold">{points.toLocaleString()} points</span>
+        </div>
+      ))}
+    </div>
+  );
+}

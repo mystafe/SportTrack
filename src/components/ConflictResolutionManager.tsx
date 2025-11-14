@@ -12,6 +12,7 @@ import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 import { useCloudSync } from '@/hooks/useCloudSync';
 import { resolveConflicts, saveLocalLastModified } from '@/lib/cloudSync/conflictResolver';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 
@@ -48,16 +49,24 @@ export function ConflictResolutionManager() {
   // Check for pending conflict on mount and when authenticated
   useEffect(() => {
     if (!isAuthenticated || !isConfigured) {
+      setShowConflictDialog(false);
+      setConflictData(null);
       return;
     }
 
-    // Small delay to ensure stores are hydrated
+    // Function to check and show conflict dialog
     const checkConflict = () => {
       const conflictStr =
         typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
       if (conflictStr) {
         try {
           const conflict = JSON.parse(conflictStr);
+          console.log('🔍 Conflict detected in localStorage:', {
+            localActivities: conflict.local?.activities?.length || 0,
+            cloudActivities: conflict.cloud?.activities?.length || 0,
+            localBadges: conflict.local?.badges?.length || 0,
+            cloudBadges: conflict.cloud?.badges?.length || 0,
+          });
           setConflictData(conflict);
           // Show conflict dialog immediately
           setShowConflictDialog(true);
@@ -69,23 +78,101 @@ export function ConflictResolutionManager() {
             localStorage.removeItem(CONFLICT_STORAGE_KEY);
           }
         }
+      } else {
+        // No conflict, hide dialog if it was showing
+        if (showConflictDialog) {
+          setShowConflictDialog(false);
+          setConflictData(null);
+        }
       }
     };
 
-    // Check immediately and also after a delay to catch late conflicts
+    // Check immediately
     checkConflict();
-    const timeoutId = setTimeout(checkConflict, 500);
-    return () => clearTimeout(timeoutId);
-  }, [isAuthenticated, isConfigured, showToast, t]);
+
+    // Check after delays to catch late conflicts
+    const timeout1 = setTimeout(checkConflict, 500);
+    const timeout2 = setTimeout(checkConflict, 1000);
+    const timeout3 = setTimeout(checkConflict, 2000);
+    const timeout4 = setTimeout(checkConflict, 3000);
+
+    // Listen to custom event from useCloudSyncListener
+    const handleConflictDetected = () => {
+      console.log('📢 Conflict detected event received');
+      checkConflict();
+    };
+    window.addEventListener('sporttrack:conflict-detected', handleConflictDetected);
+
+    // Also listen to storage events (for cross-tab communication)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === CONFLICT_STORAGE_KEY) {
+        checkConflict();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    // Poll localStorage periodically to catch conflicts set by other components
+    const pollInterval = setInterval(checkConflict, 1000);
+
+    return () => {
+      clearTimeout(timeout1);
+      clearTimeout(timeout2);
+      clearTimeout(timeout3);
+      clearTimeout(timeout4);
+      clearInterval(pollInterval);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('sporttrack:conflict-detected', handleConflictDetected);
+    };
+  }, [isAuthenticated, isConfigured, showToast, t, showConflictDialog]);
 
   const applyCloudData = async (cloudData: any, strategy: ConflictStrategy) => {
     const localData = { activities, settings, badges, challenges };
     const resolution = resolveConflicts(localData, cloudData, strategy);
 
+    console.log('🔄 Applying conflict resolution:', {
+      strategy,
+      resolvedActivities: resolution.resolvedData.activities.length,
+      resolvedBadges: resolution.resolvedData.badges.length,
+      resolvedChallenges: resolution.resolvedData.challenges.length,
+    });
+
     // Apply resolved data locally
     // Apply settings
     if (resolution.resolvedData.settings) {
       saveSettings(resolution.resolvedData.settings as any);
+    }
+
+    // Apply activities, badges, and challenges directly to localStorage
+    // This bypasses the store setters which might have side effects
+    try {
+      if (typeof window !== 'undefined') {
+        // Write activities
+        localStorage.setItem(
+          STORAGE_KEYS.ACTIVITIES,
+          JSON.stringify(resolution.resolvedData.activities)
+        );
+
+        // Write badges
+        localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(resolution.resolvedData.badges));
+
+        // Write challenges
+        localStorage.setItem(
+          STORAGE_KEYS.CHALLENGES,
+          JSON.stringify(resolution.resolvedData.challenges)
+        );
+
+        console.log('✅ Conflict resolution data written to localStorage');
+
+        // Reload page to apply changes (stores will read from localStorage)
+        // Small delay to ensure localStorage is written and cloud sync completes
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Failed to write conflict resolution data:', error);
+      showToast(lang === 'tr' ? 'Veri yazma hatası' : 'Data write error', 'error');
+      return;
     }
 
     // Only sync to cloud if strategy is NOT "cloud" (cloud strategy means use cloud data, don't overwrite it)

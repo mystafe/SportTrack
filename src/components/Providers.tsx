@@ -19,6 +19,9 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AutoSyncProvider } from '@/components/AutoSyncProvider';
 import { NameDialog } from '@/components/NameDialog';
 import { ConflictResolutionManager } from '@/components/ConflictResolutionManager';
+// Import console helpers to make them available in browser console
+import '@/lib/consoleHelpers';
+import '@/lib/syncDebug';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (

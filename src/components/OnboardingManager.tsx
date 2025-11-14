@@ -19,6 +19,16 @@ export function OnboardingManager() {
   useEffect(() => {
     if (!settingsHydrated || !activitiesHydrated) return;
 
+    // Don't show onboarding if login popup is skipped (after logout)
+    const skipLoginPopup =
+      typeof window !== 'undefined' &&
+      localStorage.getItem('sporttrack.skip_login_popup') === 'true';
+    if (skipLoginPopup) {
+      setHasCompletedOnboarding(true);
+      setShowTour(false);
+      return;
+    }
+
     // Check if user has completed onboarding
     const completed = localStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED);
     const isNewUser = !settings?.name || activities.length === 0;

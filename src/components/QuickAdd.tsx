@@ -9,6 +9,7 @@ import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ActivityDefinition } from '@/lib/activityConfig';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { startOfDay, subDays, isSameDay } from 'date-fns';
 
 export const QuickAdd = memo(function QuickAdd() {
   const [isOpen, setIsOpen] = useState(true);
@@ -22,7 +23,111 @@ export const QuickAdd = memo(function QuickAdd() {
 
   const { activities } = useActivities();
 
-  // Get most used activities (top 6)
+  // Calculate most frequent amount for each activity based on recent history
+  const getAverageAmount = useCallback(
+    (activityKey: string): number | null => {
+      const now = new Date();
+      const today = startOfDay(now);
+      const sevenDaysAgo = startOfDay(subDays(now, 7));
+
+      // Filter activities for this activity key from last 7 days
+      const recentActivities = activities.filter((activity) => {
+        if (activity.activityKey !== activityKey) return false;
+        const activityDate = new Date(activity.performedAt);
+        return activityDate >= sevenDaysAgo && activityDate <= now;
+      });
+
+      if (recentActivities.length === 0) {
+        return null; // No recent history, use default
+      }
+
+      // Get today's activities
+      const todayActivities = recentActivities.filter((activity) => {
+        const activityDate = new Date(activity.performedAt);
+        return isSameDay(activityDate, today);
+      });
+
+      // Group similar amounts together (±5% tolerance for rounding)
+      const groupAmounts = (amounts: number[]): Map<number, number> => {
+        const groups = new Map<number, number>();
+
+        for (const amount of amounts) {
+          // Find existing group within 5% tolerance
+          let foundGroup = false;
+          for (const [groupKey] of groups) {
+            const tolerance = Math.max(groupKey * 0.05, 10); // At least 10 units tolerance
+            if (Math.abs(amount - groupKey) <= tolerance) {
+              groups.set(groupKey, (groups.get(groupKey) || 0) + 1);
+              foundGroup = true;
+              break;
+            }
+          }
+
+          if (!foundGroup) {
+            groups.set(amount, 1);
+          }
+        }
+
+        return groups;
+      };
+
+      // Count frequency of each amount (grouped by similarity)
+      const allAmounts = recentActivities.map((a) => a.amount);
+      const amountGroups = groupAmounts(allAmounts);
+
+      // Find the most frequent amount group
+      let mostFrequentAmount = 0;
+      let maxFrequency = 0;
+      for (const [amount, frequency] of amountGroups) {
+        if (frequency > maxFrequency) {
+          maxFrequency = frequency;
+          mostFrequentAmount = amount;
+        }
+      }
+
+      // If we have today's activities, check if today's amount matches the most frequent pattern
+      if (todayActivities.length > 0) {
+        const todayTotal = todayActivities.reduce((sum, activity) => sum + activity.amount, 0);
+        const todayAverage = Math.round(todayTotal / todayActivities.length);
+
+        // Check if today's average is close to the most frequent amount (±5%)
+        const tolerance = Math.max(mostFrequentAmount * 0.05, 10);
+        if (Math.abs(todayAverage - mostFrequentAmount) <= tolerance) {
+          // Today's value matches the pattern, use today's average
+          return todayAverage;
+        }
+
+        // If today's value is significantly different but we have multiple entries today,
+        // prefer today's average (user might be changing their routine)
+        if (todayActivities.length >= 2) {
+          return todayAverage;
+        }
+      }
+
+      // Use the most frequent amount from recent history
+      // If multiple amounts have the same frequency, use the average of those amounts
+      const topAmounts: number[] = [];
+      for (const [amount, frequency] of amountGroups) {
+        if (frequency === maxFrequency) {
+          topAmounts.push(amount);
+        }
+      }
+
+      if (topAmounts.length > 0) {
+        const averageOfTop = Math.round(
+          topAmounts.reduce((sum, amt) => sum + amt, 0) / topAmounts.length
+        );
+        return averageOfTop;
+      }
+
+      // Fallback: use simple average
+      const totalAmount = recentActivities.reduce((sum, activity) => sum + activity.amount, 0);
+      return Math.round(totalAmount / recentActivities.length);
+    },
+    [activities]
+  );
+
+  // Get most used activities (top 6) with their average amounts
   const mostUsedActivities = useMemo(() => {
     const activityCounts = new Map<string, { definition: ActivityDefinition; count: number }>();
 
@@ -41,13 +146,21 @@ export const QuickAdd = memo(function QuickAdd() {
 
     // If no activities yet, show default activities
     if (activityCounts.size === 0) {
-      return definitions.slice(0, 6).map((def) => ({ definition: def, count: 0 }));
+      return definitions.slice(0, 6).map((def) => ({
+        definition: def,
+        count: 0,
+        averageAmount: null,
+      }));
     }
 
     return Array.from(activityCounts.values())
       .sort((a, b) => b.count - a.count)
-      .slice(0, 6);
-  }, [definitions, activities]);
+      .slice(0, 6)
+      .map((item) => ({
+        ...item,
+        averageAmount: getAverageAmount(item.definition.key),
+      }));
+  }, [definitions, activities, getAverageAmount]);
 
   const handleQuickAddClick = useCallback((definition: ActivityDefinition) => {
     setConfirmActivity(definition);
@@ -58,9 +171,13 @@ export const QuickAdd = memo(function QuickAdd() {
 
     setIsAdding(confirmActivity.key);
     try {
+      // Use average amount from recent history if available, otherwise use default
+      const averageAmount = getAverageAmount(confirmActivity.key);
+      const amountToUse = averageAmount ?? confirmActivity.defaultAmount;
+
       const record = addActivity({
         definition: confirmActivity,
-        amount: confirmActivity.defaultAmount,
+        amount: amountToUse,
         performedAt: new Date().toISOString(),
       });
 
@@ -75,7 +192,7 @@ export const QuickAdd = memo(function QuickAdd() {
     } finally {
       setIsAdding(null);
     }
-  }, [confirmActivity, isAdding, addActivity, showToast, t, lang]);
+  }, [confirmActivity, isAdding, addActivity, showToast, t, lang, getAverageAmount]);
 
   const handleCancelAdd = useCallback(() => {
     setConfirmActivity(null);
@@ -114,8 +231,9 @@ export const QuickAdd = memo(function QuickAdd() {
           <div
             className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-6'} gap-3 sm:gap-4`}
           >
-            {mostUsedActivities.map(({ definition }) => {
+            {mostUsedActivities.map(({ definition, averageAmount }) => {
               const isAddingThis = isAdding === definition.key;
+              const displayAmount = averageAmount ?? definition.defaultAmount;
               return (
                 <button
                   key={definition.key}
@@ -159,7 +277,7 @@ export const QuickAdd = memo(function QuickAdd() {
                     {getActivityLabel(definition, lang)}
                   </div>
                   <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-semibold">
-                    {definition.defaultAmount} {getActivityUnit(definition, lang)}
+                    {displayAmount} {getActivityUnit(definition, lang)}
                   </div>
                   {isAddingThis && (
                     <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-xl ">
@@ -178,12 +296,16 @@ export const QuickAdd = memo(function QuickAdd() {
         title={t('quickAdd.confirmTitle')}
         message={
           confirmActivity
-            ? t('quickAdd.confirmMessage', {
-                activity: getActivityLabel(confirmActivity, lang),
-                amount: String(confirmActivity.defaultAmount),
-                unit: getActivityUnit(confirmActivity, lang),
-                points: String(confirmActivity.defaultAmount * confirmActivity.multiplier),
-              })
+            ? (() => {
+                const averageAmount = getAverageAmount(confirmActivity.key);
+                const amountToUse = averageAmount ?? confirmActivity.defaultAmount;
+                return t('quickAdd.confirmMessage', {
+                  activity: getActivityLabel(confirmActivity, lang),
+                  amount: String(amountToUse),
+                  unit: getActivityUnit(confirmActivity, lang),
+                  points: String(Math.round(amountToUse * confirmActivity.multiplier)),
+                });
+              })()
             : ''
         }
         variant="default"

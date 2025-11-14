@@ -6,6 +6,7 @@ import { useI18n } from '@/lib/i18n';
 import { useSettings } from '@/lib/settingsStore';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useAuth } from '@/hooks/useAuth';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 export function NameDialog() {
   const { settings, hydrated, saveSettings } = useSettings();
@@ -25,8 +26,18 @@ export function NameDialog() {
       return; // Don't show for authenticated users
     }
 
+    // Don't show if login popup is skipped (after logout)
+    const skipLoginPopup =
+      typeof window !== 'undefined' &&
+      localStorage.getItem('sporttrack.skip_login_popup') === 'true';
+    if (skipLoginPopup) {
+      setOpen(false);
+      return;
+    }
+
     const onboardingCompleted =
-      typeof window !== 'undefined' && localStorage.getItem('onboarding_completed') === 'true';
+      typeof window !== 'undefined' &&
+      localStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED) === 'true';
     const nameDialogShown =
       typeof window !== 'undefined' && localStorage.getItem('name_dialog_shown') === 'true';
 

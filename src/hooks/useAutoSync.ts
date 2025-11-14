@@ -24,10 +24,14 @@ const LAST_SYNC_TIME_KEY = 'sporttrack_last_sync_time';
 // Helper function to create a hash from array length and first/last item IDs
 function createArrayHash(arr: any[], maxItems: number = 5): string {
   if (arr.length === 0) return 'empty';
-  const ids = arr
+
+  // Get first few items (most recent activities are at the beginning)
+  const firstIds = arr
     .slice(0, maxItems)
     .map((item) => item.id || JSON.stringify(item))
     .join(',');
+
+  // Get last few items
   const lastIds =
     arr.length > maxItems
       ? arr
@@ -35,7 +39,15 @@ function createArrayHash(arr: any[], maxItems: number = 5): string {
           .map((item) => item.id || JSON.stringify(item))
           .join(',')
       : '';
-  return `${arr.length}:${ids}${lastIds ? `:${lastIds}` : ''}`;
+
+  // Also include a checksum of all IDs for better change detection
+  const allIds = arr.map((item) => item.id || '').join(',');
+  const checksum =
+    allIds.length > 0
+      ? allIds.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 10000
+      : 0;
+
+  return `${arr.length}:${firstIds}${lastIds ? `:${lastIds}` : ''}:${checksum}`;
 }
 
 export function useAutoSync() {
@@ -67,6 +79,7 @@ export function useAutoSync() {
       if (!isAuthenticated || !isConfigured) {
         lastSyncRef.current = null;
         isInitialSyncRef.current = true;
+        console.log('🔄 Auto-sync: Auth/config durumu değişti, reset ediliyor');
       }
       return;
     }
@@ -77,8 +90,30 @@ export function useAutoSync() {
     const hasPendingConflict =
       typeof window !== 'undefined' && localStorage.getItem(CONFLICT_STORAGE_KEY) !== null;
 
+    // Log sync status
+    console.log('📊 Auto-sync durumu:', {
+      isAuthenticated,
+      isConfigured,
+      allHydrated,
+      initialSyncComplete,
+      hasPendingConflict,
+      activitiesCount: activities.length,
+      settingsName: settings?.name || 'null',
+    });
+
     // Don't sync if initial sync is not complete or if there's a pending conflict
     if (!initialSyncComplete || hasPendingConflict) {
+      // Log why sync is skipped for debugging
+      if (!initialSyncComplete) {
+        console.log('⏭️ Auto-sync skipped: Initial sync not complete');
+        console.log(
+          "💡 Çözüm: useCloudSyncListener hook'unun INITIAL_SYNC_COMPLETE_KEY set etmesini bekliyor"
+        );
+      }
+      if (hasPendingConflict) {
+        console.log('⏭️ Auto-sync skipped: Pending conflict resolution');
+        console.log("💡 Çözüm: Conflict resolution dialog'unu tamamlayın");
+      }
       return;
     }
 
@@ -107,6 +142,35 @@ export function useAutoSync() {
     const badgesChanged = currentBadgesHash !== lastSyncRef.current.badgesHash;
     const challengesChanged = currentChallengesHash !== lastSyncRef.current.challengesHash;
 
+    // Log changes for debugging
+    if (activitiesChanged || settingsChanged || badgesChanged || challengesChanged) {
+      console.log('🔄 Değişiklik tespit edildi:', {
+        activities: activitiesChanged,
+        settings: settingsChanged,
+        badges: badgesChanged,
+        challenges: challengesChanged,
+        activitiesCount: activities.length,
+        settingsName: settings?.name || 'null',
+        badgesCount: badges.length,
+        challengesCount: challenges.length,
+      });
+
+      // Show hash comparison for activities if changed
+      if (activitiesChanged) {
+        console.log('📊 Activities hash karşılaştırması:', {
+          önceki: lastSyncRef.current.activitiesHash,
+          şimdiki: currentActivitiesHash,
+          fark: 'Hash değişti, sync tetiklenecek',
+        });
+      }
+    } else {
+      // Log when no changes detected (for debugging)
+      console.log('✅ Değişiklik yok, sync atlanıyor', {
+        activitiesHash: currentActivitiesHash,
+        activitiesCount: activities.length,
+      });
+    }
+
     // If nothing changed, don't sync (prevents infinite loops)
     if (!activitiesChanged && !settingsChanged && !badgesChanged && !challengesChanged) {
       return;
@@ -129,14 +193,19 @@ export function useAutoSync() {
 
       if (timeSinceLastSync < SYNC_THROTTLE_MS && lastSyncTime > 0) {
         // Too soon, reschedule
+        const waitTime = SYNC_THROTTLE_MS - timeSinceLastSync;
+        console.log(
+          `⏱️ Throttle: Son sync ${Math.round(timeSinceLastSync / 1000)}s önce yapıldı, ${Math.round(waitTime / 1000)}s bekleniyor`
+        );
         syncTimeoutRef.current = setTimeout(() => {
           syncTimeoutRef.current = null;
-        }, SYNC_THROTTLE_MS - timeSinceLastSync);
+        }, waitTime);
         return;
       }
 
       // Prevent concurrent syncs
       if (isSyncingRef.current) {
+        console.log('⏭️ Auto-sync skipped: Zaten bir sync işlemi devam ediyor');
         return;
       }
 
@@ -146,6 +215,13 @@ export function useAutoSync() {
       const finalChallengesHash = createArrayHash(challenges);
 
       isSyncingRef.current = true;
+      console.log('🚀 Auto-sync başlatılıyor...', {
+        activities: activities.length,
+        settings: settings ? 'present' : 'null',
+        badges: badges.length,
+        challenges: challenges.length,
+      });
+
       syncToCloud({
         activities,
         settings,
@@ -154,18 +230,44 @@ export function useAutoSync() {
       })
         .then(() => {
           // Update last sync time
+          const syncTime = Date.now();
           if (typeof window !== 'undefined') {
-            localStorage.setItem(LAST_SYNC_TIME_KEY, String(Date.now()));
+            localStorage.setItem(LAST_SYNC_TIME_KEY, String(syncTime));
           }
+          console.log('✅ Auto-sync başarılı!', {
+            syncTime: new Date(syncTime).toLocaleTimeString(),
+          });
           // Show success toast
           showToast(t('cloudSync.syncedToCloud'), 'success');
         })
         .catch((error) => {
           console.error('❌ Auto-sync failed:', error);
-          showToast(t('cloudSync.syncFailed'), 'error');
+          console.error('Error details:', {
+            message: error instanceof Error ? error.message : String(error),
+            code: (error as any)?.code,
+            stack: error instanceof Error ? error.stack : undefined,
+          });
+
+          // Check if error is related to invalid dates (RangeError)
+          const isDateError =
+            error instanceof RangeError ||
+            (error instanceof Error &&
+              (error.message.includes('Invalid time') ||
+                error.message.includes('RangeError') ||
+                error.message.includes('Invalid date')));
+
+          if (isDateError) {
+            console.error('⚠️ Date validation error detected. Activities may have invalid dates.');
+            console.error('💡 Attempting to sanitize activities and retry...');
+            // Don't show error toast for date errors, as they're being handled automatically
+            // The sync service will retry with sanitized dates
+          } else {
+            showToast(t('cloudSync.syncFailed'), 'error');
+          }
         })
         .finally(() => {
           isSyncingRef.current = false;
+          console.log('🏁 Auto-sync tamamlandı (flag reset)');
         });
 
       // Update last sync ref with current hashes

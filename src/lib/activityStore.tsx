@@ -52,6 +52,7 @@ type ActivitiesContextValue = {
   addActivity: (input: AddActivityInput) => ActivityRecord;
   updateActivity: (id: string, input: UpdateActivityInput) => ActivityRecord | null;
   deleteActivity: (id: string) => void;
+  clearAllActivities: () => void;
 };
 
 const ActivitiesContext = createContext<ActivitiesContextValue | null>(null);
@@ -69,6 +70,39 @@ function computePoints(multiplier: number, amount: number) {
   return Math.max(0, Math.round(amount * multiplier));
 }
 
+/**
+ * Validates and sanitizes a date string, returning a valid ISO string or current date
+ */
+function validateAndSanitizeDate(dateStr: string | null | undefined): string {
+  if (!dateStr) {
+    return new Date().toISOString();
+  }
+
+  try {
+    const date = new Date(dateStr);
+    // Check if date is valid
+    if (Number.isNaN(date.getTime())) {
+      console.warn('Invalid date detected, using current date:', dateStr);
+      return new Date().toISOString();
+    }
+    // Check if date is reasonable (not too far in past/future)
+    const now = Date.now();
+    const dateTime = date.getTime();
+    const tenYearsAgo = now - 10 * 365 * 24 * 60 * 60 * 1000;
+    const tenYearsFuture = now + 10 * 365 * 24 * 60 * 60 * 1000;
+
+    if (dateTime < tenYearsAgo || dateTime > tenYearsFuture) {
+      console.warn('Date out of reasonable range, using current date:', dateStr);
+      return new Date().toISOString();
+    }
+
+    return date.toISOString();
+  } catch (error) {
+    console.warn('Error parsing date, using current date:', dateStr, error);
+    return new Date().toISOString();
+  }
+}
+
 function buildRecord(
   definition: ActivityDefinition,
   amount: number,
@@ -76,7 +110,7 @@ function buildRecord(
   note?: string | null,
   duration?: number
 ): ActivityRecord {
-  const iso = performedAt ? new Date(performedAt).toISOString() : new Date().toISOString();
+  const iso = validateAndSanitizeDate(performedAt);
   const multiplier = definition.multiplier;
   return {
     id: generateId(),
@@ -115,7 +149,7 @@ function normalizeRecord(record: Partial<ActivityRecord>): ActivityRecord {
     multiplier,
     amount,
     points: typeof record.points === 'number' ? record.points : computePoints(multiplier, amount),
-    performedAt: record.performedAt ?? new Date().toISOString(),
+    performedAt: validateAndSanitizeDate(record.performedAt),
     note: record.note ?? null,
     description: record.description ?? fallback?.description,
     descriptionEn: record.descriptionEn ?? fallback?.descriptionEn,
@@ -181,8 +215,8 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
           return record;
         }
         const iso = input.performedAt
-          ? new Date(input.performedAt).toISOString()
-          : record.performedAt;
+          ? validateAndSanitizeDate(input.performedAt)
+          : validateAndSanitizeDate(record.performedAt);
         const multiplier = input.definition.multiplier;
         updated = {
           ...record,
@@ -210,6 +244,13 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
     setActivities((prev) => prev.filter((record) => record.id !== id));
   }, []);
 
+  const clearAllActivities = useCallback(() => {
+    setActivities([]);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, []);
+
   const clearStorageError = useCallback(() => {
     setStorageError(null);
   }, []);
@@ -223,6 +264,7 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
       addActivity,
       updateActivity,
       deleteActivity,
+      clearAllActivities,
     }),
     [
       activities,
@@ -232,6 +274,7 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
       addActivity,
       updateActivity,
       deleteActivity,
+      clearAllActivities,
     ]
   );
 

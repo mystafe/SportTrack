@@ -23,6 +23,7 @@ type ChallengeContextValue = {
   deleteChallenge: (id: string) => void;
   getChallengeProgress: (challengeId: string) => ChallengeProgress | null;
   checkCompletedChallenges: () => Challenge[];
+  clearAllChallenges: () => void;
 };
 
 const ChallengeContext = createContext<ChallengeContextValue | null>(null);
@@ -177,6 +178,13 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
     });
   }, [challenges, activities]);
 
+  const clearAllChallenges = useCallback(() => {
+    setChallenges([]);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEYS.CHALLENGES);
+    }
+  }, []);
+
   const value = useMemo<ChallengeContextValue>(
     () => ({
       challenges,
@@ -186,6 +194,7 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
       deleteChallenge,
       getChallengeProgress,
       checkCompletedChallenges,
+      clearAllChallenges,
     }),
     [
       challenges,
@@ -195,6 +204,7 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
       deleteChallenge,
       getChallengeProgress,
       checkCompletedChallenges,
+      clearAllChallenges,
     ]
   );
 

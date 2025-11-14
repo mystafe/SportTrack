@@ -120,7 +120,19 @@ function mergeData(
 }
 
 /**
+ * Check if data is empty (0 activities, 0 badges, 0 challenges)
+ */
+function isEmpty(data: {
+  activities: ActivityRecord[];
+  badges: Badge[];
+  challenges: Challenge[];
+}): boolean {
+  return data.activities.length === 0 && data.badges.length === 0 && data.challenges.length === 0;
+}
+
+/**
  * Use newest data based on metadata timestamps
+ * If one side is empty (0 activities, 0 badges, 0 challenges), use the other side
  */
 function useNewest(
   localData: {
@@ -136,8 +148,25 @@ function useNewest(
   badges: Badge[];
   challenges: Challenge[];
 } {
-  // For simplicity, we'll use cloud data if it exists
-  // In a production app, you'd compare timestamps from local storage metadata
+  const localIsEmpty = isEmpty(localData);
+  const cloudIsEmpty = isEmpty(cloudData);
+
+  // If local is empty, use cloud (even if cloud is also empty, prefer cloud for consistency)
+  if (localIsEmpty) {
+    return {
+      activities: (cloudData.activities as ActivityRecord[]) || [],
+      settings: (cloudData.settings as UserSettings) || localData.settings,
+      badges: (cloudData.badges as Badge[]) || [],
+      challenges: (cloudData.challenges as Challenge[]) || [],
+    };
+  }
+
+  // If cloud is empty, use local
+  if (cloudIsEmpty) {
+    return localData;
+  }
+
+  // Both have data, compare timestamps
   const localLastModified = getLocalLastModified();
   const cloudLastModified = cloudData.metadata?.lastModified || new Date(0);
 

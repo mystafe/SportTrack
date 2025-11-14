@@ -20,6 +20,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { AuthDialog } from '@/components/AuthDialog';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useToaster } from '@/components/Toaster';
+import { useRouter } from 'next/navigation';
+import { useActivities } from '@/lib/activityStore';
+import { useBadges } from '@/lib/badgeStore';
+import { useChallenges } from '@/lib/challengeStore';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 interface SettingsDialogProps {
   triggerButton?: React.ReactNode;
@@ -32,6 +37,10 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const keyboardShortcuts = useKeyboardShortcuts();
   const { isAuthenticated, isConfigured, user, logout } = useAuth();
   const { showToast } = useToaster();
+  const router = useRouter();
+  const { clearAllActivities } = useActivities();
+  const { clearAllBadges } = useBadges();
+  const { clearAllChallenges } = useChallenges();
   const [open, setOpen] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
@@ -124,24 +133,46 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const handleLogout = async () => {
     try {
       await logout();
-      // Clear name from settings when user logs out
+
+      // Clear all data stores
+      clearAllActivities();
+      clearAllBadges();
+      clearAllChallenges();
+
+      // Reset settings to default values
       saveSettings({
         name: '',
-        dailyTarget: settings?.dailyTarget ?? 10000,
-        customActivities: settings?.customActivities ?? [],
-        mood: settings?.mood,
+        dailyTarget: 10000,
+        customActivities: [],
+        mood: undefined,
       });
-      // Clear all localStorage cache
+
+      // Clear all localStorage cache (except theme and lang)
       if (typeof window !== 'undefined') {
         // Clear all SportTrack related localStorage items
         Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith('sporttrack.') || key === 'theme' || key === 'lang') {
+          if (key.startsWith('sporttrack.')) {
             localStorage.removeItem(key);
           }
         });
+
+        // Prevent onboarding from showing after logout
+        localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
+
+        // Prevent login popup from showing
+        localStorage.setItem('sporttrack.skip_login_popup', 'true');
       }
+
+      // Close settings dialog
+      setOpen(false);
+
+      // Navigate to homepage
+      router.push('/');
+
       showToast(
-        lang === 'tr' ? 'Çıkış yapıldı ve önbellek temizlendi' : 'Logged out and cache cleared',
+        lang === 'tr'
+          ? 'Çıkış yapıldı ve tüm veriler temizlendi'
+          : 'Logged out and all data cleared',
         'success'
       );
     } catch (error) {
