@@ -22,7 +22,7 @@ const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
  * This ensures the dialog appears immediately after login, before user opens settings
  */
 export function ConflictResolutionManager() {
-  const { isAuthenticated, isConfigured } = useAuth();
+  const { user, isAuthenticated, isConfigured } = useAuth();
   const { activities } = useActivities();
   const { settings, saveSettings } = useSettings();
   const { badges } = useBadges();
@@ -215,7 +215,16 @@ export function ConflictResolutionManager() {
         localStorage.removeItem(CONFLICT_STORAGE_KEY);
       }
 
-      await applyCloudData(conflictData.cloud, strategy);
+      // Add metadata to cloudData if missing (required by CloudData type)
+      const cloudDataWithMetadata: import('@/lib/cloudSync/types').CloudData = {
+        ...conflictData.cloud,
+        metadata: {
+          lastModified: new Date(),
+          version: Date.now(),
+          userId: user?.uid || 'unknown',
+        },
+      };
+      await applyCloudData(cloudDataWithMetadata, strategy);
     } catch (error) {
       console.error('Conflict resolution error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

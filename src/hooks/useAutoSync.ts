@@ -22,10 +22,7 @@ const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 const LAST_SYNC_TIME_KEY = 'sporttrack_last_sync_time';
 
 // Helper function to create a hash from array length and first/last item IDs
-function createArrayHash(
-  arr: Array<{ id?: string; [key: string]: unknown }>,
-  maxItems: number = 5
-): string {
+function createArrayHash<T extends { id?: string }>(arr: T[], maxItems: number = 5): string {
   if (arr.length === 0) return 'empty';
 
   // Get first few items (most recent activities are at the beginning)

@@ -168,7 +168,16 @@ export function CloudSyncSettings() {
         localStorage.removeItem(CONFLICT_STORAGE_KEY);
       }
 
-      await applyCloudData(conflictData.cloud, strategy);
+      // Add metadata to cloudData if missing (required by CloudData type)
+      const cloudDataWithMetadata: import('@/lib/cloudSync/types').CloudData = {
+        ...conflictData.cloud,
+        metadata: {
+          lastModified: new Date(),
+          version: Date.now(),
+          userId: user?.uid || '',
+        },
+      };
+      await applyCloudData(cloudDataWithMetadata, strategy);
     } catch (error) {
       console.error('Conflict resolution error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
