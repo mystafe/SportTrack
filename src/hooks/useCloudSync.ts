@@ -44,7 +44,13 @@ export function useCloudSync() {
       try {
         updateStatus('syncing');
         console.log('🔄 Starting cloud sync...');
-        await cloudSyncService.uploadToCloud(data as any);
+        // Type assertions for cloud sync service
+        await cloudSyncService.uploadToCloud({
+          activities: data.activities as import('@/lib/activityStore').ActivityRecord[],
+          settings: data.settings as import('@/lib/settingsStore').UserSettings | null,
+          badges: data.badges as import('@/lib/badges').Badge[],
+          challenges: data.challenges as import('@/lib/challenges').Challenge[],
+        });
         console.log('✅ Cloud sync completed successfully');
         updateStatus('synced');
         setSyncState((prev) => ({

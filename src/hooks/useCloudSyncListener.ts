@@ -247,7 +247,19 @@ export function useCloudSyncListener() {
 
               // Apply settings
               if (cloudData.settings) {
-                currentSaveSettings(cloudData.settings as any);
+                // Type guard for UserSettings
+                const isUserSettings = (
+                  s: unknown
+                ): s is import('@/lib/settingsStore').UserSettings => {
+                  return (
+                    typeof s === 'object' &&
+                    s !== null &&
+                    ('name' in s || 'dailyTarget' in s || 'customActivities' in s || 'mood' in s)
+                  );
+                };
+                if (isUserSettings(cloudData.settings)) {
+                  currentSaveSettings(cloudData.settings);
+                }
                 console.log('✅ Downloaded settings');
               }
 
@@ -366,7 +378,19 @@ export function useCloudSyncListener() {
 
               // Apply settings
               if (cloudData.settings) {
-                currentSaveSettings(cloudData.settings as any);
+                // Type guard for UserSettings
+                const isUserSettings = (
+                  s: unknown
+                ): s is import('@/lib/settingsStore').UserSettings => {
+                  return (
+                    typeof s === 'object' &&
+                    s !== null &&
+                    ('name' in s || 'dailyTarget' in s || 'customActivities' in s || 'mood' in s)
+                  );
+                };
+                if (isUserSettings(cloudData.settings)) {
+                  currentSaveSettings(cloudData.settings);
+                }
                 console.log('✅ Downloaded settings');
               }
 
@@ -414,13 +438,23 @@ export function useCloudSyncListener() {
       // Regular sync (not initial) - only sync settings for now
       if (cloudData.settings) {
         // Normalize both settings objects for comparison (handle undefined vs null)
-        const normalizeSettings = (s: any) => {
-          if (!s) return null;
+        const normalizeSettings = (
+          s: unknown
+        ): {
+          name: string;
+          dailyTarget: number;
+          customActivities: unknown[];
+          mood: string | null;
+        } | null => {
+          if (!s || typeof s !== 'object') return null;
+          const settings = s as Record<string, unknown>;
           return {
-            name: s.name || '',
-            dailyTarget: s.dailyTarget || 10000,
-            customActivities: s.customActivities || [],
-            mood: s.mood !== undefined ? s.mood : null,
+            name: typeof settings.name === 'string' ? settings.name : '',
+            dailyTarget: typeof settings.dailyTarget === 'number' ? settings.dailyTarget : 10000,
+            customActivities: Array.isArray(settings.customActivities)
+              ? settings.customActivities
+              : [],
+            mood: settings.mood !== undefined ? (settings.mood as string | null) : null,
           };
         };
 
@@ -431,7 +465,17 @@ export function useCloudSyncListener() {
         const localSettingsStr = JSON.stringify(normalizedLocal);
 
         if (cloudSettingsStr !== localSettingsStr) {
-          currentSaveSettings(cloudData.settings as any);
+          // Type guard for UserSettings
+          const isUserSettings = (s: unknown): s is import('@/lib/settingsStore').UserSettings => {
+            return (
+              typeof s === 'object' &&
+              s !== null &&
+              ('name' in s || 'dailyTarget' in s || 'customActivities' in s || 'mood' in s)
+            );
+          };
+          if (isUserSettings(cloudData.settings)) {
+            currentSaveSettings(cloudData.settings);
+          }
           showToastRef.current(tRef.current('cloudSync.syncedFromCloud'), 'info');
         }
       }

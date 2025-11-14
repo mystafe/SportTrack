@@ -80,45 +80,84 @@ export class CloudSyncService {
 
       /**
        * Validates and sanitizes a date string, returning a valid ISO string or current date
+       * This function is designed to NEVER throw an error - always returns a valid ISO string
        */
       const validateAndSanitizeDate = (dateStr: string | null | undefined): string => {
-        if (!dateStr) {
-          return new Date().toISOString();
+        // Always return a valid date, never throw
+        const fallbackDate = new Date();
+
+        if (!dateStr || typeof dateStr !== 'string' || dateStr.trim() === '') {
+          return fallbackDate.toISOString();
         }
 
         try {
+          // Try to parse the date
           const date = new Date(dateStr);
-          // Check if date is valid
-          if (Number.isNaN(date.getTime())) {
+
+          // Check if date is valid (not NaN)
+          const timeValue = date.getTime();
+          if (Number.isNaN(timeValue) || !isFinite(timeValue)) {
             console.warn('⚠️ Invalid date detected during sync, using current date:', dateStr);
-            return new Date().toISOString();
+            return fallbackDate.toISOString();
           }
+
           // Check if date is reasonable (not too far in past/future)
           const now = Date.now();
-          const dateTime = date.getTime();
           const tenYearsAgo = now - 10 * 365 * 24 * 60 * 60 * 1000;
           const tenYearsFuture = now + 10 * 365 * 24 * 60 * 60 * 1000;
 
-          if (dateTime < tenYearsAgo || dateTime > tenYearsFuture) {
+          if (timeValue < tenYearsAgo || timeValue > tenYearsFuture) {
             console.warn(
               '⚠️ Date out of reasonable range during sync, using current date:',
               dateStr
             );
-            return new Date().toISOString();
+            return fallbackDate.toISOString();
           }
 
-          return date.toISOString();
+          // Try to convert to ISO string - this can throw RangeError for invalid dates
+          try {
+            const isoString = date.toISOString();
+            // Validate the ISO string is not empty or malformed
+            if (!isoString || isoString.length === 0 || !isoString.includes('T')) {
+              console.warn('⚠️ Invalid ISO string generated, using current date:', dateStr);
+              return fallbackDate.toISOString();
+            }
+            return isoString;
+          } catch (isoError) {
+            // RangeError: Invalid time value
+            console.warn(
+              '⚠️ RangeError converting to ISO string, using current date:',
+              dateStr,
+              isoError
+            );
+            return fallbackDate.toISOString();
+          }
         } catch (error) {
+          // Catch any other errors (TypeError, etc.)
           console.warn('⚠️ Error parsing date during sync, using current date:', dateStr, error);
-          return new Date().toISOString();
+          return fallbackDate.toISOString();
         }
+      };
+
+      /**
+       * Type guard to check if value is an object with performedAt property
+       */
+      const hasPerformedAt = (
+        value: unknown
+      ): value is { performedAt: string; [key: string]: unknown } => {
+        return (
+          typeof value === 'object' &&
+          value !== null &&
+          'performedAt' in value &&
+          typeof (value as { performedAt: unknown }).performedAt === 'string'
+        );
       };
 
       /**
        * Recursively remove undefined values and validate dates from an object/array
        * Firestore doesn't accept undefined values
        */
-      const removeUndefined = (obj: any): any => {
+      const removeUndefined = (obj: unknown): unknown => {
         if (obj === null || obj === undefined) {
           return null;
         }
@@ -126,11 +165,24 @@ export class CloudSyncService {
         if (Array.isArray(obj)) {
           return obj
             .map((item) => {
-              // If item is an activity record, validate its performedAt date
-              if (item && typeof item === 'object' && 'performedAt' in item) {
+              // If item is an activity record, preserve performedAt and validate it
+              if (hasPerformedAt(item)) {
+                // Store the original performedAt before cleaning
+                const originalPerformedAt = item.performedAt;
+                // Clean the item (this might modify performedAt, so we'll restore it)
+                const cleaned = removeUndefined(item);
+                if (typeof cleaned === 'object' && cleaned !== null) {
+                  // Ensure performedAt is always validated and present
+                  const validatedDate = validateAndSanitizeDate(originalPerformedAt);
+                  return {
+                    ...(cleaned as Record<string, unknown>),
+                    performedAt: validatedDate,
+                  };
+                }
+                // Fallback: return item with validated date
                 return {
-                  ...removeUndefined(item),
-                  performedAt: validateAndSanitizeDate(item.performedAt),
+                  ...item,
+                  performedAt: validateAndSanitizeDate(originalPerformedAt),
                 };
               }
               return removeUndefined(item);
@@ -139,7 +191,7 @@ export class CloudSyncService {
         }
 
         if (typeof obj === 'object' && obj.constructor === Object) {
-          const cleaned: any = {};
+          const cleaned: Record<string, unknown> = {};
           for (const [key, value] of Object.entries(obj)) {
             if (value !== undefined) {
               // Special handling for performedAt fields
@@ -160,13 +212,18 @@ export class CloudSyncService {
       // Always include mood with a default value (null) if not set
       const cleanedSettings = data.settings
         ? (() => {
-            const cleaned: any = {
+            const cleaned: {
+              name: string;
+              dailyTarget: number;
+              customActivities: unknown[];
+              mood: string | null;
+            } = {
               name: data.settings.name || '',
               dailyTarget: data.settings.dailyTarget || 10000,
               customActivities: data.settings.customActivities || [],
               mood: data.settings.mood !== undefined ? data.settings.mood : null, // Always include mood
             };
-            return removeUndefined(cleaned);
+            return removeUndefined(cleaned) as typeof cleaned;
           })()
         : null;
 
@@ -240,25 +297,85 @@ service cloud.firestore {
 
       // Clean all data to remove undefined values and validate dates
       // This also sanitizes any invalid dates in activities
+      // IMPORTANT: Validate ALL dates BEFORE any processing to prevent "Invalid time value" errors
       let cleanedActivities: ActivityRecord[];
       try {
-        cleanedActivities = removeUndefined(data.activities || []) as ActivityRecord[];
-        // Double-check all activities have valid dates
-        cleanedActivities = cleanedActivities.map((activity) => ({
-          ...activity,
-          performedAt: validateAndSanitizeDate(activity.performedAt),
-        }));
+        // First, validate and sanitize all dates in activities BEFORE removeUndefined
+        const preValidatedActivities = (data.activities || []).map((activity) => {
+          try {
+            // Ensure performedAt is always a valid ISO string
+            const validatedDate = validateAndSanitizeDate(activity.performedAt);
+            return {
+              ...activity,
+              performedAt: validatedDate,
+            };
+          } catch (dateError) {
+            console.warn(
+              '⚠️ Invalid date in activity, using current date:',
+              activity.id,
+              activity.performedAt,
+              dateError
+            );
+            return {
+              ...activity,
+              performedAt: new Date().toISOString(),
+            };
+          }
+        });
+
+        // Now remove undefined values from pre-validated activities
+        const cleaned = removeUndefined(preValidatedActivities);
+        cleanedActivities = Array.isArray(cleaned) ? (cleaned as ActivityRecord[]) : [];
+
+        // Final validation pass - ensure all dates are still valid
+        cleanedActivities = cleanedActivities.map((activity) => {
+          try {
+            const finalDate = validateAndSanitizeDate(activity.performedAt);
+            return {
+              ...activity,
+              performedAt: finalDate,
+            };
+          } catch (finalError) {
+            console.error(
+              '❌ Final date validation failed for activity:',
+              activity.id,
+              activity.performedAt,
+              finalError
+            );
+            return {
+              ...activity,
+              performedAt: new Date().toISOString(),
+            };
+          }
+        });
       } catch (error) {
         console.error('❌ Error cleaning activities:', error);
-        // If cleaning fails, try to salvage valid activities
-        cleanedActivities = (data.activities || []).map((activity) => ({
-          ...activity,
-          performedAt: validateAndSanitizeDate(activity.performedAt),
-        }));
+        // If cleaning fails, try to salvage valid activities with safe dates
+        cleanedActivities = (data.activities || []).map((activity) => {
+          try {
+            return {
+              ...activity,
+              performedAt: validateAndSanitizeDate(activity.performedAt),
+            };
+          } catch (salvageError) {
+            console.error(
+              '❌ Cannot salvage activity, using current date:',
+              activity.id,
+              salvageError
+            );
+            return {
+              ...activity,
+              performedAt: new Date().toISOString(),
+            };
+          }
+        });
       }
 
-      const cleanedBadges = removeUndefined(data.badges || []);
-      const cleanedChallenges = removeUndefined(data.challenges || []);
+      const cleanedBadgesRaw = removeUndefined(data.badges || []);
+      const cleanedBadges = Array.isArray(cleanedBadgesRaw) ? cleanedBadgesRaw : [];
+
+      const cleanedChallengesRaw = removeUndefined(data.challenges || []);
+      const cleanedChallenges = Array.isArray(cleanedChallengesRaw) ? cleanedChallengesRaw : [];
 
       const cloudData: CloudData = {
         activities: cleanedActivities,
@@ -269,16 +386,21 @@ service cloud.firestore {
       };
 
       // Ensure we're sending complete data, not partial updates
-      const docData = removeUndefined({
-        activities: data.activities,
+      // IMPORTANT: Use cleanedActivities (with validated dates) instead of raw data.activities
+      const docDataRaw = removeUndefined({
+        activities: cleanedActivities, // Use cleaned activities with validated dates
         settings: cleanedSettings,
-        badges: data.badges,
-        challenges: data.challenges,
+        badges: cleanedBadges,
+        challenges: cleanedChallenges,
         metadata: {
           ...metadata,
           lastModified: serverTimestamp(),
         },
       });
+      const docData =
+        typeof docDataRaw === 'object' && docDataRaw !== null
+          ? (docDataRaw as Record<string, unknown>)
+          : {};
 
       console.log('📤 Uploading full data:', {
         activities: data.activities.length,
@@ -286,7 +408,7 @@ service cloud.firestore {
         badges: data.badges.length,
         challenges: data.challenges.length,
         totalActivitiesPoints: data.activities.reduce(
-          (sum: number, act: any) => sum + (act.points || 0),
+          (sum: number, act: ActivityRecord) => sum + (act.points || 0),
           0
         ),
       });
@@ -296,15 +418,26 @@ service cloud.firestore {
       // Use merge: true to preserve existing fields that we're not updating
       try {
         await setDoc(userDocRef, docData, { merge: true });
-      } catch (setDocError: any) {
+      } catch (setDocError: unknown) {
+        // Type guard for error with message property
+        const hasMessage = (err: unknown): err is { message: string } => {
+          return (
+            typeof err === 'object' &&
+            err !== null &&
+            'message' in err &&
+            typeof (err as { message: unknown }).message === 'string'
+          );
+        };
+
         // Check if error is related to invalid dates
         if (
-          setDocError?.message?.includes('Invalid time') ||
-          setDocError?.message?.includes('RangeError')
+          hasMessage(setDocError) &&
+          (setDocError.message.includes('Invalid time') ||
+            setDocError.message.includes('RangeError'))
         ) {
           console.error('❌ Date validation error during upload, retrying with sanitized dates...');
           // Re-sanitize all dates and retry once
-          const reSanitizedDocData = {
+          const reSanitizedDocData: Record<string, unknown> = {
             ...docData,
             activities: cleanedActivities.map((activity) => ({
               ...activity,

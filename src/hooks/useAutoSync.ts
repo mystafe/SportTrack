@@ -22,7 +22,10 @@ const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 const LAST_SYNC_TIME_KEY = 'sporttrack_last_sync_time';
 
 // Helper function to create a hash from array length and first/last item IDs
-function createArrayHash(arr: any[], maxItems: number = 5): string {
+function createArrayHash(
+  arr: Array<{ id?: string; [key: string]: unknown }>,
+  maxItems: number = 5
+): string {
   if (arr.length === 0) return 'empty';
 
   // Get first few items (most recent activities are at the beginning)
@@ -242,9 +245,14 @@ export function useAutoSync() {
         })
         .catch((error) => {
           console.error('❌ Auto-sync failed:', error);
+          // Type guard for Firebase errors
+          const isFirebaseError = (err: unknown): err is { code: string; message: string } => {
+            return typeof err === 'object' && err !== null && 'code' in err && 'message' in err;
+          };
+
           console.error('Error details:', {
             message: error instanceof Error ? error.message : String(error),
-            code: (error as any)?.code,
+            code: isFirebaseError(error) ? error.code : undefined,
             stack: error instanceof Error ? error.stack : undefined,
           });
 

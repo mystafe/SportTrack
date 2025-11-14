@@ -125,7 +125,10 @@ export function ConflictResolutionManager() {
     };
   }, [isAuthenticated, isConfigured, showToast, t, showConflictDialog]);
 
-  const applyCloudData = async (cloudData: any, strategy: ConflictStrategy) => {
+  const applyCloudData = async (
+    cloudData: import('@/lib/cloudSync/types').CloudData,
+    strategy: ConflictStrategy
+  ) => {
     const localData = { activities, settings, badges, challenges };
     const resolution = resolveConflicts(localData, cloudData, strategy);
 
@@ -139,7 +142,7 @@ export function ConflictResolutionManager() {
     // Apply resolved data locally
     // Apply settings
     if (resolution.resolvedData.settings) {
-      saveSettings(resolution.resolvedData.settings as any);
+      saveSettings(resolution.resolvedData.settings);
     }
 
     // Apply activities, badges, and challenges directly to localStorage
@@ -181,10 +184,10 @@ export function ConflictResolutionManager() {
     // For "cloud" strategy: just apply cloud data locally, don't upload anything
     if (strategy !== 'cloud') {
       await syncToCloud({
-        activities: resolution.resolvedData.activities as any[],
+        activities: resolution.resolvedData.activities,
         settings: resolution.resolvedData.settings,
-        badges: resolution.resolvedData.badges as any[],
-        challenges: resolution.resolvedData.challenges as any[],
+        badges: resolution.resolvedData.badges,
+        challenges: resolution.resolvedData.challenges,
       });
     }
 

@@ -117,14 +117,17 @@ export function CloudSyncSettings() {
     );
   };
 
-  const applyCloudData = async (cloudData: any, strategy: ConflictStrategy) => {
+  const applyCloudData = async (
+    cloudData: import('@/lib/cloudSync/types').CloudData,
+    strategy: ConflictStrategy
+  ) => {
     const localData = { activities, settings, badges, challenges };
     const resolution = resolveConflicts(localData, cloudData, strategy);
 
     // Apply resolved data locally
     // Apply settings
     if (resolution.resolvedData.settings) {
-      saveSettings(resolution.resolvedData.settings as any);
+      saveSettings(resolution.resolvedData.settings);
     }
 
     // Only sync to cloud if strategy is NOT "cloud" (cloud strategy means use cloud data, don't overwrite it)
@@ -133,10 +136,10 @@ export function CloudSyncSettings() {
     // For "cloud" strategy: just apply cloud data locally, don't upload anything
     if (strategy !== 'cloud') {
       await syncToCloud({
-        activities: resolution.resolvedData.activities as any[],
+        activities: resolution.resolvedData.activities,
         settings: resolution.resolvedData.settings,
-        badges: resolution.resolvedData.badges as any[],
-        challenges: resolution.resolvedData.challenges as any[],
+        badges: resolution.resolvedData.badges,
+        challenges: resolution.resolvedData.challenges,
       });
     }
 
