@@ -12,6 +12,9 @@ import {
   onSnapshot,
   serverTimestamp,
   Timestamp,
+  collection,
+  writeBatch,
+  getDocs,
   type DocumentSnapshot,
 } from 'firebase/firestore';
 import type { SyncStatus, CloudData, SyncMetadata } from './types';
@@ -19,6 +22,9 @@ import { ActivityRecord } from '@/lib/activityStore';
 import { UserSettings } from '@/lib/settingsStore';
 import { Badge } from '@/lib/badges';
 import { Challenge } from '@/lib/challenges';
+import { ActivityDefinition, BASE_ACTIVITY_DEFINITIONS } from '@/lib/activityConfig';
+import { calculateOverallStatistics, calculatePeriodStatistics } from './statisticsCalculator';
+import { subDays, startOfDay, endOfDay } from 'date-fns';
 
 export class CloudSyncService {
   private userId: string | null = null;
@@ -47,6 +53,255 @@ export class CloudSyncService {
       throw new Error('Firebase not configured or user not authenticated');
     }
     return doc(db, 'users', this.userId);
+  }
+
+  /**
+   * Get activities collection reference
+   */
+  private getActivitiesCollectionRef() {
+    if (!this.userId || !db) {
+      throw new Error('Firebase not configured or user not authenticated');
+    }
+    return collection(db, 'users', this.userId, 'activities');
+  }
+
+  /**
+   * Get exercises collection reference
+   */
+  private getExercisesCollectionRef() {
+    if (!this.userId || !db) {
+      throw new Error('Firebase not configured or user not authenticated');
+    }
+    return collection(db, 'users', this.userId, 'exercises');
+  }
+
+  /**
+   * Get statistics collection reference
+   */
+  private getStatisticsCollectionRef() {
+    if (!this.userId || !db) {
+      throw new Error('Firebase not configured or user not authenticated');
+    }
+    return collection(db, 'users', this.userId, 'statistics');
+  }
+
+  /**
+   * Get challenges collection reference
+   */
+  private getChallengesCollectionRef() {
+    if (!this.userId || !db) {
+      throw new Error('Firebase not configured or user not authenticated');
+    }
+    return collection(db, 'users', this.userId, 'challenges');
+  }
+
+  /**
+   * Upload converted data to cloud in new format
+   * This function handles the new Firestore structure:
+   * - users/{userId} document: { points, lastModified }
+   * - users/{userId}/activities collection: Activity definitions
+   * - users/{userId}/exercises collection: Exercise records
+   * - users/{userId}/statistics collection: Statistics documents
+   * - users/{userId}/challenges collection: Challenge records
+   */
+  async uploadConvertedDataToCloud(convertedData: {
+    activities: ActivityDefinition[];
+    exercises: ActivityRecord[];
+    statistics: Array<{
+      id: string;
+      totalPoints: number;
+      totalExercises: number;
+      totalActivities: number;
+      streakDays: number;
+      averageDailyPoints: number;
+      completionRate: number;
+      lastCalculated: Date;
+    }>;
+    challenges: Challenge[];
+    points: number;
+    lastModified: Date | null;
+  }): Promise<void> {
+    if (!this.isConfigured()) {
+      throw new Error('Cloud sync not configured');
+    }
+
+    // Check authentication
+    if (!auth?.currentUser) {
+      throw new Error('User not authenticated');
+    }
+
+    const userDocRef = this.getUserDocRef();
+    const activitiesCollectionRef = this.getActivitiesCollectionRef();
+    const exercisesCollectionRef = this.getExercisesCollectionRef();
+    const statisticsCollectionRef = this.getStatisticsCollectionRef();
+    const challengesCollectionRef = this.getChallengesCollectionRef();
+
+    console.log('📤 Uploading converted data to cloud (new format)...');
+    console.log('📋 Data summary:', {
+      activities: convertedData.activities.length,
+      exercises: convertedData.exercises.length,
+      statistics: convertedData.statistics.length,
+      challenges: convertedData.challenges.length,
+      points: convertedData.points,
+    });
+
+    // Set flag to prevent listener from processing our own writes
+    this.isUploading = true;
+
+    try {
+      // Firestore batch write limit is 500 operations
+      // We need to split into multiple batches if needed
+      const MAX_BATCH_SIZE = 500;
+
+      // Calculate total operations
+      const totalOperations =
+        1 + // user document
+        convertedData.activities.length +
+        convertedData.exercises.length +
+        convertedData.statistics.length +
+        convertedData.challenges.length;
+
+      if (totalOperations > MAX_BATCH_SIZE) {
+        console.log(
+          `⚠️ Large dataset detected (${totalOperations} operations). Splitting into multiple batches...`
+        );
+
+        // Process in chunks
+        const batches: Array<Promise<void>> = [];
+
+        // Batch 1: User document + activities + statistics + challenges (small collections)
+        const batch1 = writeBatch(db!);
+        batch1.set(
+          userDocRef,
+          {
+            points: convertedData.points,
+            lastModified: convertedData.lastModified
+              ? Timestamp.fromDate(convertedData.lastModified)
+              : serverTimestamp(),
+          },
+          { merge: true }
+        );
+
+        for (const activity of convertedData.activities) {
+          const activityDocRef = doc(activitiesCollectionRef, activity.key);
+          batch1.set(activityDocRef, activity, { merge: true });
+        }
+
+        for (const stat of convertedData.statistics) {
+          const statDocRef = doc(statisticsCollectionRef, stat.id);
+          const statData = {
+            ...stat,
+            lastCalculated: Timestamp.fromDate(stat.lastCalculated),
+            period: stat.period
+              ? {
+                  start: Timestamp.fromDate(stat.period.start),
+                  end: Timestamp.fromDate(stat.period.end),
+                }
+              : undefined,
+          };
+          batch1.set(statDocRef, statData, { merge: true });
+        }
+
+        for (const challenge of convertedData.challenges) {
+          const challengeDocRef = doc(challengesCollectionRef, challenge.id);
+          batch1.set(challengeDocRef, challenge, { merge: true });
+        }
+
+        batches.push(batch1.commit());
+
+        // Batch 2+: Exercises (split into chunks of 500)
+        const exercisesPerBatch = MAX_BATCH_SIZE;
+        for (let i = 0; i < convertedData.exercises.length; i += exercisesPerBatch) {
+          const batch = writeBatch(db!);
+          const chunk = convertedData.exercises.slice(i, i + exercisesPerBatch);
+
+          for (const exercise of chunk) {
+            const exerciseDocRef = doc(exercisesCollectionRef, exercise.id);
+            const exerciseData = {
+              ...exercise,
+              performedAt: Timestamp.fromDate(new Date(exercise.performedAt)),
+            };
+            batch.set(exerciseDocRef, exerciseData, { merge: true });
+          }
+
+          batches.push(batch.commit());
+        }
+
+        // Execute all batches
+        await Promise.all(batches);
+      } else {
+        // Single batch for smaller datasets
+        const batch = writeBatch(db!);
+
+        // 1. Update user document with points and lastModified
+        batch.set(
+          userDocRef,
+          {
+            points: convertedData.points,
+            lastModified: convertedData.lastModified
+              ? Timestamp.fromDate(convertedData.lastModified)
+              : serverTimestamp(),
+          },
+          { merge: true }
+        );
+
+        // 2. Upload activities (activity definitions)
+        for (const activity of convertedData.activities) {
+          const activityDocRef = doc(activitiesCollectionRef, activity.key);
+          batch.set(activityDocRef, activity, { merge: true });
+        }
+
+        // 3. Upload exercises (exercise records)
+        for (const exercise of convertedData.exercises) {
+          const exerciseDocRef = doc(exercisesCollectionRef, exercise.id);
+          // Ensure performedAt is a Timestamp
+          const exerciseData = {
+            ...exercise,
+            performedAt: Timestamp.fromDate(new Date(exercise.performedAt)),
+          };
+          batch.set(exerciseDocRef, exerciseData, { merge: true });
+        }
+
+        // 4. Upload statistics
+        for (const stat of convertedData.statistics) {
+          const statDocRef = doc(statisticsCollectionRef, stat.id);
+          const statData = {
+            ...stat,
+            lastCalculated: Timestamp.fromDate(stat.lastCalculated),
+            period: stat.period
+              ? {
+                  start: Timestamp.fromDate(stat.period.start),
+                  end: Timestamp.fromDate(stat.period.end),
+                }
+              : undefined,
+          };
+          batch.set(statDocRef, statData, { merge: true });
+        }
+
+        // 5. Upload challenges
+        for (const challenge of convertedData.challenges) {
+          const challengeDocRef = doc(challengesCollectionRef, challenge.id);
+          batch.set(challengeDocRef, challenge, { merge: true });
+        }
+
+        // Commit batch
+        await batch.commit();
+      }
+
+      console.log('✅ Successfully uploaded converted data to cloud!');
+      console.log('📋 Uploaded:', {
+        activities: convertedData.activities.length,
+        exercises: convertedData.exercises.length,
+        statistics: convertedData.statistics.length,
+        challenges: convertedData.challenges.length,
+      });
+    } catch (error) {
+      console.error('❌ Failed to upload converted data:', error);
+      throw error;
+    } finally {
+      this.isUploading = false;
+      this.lastUploadTimestamp = Date.now();
+    }
   }
 
   /**

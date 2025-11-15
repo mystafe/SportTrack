@@ -15,6 +15,12 @@ import { useCloudSync } from '@/hooks/useCloudSync';
 import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 import { useAuth } from '@/hooks/useAuth';
+import {
+  convertLegacyToNewFormat,
+  validateLegacyData,
+  type LegacyData,
+} from '@/lib/cloudSync/legacyConverter';
+import { cloudSyncService } from '@/lib/cloudSync/syncService';
 
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 
@@ -38,6 +44,8 @@ export function DataExportImport() {
   const [isImporting, setIsImporting] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showHealthGuide, setShowHealthGuide] = useState(false);
+  const [showConversionDialog, setShowConversionDialog] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
   const { shouldShowReminder, daysSinceLastImport, dismissReminder } = useAppleHealthReminder();
   const { syncToCloud, isConfigured } = useCloudSync();
   const { isAuthenticated } = useAuth();
@@ -206,6 +214,20 @@ export function DataExportImport() {
           />
           {isImporting ? '⏳' : '📥'} {t('data.import')}
         </label>
+        <button
+          type="button"
+          onClick={() => setShowConversionDialog(true)}
+          className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20 hover:from-purple-100 hover:to-purple-50 dark:hover:from-purple-800 dark:hover:to-purple-700 transition-all duration-200 hover:scale-105 active:scale-95 text-purple-700 dark:text-purple-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none whitespace-nowrap"
+          style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
+          title={
+            lang === 'tr'
+              ? 'Eski Formatı Yeni Formata Çevir'
+              : 'Convert Legacy Format to New Format'
+          }
+          aria-label={lang === 'tr' ? 'Eski Formatı Yeni Formata Çevir' : 'Convert Legacy Format'}
+        >
+          🔄 {lang === 'tr' ? 'Dönüştür' : 'Convert'}
+        </button>
         <div className="flex items-center gap-1">
           <Suspense
             fallback={
@@ -287,6 +309,197 @@ export function DataExportImport() {
         </div>
       )}
       <ExportDialog open={showExportDialog} onClose={() => setShowExportDialog(false)} />
+
+      {/* Legacy Format Conversion Dialog */}
+      {showConversionDialog && (
+        <LegacyConversionDialog
+          open={showConversionDialog}
+          onClose={() => {
+            setShowConversionDialog(false);
+            setIsConverting(false);
+          }}
+          isConverting={isConverting}
+          setIsConverting={setIsConverting}
+          isAuthenticated={isAuthenticated}
+          isConfigured={isConfigured}
+          lang={lang}
+          showToast={showToast}
+        />
+      )}
     </>
   );
+}
+
+/**
+ * Legacy Format Conversion Dialog
+ */
+function LegacyConversionDialog({
+  open,
+  onClose,
+  isConverting,
+  setIsConverting,
+  isAuthenticated,
+  isConfigured,
+  lang,
+  showToast,
+}: {
+  open: boolean;
+  onClose: () => void;
+  isConverting: boolean;
+  setIsConverting: (converting: boolean) => void;
+  isAuthenticated: boolean;
+  isConfigured: boolean;
+  lang: 'tr' | 'en';
+  showToast: (message: string, type: 'success' | 'error' | 'warning') => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const isMobile = useIsMobile();
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsConverting(true);
+    try {
+      const text = await file.text();
+      const legacyData = JSON.parse(text) as LegacyData;
+
+      // Validate legacy data
+      if (!validateLegacyData(legacyData)) {
+        throw new Error(
+          lang === 'tr'
+            ? 'Geçersiz dosya formatı. Eski SportTrack JSON dosyası bekleniyor.'
+            : 'Invalid file format. Expected legacy SportTrack JSON file.'
+        );
+      }
+
+      // Check if user is authenticated
+      if (!isAuthenticated || !isConfigured) {
+        showToast(
+          lang === 'tr'
+            ? 'Dönüştürme için giriş yapmanız gerekiyor.'
+            : 'You need to be logged in to convert.',
+          'error'
+        );
+        setIsConverting(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+
+      // Convert legacy format to new format
+      const convertedData = convertLegacyToNewFormat(legacyData);
+
+      console.log('🔄 Converting legacy format to new format:', {
+        activities: convertedData.activities.length,
+        exercises: convertedData.exercises.length,
+        statistics: convertedData.statistics.length,
+        challenges: convertedData.challenges.length,
+        points: convertedData.points,
+      });
+
+      // Upload to cloud using new format
+      // Note: This will require updating uploadToCloud to handle new format
+      // For now, we'll use a temporary upload function
+      await uploadConvertedDataToCloud(convertedData);
+
+      showToast(
+        lang === 'tr'
+          ? `✅ Dönüştürme tamamlandı! ${convertedData.exercises.length} exercise yeni formata yüklendi.`
+          : `✅ Conversion completed! ${convertedData.exercises.length} exercises uploaded in new format.`,
+        'success'
+      );
+
+      onClose();
+    } catch (error) {
+      console.error('Conversion failed:', error);
+      const message = error instanceof Error ? error.message : 'Conversion failed';
+      showToast(message, 'error');
+      setIsConverting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="conversion-dialog-title"
+    >
+      <div
+        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto mx-4' : 'rounded-xl shadow-xl max-w-md w-full mx-4'} border-2 border-purple-200 dark:border-purple-700 animate-scale-in`}
+      >
+        <div className={`${isMobile ? 'p-6' : 'p-6'}`}>
+          <h2
+            id="conversion-dialog-title"
+            className={`${isMobile ? 'text-xl' : 'text-lg'} font-bold text-gray-950 dark:text-white mb-4`}
+          >
+            {lang === 'tr' ? 'Eski Formatı Yeni Formata Çevir' : 'Convert Legacy Format'}
+          </h2>
+
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+            {lang === 'tr'
+              ? 'Eski SportTrack JSON dosyanızı yeni Firestore formatına çevirin ve buluta yükleyin.'
+              : 'Convert your legacy SportTrack JSON file to the new Firestore format and upload to cloud.'}
+          </p>
+
+          {!isAuthenticated && (
+            <div className="mb-4 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                {lang === 'tr'
+                  ? '⚠️ Dönüştürme için giriş yapmanız gerekiyor.'
+                  : '⚠️ You need to be logged in to convert.'}
+              </p>
+            </div>
+          )}
+
+          <label
+            className={`block w-full ${isMobile ? 'px-3 py-2 text-sm' : 'px-4 py-3 text-sm'} rounded-lg border-2 border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20 hover:from-purple-100 hover:to-purple-50 dark:hover:from-purple-800 dark:hover:to-purple-700 transition-all duration-200 cursor-pointer font-semibold text-purple-700 dark:text-purple-300 text-center`}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleFileSelect}
+              disabled={isConverting || !isAuthenticated || !isConfigured}
+              className="hidden"
+              aria-label={lang === 'tr' ? 'Eski JSON dosyası seç' : 'Select legacy JSON file'}
+            />
+            {isConverting ? '⏳ Dönüştürülüyor...' : '📁 JSON Dosyası Seç'}
+          </label>
+
+          <div className="mt-4 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isConverting}
+              className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95 disabled:opacity-50`}
+            >
+              {lang === 'tr' ? 'İptal' : 'Cancel'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Upload converted data to cloud in new format
+ */
+async function uploadConvertedDataToCloud(
+  convertedData: ReturnType<typeof convertLegacyToNewFormat>
+) {
+  await cloudSyncService.uploadConvertedDataToCloud(convertedData);
 }
