@@ -81,8 +81,10 @@ export function DataExportImport() {
     setIsImporting(true);
     try {
       const text = await file.text();
-      const data = JSON.parse(text) as {
-        // New format (v0.18.17+)
+      const parsedData = JSON.parse(text);
+
+      // Type guard to determine format
+      type NewFormat = {
         exercises?: ActivityRecord[];
         activities?: Array<{
           key: string;
@@ -100,9 +102,15 @@ export function DataExportImport() {
         }>;
         settings?: UserSettings;
         version?: string;
-        // Legacy format (backward compatibility)
-        activities?: ActivityRecord[];
       };
+
+      type LegacyFormat = {
+        activities?: ActivityRecord[];
+        settings?: UserSettings;
+        version?: string;
+      };
+
+      const data = parsedData as NewFormat | LegacyFormat;
 
       // Determine format: new format has 'exercises' and 'activities' (definitions)
       // Legacy format has 'activities' (records) and 'settings'
@@ -129,7 +137,7 @@ export function DataExportImport() {
 
       if (isNewFormat) {
         // New format: exercises + activities (definitions)
-        validExercises = (data.exercises || []).filter((a) => {
+        validExercises = (newFormatData.exercises || []).filter((a) => {
           return (
             a &&
             typeof a.id === 'string' &&
@@ -141,11 +149,11 @@ export function DataExportImport() {
         });
 
         // Extract custom activities from activity definitions
-        if (data.activities && Array.isArray(data.activities)) {
-          activityDefinitions = data.activities.filter((a) => a.isCustom === true);
+        if (newFormatData.activities && Array.isArray(newFormatData.activities)) {
+          activityDefinitions = newFormatData.activities.filter((a) => a.isCustom === true);
         }
 
-        settingsToImport = data.settings || null;
+        settingsToImport = newFormatData.settings || null;
       } else if (isLegacyFormat) {
         // Legacy format: activities (records) + settings
         validExercises = (data.activities || []).filter((a) => {
