@@ -2,28 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { SettingsDialog } from '@/components/SettingsDialog';
 import { Logo } from '@/components/Logo';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
-import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 
 export function Header() {
   const { t } = useI18n();
   const isMobile = useIsMobile();
-  const router = useRouter();
-  const { triggerHaptic } = useHapticFeedback();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const handleAddActivity = () => {
-    triggerHaptic('medium');
-    router.push('/add');
-  };
   return (
     <header className="border-b-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 backdrop-blur sticky top-0 z-40 safe-top">
       <nav
@@ -35,37 +26,6 @@ export function Header() {
           <Logo />
         </Link>
         <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm min-w-0 flex-1 justify-end">
-          {/* Add Activity Button - Always visible, compact design, no background fill, no border */}
-          <button
-            onClick={handleAddActivity}
-            className={`
-              ${isMobile ? 'min-h-[36px] min-w-[36px] px-2' : 'min-h-[40px] min-w-[40px] px-3'}
-              flex items-center justify-center gap-1.5
-              rounded-full
-              bg-transparent
-              text-brand dark:text-brand-light
-              hover:bg-brand/10 dark:hover:bg-brand/20
-              shadow-md hover:shadow-lg
-              transition-all duration-300
-              touch-feedback mobile-press
-              ${isMobile ? 'text-sm' : 'text-base'}
-              font-semibold
-              active:scale-95
-              group
-            `}
-            aria-label={t('actions.addActivity')}
-            data-tour-id="add-activity"
-          >
-            <span
-              className={`${isMobile ? 'text-xl' : 'text-2xl'} transition-transform duration-300 group-hover:scale-110`}
-            >
-              ➕
-            </span>
-            {!isMobile && (
-              <span className="hidden sm:inline whitespace-nowrap">{t('actions.addActivity')}</span>
-            )}
-          </button>
-
           {/* Navigation Icons - Hidden on mobile (BottomNavigation handles this) */}
           {!isMobile && (
             <div className="flex items-center gap-0.5 sm:gap-0.5 flex-shrink-0">

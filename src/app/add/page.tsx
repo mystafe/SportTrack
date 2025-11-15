@@ -17,7 +17,7 @@ export default function AddActivityPage() {
           className={`text-2xl sm:text-3xl font-bold flex items-center gap-2 ${isMobile ? 'title-entrance' : ''}`}
         >
           <span className={`text-2xl sm:text-3xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>
-            ➕
+            𓂃🪶
           </span>
           <span className="text-gray-950 dark:text-white">{t('actions.addActivity')}</span>
         </h1>

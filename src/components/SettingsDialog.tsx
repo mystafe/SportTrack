@@ -263,7 +263,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
               <span
                 className={`${isMobile ? 'text-[7px]' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap`}
               >
-                © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.18.7
+                © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.18.10
               </span>
             </div>
             {!isMobile && (
@@ -657,8 +657,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
           onClick={() => setOpen(true)}
           className={`${
             isMobile
-              ? 'px-3 py-2 min-h-[36px] min-w-[52px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 gap-1.5 overflow-hidden max-w-[280px] sm:max-w-none'
-              : 'px-4 py-1.5 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center gap-2 max-w-[420px]'
+              ? 'px-3 py-2 min-h-[36px] min-w-[52px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 gap-1.5 overflow-hidden max-w-[320px] sm:max-w-none'
+              : 'px-4 py-1.5 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center gap-2 max-w-[480px]'
           } truncate`}
           title={displayName}
           aria-label={displayName}
