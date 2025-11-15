@@ -314,11 +314,16 @@ export function DataExportImport() {
           );
         }
       } else {
-        showToast(t('data.importSuccess'), 'success');
+        showToast(
+          lang === 'tr' ? 'Veriler başarıyla yüklendi!' : 'Data imported successfully!',
+          'success'
+        );
       }
 
-      // Reload page to apply changes
-      window.location.reload();
+      // Wait a bit for toast to show before reloading
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error('Import failed:', error);
       const message = error instanceof Error ? error.message : t('data.importFailed');
