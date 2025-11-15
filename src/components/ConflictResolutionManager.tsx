@@ -244,6 +244,38 @@ export function ConflictResolutionManager() {
           challenges: resolution.resolvedData.challenges,
         });
         console.log('✅ Resolved data uploaded to cloud successfully');
+
+        // Verify upload by checking cloud data after a short delay
+        // This ensures data is actually saved before page reload
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        try {
+          const verifyData = await cloudSyncService.downloadFromCloud();
+          if (verifyData) {
+            const verifyActivities = verifyData.activities?.length || 0;
+            const verifyBadges = verifyData.badges?.length || 0;
+            console.log('🔍 Post-upload verification:', {
+              activities: verifyActivities,
+              badges: verifyBadges,
+              expectedActivities: resolution.resolvedData.activities.length,
+              expectedBadges: resolution.resolvedData.badges.length,
+              match:
+                verifyActivities === resolution.resolvedData.activities.length &&
+                verifyBadges === resolution.resolvedData.badges.length,
+            });
+
+            if (
+              verifyActivities !== resolution.resolvedData.activities.length ||
+              verifyBadges !== resolution.resolvedData.badges.length
+            ) {
+              console.warn(
+                '⚠️ Upload verification failed: Cloud data does not match uploaded data'
+              );
+            }
+          }
+        } catch (verifyError) {
+          console.error('❌ Failed to verify upload:', verifyError);
+        }
       } catch (uploadError) {
         console.error('❌ Failed to upload resolved data to cloud:', uploadError);
         showToast(
