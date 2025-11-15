@@ -42,6 +42,20 @@ export function resolveConflicts(
       };
 
     case 'cloud':
+      // Safety check: If cloud is empty, use local data instead to prevent data loss
+      const cloudIsEmpty = isEmpty(cloudData);
+      const localIsEmpty = isEmpty(localData);
+
+      if (cloudIsEmpty && !localIsEmpty) {
+        console.warn(
+          '⚠️ Cloud strategy selected but cloud is empty. Using local data instead to prevent data loss.'
+        );
+        return {
+          strategy: 'local',
+          resolvedData: localData,
+        };
+      }
+
       return {
         strategy: 'cloud',
         resolvedData: {

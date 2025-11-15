@@ -261,6 +261,32 @@ export function ConflictResolutionManager() {
         localStorage.setItem('sporttrack_initial_sync_complete', 'true');
       }
 
+      // Safety check: If cloud is empty and user selected "cloud" strategy,
+      // automatically use "local" strategy instead to prevent data loss
+      const cloudIsEmpty =
+        (conflictData.cloud.activities?.length || 0) === 0 &&
+        (conflictData.cloud.badges?.length || 0) === 0 &&
+        (conflictData.cloud.challenges?.length || 0) === 0;
+
+      const localHasData =
+        (conflictData.local.activities?.length || 0) > 0 ||
+        (conflictData.local.badges?.length || 0) > 0 ||
+        (conflictData.local.challenges?.length || 0) > 0;
+
+      let finalStrategy = strategy;
+      if (strategy === 'cloud' && cloudIsEmpty && localHasData) {
+        console.warn(
+          '⚠️ Cloud is empty but user selected cloud strategy. Using local strategy to prevent data loss.'
+        );
+        finalStrategy = 'local';
+        showToast(
+          lang === 'tr'
+            ? 'Bulut verileri boş olduğu için yerel veriler kullanıldı'
+            : 'Cloud data is empty, using local data instead',
+          'warning'
+        );
+      }
+
       // Add metadata to cloudData if missing (required by CloudData type)
       const cloudDataWithMetadata: import('@/lib/cloudSync/types').CloudData = {
         ...conflictData.cloud,
@@ -270,7 +296,7 @@ export function ConflictResolutionManager() {
           userId: user?.uid || 'unknown',
         },
       };
-      await applyCloudData(cloudDataWithMetadata, strategy);
+      await applyCloudData(cloudDataWithMetadata, finalStrategy);
     } catch (error) {
       console.error('Conflict resolution error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

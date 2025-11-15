@@ -263,7 +263,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
               <span
                 className={`${isMobile ? 'text-[7px]' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap`}
               >
-                © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.18.13
+                © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.18.14
               </span>
             </div>
             {!isMobile && (
