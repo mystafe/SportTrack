@@ -2,6 +2,22 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.19.1] - 2025-01
+
+### Fixed
+
+- **TypeScript Type Errors**: Fixed all type errors preventing Firebase and Vercel builds
+  - Fixed `ActivityDefinition[]` vs `ActivityRecord[]` confusion in conflict resolver
+  - Fixed `CustomActivityDefinition` to `ActivityDefinition` conversion
+  - Fixed `Badge` and `Challenge` type casting issues
+  - Fixed missing `statistics` field in `CloudData` type
+  - Fixed `UserSettings` type compatibility issues
+
+### Changed
+
+- **Build Process**: Improved type safety across all sync-related components
+- **Firebase Deploy**: Successfully deployed to Firebase Hosting with all fixes
+
 ## [0.19.0] - 2025-01
 
 ### Added
