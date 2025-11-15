@@ -52,17 +52,24 @@ export class CloudSyncService {
   /**
    * Upload local data to cloud
    */
-  async uploadToCloud(data: {
-    activities: ActivityRecord[];
-    settings: UserSettings | null;
-    badges: Badge[];
-    challenges: Challenge[];
-  }): Promise<void> {
+  async uploadToCloud(
+    data: {
+      activities: ActivityRecord[];
+      settings: UserSettings | null;
+      badges: Badge[];
+      challenges: Challenge[];
+    },
+    options?: {
+      isReset?: boolean; // Only allow empty data upload if this is a reset operation
+    }
+  ): Promise<void> {
     if (!this.isConfigured()) {
       throw new Error('Cloud sync not configured');
     }
 
-    // Never upload empty/zeroed data to cloud
+    const isReset = options?.isReset === true;
+
+    // Never upload empty/zeroed data to cloud EXCEPT during reset operation
     // Check if there's any meaningful data to upload
     const hasData =
       (data.activities && data.activities.length > 0) ||
@@ -70,9 +77,15 @@ export class CloudSyncService {
       (data.challenges && data.challenges.length > 0) ||
       (data.settings && data.settings.name && data.settings.name.trim() !== '');
 
-    if (!hasData) {
-      console.log('⏭️ Skipping upload: No data to upload (all empty/zeroed)');
-      return; // Don't upload empty data
+    if (!hasData && !isReset) {
+      console.log(
+        '⏭️ Skipping upload: No data to upload (all empty/zeroed). Only reset operations can upload empty data.'
+      );
+      return; // Don't upload empty data unless it's a reset
+    }
+
+    if (!hasData && isReset) {
+      console.log('🔄 Reset operation: Uploading empty data to cloud to clear cloud storage');
     }
 
     // Set flag to prevent listener from processing our own writes

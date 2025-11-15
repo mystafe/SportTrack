@@ -21,6 +21,7 @@ import { useActivities } from '@/lib/activityStore';
 import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 import { STORAGE_KEYS } from '@/lib/constants';
+import { useCloudSync } from '@/hooks/useCloudSync';
 
 // Lazy load heavy components that are not always visible
 const DataExportImport = lazy(() =>
@@ -51,6 +52,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const { clearAllActivities } = useActivities();
   const { clearAllBadges } = useBadges();
   const { clearAllChallenges } = useChallenges();
+  const { syncToCloud } = useCloudSync();
   const [open, setOpen] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
@@ -199,8 +201,28 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
     setShowClearDataDialog(true);
   };
 
-  const confirmClearData = () => {
+  const confirmClearData = async () => {
     try {
+      // If user is authenticated, upload empty data to cloud to clear cloud storage
+      // This is the ONLY place where empty data can be uploaded to cloud
+      if (isAuthenticated && isConfigured) {
+        try {
+          await syncToCloud(
+            {
+              activities: [],
+              settings: null,
+              badges: [],
+              challenges: [],
+            },
+            { isReset: true } // Mark this as a reset operation to allow empty data upload
+          );
+          console.log('✅ Cloud storage cleared via reset operation');
+        } catch (uploadError) {
+          console.error('❌ Failed to clear cloud storage:', uploadError);
+          // Continue with local clear even if cloud clear fails
+        }
+      }
+
       // Clear all localStorage data
       if (typeof window !== 'undefined') {
         Object.keys(localStorage).forEach((key) => {
@@ -263,7 +285,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
               <span
                 className={`${isMobile ? 'text-[7px]' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap`}
               >
-                © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.18.14
+                © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.18.15
               </span>
             </div>
             {!isMobile && (

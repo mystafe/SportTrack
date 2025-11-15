@@ -30,12 +30,17 @@ export function useCloudSync() {
   }, []);
 
   const syncToCloud = useCallback(
-    async (data: {
-      activities: unknown[];
-      settings: unknown | null;
-      badges: unknown[];
-      challenges: unknown[];
-    }): Promise<void> => {
+    async (
+      data: {
+        activities: unknown[];
+        settings: unknown | null;
+        badges: unknown[];
+        challenges: unknown[];
+      },
+      options?: {
+        isReset?: boolean; // Only allow empty data upload if this is a reset operation
+      }
+    ): Promise<void> => {
       if (!isConfigured || !isOnline) {
         updateStatus('offline');
         throw new Error('Cloud sync not configured or offline');
@@ -45,12 +50,15 @@ export function useCloudSync() {
         updateStatus('syncing');
         console.log('🔄 Starting cloud sync...');
         // Type assertions for cloud sync service
-        await cloudSyncService.uploadToCloud({
-          activities: data.activities as import('@/lib/activityStore').ActivityRecord[],
-          settings: data.settings as import('@/lib/settingsStore').UserSettings | null,
-          badges: data.badges as import('@/lib/badges').Badge[],
-          challenges: data.challenges as import('@/lib/challenges').Challenge[],
-        });
+        await cloudSyncService.uploadToCloud(
+          {
+            activities: data.activities as import('@/lib/activityStore').ActivityRecord[],
+            settings: data.settings as import('@/lib/settingsStore').UserSettings | null,
+            badges: data.badges as import('@/lib/badges').Badge[],
+            challenges: data.challenges as import('@/lib/challenges').Challenge[],
+          },
+          options
+        );
         console.log('✅ Cloud sync completed successfully');
         updateStatus('synced');
         setSyncState((prev) => ({
