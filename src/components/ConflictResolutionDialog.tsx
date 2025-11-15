@@ -7,6 +7,7 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
 import { ActivityRecord } from '@/lib/activityStore';
 import { Badge } from '@/lib/badges';
+import type { Challenge } from '@/lib/challenges';
 import { format, parseISO } from 'date-fns';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { resolveConflicts } from '@/lib/cloudSync/conflictResolver';
@@ -132,9 +133,8 @@ export function ConflictResolutionDialog({
     }
 
     const localActivities = localData.activities || [];
-    // Use exercises from new structure, fallback to activities for backward compatibility
-    const cloudActivities =
-      (cloudData.exercises as ActivityRecord[]) || (cloudData.activities as ActivityRecord[]) || [];
+    // Use exercises from new structure (exercises are ActivityRecord[], activities are ActivityDefinition[])
+    const cloudActivities = (cloudData.exercises as ActivityRecord[]) || [];
     const localBadges = localData.badges || [];
     const cloudBadges = (cloudData.badges as Badge[]) || [];
 
@@ -194,7 +194,7 @@ export function ConflictResolutionDialog({
           activities: localData.activities || [],
           settings: null,
           badges: localData.badges || [],
-          challenges: localData.challenges || [],
+          challenges: (localData.challenges as Challenge[]) || [],
         },
         cloudData,
         'merge'
@@ -244,9 +244,8 @@ export function ConflictResolutionDialog({
   // Calculate cloud statistics
   const cloudStats = useMemo(() => {
     const cloudExercises = (cloudData.exercises as ActivityRecord[]) || [];
-    const cloudActivitiesLegacy = (cloudData.activities as ActivityRecord[]) || [];
-    // Prefer exercises (new structure), fallback to activities (legacy)
-    const exercises = cloudExercises.length > 0 ? cloudExercises : cloudActivitiesLegacy;
+    // activities is ActivityDefinition[], not ActivityRecord[], so we only use exercises
+    const exercises = cloudExercises;
 
     // Activity definitions (aktivite tanımları) - separate from exercises
     // In CloudData, activities is ActivityDefinition[] (not ActivityRecord[])

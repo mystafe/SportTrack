@@ -10,8 +10,11 @@ import { useToaster } from './Toaster';
 import { AuthDialog } from './AuthDialog';
 import { useActivities, ActivityRecord } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
-import { useBadges, Badge } from '@/lib/badgeStore';
+import type { UserSettings } from '@/lib/settingsStore';
+import { useBadges } from '@/lib/badgeStore';
+import type { Badge } from '@/lib/badges';
 import { useChallenges } from '@/lib/challengeStore';
+import type { Challenge } from '@/lib/challenges';
 import { resolveConflicts, saveLocalLastModified } from '@/lib/cloudSync/conflictResolver';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { ConflictResolutionDialog } from './ConflictResolutionDialog';
@@ -338,7 +341,14 @@ export function CloudSyncSettings() {
 
       // Add metadata to cloudData if missing (required by CloudData type)
       const cloudDataWithMetadata: import('@/lib/cloudSync/types').CloudData = {
-        ...conflictData.cloud,
+        exercises: (conflictData.cloud.activities as ActivityRecord[]) || [],
+        activities: [],
+        statistics: [],
+        badges: (conflictData.cloud.badges as Badge[]) || [],
+        challenges: (conflictData.cloud.challenges as Challenge[]) || [],
+        settings: (conflictData.cloud.settings as UserSettings | null) || null,
+        points: conflictData.cloud.points || 0,
+        lastModified: new Date(),
         metadata: {
           lastModified: new Date(),
           version: Date.now(),
@@ -742,14 +752,15 @@ export function CloudSyncSettings() {
             activities: (conflictData.local.activities as ActivityRecord[]) || [],
             badges: (conflictData.local.badges as Badge[]) || [],
             challenges: conflictData.local.challenges || [],
-            settings: conflictData.local.settings || settings || null,
+            settings: (conflictData.local.settings as UserSettings | null) || settings || null,
           }}
           cloudData={{
             exercises: (conflictData.cloud.activities || []) as ActivityRecord[],
             activities: [],
+            statistics: [],
             badges: (conflictData.cloud.badges || []) as Badge[],
-            challenges: conflictData.cloud.challenges || [],
-            settings: conflictData.cloud.settings,
+            challenges: (conflictData.cloud.challenges || []) as Challenge[],
+            settings: (conflictData.cloud.settings as UserSettings | null) || null,
             metadata: conflictData.cloud.metadata || {
               lastModified: new Date(),
               version: Date.now(),

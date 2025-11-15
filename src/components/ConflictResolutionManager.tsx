@@ -9,8 +9,11 @@ import { ConflictResolutionDialog } from './ConflictResolutionDialog';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
 import { useActivities, ActivityRecord } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
-import { useBadges, Badge } from '@/lib/badgeStore';
+import type { UserSettings } from '@/lib/settingsStore';
+import { useBadges } from '@/lib/badgeStore';
+import type { Badge } from '@/lib/badges';
 import { useChallenges } from '@/lib/challengeStore';
+import type { Challenge } from '@/lib/challenges';
 import { useCloudSync } from '@/hooks/useCloudSync';
 import { resolveConflicts, saveLocalLastModified } from '@/lib/cloudSync/conflictResolver';
 import { cloudSyncService } from '@/lib/cloudSync/syncService';
@@ -270,6 +273,7 @@ export function ConflictResolutionManager() {
             const cloudDataWithMetadata: import('@/lib/cloudSync/types').CloudData = {
               exercises: conflict.cloud.activities || [],
               activities: [], // Activity definitions are not in conflict data
+              statistics: [], // Statistics are not in conflict data
               points: conflict.cloud.points || 0, // Include points from conflict data
               badges: conflict.cloud.badges || [],
               challenges: conflict.cloud.challenges || [],
@@ -416,7 +420,7 @@ export function ConflictResolutionManager() {
       resolvedActivities: resolution.resolvedData.activities.length,
       resolvedBadges: resolution.resolvedData.badges.length,
       resolvedChallenges: resolution.resolvedData.challenges.length,
-      cloudActivities: (cloudData.activities as ActivityRecord[])?.length || 0,
+      cloudActivities: cloudData.activities?.length || 0, // Activity definitions count
       cloudBadges: (cloudData.badges as Badge[])?.length || 0,
     });
 
@@ -629,7 +633,14 @@ export function ConflictResolutionManager() {
 
       // Add metadata to cloudData if missing (required by CloudData type)
       const cloudDataWithMetadata: import('@/lib/cloudSync/types').CloudData = {
-        ...conflictData.cloud,
+        exercises: (conflictData.cloud.activities as ActivityRecord[]) || [],
+        activities: [],
+        statistics: [],
+        badges: (conflictData.cloud.badges as Badge[]) || [],
+        challenges: (conflictData.cloud.challenges as Challenge[]) || [],
+        settings: (conflictData.cloud.settings as UserSettings | null) || null,
+        points: conflictData.cloud.points || 0,
+        lastModified: new Date(),
         metadata: {
           lastModified: new Date(),
           version: Date.now(),
@@ -721,14 +732,15 @@ export function ConflictResolutionManager() {
       localData={{
         activities: (conflictData.local.activities as ActivityRecord[]) || [],
         badges: (conflictData.local.badges as Badge[]) || [],
-        challenges: conflictData.local.challenges || [],
-        settings: conflictData.local.settings || settings || null,
+        challenges: (conflictData.local.challenges as Challenge[]) || [],
+        settings: (conflictData.local.settings as UserSettings | null) || settings || null,
       }}
       cloudData={{
         exercises: (conflictData.cloud.activities as ActivityRecord[]) || [],
         activities: [], // Activity definitions are not in conflict data
         badges: (conflictData.cloud.badges as Badge[]) || [],
-        challenges: conflictData.cloud.challenges || [],
+        challenges: (conflictData.cloud.challenges as Challenge[]) || [],
+        statistics: [], // Statistics are not in conflict data
         points: conflictData.cloud.points || 0, // Include points from conflict data
         lastModified: getCloudLastModified(),
         metadata: {
@@ -736,7 +748,7 @@ export function ConflictResolutionManager() {
           version: Date.now(),
           userId: user?.uid || 'unknown',
         },
-        settings: conflictData.cloud.settings || null,
+        settings: (conflictData.cloud.settings as UserSettings | null) || null,
       }}
       localLastModified={getLocalLastModified()}
       cloudLastModified={getCloudLastModified()}

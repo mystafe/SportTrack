@@ -310,9 +310,17 @@ export function useCloudSyncListener() {
             cloudData || {
               exercises: [],
               activities: [],
+              statistics: [],
               badges: [],
               challenges: [],
               settings: null,
+              points: 0,
+              lastModified: null,
+              metadata: {
+                lastModified: new Date(),
+                version: 1,
+                userId: '',
+              },
             }
           );
 
@@ -371,9 +379,17 @@ export function useCloudSyncListener() {
                 cloudData || {
                   exercises: [],
                   activities: [],
+                  statistics: [],
                   badges: [],
                   challenges: [],
                   settings: null,
+                  points: 0,
+                  lastModified: null,
+                  metadata: {
+                    lastModified: new Date(),
+                    version: 1,
+                    userId: '',
+                  },
                 }
               ))
           ) {

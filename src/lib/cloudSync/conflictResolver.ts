@@ -61,10 +61,7 @@ export function resolveConflicts(
         strategy: 'cloud',
         resolvedData: {
           // Use exercises from new structure, fallback to activities for backward compatibility
-          activities:
-            (cloudData.exercises as ActivityRecord[]) ||
-            (cloudData.activities as ActivityRecord[]) ||
-            [],
+          activities: (cloudData.exercises as ActivityRecord[]) || [], // activities is ActivityDefinition[], not ActivityRecord[]
           settings: (cloudData.settings as UserSettings) || null,
           badges: (cloudData.badges as Badge[]) || [],
           challenges: (cloudData.challenges as Challenge[]) || [],
