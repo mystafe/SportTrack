@@ -209,12 +209,6 @@ export function ConflictResolutionManager() {
         );
 
         console.log('✅ Conflict resolution data written to localStorage');
-
-        // Reload page to apply changes (stores will read from localStorage)
-        // Small delay to ensure localStorage is written and cloud sync completes
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
       }
     } catch (error) {
       console.error('Failed to write conflict resolution data:', error);
@@ -227,15 +221,38 @@ export function ConflictResolutionManager() {
     // For "merge" or "newest": upload merged/resolved data to cloud
     // For "cloud" strategy: just apply cloud data locally, don't upload anything
     if (strategy !== 'cloud') {
-      await syncToCloud({
-        activities: resolution.resolvedData.activities,
-        settings: resolution.resolvedData.settings,
-        badges: resolution.resolvedData.badges,
-        challenges: resolution.resolvedData.challenges,
-      });
+      try {
+        console.log('📤 Uploading resolved data to cloud...', {
+          strategy,
+          activities: resolution.resolvedData.activities.length,
+          badges: resolution.resolvedData.badges.length,
+          challenges: resolution.resolvedData.challenges.length,
+        });
+        await syncToCloud({
+          activities: resolution.resolvedData.activities,
+          settings: resolution.resolvedData.settings,
+          badges: resolution.resolvedData.badges,
+          challenges: resolution.resolvedData.challenges,
+        });
+        console.log('✅ Resolved data uploaded to cloud successfully');
+      } catch (uploadError) {
+        console.error('❌ Failed to upload resolved data to cloud:', uploadError);
+        showToast(
+          lang === 'tr'
+            ? 'Veriler uygulandı ancak buluta yükleme başarısız oldu'
+            : 'Data applied but cloud upload failed',
+          'warning'
+        );
+      }
     }
 
     saveLocalLastModified();
+
+    // Reload page AFTER cloud sync completes (or fails) to apply changes
+    // Stores will read from localStorage after reload
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
 
     const message =
       strategy === 'cloud'
