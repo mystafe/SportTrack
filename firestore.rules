@@ -4,7 +4,26 @@ service cloud.firestore {
     // Users can only read/write their own data
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Activities collection: Activity definitions (default + custom)
+      match /activities/{activityId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Exercises collection: Exercise records (yapılan exercise'ler)
+      match /exercises/{exerciseId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Statistics collection: Calculated statistics
+      match /statistics/{statId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Challenges collection: Challenge records
+      match /challenges/{challengeId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
   }
 }
-

@@ -23,18 +23,14 @@ export function ScrollToTop() {
     e.stopPropagation();
     if (typeof window === 'undefined') return;
 
-    // Smooth animated scroll to top
-    const scrollToTopAnimation = () => {
-      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-      if (currentScroll > 0) {
-        window.requestAnimationFrame(scrollToTopAnimation);
-        window.scrollTo(0, currentScroll - currentScroll / 8);
-      } else {
-        window.scrollTo(0, 0);
-      }
-    };
+    triggerHaptic('light');
 
-    scrollToTopAnimation();
+    // Use smooth scroll behavior
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    });
   };
 
   const handleAddActivity = (e: MouseEvent<HTMLButtonElement>) => {

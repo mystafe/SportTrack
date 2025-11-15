@@ -224,17 +224,17 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
       // If near bottom, show tooltip above instead
       if (isNearBottom) {
         tooltipStyle = {
-          bottom: `${position.height + spacing}px`,
-          left: '50%',
+          bottom: `${viewportHeight - position.top + spacing}px`,
+          left: `${position.left + position.width / 2}px`,
           transform: 'translateX(-50%)',
-          maxWidth: '90vw',
+          maxWidth: isMobile ? 'calc(100vw - 2rem)' : '90vw',
         };
       } else {
         tooltipStyle = {
           top: `${position.top + position.height + spacing}px`,
-          left: '50%',
+          left: `${position.left + position.width / 2}px`,
           transform: 'translateX(-50%)',
-          maxWidth: '90vw',
+          maxWidth: isMobile ? 'calc(100vw - 2rem)' : '90vw',
         };
       }
       break;
@@ -264,11 +264,72 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
       break;
   }
 
-  // Ensure tooltip stays within viewport
-  if (tooltipStyle.top !== undefined && typeof tooltipStyle.top === 'string') {
-    const topValue = parseInt(tooltipStyle.top);
-    if (topValue + 200 > viewportHeight) {
-      tooltipStyle.top = `${Math.max(20, viewportHeight - 250)}px`;
+  // Ensure tooltip stays within viewport (mobile-specific fixes)
+  if (isMobile) {
+    const tooltipHeight = 250; // Approximate tooltip height
+    const tooltipWidth = Math.min(320, viewportWidth - 32); // Max width with padding
+    const padding = 16; // Safe padding from edges
+
+    // Handle top/bottom positioning
+    if (tooltipStyle.top !== undefined && typeof tooltipStyle.top === 'string') {
+      const topValue = parseFloat(tooltipStyle.top.replace('px', ''));
+      // Check if tooltip would overflow bottom
+      if (topValue + tooltipHeight > viewportHeight - padding) {
+        // Try to position above element instead
+        if (position.top > tooltipHeight + padding) {
+          tooltipStyle.top = `${position.top - tooltipHeight - spacing}px`;
+          tooltipStyle.transform = 'translateX(-50%)';
+        } else {
+          // If can't fit above, position at bottom with padding
+          tooltipStyle.top = `${viewportHeight - tooltipHeight - padding}px`;
+        }
+      }
+
+      // Check if tooltip would overflow top
+      if (topValue < padding) {
+        tooltipStyle.top = `${padding}px`;
+      }
+    }
+
+    // Handle left/right positioning (when using transform: translateX(-50%))
+    if (
+      tooltipStyle.left !== undefined &&
+      typeof tooltipStyle.left === 'string' &&
+      tooltipStyle.transform?.includes('translateX')
+    ) {
+      const leftValue = parseFloat(tooltipStyle.left.replace('px', ''));
+      const halfWidth = tooltipWidth / 2;
+
+      // Check if tooltip would overflow right
+      if (leftValue + halfWidth > viewportWidth - padding) {
+        tooltipStyle.left = `${viewportWidth - halfWidth - padding}px`;
+      }
+
+      // Check if tooltip would overflow left
+      if (leftValue - halfWidth < padding) {
+        tooltipStyle.left = `${halfWidth + padding}px`;
+      }
+    } else if (tooltipStyle.left !== undefined && typeof tooltipStyle.left === 'string') {
+      // Handle absolute left positioning
+      const leftValue = parseFloat(tooltipStyle.left.replace('px', ''));
+
+      // Check if tooltip would overflow right
+      if (leftValue + tooltipWidth > viewportWidth - padding) {
+        tooltipStyle.left = `${viewportWidth - tooltipWidth - padding}px`;
+      }
+
+      // Check if tooltip would overflow left
+      if (leftValue < padding) {
+        tooltipStyle.left = `${padding}px`;
+      }
+    }
+  } else {
+    // Desktop: Ensure tooltip stays within viewport
+    if (tooltipStyle.top !== undefined && typeof tooltipStyle.top === 'string') {
+      const topValue = parseFloat(tooltipStyle.top.replace('px', ''));
+      if (topValue + 200 > viewportHeight) {
+        tooltipStyle.top = `${Math.max(20, viewportHeight - 250)}px`;
+      }
     }
   }
 
