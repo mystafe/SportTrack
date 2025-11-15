@@ -241,7 +241,7 @@ export function exportToJSON(
 
   // Prepare export data with new structure
   const exportData = {
-    // Exercise records (yapılan egzersizler) - renamed from "activities" to "exercises"
+    // Activity records (yapılan aktiviteler) - koşma, yürüme gibi
     exercises: filteredActivities,
     // Activity definitions (aktivite tanımları - default + custom)
     activities: activityDefinitions || [],

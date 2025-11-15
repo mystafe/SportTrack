@@ -1,0 +1,49 @@
+{
+  "exercises": [
+    {
+      "id": "invalid-1",
+      "activityKey": "walking",
+      "label": "Yürüyüş",
+      "icon": "🚶",
+      "unit": "adım",
+      "multiplier": 1,
+      "amount": -100,
+      "points": -100,
+      "performedAt": "invalid-date-format"
+    },
+    {
+      "id": "invalid-2",
+      "activityKey": "running",
+      "label": "Koşu",
+      "icon": "🏃",
+      "unit": "km",
+      "multiplier": 100,
+      "amount": 1000,
+      "points": 2000,
+      "performedAt": "2025-12-31T23:59:59.000Z"
+    },
+    {
+      "id": "invalid-3",
+      "amount": 5000,
+      "points": 5000,
+      "performedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "valid-1",
+      "activityKey": "walking",
+      "label": "Yürüyüş",
+      "icon": "🚶",
+      "unit": "adım",
+      "multiplier": 1,
+      "amount": 5000,
+      "points": 5000,
+      "performedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "settings": {
+    "name": "Test User",
+    "dailyTarget": -1000,
+    "customActivities": []
+  },
+  "version": "0.18.17"
+}

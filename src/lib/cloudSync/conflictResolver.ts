@@ -8,6 +8,7 @@ import { ActivityRecord } from '@/lib/activityStore';
 import { UserSettings } from '@/lib/settingsStore';
 import { Badge } from '@/lib/badges';
 import { Challenge } from '@/lib/challenges';
+import type { ActivityDefinition } from '@/lib/activityConfig';
 
 export type ConflictStrategy = 'local' | 'cloud' | 'merge' | 'newest';
 
@@ -59,7 +60,11 @@ export function resolveConflicts(
       return {
         strategy: 'cloud',
         resolvedData: {
-          activities: (cloudData.activities as ActivityRecord[]) || [],
+          // Use exercises from new structure, fallback to activities for backward compatibility
+          activities:
+            (cloudData.exercises as ActivityRecord[]) ||
+            (cloudData.activities as ActivityRecord[]) ||
+            [],
           settings: (cloudData.settings as UserSettings) || null,
           badges: (cloudData.badges as Badge[]) || [],
           challenges: (cloudData.challenges as Challenge[]) || [],
@@ -83,8 +88,9 @@ export function resolveConflicts(
 
 /**
  * Merge local and cloud data
+ * Improved: Uses timestamp-based merge for duplicates (newer data wins)
  */
-function mergeData(
+export function mergeData(
   localData: {
     activities: ActivityRecord[];
     settings: UserSettings | null;
@@ -98,26 +104,92 @@ function mergeData(
   badges: Badge[];
   challenges: Challenge[];
 } {
-  // Merge activities by ID (cloud takes precedence for duplicates)
-  const localActivityMap = new Map(localData.activities.map((a) => [a.id, a]));
-  const cloudActivities = (cloudData.activities as ActivityRecord[]) || [];
-  cloudActivities.forEach((activity) => {
+  // Merge activities by ID with timestamp-based conflict resolution
+  // Use exercises from new structure, fallback to activities for backward compatibility
+  const localActivityMap = new Map<string, ActivityRecord>();
+  localData.activities.forEach((activity) => {
     localActivityMap.set(activity.id, activity);
+  });
+
+  const cloudActivities =
+    (cloudData.exercises as ActivityRecord[]) || (cloudData.activities as ActivityRecord[]) || [];
+  cloudActivities.forEach((cloudActivity) => {
+    const localActivity = localActivityMap.get(cloudActivity.id);
+    if (localActivity) {
+      // Both have same ID - use the one with newer timestamp
+      const localTime = new Date(localActivity.performedAt).getTime();
+      const cloudTime = new Date(cloudActivity.performedAt).getTime();
+      // Use newer one (higher timestamp)
+      if (cloudTime > localTime) {
+        localActivityMap.set(cloudActivity.id, cloudActivity);
+      }
+      // Otherwise keep local (already in map)
+    } else {
+      // Cloud has new activity - add it
+      localActivityMap.set(cloudActivity.id, cloudActivity);
+    }
   });
   const mergedActivities = Array.from(localActivityMap.values());
 
-  // Settings: Use cloud if available, otherwise local
-  const mergedSettings = (cloudData.settings as UserSettings) || localData.settings;
+  // Settings: Merge intelligently - prefer cloud but keep local custom activities
+  let mergedSettings: UserSettings | null = null;
+  if (cloudData.settings && localData.settings) {
+    // Both have settings - merge custom activities
+    const localCustomActivities = localData.settings.customActivities || [];
+    const cloudCustomActivities = (cloudData.settings as UserSettings).customActivities || [];
+    const customActivitiesMap = new Map<string, ActivityDefinition>();
 
-  // Merge badges by ID (cloud takes precedence)
-  const localBadgeMap = new Map(localData.badges.map((b) => [b.id, b]));
-  const cloudBadges = (cloudData.badges as Badge[]) || [];
-  cloudBadges.forEach((badge) => {
+    // Add local custom activities
+    localCustomActivities.forEach((activity) => {
+      if (activity.key) {
+        customActivitiesMap.set(activity.key, activity);
+      }
+    });
+
+    // Add cloud custom activities (cloud takes precedence for duplicates)
+    cloudCustomActivities.forEach((activity) => {
+      if (activity.key) {
+        customActivitiesMap.set(activity.key, activity);
+      }
+    });
+
+    mergedSettings = {
+      ...(cloudData.settings as UserSettings),
+      customActivities: Array.from(customActivitiesMap.values()),
+      // Keep local name if cloud doesn't have one
+      name: (cloudData.settings as UserSettings).name || localData.settings.name || '',
+    };
+  } else {
+    // Use whichever is available
+    mergedSettings = (cloudData.settings as UserSettings) || localData.settings;
+  }
+
+  // Merge badges by ID with timestamp-based conflict resolution
+  const localBadgeMap = new Map<string, Badge>();
+  localData.badges.forEach((badge) => {
     localBadgeMap.set(badge.id, badge);
+  });
+
+  const cloudBadges = (cloudData.badges as Badge[]) || [];
+  cloudBadges.forEach((cloudBadge) => {
+    const localBadge = localBadgeMap.get(cloudBadge.id);
+    if (localBadge) {
+      // Both have same ID - use the one with newer unlock time
+      const localUnlockTime = localBadge.unlockedAt ? new Date(localBadge.unlockedAt).getTime() : 0;
+      const cloudUnlockTime = cloudBadge.unlockedAt ? new Date(cloudBadge.unlockedAt).getTime() : 0;
+      // Use newer one (higher timestamp)
+      if (cloudUnlockTime > localUnlockTime) {
+        localBadgeMap.set(cloudBadge.id, cloudBadge);
+      }
+      // Otherwise keep local (already in map)
+    } else {
+      // Cloud has new badge - add it
+      localBadgeMap.set(cloudBadge.id, cloudBadge);
+    }
   });
   const mergedBadges = Array.from(localBadgeMap.values());
 
-  // Merge challenges by ID (cloud takes precedence)
+  // Merge challenges by ID (cloud takes precedence for duplicates)
   const localChallengeMap = new Map(localData.challenges.map((c) => [c.id, c]));
   const cloudChallenges = (cloudData.challenges as Challenge[]) || [];
   cloudChallenges.forEach((challenge) => {
@@ -134,25 +206,35 @@ function mergeData(
 }
 
 /**
- * Check if data is empty (0 activities, 0 badges, 0 challenges)
+ * Check if data is empty (0 activities/exercises, 0 badges, 0 challenges)
  */
-function isEmpty(data: {
-  activities: ActivityRecord[] | unknown[];
-  badges: Badge[] | unknown[];
-  challenges: Challenge[] | unknown[];
-}): boolean {
-  return (
-    (data.activities?.length || 0) === 0 &&
-    (data.badges?.length || 0) === 0 &&
-    (data.challenges?.length || 0) === 0
-  );
+export function isEmpty(
+  data:
+    | CloudData
+    | {
+        activities: ActivityRecord[] | unknown[];
+        badges: Badge[] | unknown[];
+        challenges: Challenge[] | unknown[];
+      }
+): boolean {
+  // Check both exercises (new structure) and activities (legacy) for CloudData
+  const hasActivities =
+    'exercises' in data
+      ? ((data as CloudData).exercises?.length || 0) > 0 ||
+        ((data as CloudData).activities?.length || 0) > 0
+      : ((data as { activities: unknown[] }).activities?.length || 0) > 0;
+
+  const hasBadges = (data.badges?.length || 0) > 0;
+  const hasChallenges = (data.challenges?.length || 0) > 0;
+
+  return !hasActivities && !hasBadges && !hasChallenges;
 }
 
 /**
  * Use newest data based on metadata timestamps
  * If one side is empty (0 activities, 0 badges, 0 challenges), use the other side
  */
-function useNewest(
+export function useNewest(
   localData: {
     activities: ActivityRecord[];
     settings: UserSettings | null;
@@ -171,8 +253,11 @@ function useNewest(
 
   // If local is empty, use cloud (even if cloud is also empty, prefer cloud for consistency)
   if (localIsEmpty) {
+    // Use exercises from new structure, fallback to activities for backward compatibility
+    const cloudExercises =
+      (cloudData.exercises as ActivityRecord[]) || (cloudData.activities as ActivityRecord[]) || [];
     return {
-      activities: (cloudData.activities as ActivityRecord[]) || [],
+      activities: cloudExercises,
       settings: (cloudData.settings as UserSettings) || localData.settings,
       badges: (cloudData.badges as Badge[]) || [],
       challenges: (cloudData.challenges as Challenge[]) || [],
@@ -189,8 +274,11 @@ function useNewest(
   const cloudLastModified = cloudData.metadata?.lastModified || new Date(0);
 
   if (cloudLastModified > localLastModified) {
+    // Use exercises from new structure, fallback to activities for backward compatibility
+    const cloudExercises =
+      (cloudData.exercises as ActivityRecord[]) || (cloudData.activities as ActivityRecord[]) || [];
     return {
-      activities: (cloudData.activities as ActivityRecord[]) || localData.activities,
+      activities: cloudExercises.length > 0 ? cloudExercises : localData.activities,
       settings: (cloudData.settings as UserSettings) || localData.settings,
       badges: (cloudData.badges as Badge[]) || localData.badges,
       challenges: (cloudData.challenges as Challenge[]) || localData.challenges,

@@ -2,9 +2,45 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.19.0] - 2025-01
+
+### Added
+
+- **Comprehensive Sync Testing**: 24+ tests for sync functionality
+  - Sync service unit tests (11 tests)
+  - Conflict resolver tests (13 tests)
+  - Auto sync hook tests
+- **Sync State Management**: `useSyncStatus` hook for real-time sync status
+- **Sync History**: Track and display sync operations history
+- **Debug Tools**: Enhanced console helpers (`syncDebug`)
+- **Welcome Toast**: Welcome message after login with animations
+
+### Changed
+
+- **Sync Performance**: Debounce delay reduced from 5s to 2s for faster sync
+- **Periodic Check**: Increased from 30s to 60s to reduce Firebase requests
+- **Change Detection**: Hash-based detection for content changes (not just count)
+- **Sync Triggering**: Now triggers on add, edit, and delete operations
+- **Navigation**: Auto-redirect to homepage after activity add and conflict resolution
+
+### Fixed
+
+- **Edit/Delete Sync**: Edit and delete operations now properly trigger sync
+- **Hash Detection**: Content changes are now correctly detected
+- **Export Functions**: `isEmpty`, `mergeData`, `useNewest` functions are now exported
+- **Navigation**: Missing navigation after activity add and conflict resolution
+
+### Improved
+
+- **Conflict Resolution**: Identical data detection to prevent unnecessary syncs
+- **Error Handling**: Better error classification and retry mechanisms
+- **Sync UI**: Real-time status indicators and sync history display
+- **Code Quality**: Comprehensive test coverage and improved type safety
+
 ## [0.14.8] - 2025-01
 
 ### Fixed
+
 - **ScrollToTop Button Visibility**:
   - Improved visibility detection logic with multiple checks
   - Button now appears higher on screen (bottom-52 mobile, bottom-48 desktop)
@@ -12,6 +48,7 @@ All notable changes to SportTrack will be documented in this file.
   - More reliable visibility on homepage and all pages
 
 ### Changed
+
 - **QuoteTicker Improvements**:
   - Reduced height for more compact design (py-2.5 mobile, py-3 desktop)
   - Improved vertical alignment of text and separators
@@ -19,6 +56,7 @@ All notable changes to SportTrack will be documented in this file.
   - Better visual balance with reduced padding
 
 ### Improved
+
 - **Manage Activities Button**:
   - Enhanced design with purple-indigo gradient
   - Added gear icon (⚙️) for better visual recognition
@@ -33,6 +71,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.14.7] - 2025-01
 
 ### Fixed
+
 - **Badge Unlock Notification Animation**:
   - Fixed badge notification appearing in top-left corner before centering
   - Badge now appears directly centered on screen from the start
@@ -40,6 +79,7 @@ All notable changes to SportTrack will be documented in this file.
   - Added exit animation when badge is dismissed or clicked
 
 ### Changed
+
 - **Badge Unlock Notification Interaction**:
   - Badge notification is now clickable
   - Clicking badge navigates to achievements page
@@ -48,6 +88,7 @@ All notable changes to SportTrack will be documented in this file.
   - Improved visual feedback with cursor pointer
 
 ### Improved
+
 - **Page Transitions**:
   - Added smooth scroll behavior to HTML element
   - Page transitions are now consistent and smooth
@@ -56,6 +97,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.14.6] - 2025-01
 
 ### Fixed
+
 - **Install Prompt Layout**:
   - Install prompt no longer spans full screen width
   - Added max-width constraint (max-w-md) to center the prompt
@@ -64,6 +106,7 @@ All notable changes to SportTrack will be documented in this file.
   - Better visual hierarchy and readability
 
 ### Changed
+
 - **Install Prompt Design**:
   - Changed from full-width to centered card with max-width
   - Improved button layout: full-width on mobile, auto-width on desktop
@@ -73,6 +116,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.14.5] - 2025-01
 
 ### Fixed
+
 - **ScrollToTop Button Visibility**:
   - Reduced scroll threshold from 200px to 100px for better visibility
   - Increased bottom offset (mobile: bottom-44, desktop: bottom-40) to ensure button is always above QuoteTicker
@@ -80,6 +124,7 @@ All notable changes to SportTrack will be documented in this file.
   - Button now appears earlier when scrolling, making it more accessible on homepage
 
 ### Changed
+
 - **Activity Templates Mobile Layout**:
   - Changed mobile grid layout from 1 column to 2 columns
   - Activity template cards now display side-by-side on mobile devices
@@ -88,6 +133,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.14.4] - 2025-01
 
 ### Fixed
+
 - **iOS Dark Mode Safe Area**:
   - Fixed white background appearing in safe area insets (notch and home indicator areas) on iOS devices in dark mode
   - Added pseudo-elements (`::before` and `::after`) to cover safe area insets with proper background colors
@@ -97,6 +143,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.14.3] - 2025-01
 
 ### Fixed
+
 - **Mood Persistence**:
   - Fixed issue where mood selection was lost after page refresh
   - Mood is now properly loaded from localStorage when settings are initialized
@@ -105,6 +152,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.14.2] - 2025-01
 
 ### Added
+
 - **JSON Export Format**:
   - Added JSON export option to ExportDialog
   - JSON export includes all activities, settings, export date, version, date range, and summary statistics
@@ -113,12 +161,14 @@ All notable changes to SportTrack will be documented in this file.
   - Export file name: `sporttrack-backup-YYYY-MM-DD.json`
 
 ### Changed
+
 - **ExportDialog**:
   - Added JSON format button alongside CSV and PDF
   - Format buttons now stack vertically on mobile for better UX
   - JSON export respects date range filters (all time, last 7 days, last 30 days, custom range)
 
 ### Fixed
+
 - **Export Functionality**:
   - JSON export now available through ExportDialog (previously only available through DataExportImport component)
   - Consistent export experience across all formats
@@ -126,6 +176,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.14.1] - 2025-01
 
 ### Fixed
+
 - **Translation Keys**:
   - Added missing `stats.averageDaily` translation key (TR: "Ortalama Günlük", EN: "Average Daily")
   - Added missing `stats.perActivity` translation key (TR: "Aktivite Başına", EN: "Per Activity")
@@ -142,6 +193,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.14.0] - 2025-01
 
 ### Added
+
 - **Comprehensive Performance Optimizations**:
   - Added `React.memo` to all major components:
     - `StatsHighlights`, `StatsCards`, `PersonalRecords`
@@ -159,6 +211,7 @@ All notable changes to SportTrack will be documented in this file.
   - Better visual consistency and maintainability
 
 ### Changed
+
 - **Visual Consistency Improvements**:
   - All cards now use consistent `card-entrance` animation and styling
   - Unified card design: `rounded-xl border-2` with gradient backgrounds
@@ -179,6 +232,7 @@ All notable changes to SportTrack will be documented in this file.
   - Enhanced mobile typography scaling
 
 ### Fixed
+
 - **Performance**:
   - Reduced unnecessary re-renders in all optimized components
   - Better memory management with proper memoization
@@ -187,6 +241,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.13.5] - 2025-01
 
 ### Added
+
 - **Error Boundary Component**:
   - Added React Error Boundary for graceful error handling
   - User-friendly error fallback UI with reload and reset options
@@ -206,6 +261,7 @@ All notable changes to SportTrack will be documented in this file.
   - Better spacing consistency across components
 
 ### Changed
+
 - **Container Padding**:
   - Increased desktop container padding from `px-4` to `px-6` for better spacing
   - Mobile padding remains `px-4` for optimal use of space
@@ -214,6 +270,7 @@ All notable changes to SportTrack will be documented in this file.
   - Better visual consistency across stats components
 
 ### Fixed
+
 - **Error Handling**:
   - App no longer crashes completely on component errors
   - Better error recovery with reload and reset options
@@ -222,6 +279,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.13.4] - 2025-01
 
 ### Added
+
 - **Performance Optimizations**:
   - Added `React.memo` to `QuickAdd` and `ActivityTemplates` components for better re-render performance
   - Implemented `useCallback` hooks for event handlers to prevent unnecessary re-renders
@@ -237,6 +295,7 @@ All notable changes to SportTrack will be documented in this file.
   - Improved spacing and sizing for mobile devices
 
 ### Changed
+
 - **Component Architecture**:
   - Refactored `QuickAdd` and `ActivityTemplates` to use `memo` wrapper
   - Converted event handlers to `useCallback` for performance optimization
@@ -246,6 +305,7 @@ All notable changes to SportTrack will be documented in this file.
   - Added `templates.selectTemplate` translation key
 
 ### Fixed
+
 - **Performance**:
   - Reduced unnecessary re-renders in QuickAdd and ActivityTemplates components
   - Optimized callback dependencies to prevent memory leaks
@@ -253,6 +313,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.13.3] - 2025-01
 
 ### Added
+
 - **Enhanced Loading States**:
   - Added comprehensive skeleton loaders for Challenges, Achievements, and Stats pages
   - New `ChallengeCardSkeleton`, `BadgeCardSkeleton`, and `PageSkeleton` components
@@ -265,6 +326,7 @@ All notable changes to SportTrack will be documented in this file.
   - More engaging and informative empty state messages
 
 ### Changed
+
 - **Form Validation Improvements**:
   - Better error messages in ActivityForm with user-friendly Turkish/English messages
   - Error messages now use toast notifications instead of throwing errors
@@ -275,6 +337,7 @@ All notable changes to SportTrack will be documented in this file.
   - Enhanced gradient backgrounds for skeleton loaders
 
 ### Fixed
+
 - **Loading State Consistency**:
   - Replaced simple "Loading..." text with proper skeleton loaders
   - Consistent loading experience across all pages
@@ -283,6 +346,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.13.2] - 2025-01
 
 ### Fixed
+
 - **ScrollToTop Button - Final Fix**:
   - Lowered scroll threshold from 300px to 200px for earlier visibility
   - Increased bottom offset (`bottom-40` mobile, `bottom-36` desktop)
@@ -297,6 +361,7 @@ All notable changes to SportTrack will be documented in this file.
   - Enhanced font weights for better readability
 
 ### Changed
+
 - **QuoteTicker Design Improvements**:
   - Enhanced background gradients (stronger colors)
   - Better border styling (border-brand/60)
@@ -312,6 +377,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.13.1] - 2025-01
 
 ### Fixed
+
 - **QuoteTicker (Kayan Yazı) - Complete Redesign**:
   - Completely redesigned with beautiful marquee animation
   - Text now repeats 5 times for seamless infinite scroll
@@ -335,6 +401,7 @@ All notable changes to SportTrack will be documented in this file.
   - Improved performance with will-change
 
 ### Changed
+
 - **QuoteTicker Design**:
   - New marquee animation system
   - Gradient fade edges for professional look
@@ -348,6 +415,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.13.0] - 2025-01
 
 ### Fixed
+
 - **QuoteTicker (Kayan Yazı)**:
   - Fixed scrolling animation - text now scrolls smoothly from right to left
   - Added seamless loop by duplicating quote text 3 times
@@ -368,11 +436,12 @@ All notable changes to SportTrack will be documented in this file.
   - Better transition handling with opacity and scale
 
 ### Changed
-- **QuoteTicker Animation**: 
+
+- **QuoteTicker Animation**:
   - Text now repeats 3 times for seamless infinite scroll
   - Faster animation speed (20s instead of 30s)
   - Better container styling with explicit width/height
-- **ScrollToTop**: 
+- **ScrollToTop**:
   - Better positioning calculation
   - Enhanced visual feedback with scale animation
   - Improved performance with will-change and passive listeners
@@ -380,15 +449,16 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.12.9] - 2025-01
 
 ### Fixed
+
 - **Mobile Logo**: Increased text size from `text-sm sm:text-base` to `text-lg sm:text-xl` for better visibility
-- **ScrollToTop Button**: 
+- **ScrollToTop Button**:
   - Fixed visibility issue - button now always renders (with opacity control)
   - Increased z-index to z-[100] (above all other elements)
   - Increased bottom offset (bottom-28 mobile, bottom-24 desktop)
   - Larger button size (w-14 h-14 mobile, w-16 h-16 desktop)
   - Enhanced visual design with outer glow ring and pulse animation
   - Better border styling (border-4)
-- **Accordion Design**: 
+- **Accordion Design**:
   - Unified accordion icons - all use ▼ (down arrow) with consistent rotation
   - Icons rotate -90deg when closed, 0deg when open
   - Brand color for icons (text-brand)
@@ -396,25 +466,26 @@ All notable changes to SportTrack will be documented in this file.
   - All accordions default to open (already implemented, confirmed)
 
 ### Changed
+
 - **Activity Records Complete Redesign**:
   - **Card Layout**: Complete restructure with better hierarchy
   - **Today's Activities**: Special highlighting with ring-4, brand gradient background, and star icon
-  - **Header Section**: 
+  - **Header Section**:
     - Larger icons (text-3xl mobile, text-4xl desktop)
     - Star icon (⭐) for today's activities
     - "Bugün" badge for today's activities
     - Better spacing and alignment
-  - **Details Badges**: 
+  - **Details Badges**:
     - Colorful badges with distinct colors (blue, emerald, purple-pink gradient, cyan)
     - Better borders and backgrounds
     - Larger emoji icons (text-base)
     - Font-black for numbers
-  - **Note Display**: 
+  - **Note Display**:
     - Gradient background
     - Brand-colored quote marks
     - Better padding and styling
     - Shadow-inner effect
-  - **Action Buttons**: 
+  - **Action Buttons**:
     - Full-width buttons (flex-1)
     - Border-top separator
     - Better spacing and sizing
@@ -427,6 +498,7 @@ All notable changes to SportTrack will be documented in this file.
     - Better border colors
 
 ### Improved
+
 - **Typography**: Font-black for headings, better font weights throughout
 - **Spacing**: Better padding (px-5 py-4) and gaps
 - **Color Scheme**: More vibrant and distinct colors for badges
@@ -436,6 +508,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.12.8] - 2025-01
 
 ### Changed
+
 - **Activity Records Redesign**: Completely redesigned activity record cards with stunning visual effects
   - **Card Design**:
     - Beautiful gradient backgrounds (from-white via-gray-50/50 to-white)
@@ -478,6 +551,7 @@ All notable changes to SportTrack will be documented in this file.
     - Better visibility on hover
 
 ### Added
+
 - **New CSS Animations**:
   - `activityCardEntrance`: Stunning entrance animation with blur and scale effects
   - `activityShimmer`: Continuous shimmer effect across cards
@@ -495,6 +569,7 @@ All notable changes to SportTrack will be documented in this file.
   - Better spacing and padding
 
 ### Improved
+
 - **Typography**: Larger, bolder fonts for better readability
 - **Spacing**: Better padding and gaps between elements
 - **Color Contrast**: Improved contrast for better visibility
@@ -504,6 +579,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.12.7] - 2025-01
 
 ### Fixed
+
 - **ScrollToTop Button**: Fixed visibility and positioning - button now appears correctly above QuoteTicker
   - Increased z-index to z-[60] (above QuoteTicker's z-40)
   - Adjusted bottom positioning (bottom-24 mobile, bottom-20 desktop) to account for QuoteTicker height
@@ -512,6 +588,7 @@ All notable changes to SportTrack will be documented in this file.
   - Added i18n support for button label
 
 ### Improved
+
 - **ScrollToTop Visual Design**:
   - Added gradient background (from-brand via-brand to-brand-dark)
   - Added glow effect with pulse animation
@@ -523,15 +600,16 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.12.6] - 2025-01
 
 ### Changed
+
 - **Onboarding Flow**: "Tell Us About You" dialog now appears after onboarding tour completion
 - **Apple Health Icons**: Replaced Apple logos (🍎) with iPhone-like logos (📱) throughout the app
 - **Badge Unlock Animation**: Fixed positioning issue - animation now starts centered instead of top-left
 - **Stats Overview**: Added missing i18n key for "stats.overview" text
-- **Accordion Improvements**: 
+- **Accordion Improvements**:
   - Overview accordion now has +/- toggle button
   - All accordions (Overview, Today's Breakdown, Last 7 Days) default to open
   - Desktop accordions can be collapsed/expanded independently
-- **Challenges Renamed to Goals**: 
+- **Challenges Renamed to Goals**:
   - Navigation: "Zorluklar" → "Hedefler" (Challenges → Goals)
   - Page title: "Zorluklar ve Hedefler" → "Hedefler"
   - All challenge-related text updated to use "Hedef" terminology
@@ -544,15 +622,17 @@ All notable changes to SportTrack will be documented in this file.
   - Added shadow-lg for depth
   - Better typography (font-bold, drop-shadow)
   - Increased padding for better visibility
-- **Dark Mode**: 
+- **Dark Mode**:
   - Page outer areas (html/body) now completely black (#000000) in dark mode
   - Removed white space at top and bottom of screen
 
 ### Fixed
+
 - **Activity Trend Analysis Language**: Fixed language issue - activities now display in correct language using getActivityLabel
 - **Badge Unlock Animation**: Fixed initial positioning to be centered instead of appearing top-left
 
 ### Improved
+
 - **Visual Consistency**: Better visual hierarchy and consistency across components
 - **Mobile Experience**: Improved mobile-specific styling and behavior
 - **Accessibility**: Better contrast and readability in dark mode
@@ -560,6 +640,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.12.5] - 2025-01
 
 ### Changed
+
 - **DataExportImport Visual Improvements**:
   - Updated export and import buttons with gradient backgrounds
   - Enhanced button styling with gradients and improved borders
@@ -575,6 +656,7 @@ All notable changes to SportTrack will be documented in this file.
   - Improved visual hierarchy and spacing
 
 ### Improved
+
 - **Settings Components**: Unified gradient and shadow system across all settings components
 - **Toggle Switches**: Consistent gradient styling when enabled
 - **Input Fields**: Consistent gradient backgrounds across all settings inputs
@@ -584,6 +666,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.12.4] - 2025-01
 
 ### Fixed
+
 - **Build Error Fix**: Corrected JSX closing tag order in StatsCards component
   - Fixed incorrect closing tag sequence in Overview section
   - Resolved "Unexpected token div" build error
@@ -592,6 +675,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.12.3] - 2025-01
 
 ### Changed
+
 - **ActivityFilters Visual Improvements**:
   - Updated filter container with gradient backgrounds
   - Enhanced date range buttons with gradients
@@ -614,6 +698,7 @@ All notable changes to SportTrack will be documented in this file.
   - Enhanced form element styling
 
 ### Improved
+
 - **Filter Components**: Unified gradient and shadow system across all filter components
 - **Dialog Consistency**: All dialogs now have consistent gradient backgrounds and styling
 - **Form Elements**: Consistent input styling across all dialogs
@@ -623,6 +708,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.12.2] - 2025-01
 
 ### Changed
+
 - **ActivityForm Visual Improvements**:
   - Updated activity selection buttons with gradient backgrounds
   - Enhanced input fields with gradient backgrounds and better borders
@@ -647,6 +733,7 @@ All notable changes to SportTrack will be documented in this file.
   - Improved hover effects
 
 ### Improved
+
 - **Form Consistency**: Unified gradient and shadow system across all form components
 - **Input Fields**: All inputs now have gradient backgrounds and improved borders
 - **Typography**: Better font weights for improved readability
@@ -656,6 +743,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.12.1] - 2025-01
 
 ### Changed
+
 - **Add Activity Page Visual Improvements**:
   - Updated page header with emoji animations and better typography
   - Enhanced form container with gradient backgrounds and improved shadows
@@ -685,6 +773,7 @@ All notable changes to SportTrack will be documented in this file.
   - Enhanced shadows and transitions
 
 ### Improved
+
 - **Consistency**: Unified gradient and shadow system across Add Activity, Achievements, and Challenges pages
 - **Typography**: Better font weights and sizes for improved readability
 - **Animations**: Enhanced emoji animations and hover effects
@@ -693,6 +782,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.12.0] - 2025-01
 
 ### Changed
+
 - **Activities Page Visual Improvements**:
   - Updated all cards with new gradient backgrounds and improved shadows
   - Enhanced typography hierarchy (font-semibold → font-bold)
@@ -719,6 +809,7 @@ All notable changes to SportTrack will be documented in this file.
   - Smoother transitions across all components
 
 ### Improved
+
 - **Consistency**: Unified gradient and shadow system across Activities and Stats pages
 - **Typography**: Better font weights and sizes for improved readability
 - **Animations**: Enhanced emoji animations and hover effects
@@ -727,6 +818,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.11.9] - 2025-01
 
 ### Changed
+
 - **Visual Design Improvements**:
   - Improved color contrast across all components (text-gray-900 → text-gray-950)
   - Enhanced typography hierarchy with better font weights (font-medium → font-semibold/font-bold)
@@ -738,10 +830,12 @@ All notable changes to SportTrack will be documented in this file.
   - Better line heights (leading-relaxed for body text)
 
 ### Fixed
+
 - **Page.tsx**: Fixed missing `mounted` state causing hydration issues
 - **Input Cursor Shifting**: Added explicit `transform: none` to input focus states to prevent cursor movement
 
 ### Improved
+
 - **StatsHighlights**: Better typography hierarchy and contrast
 - **QuickAdd**: Enhanced visual design with gradients and better typography
 - **ActivityTemplates**: Improved card design and typography
@@ -750,6 +844,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.11.8] - 2025-01
 
 ### Added
+
 - **Scroll to Top Button**: Added floating scroll-to-top button that appears when scrolling down
 - **Quote Ticker**: Added animated scrolling quote ticker at the bottom of the screen
 - **Badge Unlock Notification**: Replaced toast notifications with animated badge unlock component
@@ -757,12 +852,13 @@ All notable changes to SportTrack will be documented in this file.
 - **Add Activity Button**: Added quick "Add Activity" button to Activities page
 
 ### Changed
+
 - **Activities Page**: Added "Add Activity" button for quick navigation
 - **Add Activity Page**: Removed "Manage Activities" button
 - **Activity Duration**: Temporarily hidden/removed Activity Duration feature
 - **Logo Text**: Increased mobile logo text size for better readability
 - **Manage Activities Dialog**: Translation fields (EN/TR) are now optional - if left empty, the first language value is used
-- **Settings Dialog**: 
+- **Settings Dialog**:
   - Tell Us About You dialog now appears after onboarding completion
   - Default name is "user" instead of empty
   - Dialog closes when clicking outside
@@ -770,11 +866,13 @@ All notable changes to SportTrack will be documented in this file.
 - **StatsCards**: Today's Breakdown and Last 7 Days accordions now open by default on desktop
 
 ### Fixed
+
 - **Input Cursor Shifting**: Removed transform animations from input focus states (may need further investigation if issue persists)
 
 ## [0.11.7] - 2025-01
 
 ### Fixed
+
 - **Apple Health CSV Import - Invalid String Length Error**:
   - Implemented chunked processing for large CSV files (>100MB)
   - Added `parseAppleHealthCSVChunked` function for streaming CSV parsing
@@ -784,6 +882,7 @@ All notable changes to SportTrack will be documented in this file.
   - Prevents "Invalid string length" errors for very large CSV files
 
 ### Added
+
 - **Visual Design Analysis**:
   - Created comprehensive `VISUAL_IMPROVEMENTS.md` document
   - Detailed recommendations for color palette, typography, spacing, and layout
@@ -793,12 +892,14 @@ All notable changes to SportTrack will be documented in this file.
   - Animation and transition optimizations
 
 ### Changed
+
 - **CSV Parsing**: Large CSV files (>100MB) now use chunked processing instead of loading entire file into memory
 - **Error Handling**: More specific error messages for CSV parsing failures
 
 ## [0.11.6] - 2025-01
 
 ### Fixed
+
 - **Hydration Error - Motivational Message**:
   - Fixed hydration mismatch by making motivational message client-side only
   - Added `mounted` state check before generating motivational message
@@ -810,41 +911,38 @@ All notable changes to SportTrack will be documented in this file.
   - Better readability on mobile devices
 
 ### Changed
+
 - **Motivational Message Rendering**: Now uses `useState` and `useEffect` instead of `useMemo` to ensure client-side only rendering
 
 ## [0.11.5] - 2025-01
 
 ### Fixed
+
 - **Critical: Content Visibility Issues - Animations Causing Text to Disappear**:
   - **Stagger Item Animation**: Removed opacity animation from `staggerFadeIn` - content now always visible
     - Changed from `opacity: 0` → `opacity: 1 !important`
     - Only transform animation remains
-  
   - **Card Entrance Animation**: Removed opacity animation from `cardEntrance` - cards now always visible
     - Changed from `opacity: 0` → `opacity: 1 !important`
     - Only transform animation remains
-  
   - **Fade In Scale Mobile**: Removed opacity animation from `fadeInScaleMobile` - mobile content now always visible
     - Changed from `opacity: 0` → `opacity: 1 !important`
     - Only transform animation remains
-  
   - **Card Lift Animation**: Removed opacity animation from `cardLift` - mobile cards now always visible
     - Changed from `opacity: 0` → `opacity: 1 !important`
     - Only transform animation remains
-  
   - **Slide In Bottom Mobile**: Removed opacity animation from `slideInBottomMobile` - mobile content now always visible
     - Changed from `opacity: 0` → `opacity: 1 !important`
     - Only transform animation remains
-  
   - **Slide In Left/Right**: Removed opacity animations from `slideInLeft` and `slideInRight` - content now always visible
     - Changed from `opacity: 0` → `opacity: 1 !important`
     - Only transform animations remain
-  
   - **Bounce In Mobile**: Removed opacity animation from `bounceInMobile` - mobile content now always visible
     - Changed from `opacity: 0` → `opacity: 1 !important`
     - Only transform animation remains
 
 ### Changed
+
 - **All Entrance Animations**: Removed opacity transitions from all entrance animations
   - StatsCards: Always visible
   - StatsHighlights: Always visible
@@ -855,6 +953,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.11.4] - 2025-01
 
 ### Fixed
+
 - **Landing Page Text Readability - Critical Fix**:
   - **Z-Index Hierarchy**: Fixed z-index layering - all decorative elements now behind text
     - Quote dots: `z-index: 0` (behind text)
@@ -865,32 +964,30 @@ All notable changes to SportTrack will be documented in this file.
     - Decorative icon: `z-index: 10` (behind text)
     - Quote text: `z-index: 50` (always on top)
     - Motivational message: `z-index: 50` (always on top)
-  
   - **Opacity Reductions**: Reduced opacity of all decorative elements to prevent text obstruction
     - Quote dots: `opacity: 0.3` → `0.15` (light), `0.1` (dark)
     - Pattern overlay: `opacity: 0.05` → `0.03` (light), `0.1` → `0.05` (dark)
     - Sparkle particles: `opacity: 1` → `0.6` (max), `opacity: 1` → `0.5` (enhanced)
     - Quote marks: `opacity: 0.15` → `0.1`
     - Decorative icon: `opacity: 20` → `15`
-  
   - **Text Shadow**: Added explicit text shadow to quote and motivational message text for better contrast
     - `textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'`
-  
   - **Motivational Card Background**: Reduced background gradient opacity
     - Light mode: `rgba(14, 165, 233, 0.15)` → `0.1`, `rgba(2, 132, 199, 0.2)` → `0.15`
     - Dark mode: `rgba(14, 165, 233, 0.25)` → `0.15`, `rgba(2, 132, 199, 0.3)` → `0.2`
-  
   - **Pattern Overlay Colors**: Reduced pattern overlay color intensity
     - Light mode: `rgba(14, 165, 233, 0.1)` → `0.05`
     - Dark mode: `rgba(96, 165, 250, 0.15)` → `0.08`
 
 ### Changed
+
 - **Text Z-Index**: Increased from `z-20` to `z-50` to ensure text is always above all decorative elements
 - **All Decorative Elements**: Explicitly set z-index values to create proper layering hierarchy
 
 ## [0.11.3] - 2025-01
 
 ### Fixed
+
 - **Critical Text Readability Issues**:
   - **Gradient Text Animation**: Fixed transparent text issue by adding fallback color (`color: #0ea5e9`) and browser support fallback
   - **Quote Text Animations**: Removed opacity animations from `text-reveal`, `rotate-quote`, and `quote-rotate` - text now always visible
@@ -911,6 +1008,7 @@ All notable changes to SportTrack will be documented in this file.
   - Fallback text: `text-gray-600 dark:text-gray-400` → `text-gray-700 dark:text-gray-200` with `font-medium`
 
 ### Changed
+
 - **Page Title**: Removed `gradient-text-animated` on mobile, replaced with solid brand color for better readability
 - **Quote Text**: Removed all animation classes (`text-reveal`, `quote-rotate`, `rotate-quote`) that were causing opacity issues
 - **All Animations**: Removed opacity transitions from text animations - only transform animations remain
@@ -918,6 +1016,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.11.2] - 2025-01
 
 ### Fixed
+
 - **React Hydration Error**:
   - Fixed quote hydration mismatch by making quotes client-side only
   - Added `mounted` state to prevent server/client mismatch
@@ -946,6 +1045,7 @@ All notable changes to SportTrack will be documented in this file.
   - Fixed icon size validation issues
 
 ### Changed
+
 - **Card Borders**:
   - Activity filters container: `border` → `border-2`
   - Activity list container: `border` → `border-2`
@@ -959,6 +1059,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.11.1] - 2025-01
 
 ### Fixed
+
 - **iPhone Safe Area Issues**:
   - Fixed white space at top and bottom on iPhone devices
   - Removed duplicate body background gradients
@@ -979,6 +1080,7 @@ All notable changes to SportTrack will be documented in this file.
   - Date items: Improved font weights and colors
 
 ### Changed
+
 - **Body and HTML Styling**:
   - Removed conflicting background gradients
   - Simplified body background to solid colors
@@ -994,6 +1096,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.11.0] - 2025-01
 
 ### Fixed
+
 - **Readability Improvements**:
   - Increased font sizes across all components (cards, highlights, activity records)
   - Improved text contrast: Changed `text-gray-500 dark:text-gray-400` to `text-gray-700 dark:text-gray-300` with `font-medium`
@@ -1004,6 +1107,7 @@ All notable changes to SportTrack will be documented in this file.
   - QuickAdd buttons: Better text visibility
 
 ### Added
+
 - **Onboarding Tour Auto-Close**:
   - Tour automatically closes after 30 seconds of inactivity
   - Tracks user interactions (clicks, keyboard, scroll) to reset timeout
@@ -1015,6 +1119,7 @@ All notable changes to SportTrack will be documented in this file.
   - Resets onboarding completion status
 
 ### Changed
+
 - **Text Contrast**:
   - Labels: `text-gray-500` → `text-gray-700 dark:text-gray-300` with `font-medium`
   - Values: Maintained `text-gray-900 dark:text-gray-100` for better readability
@@ -1030,6 +1135,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.10.9] - 2025-01
 
 ### Fixed
+
 - **CSV File Import on Mobile**:
   - Fixed CSV file selection not working on mobile devices
   - Added MIME types to file input accept attribute (`text/csv`, `application/csv`, `application/xml`, `text/xml`, `application/gzip`)
@@ -1045,6 +1151,7 @@ All notable changes to SportTrack will be documented in this file.
   - Added try-catch around CSV text decoding
 
 ### Changed
+
 - **Mobile File Input**:
   - File input button now has minimum height and width on mobile (`min-h-[36px] min-w-[80px]`)
   - Better touch feedback with `touch-feedback mobile-press` classes
@@ -1059,6 +1166,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.10.8] - 2025-01
 
 ### Fixed
+
 - **Onboarding Tour Improvements**:
   - Fixed issue where tour would scroll to bottom on second step
   - Reduced overlay blur (from `bg-black/60 backdrop-blur-sm` to `bg-black/40 backdrop-blur-[2px]`)
@@ -1076,6 +1184,7 @@ All notable changes to SportTrack will be documented in this file.
   - Improved file reading error handling with specific messages
 
 ### Changed
+
 - **Onboarding Tour UX**:
   - Overlay is now less intrusive (40% opacity vs 60%)
   - Highlight is more visible with enhanced glow effects
@@ -1091,6 +1200,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.10.7] - 2025-01
 
 ### Added
+
 - **Enhanced Navbar & Header Animations**:
   - Navbar icons with touch feedback and enhanced animations
   - Icon wiggle animation on mobile
@@ -1129,6 +1239,7 @@ All notable changes to SportTrack will be documented in this file.
   - `emojiCelebrate`: Enhanced emoji celebration
 
 ### Changed
+
 - **Mobile Enhancements**:
   - Navbar icons now have touch feedback on mobile
   - Quote card uses enhanced entrance animation
@@ -1139,6 +1250,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.10.6] - 2025-01
 
 ### Added
+
 - **Mobile-First Animations & Visual Effects**:
   - Touch feedback animations (ripple effect on touch)
   - Press animation for mobile buttons and cards
@@ -1172,6 +1284,7 @@ All notable changes to SportTrack will be documented in this file.
   - GPU-accelerated animations for better performance
 
 ### Changed
+
 - **Mobile Animation Performance**:
   - Reduced animation durations on mobile (stagger-item: 0.3s, card-entrance: 0.4s)
   - Optimized transition timing functions
@@ -1180,12 +1293,14 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.10.5] - 2025-01
 
 ### Fixed
+
 - **Input Cursor Issue**:
   - Input alanlarına focus olduğunda imleç kayması sorunu düzeltildi
   - `transform: scale(1.01)` efekti kaldırıldı (sadece border ve box-shadow animasyonları kaldı)
   - Daha stabil ve kullanıcı dostu input deneyimi
 
 ### Changed
+
 - **Mobile Compact Design**:
   - Activity Form mobilde daha compact:
     - Form spacing azaltıldı (space-y-5 → space-y-3)
@@ -1195,7 +1310,6 @@ All notable changes to SportTrack will be documented in this file.
     - Butonlar daha küçük (px-3 py-2, min-h-[40px], text-xs)
     - Font size'lar küçültüldü (text-sm → text-xs)
     - Gap'ler azaltıldı (gap-3 → gap-2)
-  
   - Activity Templates mobilde daha compact:
     - Template card'lar daha küçük (p-2.5, gap-2, rounded-lg)
     - Icon size küçültüldü (text-3xl → text-2xl)
@@ -1203,7 +1317,6 @@ All notable changes to SportTrack will be documented in this file.
     - Gap'ler azaltıldı (gap-3 → gap-2)
     - Category başlıkları daha küçük (text-xs → text-[9px])
     - Spacing azaltıldı (space-y-4 → space-y-3)
-  
   - Add Activity sayfası mobilde daha compact:
     - Container padding azaltıldı (p-4 sm:p-6 → p-3)
     - Border radius küçültüldü (rounded-xl → rounded-lg)
@@ -1211,6 +1324,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.10.4] - 2025-01
 
 ### Changed
+
 - **Mobile Logo Enhancement**:
   - SportTrack yazısı mobilde biraz daha büyük (text-[10px] → text-[11px])
   - Daha okunabilir görünüm
@@ -1236,12 +1350,14 @@ All notable changes to SportTrack will be documented in this file.
   - Tooltip pozisyonları iyileştirildi
 
 ### Fixed
+
 - Onboarding tour'un yanlış elementleri gösterme sorunu düzeltildi
 - Highlight'ın hangi elementi işaret ettiği artık daha net anlaşılıyor
 
 ## [0.10.3] - 2025-01
 
 ### Added
+
 - **Enhanced Activity Form Animations**:
   - Activity selection buttons with gradient backgrounds
   - Icon pulse animation on selection
@@ -1273,6 +1389,7 @@ All notable changes to SportTrack will be documented in this file.
   - 3D tilt effects
 
 ### Changed
+
 - **Visual Improvements**:
   - All input fields now have enhanced focus states
   - All buttons have glow effects
@@ -1284,6 +1401,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.10.2] - 2025-01
 
 ### Added
+
 - **Extraordinary Quote Design & Animations**:
   - Animated gradient backgrounds with smooth color transitions
   - Decorative quote marks with floating animations
@@ -1312,6 +1430,7 @@ All notable changes to SportTrack will be documented in this file.
   - Diverse and inspiring content
 
 ### Changed
+
 - **Visual Improvements**:
   - Quote card now has premium design with multiple layers
   - Larger, more prominent quote text
@@ -1322,6 +1441,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.10.1] - 2025-01
 
 ### Added
+
 - **Extraordinary Animations & Micro-interactions**:
   - Smooth page transitions with fade-in effects
   - Stagger animations for list items (sequential entrance)
@@ -1340,6 +1460,7 @@ All notable changes to SportTrack will be documented in this file.
   - Smooth scroll behavior
 
 ### Changed
+
 - **Visual Enhancements**:
   - All stat cards now have magnetic hover and 3D tilt effects
   - Quick Add buttons enhanced with ripple and magnetic effects
@@ -1352,6 +1473,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.10.0] - 2025-01
 
 ### Added
+
 - **Keyboard Shortcuts System**:
   - GitHub-style navigation shortcuts (`g h`, `g a`, `g s`, `g c`, `g t`)
   - Quick action shortcuts (`a` for add activity)
@@ -1365,6 +1487,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.9.9] - 2025-01
 
 ### Changed
+
 - **Mobile Logo Enhancement**:
   - Logo yanında "sport" ve "track" alt alta küçük font ile gösteriliyor
   - Mavi gradient renk tonu (brand color)
@@ -1378,6 +1501,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.9.8] - 2025-01
 
 ### Added
+
 - **Onboarding Tour System**:
   - Interactive step-by-step tutorial for new users
   - Highlights key features and navigation elements
@@ -1391,6 +1515,7 @@ All notable changes to SportTrack will be documented in this file.
   - Smooth animations and transitions
 
 ### Improved
+
 - **User Experience**:
   - New users get guided tour automatically
   - Better first-time user experience
@@ -1400,7 +1525,8 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.9.7] - 2025-01
 
 ### Added
-- **Beautiful Logo**: 
+
+- **Beautiful Logo**:
   - Custom SVG logo with animated running figure
   - Gradient background with glow effects
   - Responsive design (full logo on desktop, compact "ST" on mobile)
@@ -1408,13 +1534,15 @@ All notable changes to SportTrack will be documented in this file.
   - Dark mode optimized
 
 ### Fixed
-- **Apple Health CSV Import Error**: 
+
+- **Apple Health CSV Import Error**:
   - Fixed "Invalid string length" error for large CSV files
   - Files larger than 50MB now use ArrayBuffer instead of readAsText
   - Better error handling and memory management
   - Improved progress reporting for large files
 
 ### Changed
+
 - **Extraordinary Navbar Icons**:
   - Each icon has unique color-themed gradient backgrounds on hover
   - Shimmer border animation effects
@@ -1428,6 +1556,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.9.6] - 2025-01
 
 ### Changed
+
 - **Dark Mode Görsel İyileştirmeleri**:
   - Tüm kartlar için daha iyi dark mode kontrastları (`dark:border-gray-700/50`, `dark:bg-gray-900/80`)
   - Backdrop blur efekti eklendi (`backdrop-blur-sm`)
@@ -1436,6 +1565,7 @@ All notable changes to SportTrack will be documented in this file.
   - Text renkleri dark mode'da daha iyi kontrast (`dark:text-gray-100`, `dark:text-gray-400`)
 
 ### Improved
+
 - **Mobil Görsel İyileştirmeleri**:
   - Tüm kartlar `rounded-xl` ile daha modern görünüm
   - Background gradient'leri daha subtle ve elegant
@@ -1453,12 +1583,14 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.9.5] - 2025-01
 
 ### Added
+
 - **Default Haftalık Challenge**: 50k puan hedefli haftalık challenge eklendi
   - Yeni kullanıcılar için otomatik olarak oluşturuluyor
   - Mevcut kullanıcılar için de eklenecek (eğer yoksa)
   - getDefaultWeeklyChallenge fonksiyonu eklendi
 
 ### Changed
+
 - **Navbar Mobil Uyumluluk**:
   - Logo mobilde "ST" olarak kısaltıldı
   - Navbar container'a `min-w-0` ve `flex-1` eklendi overflow önlemek için
@@ -1470,6 +1602,7 @@ All notable changes to SportTrack will be documented in this file.
   - Desktop'ta kullanıcı ismi için `max-w-[120px] truncate` eklendi
 
 ### Improved
+
 - **Navbar Estetik İyileştirmeleri**:
   - Daha iyi spacing ve alignment
   - Flexbox layout iyileştirmeleri
@@ -1479,6 +1612,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.9.4] - 2025-01
 
 ### Changed
+
 - **Navbar İkonları Daha Elegant**:
   - Container kaldırıldı, daha minimal ve elegant tasarım
   - İkonlar arası gap azaltıldı (gap-0.5 sm:gap-1)
@@ -1501,6 +1635,7 @@ All notable changes to SportTrack will be documented in this file.
   - Shadow daha subtle (shadow-sm)
 
 ### Fixed
+
 - **Apple Health Büyük Dosya Desteği (1.3GB+)**:
   - 1GB+ dosyalar için ArrayBuffer ve chunked processing
   - 100MB chunk'lar halinde işleme
@@ -1511,24 +1646,26 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.9.3] - 2025-01
 
 ### Added
+
 - **Yeni Aktivite Ekleme Sayfası**: `/add` route'u eklendi
   - Aktivite ekleme formu artık ayrı bir sayfada
   - Ana sayfadaki "Aktivite Ekle" butonu yeni sayfaya yönlendiriyor
   - Başarılı ekleme sonrası aktiviteler sayfasına yönlendirme
 
 ### Changed
+
 - **Navbar İyileştirmeleri**:
   - 4 navigasyon ikonu (📝, 📊, 🏆, 🎯) güzel bir container içinde hizalandı
   - Hover ve active state animasyonları eklendi
   - Background container ile görsel olarak gruplandı
   - İkonlar daha büyük ve tutarlı boyutlarda (text-xl sm:text-2xl)
-  
 - **Activities Sayfası**:
   - "Yeni Aktivite" formu kaldırıldı
   - Sayfa artık sadece aktivite listesi ve filtreleme içeriyor
   - Daha temiz ve odaklanmış bir görünüm
 
 ### Improved
+
 - **Genel Görsel İyileştirmeler**:
   - Navbar ikonları için modern container tasarımı
   - Smooth hover ve scale animasyonları
@@ -1538,6 +1675,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.9.2] - 2025-01
 
 ### Added
+
 - **Aktivite Türleri Trend Analizi**: Zaman içinde aktivite türlerinin performans analizi
   - En çok kullanılan 5 aktivite türü için trend grafikleri
   - 7, 30, 90 günlük trend görünümleri
@@ -1548,11 +1686,13 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.9.1] - 2025-01
 
 ### Changed
+
 - **Navbar İyileştirmeleri**:
   - Activities ve Statistics linklerinde yazı kaldırıldı, sadece ikonlar gösteriliyor (📝 ve 📊)
   - ARIA labels eklendi erişilebilirlik için
 
 ### Fixed
+
 - **Apple Health Import Büyük Dosya Desteği**:
   - 1.3GB+ dosyalar için FileReader API ile daha iyi hata yönetimi
   - Büyük dosyalar için chunked/batched processing
@@ -1562,6 +1702,7 @@ All notable changes to SportTrack will be documented in this file.
   - FileReader progress events ile dosya okuma ilerlemesi gösterimi
 
 ### Improved
+
 - **Aktivite Süresi Entegrasyonu**:
   - ActivityTimer'a başlık ve süre gösterimi eklendi
   - Timer başlığında mevcut süre bilgisi gösteriliyor
@@ -1570,6 +1711,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.9.0] - 2025-01
 
 ### Changed
+
 - **UI İyileştirmeleri**:
   - Activities sayfasına 📝 ikonu eklendi
   - Statistics sayfasına 📊 ikonu eklendi
@@ -1577,12 +1719,14 @@ All notable changes to SportTrack will be documented in this file.
   - Sayfa başlıkları tutarlı hale getirildi
 
 ### Fixed
+
 - Statistics sayfasında aktivite ekleme formu olmadığı doğrulandı
 - Activities sayfasında istatistikler ile ilgili içerik olmadığı doğrulandı
 
 ## [0.8.9] - 2025-01
 
 ### Added
+
 - **Apple Health XML Support**: XML format desteği eklendi
   - XML export dosyalarını parse etme desteği
   - Büyük dosyalar (1GB+) için optimizasyon
@@ -1591,18 +1735,21 @@ All notable changes to SportTrack will be documented in this file.
   - parseAppleHealthXML ve parseAppleHealthFile fonksiyonları
 
 ### Changed
+
 - Apple Health import artık hem CSV hem de XML formatlarını destekliyor
 - Büyük dosyalar için kullanıcıya onay mesajı gösteriliyor
 - İşlem sırasında gerçek zamanlı ilerleme gösterimi eklendi
 - Maksimum dosya boyutu 2GB olarak ayarlandı
 
 ### Fixed
+
 - Büyük dosyaların işlenmesi sırasında memory optimizasyonu yapıldı
 - XML parsing hataları için daha iyi hata mesajları eklendi
 
 ## [0.8.8] - 2025-01
 
 ### Added
+
 - **Apple Health Import Guide**: Detaylı kullanım rehberi
   - Apple Health'tan veri dışa aktarma adımları
   - CSV dosyası hazırlama rehberi
@@ -1610,6 +1757,7 @@ All notable changes to SportTrack will be documented in this file.
   - AppleHealthGuide bileşeni eklendi
 
 ### Changed
+
 - **Görsel İyileştirmeler**:
   - ActivityTemplates bileşeni sayfanın sonuna taşındı
   - Template kartları modern gradient tasarıma güncellendi
@@ -1619,11 +1767,13 @@ All notable changes to SportTrack will be documented in this file.
   - Mobil uyumluluk iyileştirildi
 
 ### Fixed
+
 - Template kartlarının responsive tasarımı optimize edildi
 
 ## [0.8.7] - 2025-01
 
 ### Added
+
 - **Ortalama Günlük Aktivite Süresi Analizi**: Aktivite sürelerinin detaylı analizi
   - Ortalama günlük aktivite süresi hesaplama
   - Toplam aktivite süresi gösterimi
@@ -1633,11 +1783,13 @@ All notable changes to SportTrack will be documented in this file.
   - durationUtils utility fonksiyonları (formatDuration, formatDurationShort)
 
 ### Changed
+
 - Stats sayfasına Duration Stats bölümü eklendi
 
 ## [0.8.6] - 2025-01
 
 ### Added
+
 - **Haftalık ve Aylık Karşılaştırma**: Dönemsel performans karşılaştırması
   - Bu hafta vs geçen hafta karşılaştırması
   - Bu ay vs geçen ay karşılaştırması
@@ -1647,11 +1799,13 @@ All notable changes to SportTrack will be documented in this file.
   - PeriodComparison bileşeni ve comparisonUtils utility fonksiyonları
 
 ### Fixed
+
 - ActivityFormInitial tipine `duration` alanı eklendi
 
 ## [0.8.5] - 2025-01
 
 ### Added
+
 - **Haftalık ve Aylık Karşılaştırma**: Dönemsel performans karşılaştırması
   - PeriodComparison component'i eklendi
   - comparisonUtils utility fonksiyonları
@@ -1659,6 +1813,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.8.4] - 2025-01
 
 ### Added
+
 - **Zaman Analizi**: En aktif saatler ve günler analizi
   - Saat bazında aktivite dağılım grafikleri (0-23 saat)
   - Haftanın günlerine göre aktivite dağılım grafikleri
@@ -1666,12 +1821,14 @@ All notable changes to SportTrack will be documented in this file.
   - Bar chart grafikleri ile görselleştirme
 
 ### Changed
+
 - Weightlifting katsayısı 10'dan 15'e yükseltildi
 - Aktivite listesinde süre bilgisi gösterimi eklendi
 
 ## [0.8.3] - 2025-01
 
 ### Added
+
 - **Aktivite Süresi Takibi**: Gerçek zamanlı timer
   - Başlat/Durdur/Sıfırla butonları
   - Saat:dakika:saniye formatında gösterim
@@ -1679,11 +1836,13 @@ All notable changes to SportTrack will be documented in this file.
   - Aktivite listesinde süre gösterimi
 
 ### Changed
+
 - ActivityRecord tipine `duration` alanı eklendi (saniye cinsinden)
 
 ## [0.8.2] - 2025-01
 
 ### Added
+
 - **Aktivite Süresi Takibi**: Gerçek zamanlı timer bileşeni
   - ActivityTimer component'i eklendi
   - Aktivite formuna timer entegrasyonu
@@ -1691,6 +1850,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.8.1] - 2025-01
 
 ### Added
+
 - **Kişisel Rekorlar Sistemi**: En iyi performansların takibi
   - En iyi gün (en yüksek günlük puan)
   - En uzun seri (en uzun hedef tamamlama serisi)
@@ -1701,6 +1861,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.8.0] - 2025-01
 
 ### Added
+
 - **Zorluklar ve Hedefler Sistemi**: Kapsamlı hedef takip sistemi
   - Günlük, haftalık, aylık ve özel zorluklar
   - Otomatik ilerleme takibi ve durum yönetimi
@@ -1713,6 +1874,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.7.9] - 2025-01
 
 ### Added
+
 - **Seviye Sistemi**: XP tabanlı seviye ilerlemesi
   - Seviye 1-50+ arası seviyeler
   - XP hesaplama (her puan = 1 XP)
@@ -1725,6 +1887,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.7.8] - 2025-01
 
 ### Fixed
+
 - Template kategorileri ve görüntüleme sorunları düzeltildi
 - Export/Import'a mood (ruh hali) desteği eklendi
 - Template çevirileri eklendi
@@ -1732,6 +1895,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.7.7] - 2025-01
 
 ### Added
+
 - **Aktivite Şablonları**: Önceden tanımlı aktivite kombinasyonları
   - Aktivite şablonları sistemi (`ActivityTemplates` component)
   - Kategorilere göre şablonlar (hızlı, kardiyo, güç, esneklik, karışık)
@@ -1741,12 +1905,14 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.7.6] - 2025-01
 
 ### Fixed
+
 - Template sistemindeki sorunlar düzeltildi
 - Template kategorileri optimizasyonu
 
 ## [0.7.5] - 2025-01
 
 ### Added
+
 - **Aktivite Şablonları**: Önceden tanımlı aktivite kombinasyonları
   - `activityTemplates.ts` dosyası ve şablon tanımları
   - `ActivityTemplates` component'i
@@ -1754,6 +1920,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.7.4] - 2025-01
 
 ### Added
+
 - **Apple Health Entegrasyonu**: Apple Health CSV import desteği
   - Apple Health CSV dosyası import
   - Adım verileri otomatik parse ve kayıt
@@ -1762,6 +1929,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.7.3] - 2025-01
 
 ### Added
+
 - **Aktivite Filtreleme**: Gelişmiş filtreleme ve sıralama
   - Tarih aralığı filtreleme (tümü, bugün, son 7 gün, son 30 gün, özel)
   - Aktivite türü filtreleme
@@ -1774,6 +1942,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.7.2] - 2025-01
 
 ### Added
+
 - **Hızlı Aktivite Ekleme**: En çok kullanılan aktiviteler için hızlı erişim
   - QuickAdd component'i
   - En sık kullanılan aktivitelerin otomatik hesaplanması
@@ -1783,6 +1952,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.7.1] - 2025-01
 
 ### Added
+
 - **Bildirimler ve Hatırlatıcılar**: Kapsamlı bildirim sistemi
   - Push notification desteği
   - Günlük hatırlatıcılar (özelleştirilebilir saat)
@@ -1796,6 +1966,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.7.0] - 2025-01
 
 ### Added
+
 - **Rozetler ve Başarımlar**: Gamification sistemi
   - 17 farklı rozet (streak, points, activities, special)
   - Rozet nadirlik seviyeleri (common, rare, epic, legendary)
@@ -1808,6 +1979,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.6.2] - 2025-01
 
 ### Added
+
 - **CSV ve PDF Export**: Gelişmiş veri export özellikleri
   - CSV export (Excel uyumlu, UTF-8 BOM desteği)
   - PDF export (jspdf ve jspdf-autotable kullanarak)
@@ -1819,6 +1991,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.6.1] - 2025-01
 
 ### Added
+
 - **Gelişmiş Grafikler**: Recharts kütüphanesi ile görselleştirme
   - Trend grafikleri (7, 30, 90 günlük çizgi grafikleri)
   - Aktivite karşılaştırma grafikleri (bar chart)
@@ -1830,6 +2003,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.6.0] - 2025-01
 
 ### Added
+
 - **PWA (Progressive Web App) Özellikleri**: Tam PWA desteği
   - Service Worker implementasyonu
   - Offline çalışma desteği
@@ -1843,16 +2017,19 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.5.7] - 2024
 
 ### Added
+
 - Ruh hali seçimi ve motivasyonel mesajlar sistemi
 - Motivasyonel alıntılar genişletildi (40+ alıntı)
 - Ruh haline göre esprili, ciddi ve motive edici mesajlar
 
 ### Changed
+
 - Footer versiyon gösterimi mobilde aynı satırda, sağa hizalı
 
 ## [0.5.6] - 2024
 
 ### Fixed
+
 - Cross-language hint mesajları düzeltildi
 - Placeholder metinleri doğru dilde gösteriliyor
 - Mobil date input overflow sorunu çözüldü
@@ -1860,6 +2037,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.5.5] - 2024
 
 ### Changed
+
 - Mobil tasarım iyileştirmeleri
 - Touch target boyutları artırıldı (min-h-[44px])
 - Kart padding ve font boyutları optimize edildi
@@ -1867,29 +2045,34 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.5.4] - 2024
 
 ### Changed
+
 - Mobil navbar boyutu artırıldı
 - Diğer elementlerin boyutları optimize edildi
 
 ## [0.5.3] - 2024
 
 ### Changed
+
 - Default aktivitelerin çarpanları, açıklamaları, varsayılan değerleri ve birimleri güncellendi
 - Cross-language placeholder metinleri düzeltildi
 
 ## [0.5.2] - 2024
 
 ### Fixed
+
 - Build hataları düzeltildi (Mood type, motivationalMessages type errors)
 
 ## [0.5.1] - 2024
 
 ### Fixed
+
 - Placeholder metinleri doğru dilde gösteriliyor
 - Footer versiyon gösterimi mobilde düzeltildi
 
 ## [0.5.0] - 2024
 
 ### Added
+
 - Ruh hali seçimi (sad, unhappy, cheerful, happy, tired/sick)
 - Ruh haline göre motivasyonel mesajlar sistemi
 - Motivasyonel alıntılar genişletildi
@@ -1897,12 +2080,14 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.4.4] - 2024
 
 ### Changed
+
 - README.md güncellendi
 - Mobil UI iyileştirmeleri
 
 ## [0.4.3] - 2024
 
 ### Added
+
 - Mobile navbar improvements (larger navbar, smaller buttons)
 - Mobile responsive layout for Activity Name, Unit, and Description fields (2 columns on mobile)
 - Stats link in mobile navbar
@@ -1911,11 +2096,13 @@ All notable changes to SportTrack will be documented in this file.
 - Separate profile and app settings dialogs on mobile
 
 ### Fixed
+
 - Description placeholder texts now show correct language (EN/TR)
 - Date filtering in stats page using proper date comparison
 - Daily statistics date selection filtering
 
 ### Changed
+
 - Mobile cards layout: 2 columns for stats cards and highlights
 - Highlights section: removed accordion, always visible
 - Footer: version number aligned to the right
@@ -1924,17 +2111,20 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.4.2] - 2024
 
 ### Fixed
+
 - Description placeholder texts to show correct language (EN/TR)
 - Date filtering in stats page using proper date comparison
 - Mobile UI improvements
 
 ### Changed
+
 - Mobile navbar sizing (larger navbar, smaller buttons)
 - Separate profile and app settings dialogs on mobile
 
 ## [0.4.1] - 2024
 
 ### Added
+
 - Detailed statistics page with day-by-day breakdown
 - Loading states with skeleton loaders
 - Custom confirmation dialog component
@@ -1947,11 +2137,13 @@ All notable changes to SportTrack will be documented in this file.
 - Constants file for magic numbers, storage keys, timeouts, limits, breakpoints
 
 ### Changed
+
 - Improved ManageActivitiesDialog layout (side-by-side fields)
 - Last 7 days order reversed (oldest day first)
 - Footer version display updated
 
 ### Fixed
+
 - Missing imports in SettingsDialog and i18n
 - Duplicate translation keys
 - Hydration warnings
@@ -1960,6 +2152,7 @@ All notable changes to SportTrack will be documented in this file.
 ## [0.3.4] - 2024
 
 ### Initial Release
+
 - Basic activity tracking
 - Custom activity management
 - Statistics and highlights

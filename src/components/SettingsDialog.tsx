@@ -22,6 +22,7 @@ import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { useCloudSync } from '@/hooks/useCloudSync';
+import { useAutoSync } from '@/hooks/useAutoSync';
 
 // Lazy load heavy components that are not always visible
 const DataExportImport = lazy(() =>
@@ -49,10 +50,11 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const { isAuthenticated, isConfigured, user, logout } = useAuth();
   const { showToast } = useToaster();
   const router = useRouter();
-  const { clearAllActivities } = useActivities();
-  const { clearAllBadges } = useBadges();
-  const { clearAllChallenges } = useChallenges();
+  const { activities, clearAllActivities } = useActivities();
+  const { badges, clearAllBadges } = useBadges();
+  const { challenges, clearAllChallenges } = useChallenges();
   const { syncToCloud } = useCloudSync();
+  const { flushPendingSync } = useAutoSync();
   const [open, setOpen] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
@@ -149,6 +151,83 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
   const handleLogout = async () => {
     try {
+      // CRITICAL: Flush any pending debounced sync operations first
+      try {
+        await flushPendingSync();
+      } catch (flushError) {
+        // Log only in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to flush pending sync:', flushError);
+        }
+        // Continue anyway - we'll do a full sync below
+      }
+
+      // Read latest data directly from localStorage to ensure we have the most up-to-date data
+      // This is important because store updates might be debounced
+      let latestActivities: unknown[] = [];
+      let latestSettings: unknown | null = null;
+      let latestBadges: unknown[] = [];
+      let latestChallenges: unknown[] = [];
+
+      if (typeof window !== 'undefined') {
+        try {
+          const activitiesRaw = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+          if (activitiesRaw) {
+            latestActivities = JSON.parse(activitiesRaw);
+          }
+          const settingsRaw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+          if (settingsRaw) {
+            latestSettings = JSON.parse(settingsRaw);
+          }
+          const badgesRaw = localStorage.getItem(STORAGE_KEYS.BADGES);
+          if (badgesRaw) {
+            latestBadges = JSON.parse(badgesRaw);
+          }
+          const challengesRaw = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+          if (challengesRaw) {
+            latestChallenges = JSON.parse(challengesRaw);
+          }
+        } catch (parseError) {
+          console.error('Failed to read data from localStorage:', parseError);
+          // Fallback to store values
+          latestActivities = activities;
+          latestSettings = settings;
+          latestBadges = badges;
+          latestChallenges = challenges;
+        }
+      } else {
+        // Fallback to store values if localStorage is not available
+        latestActivities = activities;
+        latestSettings = settings;
+        latestBadges = badges;
+        latestChallenges = challenges;
+      }
+
+      // Sync to cloud before logout (using latest data from localStorage)
+      try {
+        // Debug log only in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Syncing latest data to cloud before logout...', {
+            activitiesCount: latestActivities.length,
+            badgesCount: latestBadges.length,
+            challengesCount: latestChallenges.length,
+            hasSettings: !!latestSettings,
+          });
+        }
+        await syncToCloud({
+          activities: latestActivities,
+          settings: latestSettings,
+          badges: latestBadges,
+          challenges: latestChallenges,
+        });
+      } catch (syncError) {
+        // Log only in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to sync before logout:', syncError);
+        }
+        // Continue with logout even if sync fails
+      }
+
       await logout();
 
       // Clear all data stores
@@ -173,6 +252,12 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
           }
         });
 
+        // Clear initial sync flags to allow fresh sync on next login
+        localStorage.removeItem('sporttrack_initial_sync_complete');
+        localStorage.removeItem('sporttrack_sync_conflict');
+        localStorage.removeItem('sporttrack_last_login_time'); // Clear for WelcomeToast
+        localStorage.removeItem('sporttrack_last_user_id'); // Clear for WelcomeToast
+
         // Prevent onboarding from showing after logout
         localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
 
@@ -188,8 +273,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
       showToast(
         lang === 'tr'
-          ? 'Çıkış yapıldı ve tüm veriler temizlendi'
-          : 'Logged out and all data cleared',
+          ? 'Başarıyla çıkış yapıldı! Verileriniz buluta senkronize edildi.'
+          : 'Successfully logged out! Your data has been synced to cloud.',
         'success'
       );
     } catch (error) {
@@ -589,7 +674,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     </div>
                   )}
 
-                  {/* Sign Out, Clear All Data, Show Onboarding Tour - Same Row */}
+                  {/* Sign Out, Sync to Cloud, Clear All Data, Show Onboarding Tour - Same Row */}
                   {isAuthenticated && (
                     <div className="flex items-center gap-2">
                       <button
@@ -598,6 +683,34 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                         className={`flex-1 ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:text-[10px] min-h-[28px]'} rounded-lg border-2 border-red-200 dark:border-red-800 bg-gradient-to-r from-red-50 to-white dark:from-red-900/20 dark:to-red-900/10 hover:from-red-100 hover:to-red-50 dark:hover:from-red-800/30 transition-all duration-200 text-red-700 dark:text-red-400 font-semibold flex items-center justify-center`}
                       >
                         {lang === 'tr' ? 'Çıkış Yap' : 'Sign Out'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await syncToCloud({
+                              activities: activities,
+                              settings: settings,
+                              badges: badges,
+                              challenges: challenges,
+                            });
+                            showToast(
+                              lang === 'tr'
+                                ? 'Veriler buluta senkronize edildi'
+                                : 'Data synced to cloud',
+                              'success'
+                            );
+                          } catch (error) {
+                            showToast(
+                              lang === 'tr' ? 'Senkronizasyon hatası' : 'Sync error',
+                              'error'
+                            );
+                          }
+                        }}
+                        className={`flex-1 ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:text-[10px] min-h-[28px]'} rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/20 dark:to-blue-900/10 hover:from-blue-100 hover:to-blue-50 dark:hover:from-blue-800/30 transition-all duration-200 text-blue-700 dark:text-blue-400 font-semibold flex items-center justify-center`}
+                        title={lang === 'tr' ? 'Buluta Senkronize Et' : 'Sync to Cloud'}
+                      >
+                        ☁️ {lang === 'tr' ? 'Sync' : 'Sync'}
                       </button>
                       <button
                         type="button"

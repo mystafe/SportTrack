@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ActivityDefinition, ActivityKey } from '@/lib/activityConfig';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
@@ -61,6 +62,7 @@ function asDefinitionFromRecord(record: ActivityFormInitial): ActivityDefinition
 }
 
 export function ActivityForm({ onCreated, onSaved, onCancel, initial }: ActivityFormProps) {
+  const router = useRouter();
   const isMobile = useIsMobile();
   const { triggerHaptic } = useHapticFeedback();
   const baseDefinitions = useActivityDefinitions();
@@ -232,6 +234,9 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
               );
             });
           }
+
+          // Navigate to homepage after adding activity
+          router.push('/');
         }, 500);
 
         setAmount(String(definition.defaultAmount));

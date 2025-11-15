@@ -1,0 +1,37 @@
+{
+  "exercises": [
+    {
+      "id": "test-normal-1",
+      "activityKey": "walking",
+      "label": "Yürüyüş",
+      "labelEn": "Walking",
+      "icon": "🚶",
+      "unit": "adım",
+      "unitEn": "steps",
+      "multiplier": 1,
+      "amount": 5000,
+      "points": 5000,
+      "performedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "test-normal-2",
+      "activityKey": "running",
+      "label": "Koşu",
+      "labelEn": "Running",
+      "icon": "🏃",
+      "unit": "km",
+      "unitEn": "km",
+      "multiplier": 100,
+      "amount": 5,
+      "points": 500,
+      "performedAt": "2024-01-16T08:00:00.000Z"
+    }
+  ],
+  "settings": {
+    "name": "Test User",
+    "dailyTarget": 10000,
+    "customActivities": [],
+    "mood": "happy"
+  },
+  "version": "0.18.17"
+}

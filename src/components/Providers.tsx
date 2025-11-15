@@ -31,6 +31,11 @@ const ConflictResolutionManager = lazy(() =>
     default: m.ConflictResolutionManager,
   }))
 );
+const WelcomeToast = lazy(() =>
+  import('@/components/WelcomeToast').then((m) => ({
+    default: m.WelcomeToast,
+  }))
+);
 
 export function Providers({ children }: { children: ReactNode }) {
   // Import console helpers to make them available in browser console (only in browser)
@@ -66,6 +71,9 @@ export function Providers({ children }: { children: ReactNode }) {
                       <NameDialog />
                       <Suspense fallback={null}>
                         <ConflictResolutionManager />
+                      </Suspense>
+                      <Suspense fallback={null}>
+                        <WelcomeToast />
                       </Suspense>
                       {children}
                     </AutoSyncProvider>

@@ -68,7 +68,7 @@ const translations: Translations = {
   'list.editingTitle': { tr: 'Egzersizi Düzenle', en: 'Edit Exercise' },
   'list.pointsUnit': { tr: 'puan', en: 'pts' },
 
-  'activities.custom.manageButton': { tr: 'Egzersizleri Özelleştir', en: 'Manage Exercises' },
+  'activities.custom.manageButton': { tr: 'Aktiviteleri Yönet', en: 'Manage Activities' },
   'activities.custom.title': { tr: 'Egzersiz Listesini Özelleştir', en: 'Customize Exercises' },
   'activities.custom.subtitle': {
     tr: 'Standart egzersizlerin yanı sıra kendine özel egzersizler ekleyebilir, düzenleyebilir veya kaldırabilirsin.',

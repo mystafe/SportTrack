@@ -3,23 +3,39 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCloudSync } from '@/hooks/useCloudSync';
+import { useSyncQueue } from '@/hooks/useSyncQueue';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useToaster } from './Toaster';
 import { AuthDialog } from './AuthDialog';
-import { useActivities } from '@/lib/activityStore';
+import { useActivities, ActivityRecord } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
-import { useBadges } from '@/lib/badgeStore';
+import { useBadges, Badge } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 import { resolveConflicts, saveLocalLastModified } from '@/lib/cloudSync/conflictResolver';
+import { STORAGE_KEYS } from '@/lib/constants';
 import { ConflictResolutionDialog } from './ConflictResolutionDialog';
+import { SyncHistoryDialog } from './SyncHistoryDialog';
+import { syncHistoryService } from '@/lib/cloudSync/syncHistory';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
+import { formatDistanceToNow } from 'date-fns';
+import { tr, enUS } from 'date-fns/locale';
 
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
+
+/**
+ * Format relative time (e.g., "2 minutes ago")
+ */
+function formatRelativeTime(date: Date, lang: 'tr' | 'en'): string {
+  const locale = lang === 'tr' ? tr : enUS;
+  return formatDistanceToNow(date, { addSuffix: true, locale });
+}
 
 export function CloudSyncSettings() {
   const { user, isAuthenticated, logout, isConfigured } = useAuth();
   const { syncState, syncToCloud, syncFromCloud } = useCloudSync();
+  const { pendingCount, failedCount, isProcessing, processQueue, retryFailed, getWaitingForRetry } =
+    useSyncQueue();
   const { activities } = useActivities();
   const { settings, saveSettings } = useSettings();
   const { badges } = useBadges();
@@ -42,11 +58,105 @@ export function CloudSyncSettings() {
       settings: unknown | null;
       badges: unknown[];
       challenges: unknown[];
+      points?: number;
+      metadata?: {
+        lastModified: Date;
+        version: number;
+        userId: string;
+      };
     };
   } | null>(null);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [syncStatistics, setSyncStatistics] = useState(syncHistoryService.getStatistics());
+  const [hasConflicts, setHasConflicts] = useState<boolean | null>(null);
 
   // Note: Initial conflict resolution on login is now handled by ConflictResolutionManager component
   // This conflict dialog is only used for manual download conflicts
+
+  const checkForConflicts = (
+    local: {
+      activities: unknown[];
+      settings: unknown | null;
+      badges: unknown[];
+      challenges: unknown[];
+    },
+    cloud: import('@/lib/cloudSync/types').CloudData
+  ): boolean => {
+    // Use exercises (yapılan aktiviteler) for comparison, not activities (aktivite tanımları)
+    const cloudExercises = (cloud.exercises || cloud.activities || []) as Array<{
+      points?: number;
+    }>;
+    const cloudExercisesLength = cloudExercises.length;
+
+    // Calculate total points for comparison (always from exercises for accuracy)
+    const localTotalPoints = (local.activities as Array<{ points?: number }>).reduce(
+      (sum, ex) => sum + (ex.points || 0),
+      0
+    );
+    const cloudTotalPoints = cloudExercises.reduce((sum, ex) => sum + (ex.points || 0), 0);
+
+    // Check if counts differ
+    const countsDiffer =
+      local.activities.length !== cloudExercisesLength ||
+      local.badges.length !== (cloud.badges?.length || 0) ||
+      local.challenges.length !== (cloud.challenges?.length || 0);
+
+    // Check if total points differ (more accurate than just counts)
+    const pointsDiffer = Math.abs(localTotalPoints - cloudTotalPoints) > 0.01; // Allow small floating point differences
+
+    // If counts are the same but points differ, there's still a conflict (data might be different)
+    // If counts differ, there's definitely a conflict
+    return countsDiffer || pointsDiffer;
+  };
+
+  // Check for conflicts periodically (optimized: less frequent checks)
+  useEffect(() => {
+    if (!isAuthenticated || !isConfigured) {
+      setHasConflicts(null);
+      return;
+    }
+
+    let timeoutId: NodeJS.Timeout | null = null;
+    let intervalId: NodeJS.Timeout | null = null;
+
+    const checkConflicts = async () => {
+      try {
+        const cloudData = await syncFromCloud();
+        if (cloudData) {
+          const localData = { activities, settings, badges, challenges };
+          const conflicts = checkForConflicts(localData, cloudData);
+          setHasConflicts(conflicts);
+        } else {
+          setHasConflicts(null);
+        }
+      } catch (error) {
+        // Silent fail - conflicts check is not critical
+        setHasConflicts(null);
+      }
+    };
+
+    // Initial check after a short delay (debounce)
+    timeoutId = setTimeout(() => {
+      checkConflicts();
+    }, 2000);
+
+    // Check every 60 seconds (increased from 30s to reduce Firebase requests)
+    intervalId = setInterval(checkConflicts, 60000);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isAuthenticated,
+    isConfigured,
+    activities.length,
+    badges.length,
+    challenges.length,
+    settings?.name,
+    settings?.dailyTarget,
+  ]);
 
   if (!isConfigured) {
     return (
@@ -62,15 +172,17 @@ export function CloudSyncSettings() {
       return;
     }
 
-    console.log('🔄 handleSyncToCloud called');
     setSyncing(true);
     try {
-      console.log('📊 Data to sync:', {
-        activities: activities.length,
-        settings: settings ? 'present' : 'null',
-        badges: badges.length,
-        challenges: challenges.length,
-      });
+      // Debug log only in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Data to sync:', {
+          activities: activities.length,
+          settings: settings ? 'present' : 'null',
+          badges: badges.length,
+          challenges: challenges.length,
+        });
+      }
 
       await syncToCloud({
         activities,
@@ -79,42 +191,54 @@ export function CloudSyncSettings() {
         challenges,
       });
 
-      console.log('✅ Sync completed, showing toast');
+      // Show toast only for manual sync
       showToast(lang === 'tr' ? 'Buluta senkronize edildi!' : 'Synced to cloud!', 'success');
     } catch (error) {
-      console.error('❌ Sync error in handleSyncToCloud:', error);
+      // Log error only in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Sync error in handleSyncToCloud:', error);
+      }
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      showToast(
-        lang === 'tr' ? `Senkronizasyon hatası: ${errorMessage}` : `Sync error: ${errorMessage}`,
-        'error'
-      );
-    } finally {
-      console.log('🏁 handleSyncToCloud finally, setting syncing to false');
-      setSyncing(false);
-    }
-  };
 
-  const checkForConflicts = (
-    local: {
-      activities: unknown[];
-      settings: unknown | null;
-      badges: unknown[];
-      challenges: unknown[];
-    },
-    cloud: {
-      activities: unknown[];
-      settings: unknown | null;
-      badges: unknown[];
-      challenges: unknown[];
+      // Check if error is due to offline mode
+      // Note: syncToCloud now returns silently when offline, so this catch block
+      // should only catch real errors, not offline mode
+      if (errorMessage.includes('Offline') || errorMessage.includes('offline')) {
+        // Offline mode - data is queued, show info message instead of error
+        // Get current pending count from sync state
+        const currentPendingCount = syncState.pendingChanges || 0;
+        showToast(
+          lang === 'tr'
+            ? `Offline: ${currentPendingCount} değişiklik senkronizasyon için kuyruğa eklendi`
+            : `Offline: ${currentPendingCount} changes queued for sync`,
+          'info'
+        );
+      } else {
+        // Real error - show error message
+        showToast(
+          lang === 'tr' ? `Senkronizasyon hatası: ${errorMessage}` : `Sync error: ${errorMessage}`,
+          'error'
+        );
+      }
+    } finally {
+      setSyncing(false);
+
+      // Check for conflicts after sync completes (optimized: only if needed)
+      if (isAuthenticated && isConfigured) {
+        setTimeout(async () => {
+          try {
+            const cloudData = await syncFromCloud();
+            if (cloudData) {
+              const localData = { activities, settings, badges, challenges };
+              const conflicts = checkForConflicts(localData, cloudData);
+              setHasConflicts(conflicts);
+            }
+          } catch (error) {
+            // Silent fail
+          }
+        }, 1000); // Small delay to allow cloud to process
+      }
     }
-  ): boolean => {
-    // Simple conflict detection: check if counts differ
-    return (
-      local.activities.length !== cloud.activities.length ||
-      local.badges.length !== cloud.badges.length ||
-      local.challenges.length !== cloud.challenges.length ||
-      JSON.stringify(local.settings) !== JSON.stringify(cloud.settings)
-    );
   };
 
   const applyCloudData = async (
@@ -124,10 +248,39 @@ export function CloudSyncSettings() {
     const localData = { activities, settings, badges, challenges };
     const resolution = resolveConflicts(localData, cloudData, strategy);
 
-    // Apply resolved data locally
-    // Apply settings
-    if (resolution.resolvedData.settings) {
-      saveSettings(resolution.resolvedData.settings);
+    // Apply resolved data to localStorage
+    if (typeof window !== 'undefined') {
+      // Write activities
+      if (resolution.resolvedData.activities.length > 0) {
+        localStorage.setItem(
+          STORAGE_KEYS.ACTIVITIES,
+          JSON.stringify(resolution.resolvedData.activities)
+        );
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.ACTIVITIES);
+      }
+
+      // Write badges
+      if (resolution.resolvedData.badges.length > 0) {
+        localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(resolution.resolvedData.badges));
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.BADGES);
+      }
+
+      // Write challenges
+      if (resolution.resolvedData.challenges.length > 0) {
+        localStorage.setItem(
+          STORAGE_KEYS.CHALLENGES,
+          JSON.stringify(resolution.resolvedData.challenges)
+        );
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.CHALLENGES);
+      }
+
+      // Apply settings
+      if (resolution.resolvedData.settings) {
+        saveSettings(resolution.resolvedData.settings);
+      }
     }
 
     // Only sync to cloud if strategy is NOT "cloud" (cloud strategy means use cloud data, don't overwrite it)
@@ -135,15 +288,30 @@ export function CloudSyncSettings() {
     // For "merge" or "newest": upload merged/resolved data to cloud
     // For "cloud" strategy: just apply cloud data locally, don't upload anything
     if (strategy !== 'cloud') {
-      await syncToCloud({
-        activities: resolution.resolvedData.activities,
-        settings: resolution.resolvedData.settings,
-        badges: resolution.resolvedData.badges,
-        challenges: resolution.resolvedData.challenges,
-      });
+      try {
+        await syncToCloud({
+          activities: resolution.resolvedData.activities,
+          settings: resolution.resolvedData.settings,
+          badges: resolution.resolvedData.badges,
+          challenges: resolution.resolvedData.challenges,
+        });
+        // Wait a bit more to ensure upload is fully processed
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('Failed to sync to cloud after conflict resolution:', error);
+        showToast(lang === 'tr' ? "Cloud'a yükleme hatası" : 'Failed to upload to cloud', 'error');
+      }
     }
 
     saveLocalLastModified();
+
+    // Reload page to apply changes (wait longer to ensure cloud upload is complete)
+    setTimeout(
+      () => {
+        window.location.reload();
+      },
+      strategy !== 'cloud' ? 1500 : 500
+    );
 
     const message =
       strategy === 'cloud'
@@ -208,9 +376,16 @@ export function CloudSyncSettings() {
         const hasConflicts = checkForConflicts(localData, cloudData);
 
         if (hasConflicts) {
+          // Convert CloudData to conflict format (use exercises, not activities)
           setConflictData({
             local: localData,
-            cloud: cloudData,
+            cloud: {
+              activities: (cloudData.exercises || cloudData.activities || []) as unknown[],
+              settings: cloudData.settings,
+              badges: (cloudData.badges || []) as unknown[],
+              challenges: (cloudData.challenges || []) as unknown[],
+              metadata: cloudData.metadata,
+            },
           });
           setShowConflictDialog(true);
         } else {
@@ -328,65 +503,77 @@ export function CloudSyncSettings() {
                   setSyncing(true);
                   try {
                     const cloudData = await syncFromCloud();
-                    if (cloudData) {
-                      // Check for conflicts
-                      const localData = { activities, settings, badges, challenges };
-                      const hasConflicts = checkForConflicts(localData, cloudData);
+                    const localData = { activities, settings, badges, challenges };
 
-                      if (hasConflicts) {
-                        setConflictData({
-                          local: localData,
-                          cloud: cloudData,
-                        });
-                        setShowConflictDialog(true);
-                      } else {
-                        // No conflicts, sync both ways
-                        await syncToCloud({
-                          activities,
-                          settings,
-                          badges,
-                          challenges,
-                        });
-                        showToast(lang === 'tr' ? 'Senkronize edildi!' : 'Synced!', 'success');
-                      }
-                    } else {
-                      // No cloud data, just upload local
-                      await syncToCloud({
-                        activities,
-                        settings,
-                        badges,
-                        challenges,
+                    if (cloudData) {
+                      // Convert CloudData to conflict format
+                      // Include points from cloudData for proper display
+                      setConflictData({
+                        local: localData,
+                        cloud: {
+                          activities: (cloudData.exercises ||
+                            cloudData.activities ||
+                            []) as unknown[],
+                          settings: cloudData.settings,
+                          badges: (cloudData.badges || []) as unknown[],
+                          challenges: (cloudData.challenges || []) as unknown[],
+                          metadata: cloudData.metadata,
+                          points: cloudData.points, // Include points for proper display
+                        },
                       });
-                      showToast(
-                        lang === 'tr' ? 'Buluta senkronize edildi!' : 'Synced to cloud!',
-                        'success'
-                      );
+                      setShowConflictDialog(true);
+                    } else {
+                      // No cloud data, show local data only
+                      setConflictData({
+                        local: localData,
+                        cloud: {
+                          activities: [],
+                          settings: null,
+                          badges: [],
+                          challenges: [],
+                          points: 0,
+                          metadata: {
+                            lastModified: new Date(),
+                            version: Date.now(),
+                            userId: user?.uid || 'unknown',
+                          },
+                        },
+                      });
+                      setShowConflictDialog(true);
                     }
                   } catch (error) {
-                    showToast(lang === 'tr' ? 'Senkronizasyon hatası' : 'Sync error', 'error');
+                    console.error('Failed to fetch cloud data:', error);
+                    showToast(
+                      lang === 'tr' ? 'Bulut verileri alınamadı' : 'Failed to fetch cloud data',
+                      'error'
+                    );
                   } finally {
                     setSyncing(false);
                   }
                 }}
                 disabled={syncing || syncState.status === 'syncing'}
-                className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-center box-border leading-none"
+                className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800/50 dark:hover:to-blue-700/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-center box-border leading-none"
                 style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
                 title={
-                  syncing || syncState.status === 'syncing'
-                    ? lang === 'tr'
-                      ? 'Senkronize ediliyor...'
-                      : 'Syncing...'
-                    : lang === 'tr'
-                      ? 'Senkronize Et'
-                      : 'Sync'
+                  lang === 'tr'
+                    ? 'Cloud ve Local verileri karşılaştır'
+                    : 'Compare Cloud and Local data'
                 }
-                aria-label={lang === 'tr' ? 'Senkronize Et' : 'Sync'}
+                aria-label={
+                  lang === 'tr'
+                    ? 'Cloud ve Local verileri karşılaştır'
+                    : 'Compare Cloud and Local data'
+                }
               >
                 {syncing || syncState.status === 'syncing'
                   ? '⏳'
-                  : syncState.status === 'synced'
+                  : hasConflicts === false
                     ? '✅'
-                    : '🔄'}
+                    : hasConflicts === true
+                      ? '⚠️'
+                      : syncState.status === 'synced'
+                        ? '✅'
+                        : '🔄'}
               </button>
             )}
             <div
@@ -422,27 +609,115 @@ export function CloudSyncSettings() {
           </button>
         )}
 
-        {/* Sync Status Display */}
+        {/* Enhanced Sync Status Display */}
         {isAuthenticated && (
-          <div
-            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} ${
-              syncState.status === 'syncing'
-                ? 'text-blue-500 dark:text-blue-400'
-                : syncState.status === 'synced'
-                  ? 'text-green-500 dark:text-green-400'
-                  : syncState.status === 'error'
-                    ? 'text-red-500 dark:text-red-400'
-                    : 'text-gray-500 dark:text-gray-400'
-            }`}
-          >
-            {syncState.status === 'syncing' &&
-              (lang === 'tr' ? 'Senkronize ediliyor...' : 'Syncing...')}
-            {syncState.status === 'synced' &&
-              syncState.lastSyncAt &&
-              (lang === 'tr'
-                ? `Son senkronizasyon: ${new Date(syncState.lastSyncAt).toLocaleTimeString('tr-TR')}`
-                : `Last synced: ${new Date(syncState.lastSyncAt).toLocaleTimeString('en-US')}`)}
-            {syncState.status === 'error' && syncState.error && <span>{syncState.error}</span>}
+          <div className="space-y-1">
+            {/* Real-time Status Indicator */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {/* Status Icon */}
+                <div className="relative">
+                  {syncState.status === 'syncing' || isProcessing ? (
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                  ) : syncState.status === 'synced' ? (
+                    <div className="w-2 h-2 bg-green-500 rounded-full" />
+                  ) : syncState.status === 'error' ? (
+                    <div className="w-2 h-2 bg-red-500 rounded-full" />
+                  ) : syncState.status === 'offline' ? (
+                    <div className="w-2 h-2 bg-gray-400 rounded-full" />
+                  ) : (
+                    <div className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full" />
+                  )}
+                </div>
+
+                {/* Status Text */}
+                <div
+                  className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} ${
+                    syncState.status === 'syncing' || isProcessing
+                      ? 'text-blue-500 dark:text-blue-400'
+                      : syncState.status === 'synced'
+                        ? 'text-green-500 dark:text-green-400'
+                        : syncState.status === 'error'
+                          ? 'text-red-500 dark:text-red-400'
+                          : syncState.status === 'offline'
+                            ? 'text-gray-500 dark:text-gray-400'
+                            : 'text-gray-500 dark:text-gray-400'
+                  }`}
+                >
+                  {syncState.status === 'syncing' || isProcessing
+                    ? lang === 'tr'
+                      ? 'Senkronize ediliyor...'
+                      : 'Syncing...'
+                    : syncState.status === 'synced' && syncState.lastSyncAt
+                      ? lang === 'tr'
+                        ? `Son senkronizasyon: ${new Date(syncState.lastSyncAt).toLocaleTimeString('tr-TR')}`
+                        : `Last synced: ${new Date(syncState.lastSyncAt).toLocaleTimeString('en-US')}`
+                      : syncState.status === 'error' && syncState.error
+                        ? syncState.error
+                        : ''}
+                </div>
+              </div>
+
+              {/* Last Sync Time Tooltip */}
+              {syncState.lastSyncAt && syncState.status !== 'syncing' && (
+                <div
+                  className={`${isMobile ? 'text-[8px]' : 'text-[9px]'} text-gray-400 dark:text-gray-500`}
+                >
+                  {formatRelativeTime(syncState.lastSyncAt, lang)}
+                </div>
+              )}
+            </div>
+
+            {/* Queue Status */}
+            {(pendingCount > 0 || failedCount > 0 || getWaitingForRetry().length > 0) && (
+              <div className="flex items-center gap-2 flex-wrap">
+                {pendingCount > 0 && (
+                  <div
+                    className={`${isMobile ? 'text-[8px]' : 'text-[9px]'} px-1.5 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700`}
+                  >
+                    📦 {lang === 'tr' ? `${pendingCount} bekleyen` : `${pendingCount} pending`}
+                  </div>
+                )}
+                {getWaitingForRetry().length > 0 && (
+                  <div
+                    className={`${isMobile ? 'text-[8px]' : 'text-[9px]'} px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 border border-orange-200 dark:border-orange-700`}
+                    title={
+                      lang === 'tr'
+                        ? 'Exponential backoff nedeniyle bekliyor'
+                        : 'Waiting due to exponential backoff'
+                    }
+                  >
+                    ⏳{' '}
+                    {lang === 'tr'
+                      ? `${getWaitingForRetry().length} bekliyor`
+                      : `${getWaitingForRetry().length} waiting`}
+                  </div>
+                )}
+                {failedCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={retryFailed}
+                    className={`${isMobile ? 'text-[8px]' : 'text-[9px]'} px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-700 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors`}
+                    title={lang === 'tr' ? 'Başarısız olanları tekrar dene' : 'Retry failed items'}
+                  >
+                    ⚠️ {lang === 'tr' ? `${failedCount} başarısız` : `${failedCount} failed`}
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Sync History Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setSyncStatistics(syncHistoryService.getStatistics());
+                setShowHistoryDialog(true);
+              }}
+              className={`${isMobile ? 'text-[8px]' : 'text-[9px]'} px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors mt-1`}
+              title={lang === 'tr' ? 'Senkronizasyon geçmişi' : 'Sync history'}
+            >
+              📊 {lang === 'tr' ? 'Geçmiş' : 'History'}
+            </button>
           </div>
         )}
       </div>
@@ -463,13 +738,25 @@ export function CloudSyncSettings() {
               localStorage.removeItem(CONFLICT_STORAGE_KEY);
             }
           }}
-          localCount={{
-            activities: conflictData.local.activities.length,
-            badges: conflictData.local.badges.length,
+          localData={{
+            activities: (conflictData.local.activities as ActivityRecord[]) || [],
+            badges: (conflictData.local.badges as Badge[]) || [],
+            challenges: conflictData.local.challenges || [],
+            settings: conflictData.local.settings || settings || null,
           }}
-          cloudCount={{
-            activities: conflictData.cloud.activities.length,
-            badges: conflictData.cloud.badges.length,
+          cloudData={{
+            exercises: (conflictData.cloud.activities || []) as ActivityRecord[],
+            activities: [],
+            badges: (conflictData.cloud.badges || []) as Badge[],
+            challenges: conflictData.cloud.challenges || [],
+            settings: conflictData.cloud.settings,
+            metadata: conflictData.cloud.metadata || {
+              lastModified: new Date(),
+              version: Date.now(),
+              userId: user?.uid || 'unknown',
+            },
+            points: 0,
+            lastModified: conflictData.cloud.metadata?.lastModified || null,
           }}
           localLastModified={(() => {
             if (typeof window === 'undefined') return null;
@@ -511,6 +798,18 @@ export function CloudSyncSettings() {
             }
             return null;
           })()}
+        />
+      )}
+
+      {showHistoryDialog && (
+        <SyncHistoryDialog
+          open={showHistoryDialog}
+          statistics={syncStatistics}
+          onClose={() => {
+            setShowHistoryDialog(false);
+            // Refresh statistics when closing
+            setSyncStatistics(syncHistoryService.getStatistics());
+          }}
         />
       )}
     </>

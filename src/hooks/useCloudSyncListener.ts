@@ -38,11 +38,11 @@ function isLocalEmpty(local: {
  * Check if cloud data is empty (all zeros)
  */
 function isCloudEmpty(cloud: CloudData): boolean {
-  return (
-    (cloud.activities?.length || 0) === 0 &&
-    (cloud.badges?.length || 0) === 0 &&
-    (cloud.challenges?.length || 0) === 0
-  );
+  // Use exercises from new structure, fallback to activities for backward compatibility
+  const hasExercises = (cloud.exercises?.length || 0) > 0 || (cloud.activities?.length || 0) > 0;
+  const hasBadges = (cloud.badges?.length || 0) > 0;
+  const hasChallenges = (cloud.challenges?.length || 0) > 0;
+  return !hasExercises && !hasBadges && !hasChallenges;
 }
 
 /**
@@ -124,7 +124,9 @@ function hasConflicts(
 
   // Both have data, check if they are actually different
   // First check lengths (quick check)
-  const cloudActivitiesLength = cloud.activities?.length || 0;
+  // Use exercises from new structure, fallback to activities for backward compatibility
+  const cloudExercises = (cloud.exercises || cloud.activities || []) as Array<{ id?: string }>;
+  const cloudActivitiesLength = cloudExercises.length;
   const cloudBadgesLength = cloud.badges?.length || 0;
   const cloudChallengesLength = cloud.challenges?.length || 0;
 
@@ -138,8 +140,7 @@ function hasConflicts(
 
   // Check if activities are the same (by ID)
   const localActivities = local.activities as Array<{ id?: string }>;
-  const cloudActivities = (cloud.activities || []) as Array<{ id?: string }>;
-  if (!arraysEqualById(localActivities, cloudActivities)) {
+  if (!arraysEqualById(localActivities, cloudExercises)) {
     return true; // Different activities = conflict
   }
 
@@ -169,7 +170,7 @@ function hasConflicts(
 }
 
 export function useCloudSyncListener() {
-  const { isAuthenticated, isConfigured } = useAuth();
+  const { isAuthenticated, isConfigured, user } = useAuth();
   const { activities, hydrated: activitiesHydrated } = useActivities();
   const { settings, hydrated: settingsHydrated, saveSettings } = useSettings();
   const { badges, hydrated: badgesHydrated } = useBadges();
@@ -219,39 +220,205 @@ export function useCloudSyncListener() {
   const allHydrated =
     activitiesHydrated && settingsHydrated && badgesHydrated && challengesHydrated;
 
-  // Reset initial sync flag when user logs out
+  // Reset initial sync flag when user logs out OR when user changes
+  // This ensures that each user gets a fresh initial sync check
+  const userIdRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!isAuthenticated) {
+      // User logged out - clear flags
+      console.log('🔓 User logged out - clearing sync flags');
       initialSyncDoneRef.current = false;
+      userIdRef.current = null;
       if (typeof window !== 'undefined') {
         localStorage.removeItem(INITIAL_SYNC_COMPLETE_KEY);
         localStorage.removeItem(CONFLICT_STORAGE_KEY);
       }
+    } else if (user) {
+      // User logged in - check if user changed
+      const currentUserId = user.uid;
+      if (userIdRef.current !== null && userIdRef.current !== currentUserId) {
+        // User changed (different user logged in) - reset flags for new user
+        console.log('👤 User changed - resetting initial sync flags', {
+          oldUserId: userIdRef.current,
+          newUserId: currentUserId,
+        });
+        initialSyncDoneRef.current = false;
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(INITIAL_SYNC_COMPLETE_KEY);
+          localStorage.removeItem(CONFLICT_STORAGE_KEY);
+        }
+      } else if (userIdRef.current === null) {
+        // First time detecting user after login - ensure flags are cleared
+        console.log('👤 First login detected - ensuring sync flags are cleared', {
+          userId: currentUserId,
+        });
+        initialSyncDoneRef.current = false;
+        if (typeof window !== 'undefined') {
+          // Don't remove if already removed, but ensure it's false
+          const existing = localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY);
+          if (existing === 'true') {
+            // Clear stale flag silently
+            localStorage.removeItem(INITIAL_SYNC_COMPLETE_KEY);
+          }
+          localStorage.removeItem(CONFLICT_STORAGE_KEY);
+        }
+      }
+      userIdRef.current = currentUserId;
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
     if (!isAuthenticated || !isConfigured || !allHydrated) {
       return;
     }
 
+    // CRITICAL FIX: Force initial sync check immediately on login
+    // Don't rely only on listener - also do a direct download check
+    const performInitialSyncCheck = async () => {
+      // Check if initial sync is already complete
+      const initialSyncComplete =
+        typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
+
+      if (initialSyncComplete && initialSyncDoneRef.current) {
+        // Initial sync already complete, skipping
+        return;
+      }
+
+      // Force download from cloud immediately (with retry)
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      while (retryCount < maxRetries && !initialSyncDoneRef.current) {
+        try {
+          const cloudData = await cloudSyncService.downloadFromCloud();
+          const currentActivities = activitiesRef.current;
+          const currentSettings = settingsRef.current;
+          const currentBadges = badgesRef.current;
+          const currentChallenges = challengesRef.current;
+          const currentSaveSettings = saveSettingsRef.current;
+
+          const localData = {
+            activities: currentActivities,
+            settings: currentSettings,
+            badges: currentBadges,
+            challenges: currentChallenges,
+          };
+
+          const localIsEmpty = isLocalEmpty(localData);
+          const cloudIsEmpty = isCloudEmpty(
+            cloudData || {
+              exercises: [],
+              activities: [],
+              badges: [],
+              challenges: [],
+              settings: null,
+            }
+          );
+
+          // If local is empty and cloud has data, download immediately
+          if (localIsEmpty && cloudData && !cloudIsEmpty) {
+            // Apply cloud data directly
+            if (typeof window !== 'undefined') {
+              const cloudExercises = (cloudData.exercises ||
+                cloudData.activities ||
+                []) as Array<unknown>;
+              if (cloudExercises.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudExercises));
+              }
+              if (cloudData.badges && cloudData.badges.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(cloudData.badges));
+              }
+              if (cloudData.challenges && cloudData.challenges.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(cloudData.challenges));
+              }
+              if (cloudData.settings) {
+                const isUserSettings = (
+                  s: unknown
+                ): s is import('@/lib/settingsStore').UserSettings => {
+                  return (
+                    typeof s === 'object' &&
+                    s !== null &&
+                    ('name' in s || 'dailyTarget' in s || 'customActivities' in s || 'mood' in s)
+                  );
+                };
+                if (isUserSettings(cloudData.settings)) {
+                  currentSaveSettings(cloudData.settings);
+                }
+              }
+
+              // Verify data was loaded
+              const verifyActivities = JSON.parse(
+                localStorage.getItem(STORAGE_KEYS.ACTIVITIES) || '[]'
+              );
+              if (verifyActivities.length > 0) {
+                initialSyncDoneRef.current = true;
+                localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
+                // Silent sync - no toast for automatic sync
+                setTimeout(() => window.location.reload(), 500);
+                return;
+              }
+            }
+          }
+
+          // If both empty or identical, mark as complete
+          if (
+            (localIsEmpty && cloudIsEmpty) ||
+            (!localIsEmpty &&
+              !cloudIsEmpty &&
+              !hasConflicts(
+                localData,
+                cloudData || {
+                  exercises: [],
+                  activities: [],
+                  badges: [],
+                  challenges: [],
+                  settings: null,
+                }
+              ))
+          ) {
+            initialSyncDoneRef.current = true;
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
+            }
+            return;
+          }
+
+          // If we get here, there might be a conflict - let the listener handle it
+          break;
+        } catch (error) {
+          // Log only in development
+          if (process.env.NODE_ENV === 'development') {
+            console.error(`Initial sync attempt ${retryCount + 1} failed:`, error);
+          }
+          retryCount++;
+          if (retryCount < maxRetries) {
+            await new Promise((resolve) => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
+          }
+        }
+      }
+    };
+
+    // Perform initial sync check immediately
+    performInitialSyncCheck();
+
     // Check if initial sync is already complete - if so, don't subscribe to listener
     const initialSyncComplete =
       typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
 
     if (initialSyncComplete && initialSyncDoneRef.current) {
-      console.log('✅ Initial sync already complete, skipping cloud listener subscription');
+      // Initial sync already complete, skipping cloud listener subscription
       return;
     }
 
     let unsubscribeFn: (() => void) | null = null;
     let isUnsubscribed = false;
 
-    // Set a timeout to mark initial sync as complete if listener doesn't fire within 5 seconds
-    // This handles cases where Firebase connection is slow or fails
+    // Set a timeout to mark initial sync as complete if listener doesn't fire within 10 seconds
+    // Increased timeout for slower connections
     const fallbackTimeout = setTimeout(() => {
       if (!initialSyncDoneRef.current && !isUnsubscribed) {
-        console.log('⏱️ Fallback: Marking initial sync as complete (listener timeout)');
+        // Timeout - mark as complete silently
         initialSyncDoneRef.current = true;
         if (typeof window !== 'undefined') {
           localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
@@ -262,7 +429,7 @@ export function useCloudSyncListener() {
           isUnsubscribed = true;
         }
       }
-    }, 5000);
+    }, 10000); // Increased to 10 seconds
 
     unsubscribeFn = cloudSyncService.subscribeToCloud((cloudData: CloudData | null) => {
       // Clear fallback timeout since listener fired
@@ -303,24 +470,22 @@ export function useCloudSyncListener() {
       const initialSyncComplete =
         typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
 
-      // If initial sync is complete, unsubscribe from listener and don't process snapshots
-      // External changes will be handled by auto-sync or manual sync
+      // If initial sync is complete, skip initial sync logic but continue listening for real-time updates
+      // Don't unsubscribe - we need to listen for changes from other devices
       if (initialSyncComplete && initialSyncDoneRef.current) {
-        console.log('✅ Initial sync already complete, unsubscribing from cloud listener');
+        // Skip initial sync logic, but continue to regular sync below
+        // Initial sync already complete, processing real-time update
+
         // Clear any stale conflict data
         if (typeof window !== 'undefined') {
           const existingConflict = localStorage.getItem(CONFLICT_STORAGE_KEY);
           if (existingConflict) {
-            console.log('🧹 Clearing stale conflict data');
+            // Clearing stale conflict data
             localStorage.removeItem(CONFLICT_STORAGE_KEY);
           }
         }
-        // Unsubscribe from listener to prevent continuous callbacks
-        if (unsubscribeFn && !isUnsubscribed) {
-          unsubscribeFn();
-          isUnsubscribed = true;
-        }
-        return;
+
+        // Continue to regular sync below - don't return here
       }
 
       // Check if this is the initial sync (first time after login)
@@ -331,7 +496,7 @@ export function useCloudSyncListener() {
         typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
 
       if (existingConflict) {
-        console.log('⏭️ Conflict already exists, skipping initial sync conflict detection');
+        // Conflict already exists, skipping initial sync conflict detection
         initialSyncDoneRef.current = true;
         if (typeof window !== 'undefined') {
           localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
@@ -350,48 +515,53 @@ export function useCloudSyncListener() {
           localData.badges.length > 0 ||
           localData.challenges.length > 0 ||
           localData.settings !== null;
+        // Use exercises from new structure, fallback to activities for backward compatibility
+        const cloudExercises = (cloudData.exercises ||
+          cloudData.activities ||
+          []) as Array<unknown>;
         const cloudHasData =
-          (cloudData.activities?.length || 0) > 0 ||
+          cloudExercises.length > 0 ||
           (cloudData.badges?.length || 0) > 0 ||
           (cloudData.challenges?.length || 0) > 0 ||
           cloudData.settings !== null;
 
-        console.log('🔍 Initial sync check:', {
-          localIsEmpty,
-          cloudIsEmpty,
-          localHasData,
-          cloudHasData,
-          localActivities: localData.activities.length,
-          cloudActivities: cloudData.activities?.length || 0,
-          localBadges: localData.badges.length,
-          cloudBadges: cloudData.badges?.length || 0,
-        });
+        // Debug log only in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Initial sync check:', {
+            localIsEmpty,
+            cloudIsEmpty,
+            localHasData,
+            cloudHasData,
+            localActivities: localData.activities.length,
+            cloudExercises: cloudExercises.length,
+          });
+        }
 
-        // If local is empty (0 activities, badges, challenges), automatically use cloud - no conflict
+        // CRITICAL: If one environment has data and the other doesn't, automatically sync from the one with data
+        // Priority: If local is empty and cloud has data -> download from cloud
+        // If cloud is empty and local has data -> upload to cloud (handled by useAutoSync)
         if (localIsEmpty && cloudHasData) {
-          console.log(
-            '📥 Initial sync: Local is empty (0 activities/badges/challenges), cloud has data - downloading from cloud automatically'
-          );
+          // Initial sync: Local is empty, cloud has data - downloading from cloud automatically
 
           // Apply cloud data directly to localStorage
           try {
             if (typeof window !== 'undefined') {
-              // Write activities
-              if (cloudData.activities && cloudData.activities.length > 0) {
-                localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudData.activities));
-                console.log('✅ Downloaded activities:', cloudData.activities.length);
+              // Write activities (use exercises from new structure, fallback to activities for backward compatibility)
+              const cloudExercises = (cloudData.exercises ||
+                cloudData.activities ||
+                []) as Array<unknown>;
+              if (cloudExercises.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudExercises));
               }
 
               // Write badges
               if (cloudData.badges && cloudData.badges.length > 0) {
                 localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(cloudData.badges));
-                console.log('✅ Downloaded badges:', cloudData.badges.length);
               }
 
               // Write challenges
               if (cloudData.challenges && cloudData.challenges.length > 0) {
                 localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(cloudData.challenges));
-                console.log('✅ Downloaded challenges:', cloudData.challenges.length);
               }
 
               // Apply settings
@@ -409,18 +579,13 @@ export function useCloudSyncListener() {
                 if (isUserSettings(cloudData.settings)) {
                   currentSaveSettings(cloudData.settings);
                 }
-                console.log('✅ Downloaded settings');
               }
 
               // Mark initial sync as complete
               initialSyncDoneRef.current = true;
               localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
 
-              // Show success toast
-              showToastRef.current(tRef.current('cloudSync.syncedFromCloud'), 'success');
-
-              // Reload page to apply changes (stores will read from localStorage)
-              console.log('🔄 Reloading page to apply cloud data...');
+              // Silent sync - no toast for automatic sync
               setTimeout(() => {
                 window.location.reload();
               }, 500);
@@ -428,16 +593,18 @@ export function useCloudSyncListener() {
               return; // Exit early, page will reload
             }
           } catch (error) {
-            console.error('❌ Failed to download cloud data:', error);
+            // Log error only in development
+            if (process.env.NODE_ENV === 'development') {
+              console.error('Failed to download cloud data:', error);
+            }
+            // Show error toast only for critical failures
             showToastRef.current(tRef.current('cloudSync.syncFailed') || 'Sync failed', 'error');
           }
         }
 
         // If cloud is empty and local has data, automatically upload local to cloud - no conflict
         if (cloudIsEmpty && localHasData && !localIsEmpty) {
-          console.log(
-            '📤 Initial sync: Cloud is empty (0 activities/badges/challenges), local has data - uploading local data to cloud automatically'
-          );
+          // Initial sync: Cloud is empty, local has data - uploading local data to cloud automatically
 
           // Upload immediately (async, don't block)
           (async () => {
@@ -463,7 +630,10 @@ export function useCloudSyncListener() {
                 'success'
               );
             } catch (error) {
-              console.error('❌ Failed to upload local data to cloud:', error);
+              // Log error only in development
+              if (process.env.NODE_ENV === 'development') {
+                console.error('Failed to upload local data to cloud:', error);
+              }
               showToastRef.current(
                 lang === 'tr' ? 'Buluta yükleme hatası' : 'Upload to cloud failed',
                 'error'
@@ -487,18 +657,47 @@ export function useCloudSyncListener() {
           const cloudSettingsNormalized = normalizeSettingsForComparison(cloudData.settings);
           const settingsMatch = localSettingsNormalized === cloudSettingsNormalized;
 
-          console.log('🔍 Initial sync conflict check:', {
-            conflicts,
-            localActivities: localData.activities.length,
-            cloudActivities: cloudData.activities?.length || 0,
-            localBadges: localData.badges.length,
-            cloudBadges: cloudData.badges?.length || 0,
-            localChallenges: localData.challenges.length,
-            cloudChallenges: cloudData.challenges?.length || 0,
-            settingsMatch,
-            localSettings: localSettingsNormalized,
-            cloudSettings: cloudSettingsNormalized,
-          });
+          // Use exercises from new structure, fallback to activities for backward compatibility
+          const cloudExercises = (cloudData.exercises ||
+            cloudData.activities ||
+            []) as Array<unknown>;
+
+          // Check if data is identical (same IDs and content)
+          const localActivities = localData.activities as Array<{ id?: string }>;
+          const cloudActivities = cloudExercises as Array<{ id?: string }>;
+          const localBadges = localData.badges as Array<{ id?: string }>;
+          const cloudBadges = (cloudData.badges || []) as Array<{ id?: string }>;
+          const localChallenges = localData.challenges as Array<{ id?: string }>;
+          const cloudChallenges = (cloudData.challenges || []) as Array<{ id?: string }>;
+
+          const activitiesIdentical = arraysEqualById(localActivities, cloudActivities);
+          const badgesIdentical = arraysEqualById(localBadges, cloudBadges);
+          const challengesIdentical = arraysEqualById(localChallenges, cloudChallenges);
+          const isIdentical =
+            !conflicts &&
+            activitiesIdentical &&
+            badgesIdentical &&
+            challengesIdentical &&
+            settingsMatch;
+
+          // Debug log only in development
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Initial sync conflict check:', {
+              conflicts,
+              isIdentical,
+              localActivities: localData.activities.length,
+              cloudExercises: cloudExercises.length,
+            });
+          }
+
+          // If data is identical, no conflict - just mark sync as complete
+          if (isIdentical) {
+            initialSyncDoneRef.current = true;
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
+            }
+            return; // Exit early, no conflict dialog needed
+          }
 
           if (conflicts) {
             // Check if conflict was already stored (prevent duplicate detection)
@@ -506,7 +705,7 @@ export function useCloudSyncListener() {
               typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
 
             if (existingConflict) {
-              console.log('⏭️ Conflict already stored, skipping duplicate detection');
+              // Conflict already stored, skipping duplicate detection
               // Mark initial sync as complete to prevent re-detection
               initialSyncDoneRef.current = true;
               if (typeof window !== 'undefined') {
@@ -516,6 +715,10 @@ export function useCloudSyncListener() {
             }
 
             // Store conflict data for ConflictResolutionManager to handle
+            // Use exercises from new structure, fallback to activities for backward compatibility
+            const cloudExercises = (cloudData.exercises ||
+              cloudData.activities ||
+              []) as Array<unknown>;
             const conflictData = {
               local: {
                 activities: localData.activities,
@@ -524,25 +727,15 @@ export function useCloudSyncListener() {
                 challenges: localData.challenges,
               },
               cloud: {
-                activities: cloudData.activities || [],
+                activities: cloudExercises, // Use exercises for new structure
                 settings: cloudData.settings || null,
                 badges: cloudData.badges || [],
                 challenges: cloudData.challenges || [],
+                points: cloudData.points || 0, // Include points from cloudData
               },
             };
 
-            console.log('⚠️ CONFLICT DETECTED - Storing conflict data:', {
-              local: {
-                activities: conflictData.local.activities.length,
-                badges: conflictData.local.badges.length,
-                challenges: conflictData.local.challenges.length,
-              },
-              cloud: {
-                activities: conflictData.cloud.activities.length,
-                badges: conflictData.cloud.badges.length,
-                challenges: conflictData.cloud.challenges.length,
-              },
-            });
+            // CONFLICT DETECTED - Storing conflict data
 
             if (typeof window !== 'undefined') {
               localStorage.setItem(CONFLICT_STORAGE_KEY, JSON.stringify(conflictData));
@@ -556,8 +749,7 @@ export function useCloudSyncListener() {
               localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
             }
 
-            // Show toast notification
-            showToastRef.current(tRef.current('cloudSync.conflictDetected'), 'warning');
+            // No toast - conflict dialog will be shown by ConflictResolutionManager
 
             return;
           }
@@ -566,32 +758,31 @@ export function useCloudSyncListener() {
         // No conflict or one side is empty
         if (cloudHasData && !localHasData && !localIsEmpty) {
           // Cloud has data, local doesn't - use cloud
-          console.log('📥 Initial sync: Cloud has data, local is empty - downloading from cloud', {
-            cloudActivities: cloudData.activities?.length || 0,
-            cloudBadges: cloudData.badges?.length || 0,
-            cloudChallenges: cloudData.challenges?.length || 0,
-            hasSettings: !!cloudData.settings,
-          });
+          // Use exercises from new structure, fallback to activities for backward compatibility
+          const cloudExercises = (cloudData.exercises ||
+            cloudData.activities ||
+            []) as Array<unknown>;
+          // Initial sync: Cloud has data, local is empty - downloading from cloud
 
           // Apply cloud data directly to localStorage (similar to conflict resolution)
           try {
             if (typeof window !== 'undefined') {
-              // Write activities
-              if (cloudData.activities && cloudData.activities.length > 0) {
-                localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudData.activities));
-                console.log('✅ Downloaded activities:', cloudData.activities.length);
+              // Write activities (use exercises from new structure)
+              if (cloudExercises.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudExercises));
+                // Downloaded exercises/activities
               }
 
               // Write badges
               if (cloudData.badges && cloudData.badges.length > 0) {
                 localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(cloudData.badges));
-                console.log('✅ Downloaded badges:', cloudData.badges.length);
+                // Downloaded badges
               }
 
               // Write challenges
               if (cloudData.challenges && cloudData.challenges.length > 0) {
                 localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(cloudData.challenges));
-                console.log('✅ Downloaded challenges:', cloudData.challenges.length);
+                // Downloaded challenges
               }
 
               // Apply settings
@@ -609,7 +800,7 @@ export function useCloudSyncListener() {
                 if (isUserSettings(cloudData.settings)) {
                   currentSaveSettings(cloudData.settings);
                 }
-                console.log('✅ Downloaded settings');
+                // Downloaded settings
               }
 
               // Mark initial sync as complete
@@ -620,7 +811,7 @@ export function useCloudSyncListener() {
               showToastRef.current(tRef.current('cloudSync.syncedFromCloud'), 'success');
 
               // Reload page to apply changes (stores will read from localStorage)
-              console.log('🔄 Reloading page to apply cloud data...');
+              // Reloading page to apply cloud data
               setTimeout(() => {
                 window.location.reload();
               }, 500);
@@ -628,22 +819,22 @@ export function useCloudSyncListener() {
               return; // Exit early, page will reload
             }
           } catch (error) {
-            console.error('❌ Failed to download cloud data:', error);
+            // Log error only in development
+            if (process.env.NODE_ENV === 'development') {
+              console.error('Failed to download cloud data:', error);
+            }
+            // Show error toast only for critical failures
             showToastRef.current(tRef.current('cloudSync.syncFailed') || 'Sync failed', 'error');
           }
         } else if (!cloudHasData && localHasData && !localIsEmpty) {
           // Local has data, cloud doesn't - use local (useAutoSync will upload automatically)
-          console.log(
-            '📤 Initial sync: Local has data, cloud is empty - will upload local data automatically'
-          );
+          // Initial sync: Local has data, cloud is empty - will upload local data automatically
         } else if (cloudIsEmpty && localIsEmpty) {
           // Both empty (0 activities, 0 badges, 0 challenges) - useAutoSync will handle if local has settings
-          console.log(
-            '✅ Initial sync: Both empty (0 activities/badges/challenges) - useAutoSync will handle settings sync'
-          );
+          // Initial sync: Both empty - useAutoSync will handle settings sync
         } else {
           // Both same or no action needed
-          console.log('✅ Initial sync: Both same or no action needed');
+          // Initial sync: Both same or no action needed
         }
 
         initialSyncDoneRef.current = true;
@@ -651,58 +842,141 @@ export function useCloudSyncListener() {
           localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
         }
 
-        // Unsubscribe after initial sync is complete
-        if (unsubscribeFn && !isUnsubscribed) {
-          console.log('🔌 Unsubscribing from cloud listener after initial sync');
-          unsubscribeFn();
-          isUnsubscribed = true;
-        }
-        return;
+        // Don't unsubscribe - continue listening for real-time updates from other devices
+        // The listener will continue to process regular sync updates below
+        // Initial sync complete, continuing to listen for real-time updates
+        return; // Exit initial sync logic, but listener continues
       }
 
-      // Regular sync (not initial) - only sync settings for now
-      // NOTE: This should not happen if initial sync is complete, but keeping for safety
-      if (cloudData.settings) {
-        // Normalize both settings objects for comparison (handle undefined vs null)
-        const normalizeSettings = (
-          s: unknown
-        ): {
-          name: string;
-          dailyTarget: number;
-          customActivities: unknown[];
-          mood: string | null;
-        } | null => {
-          if (!s || typeof s !== 'object') return null;
-          const settings = s as Record<string, unknown>;
-          return {
-            name: typeof settings.name === 'string' ? settings.name : '',
-            dailyTarget: typeof settings.dailyTarget === 'number' ? settings.dailyTarget : 10000,
-            customActivities: Array.isArray(settings.customActivities)
-              ? settings.customActivities
-              : [],
-            mood: settings.mood !== undefined ? (settings.mood as string | null) : null,
-          };
-        };
+      // Regular sync (after initial sync) - sync all data from cloud to local
+      // This handles real-time updates from other devices
+      if (initialSyncComplete && initialSyncDoneRef.current) {
+        // Processing real-time cloud update
 
-        const normalizedCloud = normalizeSettings(cloudData.settings);
-        const normalizedLocal = normalizeSettings(currentSettings);
+        // Use exercises from new structure, fallback to activities for backward compatibility
+        const cloudExercises = (cloudData.exercises ||
+          cloudData.activities ||
+          []) as Array<unknown>;
 
-        const cloudSettingsStr = JSON.stringify(normalizedCloud);
-        const localSettingsStr = JSON.stringify(normalizedLocal);
+        // Check if cloud has more recent data than local
+        // For now, we'll download if cloud has more items (simple heuristic)
+        // In the future, we could compare lastModified timestamps
+        const cloudHasMoreData =
+          cloudExercises.length > currentActivities.length ||
+          (cloudData.badges?.length || 0) > currentBadges.length ||
+          (cloudData.challenges?.length || 0) > currentChallenges.length;
 
-        if (cloudSettingsStr !== localSettingsStr) {
-          // Type guard for UserSettings
-          const isUserSettings = (s: unknown): s is import('@/lib/settingsStore').UserSettings => {
-            return (
-              typeof s === 'object' &&
-              s !== null &&
-              ('name' in s || 'dailyTarget' in s || 'customActivities' in s || 'mood' in s)
+        if (cloudHasMoreData) {
+          // Cloud has more data than local - downloading updates
+
+          try {
+            if (typeof window !== 'undefined') {
+              // Write activities (use exercises from new structure)
+              if (cloudExercises.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudExercises));
+                // Downloaded exercises/activities
+              }
+
+              // Write badges
+              if (cloudData.badges && cloudData.badges.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(cloudData.badges));
+                // Downloaded badges
+              }
+
+              // Write challenges
+              if (cloudData.challenges && cloudData.challenges.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(cloudData.challenges));
+                // Downloaded challenges
+              }
+
+              // Apply settings
+              if (cloudData.settings) {
+                const isUserSettings = (
+                  s: unknown
+                ): s is import('@/lib/settingsStore').UserSettings => {
+                  return (
+                    typeof s === 'object' &&
+                    s !== null &&
+                    ('name' in s || 'dailyTarget' in s || 'customActivities' in s || 'mood' in s)
+                  );
+                };
+                if (isUserSettings(cloudData.settings)) {
+                  currentSaveSettings(cloudData.settings);
+                }
+                // Downloaded settings
+              }
+
+              // Show success toast
+              showToastRef.current(
+                lang === 'tr' ? 'Bulut verileri güncellendi' : 'Cloud data updated',
+                'success'
+              );
+
+              // Reload page to apply changes (stores will read from localStorage)
+              // Reloading page silently
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
+
+              return; // Exit early, page will reload
+            }
+          } catch (error) {
+            // Log error only in development
+            if (process.env.NODE_ENV === 'development') {
+              console.error('Failed to download cloud updates:', error);
+            }
+            showToastRef.current(
+              lang === 'tr' ? 'Bulut güncellemesi başarısız' : 'Cloud update failed',
+              'error'
             );
-          };
-          if (isUserSettings(cloudData.settings)) {
-            currentSaveSettings(cloudData.settings);
           }
-          showToastRef.current(tRef.current('cloudSync.syncedFromCloud'), 'info');
+        }
+
+        // Sync settings if changed
+        if (cloudData.settings) {
+          // Normalize both settings objects for comparison (handle undefined vs null)
+          const normalizeSettings = (
+            s: unknown
+          ): {
+            name: string;
+            dailyTarget: number;
+            customActivities: unknown[];
+            mood: string | null;
+          } | null => {
+            if (!s || typeof s !== 'object') return null;
+            const settings = s as Record<string, unknown>;
+            return {
+              name: typeof settings.name === 'string' ? settings.name : '',
+              dailyTarget: typeof settings.dailyTarget === 'number' ? settings.dailyTarget : 10000,
+              customActivities: Array.isArray(settings.customActivities)
+                ? settings.customActivities
+                : [],
+              mood: settings.mood !== undefined ? (settings.mood as string | null) : null,
+            };
+          };
+
+          const normalizedCloud = normalizeSettings(cloudData.settings);
+          const normalizedLocal = normalizeSettings(currentSettings);
+
+          const cloudSettingsStr = JSON.stringify(normalizedCloud);
+          const localSettingsStr = JSON.stringify(normalizedLocal);
+
+          if (cloudSettingsStr !== localSettingsStr) {
+            // Type guard for UserSettings
+            const isUserSettings = (
+              s: unknown
+            ): s is import('@/lib/settingsStore').UserSettings => {
+              return (
+                typeof s === 'object' &&
+                s !== null &&
+                ('name' in s || 'dailyTarget' in s || 'customActivities' in s || 'mood' in s)
+              );
+            };
+            if (isUserSettings(cloudData.settings)) {
+              currentSaveSettings(cloudData.settings);
+            }
+            // Silent sync - no toast for automatic real-time updates
+          }
         }
       }
 

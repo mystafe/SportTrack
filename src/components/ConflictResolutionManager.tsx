@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { useToaster } from './Toaster';
 import { ConflictResolutionDialog } from './ConflictResolutionDialog';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
-import { useActivities } from '@/lib/activityStore';
+import { useActivities, ActivityRecord } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
-import { useBadges } from '@/lib/badgeStore';
+import { useBadges, Badge } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 import { useCloudSync } from '@/hooks/useCloudSync';
 import { resolveConflicts, saveLocalLastModified } from '@/lib/cloudSync/conflictResolver';
@@ -23,6 +24,7 @@ const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
  * This ensures the dialog appears immediately after login, before user opens settings
  */
 export function ConflictResolutionManager() {
+  const router = useRouter();
   const { user, isAuthenticated, isConfigured } = useAuth();
   const { activities } = useActivities();
   const { settings, saveSettings } = useSettings();
@@ -44,6 +46,7 @@ export function ConflictResolutionManager() {
       settings: unknown | null;
       badges: unknown[];
       challenges: unknown[];
+      points?: number;
     };
   } | null>(null);
 
@@ -59,23 +62,80 @@ export function ConflictResolutionManager() {
       return;
     }
 
-    // Check if initial sync is complete - if so, don't show conflict dialog
+    // Check if initial sync is complete - but still check for conflicts if local is empty
     const initialSyncComplete =
       typeof window !== 'undefined' &&
       localStorage.getItem('sporttrack_initial_sync_complete') === 'true';
 
+    // If initial sync is complete but we have conflict data, check if local is empty
+    // If local is empty and cloud has data, we should still download from cloud
     if (initialSyncComplete) {
-      // Initial sync is complete, clear any stale conflict data
-      if (typeof window !== 'undefined') {
-        const conflictStr = localStorage.getItem(CONFLICT_STORAGE_KEY);
-        if (conflictStr) {
-          console.log('🧹 Clearing stale conflict data (initial sync already complete)');
-          localStorage.removeItem(CONFLICT_STORAGE_KEY);
+      const conflictStr =
+        typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
+      if (conflictStr) {
+        try {
+          const conflict = JSON.parse(conflictStr);
+          // Check if local is truly empty (0 activities, 0 badges, 0 challenges)
+          // Settings don't count as "data" for this check - we only care about activities/badges/challenges
+          const localIsEmpty =
+            (conflict.local?.activities?.length || 0) === 0 &&
+            (conflict.local?.badges?.length || 0) === 0 &&
+            (conflict.local?.challenges?.length || 0) === 0;
+          const cloudHasData =
+            (conflict.cloud?.activities?.length || 0) > 0 ||
+            (conflict.cloud?.badges?.length || 0) > 0 ||
+            (conflict.cloud?.challenges?.length || 0) > 0;
+
+          console.log('🔍 Checking conflict with initialSyncComplete=true:', {
+            localIsEmpty,
+            cloudHasData,
+            localActivities: conflict.local?.activities?.length || 0,
+            cloudActivities: conflict.cloud?.activities?.length || 0,
+            localBadges: conflict.local?.badges?.length || 0,
+            cloudBadges: conflict.cloud?.badges?.length || 0,
+          });
+
+          // If local is empty and cloud has data, clear initial sync flag and process conflict
+          if (localIsEmpty && cloudHasData) {
+            console.log(
+              '🔄 Local is empty but cloud has data - clearing initial sync flag to allow download'
+            );
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('sporttrack_initial_sync_complete');
+            }
+            // Continue to process conflict below - don't return here
+          } else if (!localIsEmpty) {
+            // Local has data, initial sync complete - this is a real conflict, show dialog
+            console.log('⚠️ Real conflict detected - showing conflict dialog');
+            // Continue to process conflict below - don't return here
+          } else {
+            // Both empty or cloud empty - clear stale conflict data
+            console.log(
+              '🧹 Clearing stale conflict data (initial sync already complete, no real conflict)'
+            );
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem(CONFLICT_STORAGE_KEY);
+            }
+            setShowConflictDialog(false);
+            setConflictData(null);
+            return;
+          }
+        } catch (error) {
+          console.error('Failed to parse conflict data:', error);
+          // Clear invalid conflict data
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(CONFLICT_STORAGE_KEY);
+          }
+          setShowConflictDialog(false);
+          setConflictData(null);
+          return;
         }
+      } else {
+        // No conflict data, initial sync complete - nothing to do
+        setShowConflictDialog(false);
+        setConflictData(null);
+        return;
       }
-      setShowConflictDialog(false);
-      setConflictData(null);
-      return;
     }
 
     // Function to check and show conflict dialog
@@ -85,14 +145,55 @@ export function ConflictResolutionManager() {
         typeof window !== 'undefined' &&
         localStorage.getItem('sporttrack_initial_sync_complete') === 'true';
 
+      // If sync is complete, we already handled it above
+      // But if we cleared the flag (local empty + cloud has data), continue processing
       if (syncComplete) {
-        // Initial sync is complete, don't show conflict dialog
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem(CONFLICT_STORAGE_KEY);
+        // Check if we're in the special case (local empty + cloud has data)
+        // If so, we already cleared the flag above, so continue processing
+        const conflictStr =
+          typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
+        if (conflictStr) {
+          try {
+            const conflict = JSON.parse(conflictStr);
+            const localIsEmpty =
+              (conflict.local?.activities?.length || 0) === 0 &&
+              (conflict.local?.badges?.length || 0) === 0 &&
+              (conflict.local?.challenges?.length || 0) === 0;
+            const cloudHasData =
+              (conflict.cloud?.activities?.length || 0) > 0 ||
+              (conflict.cloud?.badges?.length || 0) > 0 ||
+              (conflict.cloud?.challenges?.length || 0) > 0;
+
+            // If local is empty and cloud has data, we already cleared the flag above
+            // Continue processing to download from cloud
+            if (localIsEmpty && cloudHasData) {
+              console.log('✅ Continuing conflict processing after clearing flag');
+              // Continue below - don't return
+            } else {
+              // Real conflict or both empty - don't process
+              console.log('🧹 Clearing conflict (sync complete, no special case)');
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem(CONFLICT_STORAGE_KEY);
+              }
+              setShowConflictDialog(false);
+              setConflictData(null);
+              return;
+            }
+          } catch (error) {
+            console.error('Failed to parse conflict in checkConflict:', error);
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem(CONFLICT_STORAGE_KEY);
+            }
+            setShowConflictDialog(false);
+            setConflictData(null);
+            return;
+          }
+        } else {
+          // No conflict data, sync complete - nothing to do
+          setShowConflictDialog(false);
+          setConflictData(null);
+          return;
         }
-        setShowConflictDialog(false);
-        setConflictData(null);
-        return;
       }
 
       const conflictStr =
@@ -106,12 +207,145 @@ export function ConflictResolutionManager() {
             localBadges: conflict.local?.badges?.length || 0,
             cloudBadges: conflict.cloud?.badges?.length || 0,
           });
+
+          // Check if local is empty and cloud has data - if so, automatically download from cloud
+          const localIsEmpty =
+            (conflict.local?.activities?.length || 0) === 0 &&
+            (conflict.local?.badges?.length || 0) === 0 &&
+            (conflict.local?.challenges?.length || 0) === 0;
+          const cloudHasData =
+            (conflict.cloud?.activities?.length || 0) > 0 ||
+            (conflict.cloud?.badges?.length || 0) > 0 ||
+            (conflict.cloud?.challenges?.length || 0) > 0;
+          const cloudIsEmpty = !cloudHasData;
+          const localHasData = !localIsEmpty;
+
+          // Check if data is identical (no real conflict)
+          const localActivities = (conflict.local?.activities || []) as Array<{ id?: string }>;
+          const cloudActivities = (conflict.cloud?.activities || []) as Array<{ id?: string }>;
+          const localBadges = (conflict.local?.badges || []) as Array<{ id?: string }>;
+          const cloudBadges = (conflict.cloud?.badges || []) as Array<{ id?: string }>;
+          const localChallenges = (conflict.local?.challenges || []) as Array<{ id?: string }>;
+          const cloudChallenges = (conflict.cloud?.challenges || []) as Array<{ id?: string }>;
+
+          const arraysEqualById = <T extends { id?: string }>(arr1: T[], arr2: T[]): boolean => {
+            if (arr1.length !== arr2.length) return false;
+            const ids1 = new Set(arr1.map((item) => item.id).filter(Boolean));
+            const ids2 = new Set(arr2.map((item) => item.id).filter(Boolean));
+            if (ids1.size !== ids2.size) return false;
+            for (const id of ids1) {
+              if (!ids2.has(id)) return false;
+            }
+            return true;
+          };
+
+          const activitiesIdentical = arraysEqualById(localActivities, cloudActivities);
+          const badgesIdentical = arraysEqualById(localBadges, cloudBadges);
+          const challengesIdentical = arraysEqualById(localChallenges, cloudChallenges);
+          const countsMatch =
+            localActivities.length === cloudActivities.length &&
+            localBadges.length === cloudBadges.length &&
+            localChallenges.length === cloudChallenges.length;
+          const isIdentical =
+            countsMatch && activitiesIdentical && badgesIdentical && challengesIdentical;
+
+          // If identical, no conflict - just mark sync as complete and clear conflict
+          if (isIdentical && localHasData && cloudHasData) {
+            console.log('✅ Data is identical - no conflict, clearing conflict data');
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem(CONFLICT_STORAGE_KEY);
+              localStorage.setItem('sporttrack_initial_sync_complete', 'true');
+            }
+            setShowConflictDialog(false);
+            setConflictData(null);
+            return;
+          }
+
+          // If only one side has data, automatically sync (no conflict dialog)
+          if (localIsEmpty && cloudHasData) {
+            // Local is empty, cloud has data - automatically download from cloud
+            console.log('📥 Local is empty, cloud has data - automatically downloading from cloud');
+
+            // Convert conflict cloud data to CloudData format
+            const cloudDataWithMetadata: import('@/lib/cloudSync/types').CloudData = {
+              exercises: conflict.cloud.activities || [],
+              activities: [], // Activity definitions are not in conflict data
+              points: conflict.cloud.points || 0, // Include points from conflict data
+              badges: conflict.cloud.badges || [],
+              challenges: conflict.cloud.challenges || [],
+              lastModified: null,
+              metadata: {
+                lastModified: new Date(),
+                version: Date.now(),
+                userId: user?.uid || 'unknown',
+              },
+              settings: conflict.cloud.settings || null,
+            };
+
+            // Automatically apply cloud data
+            applyCloudData(cloudDataWithMetadata, 'cloud').catch((error) => {
+              console.error('Failed to auto-download cloud data:', error);
+              showToast(
+                lang === 'tr' ? 'Bulut verileri indirilemedi' : 'Failed to download cloud data',
+                'error'
+              );
+            });
+
+            // Clear conflict data
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem(CONFLICT_STORAGE_KEY);
+            }
+            setShowConflictDialog(false);
+            setConflictData(null);
+            return;
+          }
+
+          if (cloudIsEmpty && localHasData) {
+            // Cloud is empty, local has data - automatically upload to cloud (no conflict dialog)
+            console.log('📤 Cloud is empty, local has data - automatically uploading to cloud');
+
+            // Upload local data to cloud
+            syncToCloud({
+              activities: conflict.local.activities || [],
+              settings: conflict.local.settings || null,
+              badges: conflict.local.badges || [],
+              challenges: conflict.local.challenges || [],
+            })
+              .then(() => {
+                if (typeof window !== 'undefined') {
+                  localStorage.removeItem(CONFLICT_STORAGE_KEY);
+                  localStorage.setItem('sporttrack_initial_sync_complete', 'true');
+                }
+                showToast(
+                  lang === 'tr'
+                    ? 'Yerel verileriniz buluta yüklendi'
+                    : 'Your local data has been uploaded to cloud',
+                  'success'
+                );
+              })
+              .catch((error) => {
+                console.error('Failed to upload local data:', error);
+                showToast(
+                  lang === 'tr' ? 'Buluta yükleme hatası' : 'Upload to cloud failed',
+                  'error'
+                );
+              });
+
+            setShowConflictDialog(false);
+            setConflictData(null);
+            return;
+          }
+
+          // Real conflict - show dialog (both have data and they are different)
           setConflictData(conflict);
           // Show conflict dialog immediately
           setShowConflictDialog(true);
-          showToast(t('cloudSync.conflictDetected'), 'info');
+          // No toast - conflict dialog is already visible
         } catch (error) {
-          console.error('Failed to parse conflict data:', error);
+          // Log error only in development
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Failed to parse conflict data:', error);
+          }
           // Clear invalid conflict data
           if (typeof window !== 'undefined') {
             localStorage.removeItem(CONFLICT_STORAGE_KEY);
@@ -129,10 +363,10 @@ export function ConflictResolutionManager() {
     // Check immediately
     checkConflict();
 
-    // Check after delays to catch late conflicts (reduced frequency)
-    const timeout1 = setTimeout(checkConflict, 500);
-    const timeout2 = setTimeout(checkConflict, 1500);
-    const timeout3 = setTimeout(checkConflict, 3000);
+    // Check after shorter delays to catch conflicts faster after login
+    const timeout1 = setTimeout(checkConflict, 100);
+    const timeout2 = setTimeout(checkConflict, 500);
+    const timeout3 = setTimeout(checkConflict, 1000);
 
     // Listen to custom event from useCloudSyncListener
     const handleConflictDetected = () => {
@@ -182,6 +416,8 @@ export function ConflictResolutionManager() {
       resolvedActivities: resolution.resolvedData.activities.length,
       resolvedBadges: resolution.resolvedData.badges.length,
       resolvedChallenges: resolution.resolvedData.challenges.length,
+      cloudActivities: (cloudData.activities as ActivityRecord[])?.length || 0,
+      cloudBadges: (cloudData.badges as Badge[])?.length || 0,
     });
 
     // Apply resolved data locally
@@ -195,19 +431,28 @@ export function ConflictResolutionManager() {
     try {
       if (typeof window !== 'undefined') {
         // Write activities
-        localStorage.setItem(
-          STORAGE_KEYS.ACTIVITIES,
-          JSON.stringify(resolution.resolvedData.activities)
-        );
+        const activitiesToWrite = resolution.resolvedData.activities || [];
+        localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(activitiesToWrite));
+        console.log(`✅ Written ${activitiesToWrite.length} activities to localStorage`);
 
         // Write badges
-        localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(resolution.resolvedData.badges));
+        const badgesToWrite = resolution.resolvedData.badges || [];
+        localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(badgesToWrite));
+        console.log(`✅ Written ${badgesToWrite.length} badges to localStorage`);
 
         // Write challenges
-        localStorage.setItem(
-          STORAGE_KEYS.CHALLENGES,
-          JSON.stringify(resolution.resolvedData.challenges)
-        );
+        const challengesToWrite = resolution.resolvedData.challenges || [];
+        localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(challengesToWrite));
+        console.log(`✅ Written ${challengesToWrite.length} challenges to localStorage`);
+
+        // Verify what was written
+        const writtenActivities = JSON.parse(localStorage.getItem(STORAGE_KEYS.ACTIVITIES) || '[]');
+        const writtenBadges = JSON.parse(localStorage.getItem(STORAGE_KEYS.BADGES) || '[]');
+        console.log('🔍 Verification - Written to localStorage:', {
+          activities: writtenActivities.length,
+          badges: writtenBadges.length,
+          challenges: challengesToWrite.length,
+        });
 
         console.log('✅ Conflict resolution data written to localStorage');
       }
@@ -246,27 +491,28 @@ export function ConflictResolutionManager() {
         });
         console.log('✅ Resolved data uploaded to cloud successfully');
 
-        // Verify upload by checking cloud data after a short delay
-        // This ensures data is actually saved before page reload
-        await new Promise((resolve) => setTimeout(resolve, 300));
-
         try {
+          // Wait longer for Firestore to process the upload
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
           const verifyData = await cloudSyncService.downloadFromCloud();
           if (verifyData) {
-            const verifyActivities = verifyData.activities?.length || 0;
+            // Use exercises from new structure, fallback to activities for legacy
+            const verifyExercises =
+              verifyData.exercises?.length || verifyData.activities?.length || 0;
             const verifyBadges = verifyData.badges?.length || 0;
             console.log('🔍 Post-upload verification:', {
-              activities: verifyActivities,
+              exercises: verifyExercises,
               badges: verifyBadges,
-              expectedActivities: resolution.resolvedData.activities.length,
+              expectedExercises: resolution.resolvedData.activities.length,
               expectedBadges: resolution.resolvedData.badges.length,
               match:
-                verifyActivities === resolution.resolvedData.activities.length &&
+                verifyExercises === resolution.resolvedData.activities.length &&
                 verifyBadges === resolution.resolvedData.badges.length,
             });
 
             if (
-              verifyActivities !== resolution.resolvedData.activities.length ||
+              verifyExercises !== resolution.resolvedData.activities.length ||
               verifyBadges !== resolution.resolvedData.badges.length
             ) {
               console.warn(
@@ -290,21 +536,54 @@ export function ConflictResolutionManager() {
 
     saveLocalLastModified();
 
-    // Reload page AFTER cloud sync completes (or fails) to apply changes
-    // Stores will read from localStorage after reload
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
+    // Remove conflict resolution flag before reload
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('sporttrack_conflict_resolution_in_progress');
+    }
 
+    // Show success message
     const message =
-      strategy === 'cloud'
+      strategy === 'merge'
         ? lang === 'tr'
-          ? 'Bulut verileri uygulandı'
-          : 'Cloud data applied'
-        : lang === 'tr'
-          ? 'Veriler uygulandı ve senkronize edildi!'
-          : 'Data applied and synced!';
+          ? 'Veriler güncellendi ve senkronize edildi!'
+          : 'Data updated and synced!'
+        : strategy === 'cloud'
+          ? lang === 'tr'
+            ? 'Veriler güncellendi ve senkronize edildi!'
+            : 'Data updated and synced!'
+          : lang === 'tr'
+            ? 'Veriler güncellendi ve senkronize edildi!'
+            : 'Data updated and synced!';
     showToast(message, 'success');
+
+    // Wait for cloud sync to complete, then navigate with animation
+    setTimeout(
+      () => {
+        // Add page transition class for smooth animation
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.add('page-transitioning');
+        }
+
+        // Navigate to home page with smooth transition
+        router.push('/');
+
+        // Remove transition class after navigation and trigger data refresh
+        setTimeout(() => {
+          if (typeof document !== 'undefined') {
+            document.documentElement.classList.remove('page-transitioning');
+          }
+          // Trigger a custom event to refresh all stores (lazy loading)
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('sporttrack:refresh-data'));
+          }
+          // Small delay then reload to ensure all data is properly loaded
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }, 300);
+      },
+      strategy !== 'cloud' ? 2000 : 500
+    );
   };
 
   const handleConflictResolve = async (strategy: ConflictStrategy) => {
@@ -313,8 +592,10 @@ export function ConflictResolutionManager() {
     setShowConflictDialog(false);
 
     try {
-      // Clear conflict storage IMMEDIATELY to prevent re-detection
+      // Set flag to prevent useAutoSync from interfering during conflict resolution
       if (typeof window !== 'undefined') {
+        localStorage.setItem('sporttrack_conflict_resolution_in_progress', 'true');
+        // Clear conflict storage IMMEDIATELY to prevent re-detection
         localStorage.removeItem(CONFLICT_STORAGE_KEY);
         // Mark initial sync as complete to prevent re-detection
         localStorage.setItem('sporttrack_initial_sync_complete', 'true');
@@ -437,13 +718,25 @@ export function ConflictResolutionManager() {
           localStorage.setItem('sporttrack_initial_sync_complete', 'true');
         }
       }}
-      localCount={{
-        activities: conflictData.local.activities.length,
-        badges: conflictData.local.badges.length,
+      localData={{
+        activities: (conflictData.local.activities as ActivityRecord[]) || [],
+        badges: (conflictData.local.badges as Badge[]) || [],
+        challenges: conflictData.local.challenges || [],
+        settings: conflictData.local.settings || settings || null,
       }}
-      cloudCount={{
-        activities: conflictData.cloud.activities.length,
-        badges: conflictData.cloud.badges.length,
+      cloudData={{
+        exercises: (conflictData.cloud.activities as ActivityRecord[]) || [],
+        activities: [], // Activity definitions are not in conflict data
+        badges: (conflictData.cloud.badges as Badge[]) || [],
+        challenges: conflictData.cloud.challenges || [],
+        points: conflictData.cloud.points || 0, // Include points from conflict data
+        lastModified: getCloudLastModified(),
+        metadata: {
+          lastModified: getCloudLastModified() || new Date(),
+          version: Date.now(),
+          userId: user?.uid || 'unknown',
+        },
+        settings: conflictData.cloud.settings || null,
       }}
       localLastModified={getLocalLastModified()}
       cloudLastModified={getCloudLastModified()}
