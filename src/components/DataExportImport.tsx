@@ -201,10 +201,11 @@ export function DataExportImport() {
         throw new Error('Invalid file format: settings missing');
       }
 
-      if (
-        validExercises.length === 0 &&
-        (data.exercises?.length || data.activities?.length || 0) > 0
-      ) {
+      const totalExercises = isNewFormat
+        ? newFormatData.exercises?.length || 0
+        : legacyFormatData.activities?.length || 0;
+
+      if (validExercises.length === 0 && totalExercises > 0) {
         throw new Error('No valid exercises found in file');
       }
 
