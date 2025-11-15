@@ -193,16 +193,23 @@ export class CloudSyncService {
 
         for (const stat of convertedData.statistics) {
           const statDocRef = doc(statisticsCollectionRef, stat.id);
-          const statData = {
-            ...stat,
+          const statData: Record<string, unknown> = {
+            id: stat.id,
+            totalPoints: stat.totalPoints,
+            totalExercises: stat.totalExercises,
+            totalActivities: stat.totalActivities,
+            streakDays: stat.streakDays,
+            averageDailyPoints: stat.averageDailyPoints,
+            completionRate: stat.completionRate,
             lastCalculated: Timestamp.fromDate(stat.lastCalculated),
-            period: stat.period
-              ? {
-                  start: Timestamp.fromDate(stat.period.start),
-                  end: Timestamp.fromDate(stat.period.end),
-                }
-              : undefined,
           };
+          // Only add period if it exists
+          if (stat.period) {
+            statData.period = {
+              start: Timestamp.fromDate(stat.period.start),
+              end: Timestamp.fromDate(stat.period.end),
+            };
+          }
           batch1.set(statDocRef, statData, { merge: true });
         }
 
@@ -221,10 +228,27 @@ export class CloudSyncService {
 
           for (const exercise of chunk) {
             const exerciseDocRef = doc(exercisesCollectionRef, exercise.id);
-            const exerciseData = {
-              ...exercise,
+            // Remove undefined values and ensure performedAt is a Timestamp
+            const exerciseData: Record<string, unknown> = {
+              id: exercise.id,
+              activityKey: exercise.activityKey,
+              label: exercise.label,
+              icon: exercise.icon,
+              unit: exercise.unit,
+              multiplier: exercise.multiplier,
+              amount: exercise.amount,
+              points: exercise.points,
               performedAt: Timestamp.fromDate(new Date(exercise.performedAt)),
             };
+            // Add optional fields only if they exist
+            if (exercise.labelEn) exerciseData.labelEn = exercise.labelEn;
+            if (exercise.unitEn) exerciseData.unitEn = exercise.unitEn;
+            if (exercise.note) exerciseData.note = exercise.note;
+            if (exercise.description) exerciseData.description = exercise.description;
+            if (exercise.descriptionEn) exerciseData.descriptionEn = exercise.descriptionEn;
+            if (exercise.isCustom !== undefined) exerciseData.isCustom = exercise.isCustom;
+            if (exercise.category) exerciseData.category = exercise.category;
+            if (exercise.duration !== undefined) exerciseData.duration = exercise.duration;
             batch.set(exerciseDocRef, exerciseData, { merge: true });
           }
 
@@ -262,11 +286,27 @@ export class CloudSyncService {
         // 3. Upload exercises (exercise records)
         for (const exercise of convertedData.exercises) {
           const exerciseDocRef = doc(exercisesCollectionRef, exercise.id);
-          // Ensure performedAt is a Timestamp
-          const exerciseData = {
-            ...exercise,
+          // Remove undefined values and ensure performedAt is a Timestamp
+          const exerciseData: Record<string, unknown> = {
+            id: exercise.id,
+            activityKey: exercise.activityKey,
+            label: exercise.label,
+            icon: exercise.icon,
+            unit: exercise.unit,
+            multiplier: exercise.multiplier,
+            amount: exercise.amount,
+            points: exercise.points,
             performedAt: Timestamp.fromDate(new Date(exercise.performedAt)),
           };
+          // Add optional fields only if they exist
+          if (exercise.labelEn) exerciseData.labelEn = exercise.labelEn;
+          if (exercise.unitEn) exerciseData.unitEn = exercise.unitEn;
+          if (exercise.note) exerciseData.note = exercise.note;
+          if (exercise.description) exerciseData.description = exercise.description;
+          if (exercise.descriptionEn) exerciseData.descriptionEn = exercise.descriptionEn;
+          if (exercise.isCustom !== undefined) exerciseData.isCustom = exercise.isCustom;
+          if (exercise.category) exerciseData.category = exercise.category;
+          if (exercise.duration !== undefined) exerciseData.duration = exercise.duration;
           batch.set(exerciseDocRef, exerciseData, { merge: true });
         }
 
