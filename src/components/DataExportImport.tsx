@@ -114,9 +114,14 @@ export function DataExportImport() {
 
       // Determine format: new format has 'exercises' and 'activities' (definitions)
       // Legacy format has 'activities' (records) and 'settings'
-      const isNewFormat = data.exercises !== undefined && Array.isArray(data.exercises);
+      const newFormatData = data as NewFormat;
+      const legacyFormatData = data as LegacyFormat;
+      const isNewFormat =
+        newFormatData.exercises !== undefined && Array.isArray(newFormatData.exercises);
       const isLegacyFormat =
-        !isNewFormat && data.activities !== undefined && Array.isArray(data.activities);
+        !isNewFormat &&
+        legacyFormatData.activities !== undefined &&
+        Array.isArray(legacyFormatData.activities);
 
       let validExercises: ActivityRecord[] = [];
       let activityDefinitions: Array<{
@@ -137,7 +142,7 @@ export function DataExportImport() {
 
       if (isNewFormat) {
         // New format: exercises + activities (definitions)
-        validExercises = (newFormatData.exercises || []).filter((a) => {
+        validExercises = (newFormatData.exercises || []).filter((a: ActivityRecord) => {
           return (
             a &&
             typeof a.id === 'string' &&
@@ -150,13 +155,15 @@ export function DataExportImport() {
 
         // Extract custom activities from activity definitions
         if (newFormatData.activities && Array.isArray(newFormatData.activities)) {
-          activityDefinitions = newFormatData.activities.filter((a) => a.isCustom === true);
+          activityDefinitions = newFormatData.activities.filter(
+            (a: { isCustom?: boolean }) => a.isCustom === true
+          );
         }
 
         settingsToImport = newFormatData.settings || null;
       } else if (isLegacyFormat) {
         // Legacy format: activities (records) + settings
-        validExercises = (data.activities || []).filter((a) => {
+        validExercises = (legacyFormatData.activities || []).filter((a: ActivityRecord) => {
           return (
             a &&
             typeof a.id === 'string' &&
@@ -167,7 +174,7 @@ export function DataExportImport() {
           );
         });
 
-        settingsToImport = data.settings || null;
+        settingsToImport = legacyFormatData.settings || null;
 
         // Extract custom activities from settings.customActivities
         if (settingsToImport?.customActivities) {
