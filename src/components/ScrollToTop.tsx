@@ -23,32 +23,43 @@ export function ScrollToTop() {
     e.stopPropagation();
     if (typeof window === 'undefined') return;
 
-    // Use multiple methods to ensure scrolling works
-    // Method 1: Smooth scroll
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    // Smooth animated scroll to top
+    const scrollToTopAnimation = () => {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      if (currentScroll > 0) {
+        window.requestAnimationFrame(scrollToTopAnimation);
+        window.scrollTo(0, currentScroll - currentScroll / 8);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    };
 
-    // Method 2: Direct scroll (fallback)
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-
-    // Method 3: Window scroll (additional fallback)
-    window.scrollTo(0, 0);
-
-    // Method 4: Scroll main element if exists
-    const mainElement = document.querySelector('main');
-    if (mainElement) {
-      mainElement.scrollTop = 0;
-    }
+    scrollToTopAnimation();
   };
 
   const handleAddActivity = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     triggerHaptic('medium');
-    router.push('/add');
+
+    // Smooth page transition with fade effect
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      mainElement.style.transition = 'opacity 0.2s ease-out, transform 0.2s ease-out';
+      mainElement.style.opacity = '0.9';
+      mainElement.style.transform = 'translateY(-4px)';
+    }
+
+    setTimeout(() => {
+      router.push('/add');
+      // Reset after navigation
+      setTimeout(() => {
+        if (mainElement) {
+          mainElement.style.opacity = '1';
+          mainElement.style.transform = 'translateY(0)';
+        }
+      }, 100);
+    }, 150);
   };
 
   if (!mounted) return null;
@@ -56,7 +67,7 @@ export function ScrollToTop() {
   // Calculate position above QuoteTicker - just above scrolling text
   // QuoteTicker height: ~32px + BottomNavigation: 64px + safe-bottom
   // Position button just above QuoteTicker with small gap
-  const bottomOffset = isMobile ? 'bottom-[108px]' : 'bottom-[104px]';
+  const bottomOffset = isMobile ? 'bottom-[112px]' : 'bottom-[104px]';
 
   return (
     <div
@@ -75,7 +86,7 @@ export function ScrollToTop() {
         title={t('actions.addActivity')}
       >
         <span
-          className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black drop-shadow-lg relative z-10`}
+          className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black drop-shadow-lg relative z-10 whitespace-nowrap`}
         >
           𓂃🪶
         </span>

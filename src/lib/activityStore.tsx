@@ -185,6 +185,13 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(debouncedActivities));
       setStorageError(null);
+
+      // Update local last modified date after debounced save
+      try {
+        localStorage.setItem('sporttrack_last_sync', new Date().toISOString());
+      } catch (error) {
+        console.error('Failed to save local last modified:', error);
+      }
     } catch (error) {
       if (isQuotaError(error)) {
         setStorageError('quota');
