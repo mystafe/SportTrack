@@ -235,7 +235,11 @@ export function DataExportImport() {
         ? newFormatData.userName || null
         : legacyFormatData.userName || null;
 
-      if (activityDefinitions.length > 0 || userNameToImport) {
+      // Always update settings with userName if available, even if it's in settingsToImport
+      // Priority: userName field > settings.name
+      const finalUserName = userNameToImport || settingsToImport?.name || null;
+
+      if (activityDefinitions.length > 0 || finalUserName) {
         // Update settings with custom activities and/or userName
         const updatedSettings: UserSettings = {
           ...settingsToImport,
@@ -253,16 +257,16 @@ export function DataExportImport() {
               descriptionEn: ad.descriptionEn,
             })),
           }),
-          // Import userName if available and not null
-          ...(userNameToImport && { name: userNameToImport }),
+          // Import userName if available and not null (priority: userName field > settings.name)
+          ...(finalUserName && finalUserName.trim() !== '' && { name: finalUserName }),
         };
         localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updatedSettings));
       } else {
         // Still update userName if available
-        if (userNameToImport) {
+        if (finalUserName && finalUserName.trim() !== '') {
           const updatedSettings: UserSettings = {
             ...settingsToImport,
-            name: userNameToImport,
+            name: finalUserName,
           };
           localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updatedSettings));
         } else {
@@ -275,7 +279,9 @@ export function DataExportImport() {
       if (typeof window !== 'undefined') {
         localStorage.removeItem(CONFLICT_STORAGE_KEY);
         // Mark name dialog as shown if userName was imported (to prevent "Tell Us About You" dialog)
-        if (userNameToImport && userNameToImport.trim() !== '') {
+        // Also check settings.name in case userName field is not present but name is in settings
+        const finalUserName = userNameToImport || settingsToImport?.name || null;
+        if (finalUserName && finalUserName.trim() !== '') {
           localStorage.setItem('name_dialog_shown', 'true');
         }
       }
