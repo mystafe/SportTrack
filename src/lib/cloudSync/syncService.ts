@@ -184,7 +184,11 @@ export class CloudSyncService {
 
         for (const activity of convertedData.activities) {
           const activityDocRef = doc(activitiesCollectionRef, activity.key);
-          batch1.set(activityDocRef, activity, { merge: true });
+          // Remove undefined values from activity definition
+          const cleanedActivity = Object.fromEntries(
+            Object.entries(activity).filter(([_, value]) => value !== undefined)
+          ) as ActivityDefinition;
+          batch1.set(activityDocRef, cleanedActivity, { merge: true });
         }
 
         for (const stat of convertedData.statistics) {
@@ -248,7 +252,11 @@ export class CloudSyncService {
         // 2. Upload activities (activity definitions)
         for (const activity of convertedData.activities) {
           const activityDocRef = doc(activitiesCollectionRef, activity.key);
-          batch.set(activityDocRef, activity, { merge: true });
+          // Remove undefined values from activity definition
+          const cleanedActivity = Object.fromEntries(
+            Object.entries(activity).filter(([_, value]) => value !== undefined)
+          ) as ActivityDefinition;
+          batch.set(activityDocRef, cleanedActivity, { merge: true });
         }
 
         // 3. Upload exercises (exercise records)
@@ -265,16 +273,23 @@ export class CloudSyncService {
         // 4. Upload statistics
         for (const stat of convertedData.statistics) {
           const statDocRef = doc(statisticsCollectionRef, stat.id);
-          const statData = {
-            ...stat,
+          const statData: Record<string, unknown> = {
+            id: stat.id,
+            totalPoints: stat.totalPoints,
+            totalExercises: stat.totalExercises,
+            totalActivities: stat.totalActivities,
+            streakDays: stat.streakDays,
+            averageDailyPoints: stat.averageDailyPoints,
+            completionRate: stat.completionRate,
             lastCalculated: Timestamp.fromDate(stat.lastCalculated),
-            period: stat.period
-              ? {
-                  start: Timestamp.fromDate(stat.period.start),
-                  end: Timestamp.fromDate(stat.period.end),
-                }
-              : undefined,
           };
+          // Only add period if it exists
+          if (stat.period) {
+            statData.period = {
+              start: Timestamp.fromDate(stat.period.start),
+              end: Timestamp.fromDate(stat.period.end),
+            };
+          }
           batch.set(statDocRef, statData, { merge: true });
         }
 
