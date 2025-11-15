@@ -367,7 +367,7 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
             className={`fixed z-[10000] ${isMobile ? 'w-[calc(100vw-2rem)] max-w-sm' : 'w-80'} bg-white dark:bg-gray-900 rounded-xl shadow-2xl border-2 border-brand/30 p-4 sm:p-6 animate-scale-in`}
             style={{
               ...tooltipStyle,
-              ...(tooltipPosition === 'center' ? {} : { position: 'absolute' }),
+              position: 'fixed', // Always use fixed positioning for viewport-relative positioning
             }}
           >
             <div className="space-y-3">
