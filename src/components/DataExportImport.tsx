@@ -101,12 +101,14 @@ export function DataExportImport() {
           category?: string;
         }>;
         settings?: UserSettings;
+        userName?: string | null;
         version?: string;
       };
 
       type LegacyFormat = {
         activities?: ActivityRecord[];
         settings?: UserSettings;
+        userName?: string | null;
         version?: string;
       };
 
@@ -228,26 +230,44 @@ export function DataExportImport() {
       localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(validExercises));
 
       // Import custom activities (aktivite tanımları)
-      if (activityDefinitions.length > 0) {
-        // Update settings with custom activities
+      // Also import userName if available (from new format or legacy format)
+      const userNameToImport = isNewFormat
+        ? newFormatData.userName || null
+        : legacyFormatData.userName || null;
+
+      if (activityDefinitions.length > 0 || userNameToImport) {
+        // Update settings with custom activities and/or userName
         const updatedSettings: UserSettings = {
           ...settingsToImport,
-          customActivities: activityDefinitions.map((ad) => ({
-            id: ad.key,
-            label: ad.label,
-            labelEn: ad.labelEn,
-            icon: ad.icon,
-            multiplier: ad.multiplier,
-            unit: ad.unit,
-            unitEn: ad.unitEn,
-            defaultAmount: ad.defaultAmount,
-            description: ad.description,
-            descriptionEn: ad.descriptionEn,
-          })),
+          ...(activityDefinitions.length > 0 && {
+            customActivities: activityDefinitions.map((ad) => ({
+              id: ad.key,
+              label: ad.label,
+              labelEn: ad.labelEn,
+              icon: ad.icon,
+              multiplier: ad.multiplier,
+              unit: ad.unit,
+              unitEn: ad.unitEn,
+              defaultAmount: ad.defaultAmount,
+              description: ad.description,
+              descriptionEn: ad.descriptionEn,
+            })),
+          }),
+          // Import userName if available and not null
+          ...(userNameToImport && { name: userNameToImport }),
         };
         localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updatedSettings));
       } else {
-        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settingsToImport));
+        // Still update userName if available
+        if (userNameToImport) {
+          const updatedSettings: UserSettings = {
+            ...settingsToImport,
+            name: userNameToImport,
+          };
+          localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updatedSettings));
+        } else {
+          localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settingsToImport));
+        }
       }
 
       // Clear conflict storage key to prevent conflict dialog from showing after import

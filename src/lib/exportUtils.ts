@@ -246,6 +246,8 @@ export function exportToJSON(
     // Activity definitions (aktivite tanımları - default + custom)
     activities: activityDefinitions || [],
     settings: settings || null,
+    // User name (if available)
+    userName: settings?.name || null,
     exportDate: new Date().toISOString(),
     version: '0.18.17', // Current app version
     dateRange: options.dateRange

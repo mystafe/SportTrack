@@ -279,17 +279,13 @@ export const StatsHighlights = memo(function StatsHighlights() {
 
             <Link
               href="/stats"
-              className={`stagger-item card-entrance slide-in-right magnetic-hover hover-scale-glow rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gradient-to-br from-brand/10 via-brand/8 to-brand/5 dark:from-brand/20 dark:via-brand/15 dark:to-brand/10 ${isMobile ? 'p-3' : 'p-4'} shadow-lg group  gpu-accelerated`}
+              className={`stagger-item card-entrance slide-in-right magnetic-hover hover-scale-glow rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gradient-to-br from-brand/10 via-brand/8 to-brand/5 dark:from-brand/20 dark:via-brand/15 dark:to-brand/10 ${isMobile ? 'p-3' : 'p-4'} shadow-lg group gpu-accelerated`}
             >
               <div
-                className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-700 dark:text-gray-200 font-medium mb-1`}
+                className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-gray-900 dark:text-white group-hover:text-brand transition-colors whitespace-nowrap overflow-hidden text-ellipsis`}
+                title={`${t('stats.detailed.title')} - ${t('stats.detailed.subtitle')}`}
               >
-                {t('stats.detailed.title')}
-              </div>
-              <div
-                className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-900 dark:text-white group-hover:text-brand transition-colors`}
-              >
-                {t('stats.detailed.subtitle')}
+                {t('stats.detailed.title')} - {t('stats.detailed.subtitle')}
               </div>
               <div
                 className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-700 dark:text-gray-200 font-medium mt-2`}
