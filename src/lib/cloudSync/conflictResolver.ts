@@ -108,8 +108,8 @@ export function mergeData(
     localActivityMap.set(activity.id, activity);
   });
 
-  const cloudActivities =
-    (cloudData.exercises as ActivityRecord[]) || (cloudData.activities as ActivityRecord[]) || [];
+  // Use exercises from new structure (exercises are ActivityRecord[], activities are ActivityDefinition[])
+  const cloudActivities = (cloudData.exercises as ActivityRecord[]) || [];
   cloudActivities.forEach((cloudActivity) => {
     const localActivity = localActivityMap.get(cloudActivity.id);
     if (localActivity) {
@@ -137,22 +137,39 @@ export function mergeData(
     const customActivitiesMap = new Map<string, ActivityDefinition>();
 
     // Add local custom activities
+    // CustomActivityDefinition has 'id', ActivityDefinition has 'key'
     localCustomActivities.forEach((activity) => {
-      if (activity.key) {
-        customActivitiesMap.set(activity.key, activity);
-      }
+      const activityDef: ActivityDefinition = {
+        ...activity,
+        key: activity.id, // Convert id to key
+      };
+      customActivitiesMap.set(activity.id, activityDef);
     });
 
     // Add cloud custom activities (cloud takes precedence for duplicates)
     cloudCustomActivities.forEach((activity) => {
-      if (activity.key) {
-        customActivitiesMap.set(activity.key, activity);
-      }
+      const activityDef: ActivityDefinition = {
+        ...activity,
+        key: activity.id, // Convert id to key
+      };
+      customActivitiesMap.set(activity.id, activityDef);
     });
 
     mergedSettings = {
       ...(cloudData.settings as UserSettings),
-      customActivities: Array.from(customActivitiesMap.values()),
+      // Convert ActivityDefinition[] back to CustomActivityDefinition[]
+      customActivities: Array.from(customActivitiesMap.values()).map((def) => ({
+        id: def.key,
+        label: def.label,
+        labelEn: def.labelEn,
+        icon: def.icon,
+        multiplier: def.multiplier,
+        unit: def.unit,
+        unitEn: def.unitEn,
+        defaultAmount: def.defaultAmount,
+        description: def.description,
+        descriptionEn: def.descriptionEn,
+      })),
       // Keep local name if cloud doesn't have one
       name: (cloudData.settings as UserSettings).name || localData.settings.name || '',
     };
@@ -250,9 +267,8 @@ export function useNewest(
 
   // If local is empty, use cloud (even if cloud is also empty, prefer cloud for consistency)
   if (localIsEmpty) {
-    // Use exercises from new structure, fallback to activities for backward compatibility
-    const cloudExercises =
-      (cloudData.exercises as ActivityRecord[]) || (cloudData.activities as ActivityRecord[]) || [];
+    // Use exercises from new structure (exercises are ActivityRecord[], activities are ActivityDefinition[])
+    const cloudExercises = (cloudData.exercises as ActivityRecord[]) || [];
     return {
       activities: cloudExercises,
       settings: (cloudData.settings as UserSettings) || localData.settings,
@@ -271,9 +287,8 @@ export function useNewest(
   const cloudLastModified = cloudData.metadata?.lastModified || new Date(0);
 
   if (cloudLastModified > localLastModified) {
-    // Use exercises from new structure, fallback to activities for backward compatibility
-    const cloudExercises =
-      (cloudData.exercises as ActivityRecord[]) || (cloudData.activities as ActivityRecord[]) || [];
+    // Use exercises from new structure (exercises are ActivityRecord[], activities are ActivityDefinition[])
+    const cloudExercises = (cloudData.exercises as ActivityRecord[]) || [];
     return {
       activities: cloudExercises.length > 0 ? cloudExercises : localData.activities,
       settings: (cloudData.settings as UserSettings) || localData.settings,

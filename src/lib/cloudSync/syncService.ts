@@ -20,7 +20,7 @@ import {
 } from 'firebase/firestore';
 import type { SyncStatus, CloudData, SyncMetadata } from './types';
 import { ActivityRecord } from '@/lib/activityStore';
-import { UserSettings } from '@/lib/settingsStore';
+import { UserSettings, CustomActivityDefinition } from '@/lib/settingsStore';
 import { Badge } from '@/lib/badges';
 import { Challenge } from '@/lib/challenges';
 import { ActivityDefinition, BASE_ACTIVITY_DEFINITIONS } from '@/lib/activityConfig';
@@ -120,6 +120,7 @@ export class CloudSyncService {
   async uploadConvertedDataToCloud(convertedData: {
     activities: ActivityDefinition[];
     exercises: ActivityRecord[];
+    badges?: Badge[];
     statistics: Array<{
       id: string;
       totalPoints: number;
@@ -129,6 +130,10 @@ export class CloudSyncService {
       averageDailyPoints: number;
       completionRate: number;
       lastCalculated: Date;
+      period?: {
+        start: Date;
+        end: Date;
+      };
     }>;
     challenges: Challenge[];
     points: number;
@@ -237,7 +242,8 @@ export class CloudSyncService {
               name: badge.name,
               description: badge.description,
               icon: badge.icon,
-              points: badge.points,
+              category: badge.category,
+              rarity: badge.rarity,
             };
             // Add unlockedAt only if it's a valid Date
             if (badge.unlockedAt) {
@@ -389,7 +395,8 @@ export class CloudSyncService {
               name: badge.name,
               description: badge.description,
               icon: badge.icon,
-              points: badge.points,
+              category: badge.category,
+              rarity: badge.rarity,
             };
             // Add unlockedAt only if it's a valid Date
             if (badge.unlockedAt) {
@@ -606,20 +613,16 @@ export class CloudSyncService {
 
       // Clean settings: remove undefined fields (Firestore doesn't accept undefined)
       // Always include mood with a default value (null) if not set
-      const cleanedSettings = data.settings
+      const cleanedSettings: UserSettings | null = data.settings
         ? (() => {
-            const cleaned: {
-              name: string;
-              dailyTarget: number;
-              customActivities: unknown[];
-              mood: string | null;
-            } = {
+            const cleaned: UserSettings = {
               name: data.settings.name || '',
               dailyTarget: data.settings.dailyTarget || 10000,
-              customActivities: data.settings.customActivities || [],
+              customActivities:
+                (data.settings.customActivities as CustomActivityDefinition[]) || [],
               mood: data.settings.mood !== undefined ? data.settings.mood : null, // Always include mood
             };
-            return removeUndefined(cleaned) as typeof cleaned;
+            return removeUndefined(cleaned) as UserSettings;
           })()
         : null;
 
@@ -738,8 +741,8 @@ export class CloudSyncService {
 
       // Clean badges - handle unlockedAt Date objects properly
       // Badge interface: id, name, description, icon, category, rarity, unlockedAt (no points field)
-      const cleanedBadges = (data.badges || []).map((badge) => {
-        const cleanedBadge: Record<string, unknown> = {
+      const cleanedBadges: Badge[] = (data.badges || []).map((badge) => {
+        const cleanedBadge: Badge = {
           id: badge.id,
           name: badge.name,
           description: badge.description,
@@ -753,7 +756,7 @@ export class CloudSyncService {
             const unlockedDate =
               badge.unlockedAt instanceof Date ? badge.unlockedAt : new Date(badge.unlockedAt);
             if (!isNaN(unlockedDate.getTime()) && isFinite(unlockedDate.getTime())) {
-              cleanedBadge.unlockedAt = unlockedDate.toISOString();
+              cleanedBadge.unlockedAt = unlockedDate;
             }
           } catch (dateError) {
             console.warn(`⚠️ Invalid unlockedAt date for badge ${badge.id}, skipping:`, dateError);
@@ -763,13 +766,19 @@ export class CloudSyncService {
       });
 
       const cleanedChallengesRaw = removeUndefined(data.challenges || []);
-      const cleanedChallenges = Array.isArray(cleanedChallengesRaw) ? cleanedChallengesRaw : [];
+      const cleanedChallenges: Challenge[] = Array.isArray(cleanedChallengesRaw)
+        ? (cleanedChallengesRaw as Challenge[])
+        : [];
 
       const cloudData: CloudData = {
-        activities: cleanedActivities,
-        settings: cleanedSettings,
+        activities: [], // Activity definitions are stored separately in subcollection
+        exercises: cleanedActivities, // Exercise records (ActivityRecord[])
+        statistics: [], // Statistics are calculated separately
         badges: cleanedBadges,
         challenges: cleanedChallenges,
+        settings: cleanedSettings,
+        points: 0, // Will be calculated from exercises
+        lastModified: metadata.lastModified,
         metadata,
       };
 
@@ -895,9 +904,8 @@ export class CloudSyncService {
 
       // Write badges to subcollection
       if (cleanedBadges.length > 0) {
-        for (const badgeObj of cleanedBadges) {
-          const badge = badgeObj as Record<string, unknown>;
-          const badgeId = badge.id as string;
+        for (const badge of cleanedBadges) {
+          const badgeId = badge.id;
           if (!badgeId) {
             continue; // Badge missing id, skipping
           }
@@ -958,18 +966,28 @@ export class CloudSyncService {
       // Write challenges to subcollection
       if (cleanedChallenges.length > 0) {
         for (const challenge of cleanedChallenges) {
-          const challengeDocRef = doc(challengesCollectionRef, (challenge as { id: string }).id);
-          const cleanedChallenge = Object.fromEntries(
-            Object.entries(challenge).filter(([_, value]) => value !== undefined)
-          ) as Challenge;
+          const challengeDocRef = doc(challengesCollectionRef, challenge.id);
+          // Challenge is already typed correctly, just remove undefined values
+          const cleanedChallenge: Record<string, unknown> = {};
+          Object.entries(challenge).forEach(([key, value]) => {
+            if (value !== undefined) {
+              cleanedChallenge[key] = value;
+            }
+          });
           subcollectionBatch.set(challengeDocRef, cleanedChallenge);
         }
       }
 
       // Write custom activity definitions (activity types) to subcollection
       if (cleanedSettings?.customActivities && Array.isArray(cleanedSettings.customActivities)) {
-        const customActivities = cleanedSettings.customActivities as ActivityDefinition[];
-        for (const activity of customActivities) {
+        const customActivities = cleanedSettings.customActivities;
+        for (const customActivity of customActivities) {
+          // Convert CustomActivityDefinition to ActivityDefinition (id -> key)
+          const activity: ActivityDefinition = {
+            ...customActivity,
+            key: customActivity.id, // Convert id to key
+            isCustom: true,
+          };
           // Only write custom activities (not default ones)
           if (activity.isCustom && activity.key) {
             const activityDocRef = doc(activitiesCollectionRef, activity.key);
@@ -1197,6 +1215,7 @@ export class CloudSyncService {
       return {
         exercises, // New structure: exercises collection
         activities, // New structure: activities collection (definitions)
+        statistics: [], // Statistics are calculated separately
         challenges,
         badges,
         points: userData.points || 0,
