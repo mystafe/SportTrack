@@ -231,7 +231,33 @@ export function CloudSyncSettings() {
 
   const handleLogout = async () => {
     try {
+      // Before logout, upload local data to cloud if there's any data
+      // Never upload empty/zeroed data to cloud
+      const hasLocalData =
+        activities.length > 0 ||
+        badges.length > 0 ||
+        challenges.length > 0 ||
+        (settings && settings.name && settings.name.trim() !== '');
+
+      if (hasLocalData && isAuthenticated && isConfigured) {
+        try {
+          console.log('📤 Uploading local data to cloud before logout...');
+          await syncToCloud({
+            activities,
+            settings,
+            badges,
+            challenges,
+          });
+          console.log('✅ Local data uploaded to cloud before logout');
+        } catch (uploadError) {
+          console.error('❌ Failed to upload data before logout:', uploadError);
+          // Continue with logout even if upload fails
+        }
+      }
+
+      // Now logout
       await logout();
+
       // Clear name from settings when user logs out
       saveSettings({
         name: '',
@@ -239,6 +265,7 @@ export function CloudSyncSettings() {
         customActivities: settings?.customActivities ?? [],
         mood: settings?.mood,
       });
+
       // Clear all localStorage cache
       if (typeof window !== 'undefined') {
         // Clear all SportTrack related localStorage items
@@ -248,8 +275,15 @@ export function CloudSyncSettings() {
           }
         });
       }
+
       showToast(
-        lang === 'tr' ? 'Çıkış yapıldı ve önbellek temizlendi' : 'Logged out and cache cleared',
+        lang === 'tr'
+          ? hasLocalData
+            ? 'Veriler buluta yüklendi ve çıkış yapıldı'
+            : 'Çıkış yapıldı ve önbellek temizlendi'
+          : hasLocalData
+            ? 'Data uploaded to cloud and logged out'
+            : 'Logged out and cache cleared',
         'success'
       );
     } catch (error) {
@@ -456,11 +490,27 @@ export function CloudSyncSettings() {
             }
             return null;
           })()}
-          cloudLastModified={
-            (conflictData.cloud as any).metadata?.lastModified
-              ? new Date((conflictData.cloud as any).metadata.lastModified)
-              : null
-          }
+          cloudLastModified={(() => {
+            const cloudData = conflictData.cloud as any;
+            // Check if cloud has any data - if empty, don't show last modified date
+            const hasCloudData =
+              (cloudData.activities && cloudData.activities.length > 0) ||
+              (cloudData.badges && cloudData.badges.length > 0) ||
+              (cloudData.challenges && cloudData.challenges.length > 0);
+
+            if (!hasCloudData) {
+              return null; // No data in cloud, don't show date
+            }
+
+            if (cloudData.metadata?.lastModified) {
+              try {
+                return new Date(cloudData.metadata.lastModified);
+              } catch {
+                return null;
+              }
+            }
+            return null;
+          })()}
         />
       )}
     </>

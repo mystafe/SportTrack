@@ -28,6 +28,7 @@ export const metadata = {
   other: {
     'dns-prefetch': 'https://fonts.googleapis.com',
     preconnect: 'https://fonts.gstatic.com',
+    'mobile-web-app-capable': 'yes',
   },
 };
 

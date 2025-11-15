@@ -62,6 +62,19 @@ export class CloudSyncService {
       throw new Error('Cloud sync not configured');
     }
 
+    // Never upload empty/zeroed data to cloud
+    // Check if there's any meaningful data to upload
+    const hasData =
+      (data.activities && data.activities.length > 0) ||
+      (data.badges && data.badges.length > 0) ||
+      (data.challenges && data.challenges.length > 0) ||
+      (data.settings && data.settings.name && data.settings.name.trim() !== '');
+
+    if (!hasData) {
+      console.log('⏭️ Skipping upload: No data to upload (all empty/zeroed)');
+      return; // Don't upload empty data
+    }
+
     // Set flag to prevent listener from processing our own writes
     this.isUploading = true;
 

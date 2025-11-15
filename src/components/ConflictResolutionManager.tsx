@@ -313,9 +313,21 @@ export function ConflictResolutionManager() {
   };
 
   // Get cloud last modified date from conflict data
+  // Only return date if cloud actually has data (not empty)
   const getCloudLastModified = (): Date | null => {
     if (!conflictData) return null;
     const cloudData = conflictData.cloud as any;
+
+    // Check if cloud has any data - if empty, don't show last modified date
+    const hasCloudData =
+      (cloudData.activities && cloudData.activities.length > 0) ||
+      (cloudData.badges && cloudData.badges.length > 0) ||
+      (cloudData.challenges && cloudData.challenges.length > 0);
+
+    if (!hasCloudData) {
+      return null; // No data in cloud, don't show date
+    }
+
     if (cloudData.metadata?.lastModified) {
       try {
         return new Date(cloudData.metadata.lastModified);
