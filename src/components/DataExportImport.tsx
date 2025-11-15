@@ -274,6 +274,10 @@ export function DataExportImport() {
       // Imported data should always go to cloud without conflict check
       if (typeof window !== 'undefined') {
         localStorage.removeItem(CONFLICT_STORAGE_KEY);
+        // Mark name dialog as shown if userName was imported (to prevent "Tell Us About You" dialog)
+        if (userNameToImport && userNameToImport.trim() !== '') {
+          localStorage.setItem('name_dialog_shown', 'true');
+        }
       }
 
       // If user is authenticated and cloud sync is configured, upload to cloud immediately

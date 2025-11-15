@@ -123,7 +123,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
         {isOpen && (
           <div
             id="stats-highlights"
-            className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2' : 'gap-3'}`}
+            className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2'} ${isMobile ? 'gap-2' : 'gap-3'}`}
           >
             <div
               className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}
