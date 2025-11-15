@@ -25,12 +25,20 @@ export function ScrollToTop() {
 
     triggerHaptic('light');
 
-    // Use smooth scroll behavior
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    });
+    // Try multiple scroll methods for better compatibility
+    const scrollToTop = () => {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      if (currentScroll > 0) {
+        window.requestAnimationFrame(scrollToTop);
+        window.scrollTo(0, currentScroll - currentScroll / 8);
+      } else {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
+    };
+
+    scrollToTop();
   };
 
   const handleAddActivity = (e: MouseEvent<HTMLButtonElement>) => {

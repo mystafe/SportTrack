@@ -34,7 +34,7 @@ const AppleHealthGuide = lazy(() =>
 
 export function DataExportImport() {
   const { activities } = useActivities();
-  const { settings } = useSettings();
+  const { settings, addCustomActivity } = useSettings();
   const { badges } = useBadges();
   const { challenges } = useChallenges();
   const { t, lang } = useI18n();
@@ -82,40 +82,122 @@ export function DataExportImport() {
     try {
       const text = await file.text();
       const data = JSON.parse(text) as {
-        activities?: ActivityRecord[];
+        // New format (v0.18.17+)
+        exercises?: ActivityRecord[];
+        activities?: Array<{
+          key: string;
+          label: string;
+          labelEn?: string;
+          icon: string;
+          multiplier: number;
+          unit: string;
+          unitEn?: string;
+          defaultAmount: number;
+          description?: string;
+          descriptionEn?: string;
+          isCustom?: boolean;
+          category?: string;
+        }>;
         settings?: UserSettings;
         version?: string;
+        // Legacy format (backward compatibility)
+        activities?: ActivityRecord[];
       };
 
-      if (!data.activities || !Array.isArray(data.activities)) {
-        throw new Error('Invalid file format: activities missing');
+      // Determine format: new format has 'exercises' and 'activities' (definitions)
+      // Legacy format has 'activities' (records) and 'settings'
+      const isNewFormat = data.exercises !== undefined && Array.isArray(data.exercises);
+      const isLegacyFormat =
+        !isNewFormat && data.activities !== undefined && Array.isArray(data.activities);
+
+      let validExercises: ActivityRecord[] = [];
+      let activityDefinitions: Array<{
+        key: string;
+        label: string;
+        labelEn?: string;
+        icon: string;
+        multiplier: number;
+        unit: string;
+        unitEn?: string;
+        defaultAmount: number;
+        description?: string;
+        descriptionEn?: string;
+        isCustom?: boolean;
+        category?: string;
+      }> = [];
+      let settingsToImport: UserSettings | null = null;
+
+      if (isNewFormat) {
+        // New format: exercises + activities (definitions)
+        validExercises = (data.exercises || []).filter((a) => {
+          return (
+            a &&
+            typeof a.id === 'string' &&
+            typeof a.activityKey === 'string' &&
+            typeof a.amount === 'number' &&
+            typeof a.points === 'number' &&
+            typeof a.performedAt === 'string'
+          );
+        });
+
+        // Extract custom activities from activity definitions
+        if (data.activities && Array.isArray(data.activities)) {
+          activityDefinitions = data.activities.filter((a) => a.isCustom === true);
+        }
+
+        settingsToImport = data.settings || null;
+      } else if (isLegacyFormat) {
+        // Legacy format: activities (records) + settings
+        validExercises = (data.activities || []).filter((a) => {
+          return (
+            a &&
+            typeof a.id === 'string' &&
+            typeof a.activityKey === 'string' &&
+            typeof a.amount === 'number' &&
+            typeof a.points === 'number' &&
+            typeof a.performedAt === 'string'
+          );
+        });
+
+        settingsToImport = data.settings || null;
+
+        // Extract custom activities from settings.customActivities
+        if (settingsToImport?.customActivities) {
+          activityDefinitions = settingsToImport.customActivities.map((ca) => ({
+            key: ca.id,
+            label: ca.label,
+            labelEn: ca.labelEn,
+            icon: ca.icon,
+            multiplier: ca.multiplier,
+            unit: ca.unit,
+            unitEn: ca.unitEn,
+            defaultAmount: ca.defaultAmount,
+            description: undefined,
+            descriptionEn: undefined,
+            isCustom: true,
+            category: undefined,
+          }));
+        }
+      } else {
+        throw new Error('Invalid file format: missing exercises or activities');
       }
-      if (!data.settings) {
+
+      if (!settingsToImport) {
         throw new Error('Invalid file format: settings missing');
       }
 
-      // Validate data structure
-      const validActivities = data.activities.filter((a) => {
-        return (
-          a &&
-          typeof a.id === 'string' &&
-          typeof a.activityKey === 'string' &&
-          typeof a.amount === 'number' &&
-          typeof a.points === 'number' &&
-          typeof a.performedAt === 'string'
-        );
-      });
-
-      if (validActivities.length === 0 && data.activities.length > 0) {
-        throw new Error('No valid activities found in file');
+      if (
+        validExercises.length === 0 &&
+        (data.exercises?.length || data.activities?.length || 0) > 0
+      ) {
+        throw new Error('No valid exercises found in file');
       }
 
       // Show confirmation dialog
       const confirmed = window.confirm(
-        t('data.importConfirm', {
-          activities: String(validActivities.length),
-          settings: data.settings.name || 'Unknown',
-        })
+        lang === 'tr'
+          ? `${validExercises.length} egzersiz ve ${activityDefinitions.length} aktivite tanımı içe aktarılacak. Devam etmek istiyor musunuz?`
+          : `Import ${validExercises.length} exercises and ${activityDefinitions.length} activity definitions?`
       );
 
       if (!confirmed) {
@@ -126,9 +208,33 @@ export function DataExportImport() {
         return;
       }
 
-      // Import data
-      localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(validActivities));
-      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(data.settings));
+      // Import exercises (yapılan egzersizler)
+      localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(validExercises));
+
+      // Import custom activities (aktivite tanımları)
+      if (activityDefinitions.length > 0) {
+        const { addCustomActivity } = useSettings();
+        // We need to import custom activities into settings
+        // Update settings with custom activities
+        const updatedSettings: UserSettings = {
+          ...settingsToImport,
+          customActivities: activityDefinitions.map((ad) => ({
+            id: ad.key,
+            label: ad.label,
+            labelEn: ad.labelEn,
+            icon: ad.icon,
+            multiplier: ad.multiplier,
+            unit: ad.unit,
+            unitEn: ad.unitEn,
+            defaultAmount: ad.defaultAmount,
+            description: ad.description,
+            descriptionEn: ad.descriptionEn,
+          })),
+        };
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updatedSettings));
+      } else {
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settingsToImport));
+      }
 
       // Clear conflict storage key to prevent conflict dialog from showing after import
       // Imported data should always go to cloud without conflict check
