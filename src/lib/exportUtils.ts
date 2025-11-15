@@ -242,7 +242,7 @@ export function exportToJSON(
     activities: filteredActivities,
     settings: settings || null,
     exportDate: new Date().toISOString(),
-    version: '0.14.1', // Will be updated automatically when package.json version changes
+    version: '0.18.17', // Current app version
     dateRange: options.dateRange
       ? {
           start: options.dateRange.start.toISOString(),
