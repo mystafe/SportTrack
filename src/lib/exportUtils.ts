@@ -1,5 +1,6 @@
 import { ActivityRecord } from '@/lib/activityStore';
 import { UserSettings } from '@/lib/settingsStore';
+import { ActivityDefinition } from '@/lib/activityConfig';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { format, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
@@ -226,7 +227,8 @@ export async function exportToPDF(
 export function exportToJSON(
   activities: ActivityRecord[],
   settings: UserSettings | null,
-  options: ExportOptions
+  options: ExportOptions,
+  activityDefinitions?: ActivityDefinition[]
 ): void {
   // Filter by date range if provided
   let filteredActivities = activities;
@@ -237,9 +239,12 @@ export function exportToJSON(
     });
   }
 
-  // Prepare export data
+  // Prepare export data with new structure
   const exportData = {
-    activities: filteredActivities,
+    // Exercise records (yapılan egzersizler) - renamed from "activities" to "exercises"
+    exercises: filteredActivities,
+    // Activity definitions (aktivite tanımları - default + custom)
+    activities: activityDefinitions || [],
     settings: settings || null,
     exportDate: new Date().toISOString(),
     version: '0.18.17', // Current app version
@@ -250,7 +255,8 @@ export function exportToJSON(
         }
       : null,
     summary: {
-      totalActivities: filteredActivities.length,
+      totalExercises: filteredActivities.length,
+      totalActivities: activityDefinitions?.length || 0,
       totalPoints: filteredActivities.reduce((sum, a) => sum + a.points, 0),
       averagePoints:
         filteredActivities.length > 0

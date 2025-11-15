@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
-import { useSettings } from '@/lib/settingsStore';
+import { useSettings, useActivityDefinitions } from '@/lib/settingsStore';
 import { exportToCSV, exportToPDF, exportToJSON, ExportFormat } from '@/lib/exportUtils';
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -18,6 +18,7 @@ type ExportDialogProps = {
 export function ExportDialog({ open, onClose }: ExportDialogProps) {
   const { activities } = useActivities();
   const { settings } = useSettings();
+  const activityDefinitions = useActivityDefinitions();
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
   const isMobile = useIsMobile();
@@ -69,7 +70,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
         await exportToPDF(activities, settings, options);
         showToast(t('export.pdfSuccess'), 'success');
       } else if (exportFormat === 'json') {
-        exportToJSON(activities, settings, options);
+        exportToJSON(activities, settings, options, activityDefinitions);
         showToast(t('export.jsonSuccess'), 'success');
       }
 
