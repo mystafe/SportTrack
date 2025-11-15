@@ -220,6 +220,15 @@ export function ConflictResolutionManager() {
     // For "local" strategy: upload local data to cloud
     // For "merge" or "newest": upload merged/resolved data to cloud
     // For "cloud" strategy: just apply cloud data locally, don't upload anything
+    // Mark initial sync as complete BEFORE upload to prevent useCloudSyncListener from interfering
+    // This ensures useCloudSyncListener doesn't run during conflict resolution upload
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sporttrack_initial_sync_complete', 'true');
+      console.log(
+        '✅ Initial sync marked as complete before upload (to prevent listener interference)'
+      );
+    }
+
     if (strategy !== 'cloud') {
       try {
         console.log('📤 Uploading resolved data to cloud...', {
@@ -247,12 +256,6 @@ export function ConflictResolutionManager() {
     }
 
     saveLocalLastModified();
-
-    // Mark initial sync as complete to prevent useCloudSyncListener from running again after reload
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('sporttrack_initial_sync_complete', 'true');
-      console.log('✅ Initial sync marked as complete after conflict resolution');
-    }
 
     // Reload page AFTER cloud sync completes (or fails) to apply changes
     // Stores will read from localStorage after reload
