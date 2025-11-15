@@ -437,7 +437,25 @@ export function CloudSyncSettings() {
             activities: conflictData.cloud.activities.length,
             badges: conflictData.cloud.badges.length,
           }}
-          localLastModified={null}
+          localLastModified={(() => {
+            if (typeof window === 'undefined') return null;
+            try {
+              const stored = localStorage.getItem('sporttrack_last_sync');
+              if (stored) {
+                const date = new Date(stored);
+                if (!isNaN(date.getTime())) {
+                  return date;
+                }
+              }
+              // If no stored date, check if there are activities and use current time as fallback
+              if (activities.length > 0) {
+                return new Date();
+              }
+            } catch (error) {
+              console.error('Failed to get local last modified:', error);
+            }
+            return null;
+          })()}
           cloudLastModified={
             (conflictData.cloud as any).metadata?.lastModified
               ? new Date((conflictData.cloud as any).metadata.lastModified)
