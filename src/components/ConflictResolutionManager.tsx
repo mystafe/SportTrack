@@ -12,6 +12,7 @@ import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 import { useCloudSync } from '@/hooks/useCloudSync';
 import { resolveConflicts, saveLocalLastModified } from '@/lib/cloudSync/conflictResolver';
+import { cloudSyncService } from '@/lib/cloudSync/syncService';
 import { STORAGE_KEYS } from '@/lib/constants';
 
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
