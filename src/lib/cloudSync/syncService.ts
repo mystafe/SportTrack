@@ -215,7 +215,11 @@ export class CloudSyncService {
 
         for (const challenge of convertedData.challenges) {
           const challengeDocRef = doc(challengesCollectionRef, challenge.id);
-          batch1.set(challengeDocRef, challenge, { merge: true });
+          // Remove undefined values from challenge
+          const cleanedChallenge = Object.fromEntries(
+            Object.entries(challenge).filter(([_, value]) => value !== undefined)
+          ) as Challenge;
+          batch1.set(challengeDocRef, cleanedChallenge, { merge: true });
         }
 
         batches.push(batch1.commit());
@@ -336,7 +340,11 @@ export class CloudSyncService {
         // 5. Upload challenges
         for (const challenge of convertedData.challenges) {
           const challengeDocRef = doc(challengesCollectionRef, challenge.id);
-          batch.set(challengeDocRef, challenge, { merge: true });
+          // Remove undefined values from challenge
+          const cleanedChallenge = Object.fromEntries(
+            Object.entries(challenge).filter(([_, value]) => value !== undefined)
+          ) as Challenge;
+          batch.set(challengeDocRef, cleanedChallenge, { merge: true });
         }
 
         // Commit batch
