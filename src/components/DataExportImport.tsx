@@ -251,8 +251,8 @@ export function DataExportImport() {
           const challengesToUpload = storedChallenges ? JSON.parse(storedChallenges) : [];
 
           await syncToCloud({
-            activities: validActivities,
-            settings: data.settings,
+            activities: validExercises,
+            settings: settingsToImport,
             badges: badgesToUpload,
             challenges: challengesToUpload,
           });
