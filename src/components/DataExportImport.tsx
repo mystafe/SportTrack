@@ -213,8 +213,6 @@ export function DataExportImport() {
 
       // Import custom activities (aktivite tanımları)
       if (activityDefinitions.length > 0) {
-        const { addCustomActivity } = useSettings();
-        // We need to import custom activities into settings
         // Update settings with custom activities
         const updatedSettings: UserSettings = {
           ...settingsToImport,
