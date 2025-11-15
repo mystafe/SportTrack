@@ -248,6 +248,12 @@ export function ConflictResolutionManager() {
 
     saveLocalLastModified();
 
+    // Mark initial sync as complete to prevent useCloudSyncListener from running again after reload
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sporttrack_initial_sync_complete', 'true');
+      console.log('✅ Initial sync marked as complete after conflict resolution');
+    }
+
     // Reload page AFTER cloud sync completes (or fails) to apply changes
     // Stores will read from localStorage after reload
     setTimeout(() => {
