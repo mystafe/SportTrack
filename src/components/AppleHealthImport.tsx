@@ -15,11 +15,21 @@ import { STORAGE_KEYS } from '@/lib/constants';
 import { startOfDay } from 'date-fns';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useCloudSync } from '@/hooks/useCloudSync';
+import { useBadges } from '@/lib/badgeStore';
+import { useChallenges } from '@/lib/challengeStore';
+import { useSettings } from '@/lib/settingsStore';
+import { useAuth } from '@/hooks/useAuth';
+
+const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 
 export function AppleHealthImport() {
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
   const { activities, addActivity, deleteActivity } = useActivities();
+  const { settings } = useSettings();
+  const { badges } = useBadges();
+  const { challenges } = useChallenges();
   const definitions = useActivityDefinitions();
   const isMobile = useIsMobile();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -32,6 +42,8 @@ export function AppleHealthImport() {
     errors: string[];
   } | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const { syncToCloud, isConfigured } = useCloudSync();
+  const { isAuthenticated } = useAuth();
 
   const walkingDefinition =
     definitions.find((d) => d.key === 'WALKING') || BASE_ACTIVITY_MAP['WALKING'];
@@ -129,7 +141,7 @@ export function AppleHealthImport() {
     }
   };
 
-  const handleImport = () => {
+  const handleImport = async () => {
     if (!parseResult || !walkingDefinition) return;
 
     try {
@@ -158,15 +170,54 @@ export function AppleHealthImport() {
       // Save last import timestamp
       if (typeof window !== 'undefined') {
         localStorage.setItem(STORAGE_KEYS.APPLE_HEALTH_LAST_IMPORT, Date.now().toString());
+        // Clear conflict storage key to prevent conflict dialog from showing after import
+        // Imported data should always go to cloud without conflict check
+        localStorage.removeItem(CONFLICT_STORAGE_KEY);
       }
 
-      showToast(
-        t('appleHealth.importSuccess', {
-          count: String(parseResult.data.length),
-          replaced: String(existingWalkingActivities.length),
-        }),
-        'success'
-      );
+      // If user is authenticated and cloud sync is configured, upload to cloud immediately
+      // No conflict check - imported data should always go to cloud
+      if (isAuthenticated && isConfigured) {
+        try {
+          // Wait a bit for activities to be saved to localStorage
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          // Get updated activities from localStorage
+          const storedActivities = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+          const activitiesToUpload = storedActivities ? JSON.parse(storedActivities) : [];
+
+          await syncToCloud({
+            activities: activitiesToUpload,
+            settings: settings,
+            badges: badges,
+            challenges: challenges,
+          });
+
+          showToast(
+            lang === 'tr'
+              ? 'Apple Health verileri içe aktarıldı ve buluta yüklendi!'
+              : 'Apple Health data imported and uploaded to cloud!',
+            'success'
+          );
+        } catch (error) {
+          console.error('Failed to sync Apple Health data to cloud:', error);
+          // Still show success for import, but warn about cloud sync failure
+          showToast(
+            lang === 'tr'
+              ? 'Apple Health verileri içe aktarıldı, ancak buluta yükleme başarısız oldu.'
+              : 'Apple Health data imported, but cloud upload failed.',
+            'warning'
+          );
+        }
+      } else {
+        showToast(
+          t('appleHealth.importSuccess', {
+            count: String(parseResult.data.length),
+            replaced: String(existingWalkingActivities.length),
+          }),
+          'success'
+        );
+      }
 
       setParseResult(null);
       setShowConfirm(false);
@@ -190,7 +241,8 @@ export function AppleHealthImport() {
   return (
     <>
       <label
-        className={`px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold`}
+        className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none whitespace-nowrap"
+        style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
       >
         <input
           ref={fileInputRef}
@@ -201,7 +253,7 @@ export function AppleHealthImport() {
           className="hidden"
           aria-label={t('appleHealth.importLabel')}
         />
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1 leading-none">
           {isImporting ? '⏳' : '📱'}
           <span>{lang === 'tr' ? 'Sağlık Verisi İçe Aktar' : 'Import Health Data'}</span>
         </span>

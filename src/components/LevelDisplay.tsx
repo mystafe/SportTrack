@@ -27,7 +27,7 @@ export function LevelDisplay() {
           {t('level.level')}
         </span>
         <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-brand`}>
-          {t('level.level')} {levelInfo.level} · {levelTitle}
+          {levelInfo.level} · {levelTitle}
         </span>
       </div>
       <div className={`${isMobile ? 'space-y-1' : 'space-y-1.5'}`}>
@@ -40,26 +40,30 @@ export function LevelDisplay() {
           <span>{Math.round(levelInfo.progress * 100)}%</span>
         </div>
         <div
-          className={`w-full ${isMobile ? 'h-1.5' : 'h-2'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden`}
+          className={`w-full ${isMobile ? 'h-2' : 'h-2.5'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden relative shadow-inner`}
+          role="progressbar"
+          aria-valuenow={Math.round(levelInfo.progress * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${t('level.level')} ${levelInfo.level} - ${Math.round(levelInfo.progress * 100)}%`}
         >
           <div
-            className={`${isMobile ? 'h-1.5' : 'h-2'} bg-brand transition-all duration-500 ease-out`}
+            className={`${isMobile ? 'h-2' : 'h-2.5'} bg-gradient-to-r from-brand via-brand-light to-brand-dark rounded-full transition-all duration-700 ease-out progress-fill shadow-sm`}
             style={{ width: `${levelInfo.progress * 100}%` }}
           />
+          {levelInfo.progress > 0 && (
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-progress-shimmer rounded-full" />
+          )}
         </div>
-        <div
-          className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-gray-500 dark:text-gray-400`}
-        >
-          {xpRemaining > 0 ? (
+        {xpRemaining > 0 && (
+          <div
+            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-gray-500 dark:text-gray-400`}
+          >
             <span>
               {xpRemaining.toLocaleString()} {t('level.xpNeeded')} {t('level.nextLevel')}
             </span>
-          ) : (
-            <span>
-              {t('level.level')} {levelInfo.level}
-            </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

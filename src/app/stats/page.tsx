@@ -166,7 +166,7 @@ export default function StatsPage() {
 
   if (!hydrated) {
     return (
-      <div className="space-y-4 sm:space-y-6">
+      <main className="space-y-4 sm:space-y-6" role="main" aria-label={t('nav.stats')}>
         <PageSkeleton />
         <div
           className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${isMobile ? 'gap-2' : 'gap-4'}`}
@@ -181,12 +181,16 @@ export default function StatsPage() {
             </div>
           ))}
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 page-transition">
+    <main
+      className="space-y-4 sm:space-y-6 page-transition"
+      role="main"
+      aria-label={t('nav.stats')}
+    >
       <h1
         className={`stats-title ${isMobile ? 'title-entrance' : ''} text-2xl sm:text-3xl font-bold flex items-center gap-2`}
       >
@@ -550,6 +554,6 @@ export default function StatsPage() {
       <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
         <ActivityTypeTrend />
       </Suspense>
-    </div>
+    </main>
   );
 }

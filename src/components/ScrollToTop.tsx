@@ -6,7 +6,6 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useI18n } from '@/lib/i18n';
 
 export function ScrollToTop() {
-  const [isVisible, setIsVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
   const isMobile = useIsMobile();
   const { t } = useI18n();
@@ -14,12 +13,6 @@ export function ScrollToTop() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    // Show button always for now
-    setIsVisible(true);
-  }, [mounted]);
 
   const scrollToTop = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -65,7 +58,7 @@ export function ScrollToTop() {
       <button
         onClick={scrollToTop}
         type="button"
-        className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center ${isMobile ? 'touch-feedback mobile-press' : ''} border-2 border-white/20 dark:border-white/15 opacity-30 hover:opacity-80 relative overflow-visible`}
+        className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center ${isMobile ? 'touch-feedback mobile-press' : ''} border-2 border-white/20 dark:border-white/15 opacity-60 hover:opacity-100 relative overflow-visible`}
         aria-label={t('scrollToTop') || 'Scroll to top'}
         title={t('scrollToTop') || 'Scroll to top'}
       >

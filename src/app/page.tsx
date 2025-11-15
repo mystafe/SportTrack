@@ -68,7 +68,11 @@ export default function HomePage() {
   }, [motivationalMessage, mounted]);
 
   return (
-    <div className="space-y-4 sm:space-y-6 page-transition">
+    <main
+      className="space-y-4 sm:space-y-6 page-transition"
+      role="main"
+      aria-label={t('header.overviewTitle')}
+    >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className={isMobile ? 'title-entrance' : ''}>
           <h1
@@ -131,10 +135,10 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-3 sm:space-y-4">
         <QuickAdd />
         <ActivityTemplates />
       </div>
-    </div>
+    </main>
   );
 }

@@ -10,11 +10,13 @@ import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
+import { useSettings } from '@/lib/settingsStore';
 import { useToaster } from '@/components/Toaster';
 import { ActivityListSkeleton } from '@/components/LoadingSkeleton';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ActivityCard } from '@/components/ActivityCard';
+import { PullToRefresh } from '@/components/PullToRefresh';
 import Link from 'next/link';
 
 function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
@@ -32,7 +34,7 @@ export default function ActivitiesPage() {
   const { t } = useI18n();
   const isMobile = useIsMobile();
   return (
-    <div className="space-y-4 sm:space-y-5">
+    <main className="space-y-4 sm:space-y-5" role="main" aria-label={t('nav.activities')}>
       <div className="flex items-center justify-between">
         <h1
           className={`text-2xl sm:text-3xl font-bold flex items-center gap-2 ${isMobile ? 'title-entrance' : ''}`}
@@ -56,7 +58,7 @@ export default function ActivitiesPage() {
         </div>
       </div>
       <ActivitiesClient />
-    </div>
+    </main>
   );
 }
 
@@ -64,6 +66,7 @@ function ActivitiesClient() {
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
   const { activities, deleteActivity, hydrated } = useActivities();
+  const { settings } = useSettings();
   const { showToast } = useToaster();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -119,8 +122,13 @@ function ActivitiesClient() {
     return { totalPoints, totalCount };
   }, [filteredActivities]);
 
+  const handleRefresh = async () => {
+    // Refresh activities by reloading from localStorage
+    window.location.reload();
+  };
+
   return (
-    <div className="space-y-3 sm:space-y-4">
+    <PullToRefresh onRefresh={handleRefresh} className="space-y-3 sm:space-y-4">
       {/* Compact Filters */}
       <ActivityFilters filters={filters} onFiltersChange={setFilters} />
 
@@ -250,7 +258,9 @@ function ActivitiesClient() {
                       </span>
                     </div>
                   </div>
-                  <ul className="space-y-2 px-1 pb-2">
+                  <ul
+                    className={`${(settings?.listDensity ?? 'comfortable') === 'compact' ? 'space-y-1' : 'space-y-2'} px-1 pb-2`}
+                  >
                     {acts.map((activity, actIndex) => {
                       const isToday =
                         startOfDay(new Date(activity.performedAt)).toISOString() === todayKey;
@@ -266,6 +276,7 @@ function ActivitiesClient() {
                           onEdit={(id) => setEditingId(id)}
                           onDelete={(id, act) => setDeleteConfirm({ id, activity: act })}
                           animationDelay={`${groupIndex * 0.1 + actIndex * 0.05}s`}
+                          density={settings?.listDensity ?? 'comfortable'}
                         />
                       );
                     })}
@@ -276,6 +287,6 @@ function ActivitiesClient() {
           )}
         </div>
       </div>
-    </div>
+    </PullToRefresh>
   );
 }

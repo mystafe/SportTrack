@@ -99,14 +99,14 @@ export const StatsHighlights = memo(function StatsHighlights() {
     return (
       <button
         type="button"
-        className="flex w-full items-center justify-between text-sm font-bold text-gray-900 dark:text-white mb-3 transition-all duration-200 hover:text-brand"
+        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls="stats-highlights"
       >
         <span className="font-bold">{t('stats.highlightsTitle')}</span>
         <span
-          className="ml-2 text-lg font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light"
+          className="ml-2 text-base font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light"
           aria-hidden
           style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
         >
@@ -118,12 +118,12 @@ export const StatsHighlights = memo(function StatsHighlights() {
 
   return (
     <section className="mt-0">
-      <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300">
+      <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-3 shadow-md hover:shadow-xl transition-shadow duration-300">
         {renderHeader()}
         {isOpen && (
           <div
             id="stats-highlights"
-            className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2.5' : 'spacing-md'}`}
+            className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2' : 'gap-3'}`}
           >
             <div
               className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}

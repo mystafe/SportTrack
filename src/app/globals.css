@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Custom Properties for Spacing System (4px base unit) */
+:root {
+  --spacing-1: 0.25rem; /* 4px */
+  --spacing-2: 0.5rem; /* 8px */
+  --spacing-3: 0.75rem; /* 12px */
+  --spacing-4: 1rem; /* 16px */
+  --spacing-5: 1.25rem; /* 20px */
+  --spacing-6: 1.5rem; /* 24px */
+  --spacing-8: 2rem; /* 32px */
+  --spacing-10: 2.5rem; /* 40px */
+  --spacing-12: 3rem; /* 48px */
+  --spacing-16: 4rem; /* 64px */
+  --spacing-20: 5rem; /* 80px */
+  --spacing-24: 6rem; /* 96px */
+}
+
+/* Z-index hierarchy for mobile navigation */
+/* QuoteTicker: z-45 (above content, below navigation) */
+/* BottomNavigation: z-50 (main navigation) */
+
 html,
 body {
   height: 100%;
@@ -13,6 +33,12 @@ html {
   background-color: #ffffff;
   min-height: 100%;
   scroll-behavior: smooth;
+  /* Prevent layout shift */
+  overflow-x: hidden;
+  /* Optimize font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 html.dark {
@@ -257,7 +283,7 @@ body {
 
 /* Smooth transitions */
 .transition-smooth {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .hover-lift {
@@ -505,7 +531,7 @@ body {
 
 .stagger-item {
   opacity: 1 !important; /* Always visible */
-  animation: staggerFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: staggerFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .stagger-item:nth-child(1) {
@@ -703,7 +729,7 @@ body {
 
 .card-entrance {
   opacity: 1 !important; /* Always visible */
-  animation: cardEntrance 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: cardEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* Smooth bounce */
@@ -723,7 +749,7 @@ body {
 
 /* Rotate on hover */
 .rotate-on-hover {
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .rotate-on-hover:hover {
@@ -751,19 +777,19 @@ body {
 
 .slide-in-left {
   opacity: 1 !important; /* Always visible */
-  animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideInLeft 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .slide-in-right {
   opacity: 1 !important; /* Always visible */
-  animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* Enhanced button animations */
 .btn-enhanced {
   position: relative;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .btn-enhanced::before {
@@ -921,6 +947,22 @@ html {
   animation: pullRefresh 1s linear infinite;
 }
 
+/* Long press menu animation */
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
 /* Bottom sheet slide up animation */
 @keyframes slideUpFromBottom {
   from {
@@ -934,7 +976,7 @@ html {
 }
 
 .slide-up-bottom {
-  animation: slideUpFromBottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideUpFromBottom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Modal backdrop fade */
@@ -967,8 +1009,8 @@ html {
 
 .mobile-card-lift {
   transition:
-    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -1620,7 +1662,12 @@ html {
   background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(249, 250, 251, 1));
 }
 
-.dark .input-enhanced:focus {
+.dark *:focus-visible {
+  outline-color: #38bdf8;
+}
+
+.dark .input-enhanced:focus,
+.dark .input-enhanced:focus-visible {
   border-color: rgba(96, 165, 250, 0.7);
   box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
   /* Explicitly no transform to prevent cursor shifting */
@@ -1650,7 +1697,8 @@ html {
   }
 
   /* Improved focus states for mobile */
-  .input-enhanced:focus {
+  .input-enhanced:focus,
+  .input-enhanced:focus-visible {
     border-width: 2px;
     box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
   }
@@ -1684,6 +1732,9 @@ html {
     width: 0%;
     opacity: 0.8;
   }
+  50% {
+    opacity: 1;
+  }
   100% {
     opacity: 1;
   }
@@ -1695,6 +1746,20 @@ html {
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+@keyframes progressShine {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+    opacity: 0;
   }
 }
 
@@ -1846,27 +1911,27 @@ html {
 }
 
 .page-transition-wrapper {
-  animation: pageTransitionIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: pageTransitionIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .page-transition-out {
-  animation: pageTransitionOut 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: pageTransitionOut 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .page-transition-in {
-  animation: pageTransitionIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: pageTransitionIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .mobile-transition.page-transition-wrapper {
-  animation: mobilePageTransitionIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: mobilePageTransitionIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .mobile-transition.page-transition-out {
-  animation: mobilePageTransitionOut 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: mobilePageTransitionOut 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .mobile-transition.page-transition-in {
-  animation: mobilePageTransitionIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: mobilePageTransitionIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* Enhanced button hover effects */
@@ -2876,4 +2941,200 @@ html {
   .dark .card-entrance:active {
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
   }
+}
+
+/* Orientation Support */
+@media (orientation: landscape) {
+  /* Landscape-specific adjustments */
+  @media (max-width: 1024px) {
+    /* Tablet landscape and mobile landscape */
+    .container {
+      max-width: 100%;
+      padding-left: var(--spacing-4);
+      padding-right: var(--spacing-4);
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  /* Portrait-specific adjustments */
+  @media (max-width: 640px) {
+    /* Mobile portrait */
+    .container {
+      padding-left: var(--spacing-3);
+      padding-right: var(--spacing-3);
+    }
+  }
+}
+
+/* Responsive Typography Utilities */
+@layer utilities {
+  .text-fluid-xs {
+    font-size: clamp(0.625rem, 0.5rem + 0.3125vw, 0.75rem);
+  }
+
+  .text-fluid-sm {
+    font-size: clamp(0.75rem, 0.625rem + 0.3125vw, 0.875rem);
+  }
+
+  .text-fluid-base {
+    font-size: clamp(0.875rem, 0.75rem + 0.3125vw, 1rem);
+  }
+
+  .text-fluid-lg {
+    font-size: clamp(1rem, 0.875rem + 0.3125vw, 1.125rem);
+  }
+
+  .text-fluid-xl {
+    font-size: clamp(1.125rem, 1rem + 0.3125vw, 1.25rem);
+  }
+
+  .text-fluid-2xl {
+    font-size: clamp(1.25rem, 1.125rem + 0.3125vw, 1.5rem);
+  }
+
+  .text-fluid-3xl {
+    font-size: clamp(1.5rem, 1.25rem + 0.625vw, 2rem);
+  }
+
+  .text-fluid-4xl {
+    font-size: clamp(1.875rem, 1.5rem + 0.9375vw, 2.5rem);
+  }
+
+  /* Line height optimization for readability */
+  .leading-fluid {
+    line-height: clamp(1.5, 1.4 + 0.2vw, 1.6);
+  }
+
+  .leading-fluid-tight {
+    line-height: clamp(1.3, 1.2 + 0.2vw, 1.4);
+  }
+
+  .leading-fluid-relaxed {
+    line-height: clamp(1.6, 1.5 + 0.2vw, 1.8);
+  }
+}
+
+/* Spring Animations - Natural physics-based animations */
+@keyframes spring-bounce {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.05);
+  }
+  50% {
+    transform: scale(0.98);
+  }
+  75% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes spring-slide-up {
+  0% {
+    transform: translateY(100%) scale(0.9);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-5%) scale(1.02);
+    opacity: 0.9;
+  }
+  80% {
+    transform: translateY(2%) scale(0.98);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spring-slide-down {
+  0% {
+    transform: translateY(-100%) scale(0.9);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(5%) scale(1.02);
+    opacity: 0.9;
+  }
+  80% {
+    transform: translateY(-2%) scale(0.98);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spring-scale {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Custom easing curves for spring-like motion */
+.spring-ease {
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.spring-ease-soft {
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.spring-ease-bouncy {
+  animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Spring animation utilities */
+.animate-spring-bounce {
+  animation: spring-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-spring-slide-up {
+  animation: spring-slide-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-spring-slide-down {
+  animation: spring-slide-down 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-spring-scale {
+  animation: spring-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Smooth spring transitions */
+.transition-spring {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.transition-spring-soft {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.transition-spring-bouncy {
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Custom Z-index utilities for mobile navigation hierarchy */
+.z-45 {
+  z-index: 45;
+}
+
+.z-60 {
+  z-index: 60;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useBadges } from '@/lib/badgeStore';
 import { BADGE_DEFINITIONS, Badge } from '@/lib/badges';
@@ -77,9 +77,39 @@ export default function AchievementsPage() {
     special: lang === 'tr' ? 'Özel' : 'Special',
   };
 
+  // Helper function to safely format badge date
+  const formatBadgeDate = useCallback(
+    (unlockedAt: Date | undefined | null): string | null => {
+      if (!unlockedAt) return null;
+
+      try {
+        // Handle Firestore Timestamp or Date string
+        const dateValue =
+          unlockedAt instanceof Date
+            ? unlockedAt
+            : typeof unlockedAt === 'string'
+              ? new Date(unlockedAt)
+              : (unlockedAt as any)?.toDate
+                ? (unlockedAt as any).toDate()
+                : new Date(unlockedAt as any);
+
+        // Check if date is valid
+        if (isNaN(dateValue.getTime())) {
+          return null;
+        }
+
+        return format(dateValue, 'd MMM', { locale: dateLocale });
+      } catch (error) {
+        console.error('Error formatting badge date:', error, unlockedAt);
+        return null;
+      }
+    },
+    [dateLocale]
+  );
+
   if (!hydrated) {
     return (
-      <div className="space-y-6">
+      <main className="space-y-6" role="main" aria-label={t('nav.achievements')}>
         <PageSkeleton />
         <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 skeleton">
           <div className="h-4 w-32 rounded skeleton mb-3" />
@@ -94,7 +124,7 @@ export default function AchievementsPage() {
             <BadgeCardSkeleton key={i} />
           ))}
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -128,11 +158,21 @@ export default function AchievementsPage() {
             {unlockedCount} / {totalBadges}
           </span>
         </div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner">
+        <div
+          className={`${isMobile ? 'h-3' : 'h-4'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner relative`}
+          role="progressbar"
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${t('achievements.progress')}: ${progress}%`}
+        >
           <div
-            className="h-full bg-gradient-to-r from-brand via-brand-light to-brand-dark transition-all duration-500 shadow-sm"
+            className={`h-full bg-gradient-to-r from-brand via-brand-light to-brand-dark transition-all duration-700 ease-out progress-fill shadow-sm rounded-full`}
             style={{ width: `${progress}%` }}
           />
+          {progress > 0 && (
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-progress-shimmer rounded-full" />
+          )}
         </div>
         <div className="text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-400 mt-2">
           {progress}% {lang === 'tr' ? 'tamamlandı' : 'complete'}
@@ -159,26 +199,26 @@ export default function AchievementsPage() {
                   className={`stagger-item relative rounded-xl border-2 p-3 sm:p-4 transition-all duration-300 ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : 'hover:scale-105'} ${
                     isUnlocked
                       ? `${getRarityColor(badge.rarity)} shadow-md hover:shadow-xl`
-                      : 'border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50 via-gray-100/50 to-gray-50 dark:from-gray-800/50 dark:via-gray-800/30 dark:to-gray-800/50 opacity-60'
+                      : 'border-gray-300 dark:border-gray-800 bg-gradient-to-br from-gray-100 via-gray-200/30 to-gray-100 dark:from-gray-900/80 dark:via-gray-900/50 dark:to-gray-900/80 opacity-50 blur-[0.5px]'
                   }`}
                 >
                   {!isUnlocked && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-4xl opacity-30">🔒</div>
+                    <div className="absolute inset-0 flex items-center justify-center z-10">
+                      <div className="text-4xl opacity-40 dark:opacity-30">🔒</div>
                     </div>
                   )}
                   <div
-                    className={`text-4xl sm:text-5xl mb-2 ${!isUnlocked ? 'opacity-30' : isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}
+                    className={`text-4xl sm:text-5xl mb-2 ${!isUnlocked ? 'opacity-20 blur-[1px]' : isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}
                   >
                     {badge.icon}
                   </div>
                   <div
-                    className={`text-sm sm:text-base font-bold mb-1 text-gray-950 dark:text-gray-100 ${!isUnlocked ? 'opacity-30' : ''}`}
+                    className={`text-sm sm:text-base font-bold mb-1 text-gray-950 dark:text-gray-100 ${!isUnlocked ? 'opacity-20 blur-[0.5px]' : ''}`}
                   >
                     {badge.name[lang]}
                   </div>
                   <div
-                    className={`text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${!isUnlocked ? 'opacity-30' : ''}`}
+                    className={`text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${!isUnlocked ? 'opacity-20 blur-[0.5px]' : ''}`}
                   >
                     {badge.description[lang]}
                   </div>
@@ -198,11 +238,12 @@ export default function AchievementsPage() {
                     >
                       {getRarityLabel(badge.rarity)}
                     </span>
-                    {isUnlocked && badge.unlockedAt && (
-                      <span className="text-xs text-gray-500">
-                        {format(badge.unlockedAt, 'd MMM', { locale: dateLocale })}
-                      </span>
-                    )}
+                    {(() => {
+                      const formattedDate = formatBadgeDate(badge.unlockedAt);
+                      return formattedDate ? (
+                        <span className="text-xs text-gray-500">{formattedDate}</span>
+                      ) : null;
+                    })()}
                   </div>
                 </div>
               );

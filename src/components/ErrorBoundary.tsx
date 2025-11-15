@@ -1,8 +1,6 @@
 'use client';
 
 import React, { Component, ReactNode } from 'react';
-import { useI18n } from '@/lib/i18n';
-import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 interface Props {
   children: ReactNode;
@@ -41,8 +39,21 @@ export class ErrorBoundary extends Component<Props, State> {
 }
 
 function ErrorFallback({ error }: { error: Error | null }) {
-  const { t, lang } = useI18n();
-  const isMobile = useIsMobile();
+  // Detect language from localStorage or default to Turkish
+  const getLang = (): 'tr' | 'en' => {
+    if (typeof window === 'undefined') return 'tr';
+    try {
+      const lang = localStorage.getItem('lang');
+      return lang === 'en' ? 'en' : 'tr';
+    } catch {
+      return 'tr';
+    }
+  };
+
+  // Detect mobile from window width
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+
+  const lang = getLang();
 
   const handleReload = () => {
     if (typeof window !== 'undefined') {

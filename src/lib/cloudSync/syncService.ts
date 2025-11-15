@@ -25,6 +25,7 @@ export class CloudSyncService {
   private syncListeners: Map<string, () => void> = new Map();
   private isUploading: boolean = false; // Flag to prevent listener from triggering on our own writes
   private lastUploadTimestamp: number = 0; // Track when we last uploaded to ignore our own snapshots
+  private lastUploadId: string | null = null; // Track upload ID to prevent self-trigger
 
   setUserId(userId: string | null) {
     this.userId = userId;
@@ -414,10 +415,22 @@ service cloud.firestore {
       });
 
       const uploadStartTime = Date.now();
+      const uploadId = `upload-${uploadStartTime}-${Math.random().toString(36).substring(2, 9)}`;
+      this.lastUploadId = uploadId;
       this.lastUploadTimestamp = uploadStartTime; // Track upload time
+
+      // Add upload ID to metadata
+      const docDataWithUploadId = {
+        ...docData,
+        metadata: {
+          ...(docData.metadata as Record<string, unknown>),
+          uploadId,
+        },
+      };
+
       // Use merge: true to preserve existing fields that we're not updating
       try {
-        await setDoc(userDocRef, docData, { merge: true });
+        await setDoc(userDocRef, docDataWithUploadId, { merge: true });
       } catch (setDocError: unknown) {
         // Type guard for error with message property
         const hasMessage = (err: unknown): err is { message: string } => {
@@ -494,6 +507,8 @@ service cloud.firestore {
       setTimeout(() => {
         console.log('🔄 Resetting isUploading flag');
         this.isUploading = false;
+        // Update last upload timestamp to prevent listener from processing our own writes
+        this.lastUploadTimestamp = Date.now();
         // Keep lastUploadTimestamp for 5 seconds to ignore our own snapshots
         setTimeout(() => {
           this.lastUploadTimestamp = 0;
@@ -520,6 +535,8 @@ service cloud.firestore {
       }
 
       this.isUploading = false;
+      // Update last upload timestamp even on error to prevent listener from processing failed writes
+      this.lastUploadTimestamp = Date.now();
       throw error;
     }
   }
@@ -581,21 +598,47 @@ service cloud.firestore {
             return;
           }
 
+          // Check upload ID first (most reliable method to prevent self-trigger)
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            const uploadId = data?.metadata?.uploadId as string | undefined;
+
+            if (uploadId && uploadId === this.lastUploadId) {
+              console.log('⏭️ Ignoring snapshot (our own upload detected by upload ID)', {
+                uploadId,
+              });
+              return;
+            }
+          }
+
           // Check if this is from cache (our own write) or has pending writes
           const isFromCache = docSnap.metadata.fromCache;
           const hasPendingWrites = docSnap.metadata.hasPendingWrites;
 
-          // Ignore snapshots that arrive within 3 seconds of our upload (likely our own write)
+          // Ignore snapshots that arrive within 5 seconds of our upload (likely our own write)
+          // Increased from 3 seconds to prevent false positives
           const now = Date.now();
           const timeSinceUpload = now - this.lastUploadTimestamp;
-          const isRecentUpload = this.lastUploadTimestamp > 0 && timeSinceUpload < 3000;
+          const isRecentUpload = this.lastUploadTimestamp > 0 && timeSinceUpload < 5000;
 
-          // Only ignore cache/pending writes if it's a recent upload
+          // Ignore cache/pending writes if it's a recent upload OR if we're currently uploading
           // Otherwise, allow cache reads (important for initial sync after login)
-          if ((isFromCache || hasPendingWrites) && isRecentUpload) {
-            console.log('⏭️ Ignoring snapshot (from cache/pending writes AND recent upload)', {
-              fromCache: isFromCache,
-              hasPendingWrites: hasPendingWrites,
+          if ((isFromCache || hasPendingWrites) && (isRecentUpload || this.isUploading)) {
+            console.log(
+              '⏭️ Ignoring snapshot (from cache/pending writes AND recent upload/uploading)',
+              {
+                fromCache: isFromCache,
+                hasPendingWrites: hasPendingWrites,
+                timeSinceUpload: `${timeSinceUpload}ms`,
+                isUploading: this.isUploading,
+              }
+            );
+            return;
+          }
+
+          // Also ignore if it's a recent upload (even if not from cache)
+          if (isRecentUpload) {
+            console.log('⏭️ Ignoring snapshot (recent upload, likely our own write)', {
               timeSinceUpload: `${timeSinceUpload}ms`,
             });
             return;

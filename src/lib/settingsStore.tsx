@@ -27,12 +27,14 @@ export type CustomActivityDefinition = {
 };
 
 export type Mood = 'happy' | 'cheerful' | 'sad' | 'unhappy' | 'tired' | null;
+export type ListDensity = 'compact' | 'comfortable';
 
 export type UserSettings = {
   name: string;
   dailyTarget: number;
   customActivities: CustomActivityDefinition[];
   mood?: Mood;
+  listDensity?: ListDensity;
 };
 
 function dedupeCustomActivities(list?: CustomActivityDefinition[]): CustomActivityDefinition[] {
@@ -84,6 +86,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
               parsed.customActivities as CustomActivityDefinition[]
             ),
             mood: parsed.mood ?? undefined,
+            listDensity:
+              parsed.listDensity === 'compact' || parsed.listDensity === 'comfortable'
+                ? parsed.listDensity
+                : 'compact', // Default to compact
           });
         }
       }
@@ -102,6 +108,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     setSettings(normalized);
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+
+      // Update local last modified date
+      try {
+        localStorage.setItem('sporttrack_last_sync', new Date().toISOString());
+      } catch (error) {
+        console.error('Failed to save local last modified:', error);
+      }
     }
   }, []);
 

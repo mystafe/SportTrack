@@ -266,7 +266,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         >
           {t('form.selectActivity')}
         </div>
-        <div className={`grid grid-cols-2 sm:grid-cols-3 ${isMobile ? 'gap-2' : 'gap-3'}`}>
+        <div className={`grid grid-cols-3 sm:grid-cols-3 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
           {definitions.map((def) => {
             const active = def.key === activityKey;
             return (
@@ -282,7 +282,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     return String(def.defaultAmount);
                   });
                 }}
-                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} border-2 ${isMobile ? 'px-2 py-1.5' : 'px-3 py-2'} shadow-md hover:shadow-xl transition-all duration-300 ${
+                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} border-2 ${isMobile ? 'px-1.5 py-1' : 'px-2 py-1.5'} shadow-md hover:shadow-xl transition-all duration-300 ${
                   active
                     ? 'active border-brand dark:border-brand/60 bg-gradient-to-br from-brand/10 via-brand/5 to-brand/10 dark:from-brand/20 dark:via-brand/10 dark:to-brand/20 ring-2 ring-brand/30 dark:ring-brand/20 scale-105'
                     : 'border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 hover:from-gray-100 hover:via-gray-50 hover:to-gray-100 dark:hover:from-gray-800 dark:hover:via-gray-700 dark:hover:to-gray-800 scale-on-interact'
@@ -301,23 +301,23 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
               >
                 <div className="flex items-center justify-between">
                   <div
-                    className={`${isMobile ? 'text-lg' : 'text-xl'} transition-transform duration-300 ${active ? 'activity-icon-pulse' : ''}`}
+                    className={`${isMobile ? 'text-base' : 'text-lg'} transition-transform duration-300 ${active ? 'activity-icon-pulse' : ''}`}
                   >
                     {def.icon}
                   </div>
                   <div
-                    className={`${isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-[10px] px-2 py-0.5'} rounded-full bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 font-bold border border-gray-200 dark:border-gray-700`}
+                    className={`${isMobile ? 'text-[7px] px-1 py-0.5' : 'text-[8px] px-1 py-0.5'} rounded-full bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 font-bold border border-gray-200 dark:border-gray-700`}
                   >
                     {def.multiplier}x
                   </div>
                 </div>
                 <div
-                  className={`${isMobile ? 'mt-1' : 'mt-2'} ${isMobile ? 'text-xs' : 'text-sm'} font-bold transition-colors text-gray-950 dark:text-gray-100`}
+                  className={`${isMobile ? 'mt-0.5' : 'mt-1'} ${isMobile ? 'text-[9px]' : 'text-[10px]'} font-bold transition-colors text-gray-950 dark:text-gray-100 leading-tight`}
                 >
                   {getActivityLabel(def, lang)}
                 </div>
                 <div
-                  className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400`}
+                  className={`${isMobile ? 'text-[8px]' : 'text-[9px]'} font-medium text-gray-600 dark:text-gray-400 leading-tight`}
                 >
                   {def.defaultAmount} {getActivityUnit(def, lang)}
                 </div>
@@ -326,31 +326,9 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           })}
         </div>
       </div>
-      <div className={`grid grid-cols-1 sm:grid-cols-2 ${isMobile ? 'gap-2' : 'gap-3'}`}>
-        <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} min-w-0 max-w-full`}>
-          <div
-            className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
-          >
-            {t('form.datetime')}
-          </div>
-          <input
-            type="datetime-local"
-            value={performedAt}
-            onChange={(e) => setPerformedAt(e.target.value)}
-            className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-3 py-2.5 min-h-[44px] text-base' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 min-w-0 max-w-full transition-all duration-200`}
-            required
-            autoComplete="off"
-            data-form-type="other"
-            data-lpignore="true"
-            data-1p-ignore="true"
-            aria-autocomplete="none"
-            role="textbox"
-            name=""
-            inputMode="none"
-          />
-        </label>
-      </div>
-      <div className={isMobile ? 'space-y-2' : 'space-y-3'}>
+      <div
+        className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} ${isMobile ? 'gap-2' : 'gap-3'}`}
+      >
         <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
           <div
             className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -363,7 +341,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             step={1}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-3 py-2.5 min-h-[44px] text-base' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 transition-all duration-200`}
+            className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2 py-1.5 min-h-[40px] text-sm' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 transition-all duration-200`}
             required
             autoComplete="off"
             data-form-type="other"
@@ -381,14 +359,14 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           {getActivityDescription(definition, lang) ? (
             <div
               id="amount-description"
-              className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500 dark:text-gray-400`}
+              className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-500 dark:text-gray-400 mt-0.5`}
               role="note"
             >
               {getActivityDescription(definition, lang)}
             </div>
           ) : null}
           <div
-            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-gray-500 dark:text-gray-400 ${isMobile ? 'mt-0.5' : 'mt-1'} flex items-center gap-2`}
+            className={`${isMobile ? 'text-[8px]' : 'text-[10px]'} text-gray-500 dark:text-gray-400 ${isMobile ? 'mt-0.5' : 'mt-1'} flex items-center gap-2`}
           >
             <span>{definition.multiplier}x</span>
             <span>·</span>
@@ -397,18 +375,41 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             </span>
           </div>
         </label>
+        <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} min-w-0 max-w-full`}>
+          <div
+            className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
+          >
+            {t('form.datetime')}
+          </div>
+          <input
+            type="datetime-local"
+            value={performedAt}
+            onChange={(e) => setPerformedAt(e.target.value)}
+            className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2 py-1.5 min-h-[40px] text-sm' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 min-w-0 max-w-full transition-all duration-200`}
+            required
+            autoComplete="off"
+            data-form-type="other"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            aria-autocomplete="none"
+            aria-label={t('form.datetime')}
+            aria-required="true"
+            name=""
+            inputMode="none"
+          />
+        </label>
       </div>
       <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
         <div
-          className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
+          className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}
         >
           {t('form.noteOptional')}
         </div>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-3 py-2.5 min-h-[88px] text-base' : 'rounded-lg px-3 py-3 min-h-[88px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-200`}
-          rows={isMobile ? 3 : 3}
+          className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2 py-1.5 min-h-[60px] text-xs' : 'rounded-lg px-3 py-2 min-h-[70px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-200`}
+          rows={isMobile ? 2 : 2}
           placeholder={t('form.notePlaceholder')}
           aria-label={t('form.noteOptional')}
           autoComplete="off"
@@ -426,7 +427,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         <button
           type="submit"
           disabled={loading}
-          className={`btn-enhanced ${isMobile ? 'touch-feedback mobile-press' : 'ripple-effect'} button-glow ${isMobile && !isEditing ? 'w-full' : ''} ${isMobile ? 'px-3 py-2.5 min-h-[44px] text-xs rounded-lg bounce-in-mobile' : 'px-4 py-3 min-h-[44px] text-sm rounded-lg'} bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold disabled:opacity-50 shadow-md hover:shadow-xl transition-all duration-300 scale-on-interact disabled:hover:scale-100`}
+          className={`btn-enhanced ${isMobile ? 'touch-feedback mobile-press' : 'ripple-effect'} button-glow ${isMobile && !isEditing ? 'w-full' : ''} ${isMobile ? 'px-2.5 py-1.5 min-h-[36px] text-[10px] rounded-lg bounce-in-mobile' : 'px-4 py-3 min-h-[44px] text-sm rounded-lg'} bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold disabled:opacity-50 shadow-md hover:shadow-xl transition-all duration-300 scale-on-interact disabled:hover:scale-100`}
           aria-label={loading ? t('form.loading') : isEditing ? t('form.save') : t('form.add')}
           aria-busy={loading}
         >
@@ -436,7 +437,8 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           <button
             type="button"
             onClick={onCancel}
-            className={`${isMobile ? 'px-3 py-2.5 min-h-[44px] text-xs rounded-lg' : 'px-4 py-3 min-h-[44px] text-sm rounded-lg'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 font-semibold hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95`}
+            className={`${isMobile ? 'px-2.5 py-1.5 min-h-[36px] text-[10px] rounded-lg' : 'px-4 py-3 min-h-[44px] text-sm rounded-lg'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 font-semibold hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95`}
+            aria-label={t('form.cancel')}
           >
             {t('form.cancel')}
           </button>

@@ -1,6 +1,7 @@
 /**
  * Auto Sync Hook
- * Automatically syncs data to cloud when stores change
+ * Automatically syncs data to cloud after activity is added
+ * Uses debounced sync (5 seconds after activity added) and periodic check (every 30 seconds)
  */
 
 'use client';
@@ -15,40 +16,15 @@ import { useChallenges } from '@/lib/challengeStore';
 import { useToaster } from '@/components/Toaster';
 import { useI18n } from '@/lib/i18n';
 
-const SYNC_DEBOUNCE_MS = 3000; // Wait 3 seconds after last change before syncing
-const SYNC_THROTTLE_MS = 10000; // Minimum 10 seconds between syncs
 const INITIAL_SYNC_COMPLETE_KEY = 'sporttrack_initial_sync_complete';
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
+const LAST_ACTIVITY_ADDED_KEY = 'sporttrack_last_activity_added';
 const LAST_SYNC_TIME_KEY = 'sporttrack_last_sync_time';
 
-// Helper function to create a hash from array length and first/last item IDs
-function createArrayHash<T extends { id?: string }>(arr: T[], maxItems: number = 5): string {
-  if (arr.length === 0) return 'empty';
-
-  // Get first few items (most recent activities are at the beginning)
-  const firstIds = arr
-    .slice(0, maxItems)
-    .map((item) => item.id || JSON.stringify(item))
-    .join(',');
-
-  // Get last few items
-  const lastIds =
-    arr.length > maxItems
-      ? arr
-          .slice(-maxItems)
-          .map((item) => item.id || JSON.stringify(item))
-          .join(',')
-      : '';
-
-  // Also include a checksum of all IDs for better change detection
-  const allIds = arr.map((item) => item.id || '').join(',');
-  const checksum =
-    allIds.length > 0
-      ? allIds.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 10000
-      : 0;
-
-  return `${arr.length}:${firstIds}${lastIds ? `:${lastIds}` : ''}:${checksum}`;
-}
+// Debounce delay: wait 5 seconds after activity added before syncing
+const DEBOUNCE_DELAY_MS = 5000;
+// Periodic check interval: check every 30 seconds for changes
+const PERIODIC_CHECK_INTERVAL_MS = 30000;
 
 export function useAutoSync() {
   const { isAuthenticated, isConfigured } = useAuth();
@@ -60,26 +36,162 @@ export function useAutoSync() {
   const { showToast } = useToaster();
   const { t } = useI18n();
 
-  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const lastSyncRef = useRef<{
-    activitiesHash: string;
-    settings: string | null;
-    badgesHash: string;
-    challengesHash: string;
-  } | null>(null);
-  const isInitialSyncRef = useRef(true);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const periodicCheckRef = useRef<NodeJS.Timeout | null>(null);
   const isSyncingRef = useRef(false);
+  const lastActivityCountRef = useRef<number>(0);
+  const lastSyncHashRef = useRef<string | null>(null);
+
+  // Use refs to access current values in async functions
+  const activitiesRef = useRef(activities);
+  const settingsRef = useRef(settings);
+  const badgesRef = useRef(badges);
+  const challengesRef = useRef(challenges);
+  const syncToCloudRef = useRef(syncToCloud);
+
+  // Update refs when values change
+  useEffect(() => {
+    activitiesRef.current = activities;
+  }, [activities]);
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
+  useEffect(() => {
+    badgesRef.current = badges;
+  }, [badges]);
+  useEffect(() => {
+    challengesRef.current = challenges;
+  }, [challenges]);
+  useEffect(() => {
+    syncToCloudRef.current = syncToCloud;
+  }, [syncToCloud]);
 
   const allHydrated =
     activitiesHydrated && settingsHydrated && badgesHydrated && challengesHydrated;
 
+  // Create a simple hash of current data for change detection
+  const createDataHash = (): string => {
+    return JSON.stringify({
+      activities: activitiesRef.current.length,
+      badges: badgesRef.current.length,
+      challenges: challengesRef.current.length,
+      settings: settingsRef.current ? JSON.stringify(settingsRef.current) : null,
+    });
+  };
+
+  // Check if data has changed since last sync
+  const hasChangesSinceLastSync = (): boolean => {
+    const currentHash = createDataHash();
+    if (lastSyncHashRef.current === null) {
+      // First sync, initialize hash
+      lastSyncHashRef.current = currentHash;
+      return false; // Don't sync on initial load
+    }
+    return currentHash !== lastSyncHashRef.current;
+  };
+
+  // Debounced sync function
+  const performDebouncedSync = async () => {
+    // Clear existing debounce timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+
+    // Check if initial sync is complete and if there's a pending conflict
+    const initialSyncComplete =
+      typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
+    const hasPendingConflict =
+      typeof window !== 'undefined' && localStorage.getItem(CONFLICT_STORAGE_KEY) !== null;
+
+    // Don't sync if initial sync is not complete or if there's a pending conflict
+    if (!initialSyncComplete || hasPendingConflict) {
+      return;
+    }
+
+    // Check if there are changes
+    if (!hasChangesSinceLastSync()) {
+      console.log('⏭️ No changes detected, skipping sync');
+      return;
+    }
+
+    // Prevent concurrent syncs
+    if (isSyncingRef.current) {
+      console.log('⏭️ Auto-sync skipped: Already syncing');
+      return;
+    }
+
+    isSyncingRef.current = true;
+    console.log('🚀 Starting debounced sync...', {
+      activities: activitiesRef.current.length,
+      settings: settingsRef.current ? 'present' : 'null',
+      badges: badgesRef.current.length,
+      challenges: challengesRef.current.length,
+    });
+
+    try {
+      await syncToCloudRef.current({
+        activities: activitiesRef.current,
+        settings: settingsRef.current,
+        badges: badgesRef.current,
+        challenges: challengesRef.current,
+      });
+
+      // Update last sync time and hash
+      const syncTime = Date.now();
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LAST_SYNC_TIME_KEY, String(syncTime));
+      }
+      lastSyncHashRef.current = createDataHash();
+
+      console.log('✅ Debounced sync başarılı!', {
+        syncTime: new Date(syncTime).toLocaleTimeString(),
+      });
+    } catch (error) {
+      console.error('❌ Debounced sync failed:', error);
+    } finally {
+      isSyncingRef.current = false;
+    }
+  };
+
+  // Check if activity was added (count increased) - trigger debounced sync
+  useEffect(() => {
+    if (!allHydrated || !isAuthenticated || !isConfigured) {
+      return;
+    }
+
+    const currentCount = activities.length;
+    const lastCount = lastActivityCountRef.current;
+
+    // If activity count increased, trigger debounced sync
+    if (currentCount > lastCount && lastCount > 0) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LAST_ACTIVITY_ADDED_KEY, String(Date.now()));
+        console.log('📝 Activity added detected, scheduling debounced sync in 5 seconds');
+      }
+
+      // Schedule debounced sync
+      debounceTimerRef.current = setTimeout(() => {
+        performDebouncedSync();
+      }, DEBOUNCE_DELAY_MS);
+    }
+
+    lastActivityCountRef.current = currentCount;
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
+    };
+  }, [activities.length, allHydrated, isAuthenticated, isConfigured]);
+
+  // Periodic check: runs every 30 seconds to check for changes
   useEffect(() => {
     if (!isAuthenticated || !isConfigured || !allHydrated) {
-      // Reset lastSyncRef when not authenticated
-      if (!isAuthenticated || !isConfigured) {
-        lastSyncRef.current = null;
-        isInitialSyncRef.current = true;
-        console.log('🔄 Auto-sync: Auth/config durumu değişti, reset ediliyor');
+      if (periodicCheckRef.current) {
+        clearInterval(periodicCheckRef.current);
+        periodicCheckRef.current = null;
       }
       return;
     }
@@ -90,203 +202,94 @@ export function useAutoSync() {
     const hasPendingConflict =
       typeof window !== 'undefined' && localStorage.getItem(CONFLICT_STORAGE_KEY) !== null;
 
-    // Log sync status
-    console.log('📊 Auto-sync durumu:', {
-      isAuthenticated,
-      isConfigured,
-      allHydrated,
-      initialSyncComplete,
-      hasPendingConflict,
-      activitiesCount: activities.length,
-      settingsName: settings?.name || 'null',
-    });
-
     // Don't sync if initial sync is not complete or if there's a pending conflict
     if (!initialSyncComplete || hasPendingConflict) {
-      // Log why sync is skipped for debugging
-      if (!initialSyncComplete) {
-        console.log('⏭️ Auto-sync skipped: Initial sync not complete');
-        console.log(
-          "💡 Çözüm: useCloudSyncListener hook'unun INITIAL_SYNC_COMPLETE_KEY set etmesini bekliyor"
-        );
-      }
-      if (hasPendingConflict) {
-        console.log('⏭️ Auto-sync skipped: Pending conflict resolution');
-        console.log("💡 Çözüm: Conflict resolution dialog'unu tamamlayın");
+      if (periodicCheckRef.current) {
+        clearInterval(periodicCheckRef.current);
+        periodicCheckRef.current = null;
       }
       return;
     }
 
-    // Create current hashes
-    const currentActivitiesHash = createArrayHash(activities);
-    const currentSettingsStr = settings ? JSON.stringify(settings) : null;
-    const currentBadgesHash = createArrayHash(badges);
-    const currentChallengesHash = createArrayHash(challenges);
-
-    // Initialize lastSyncRef on first sync
-    if (lastSyncRef.current === null) {
-      lastSyncRef.current = {
-        activitiesHash: currentActivitiesHash,
-        settings: currentSettingsStr,
-        badgesHash: currentBadgesHash,
-        challengesHash: currentChallengesHash,
-      };
-      // Don't sync on initial load, wait for changes
-      isInitialSyncRef.current = false;
-      return;
+    // Initialize last sync hash on first run
+    if (lastSyncHashRef.current === null) {
+      lastSyncHashRef.current = createDataHash();
     }
 
-    // Check if anything changed
-    const activitiesChanged = currentActivitiesHash !== lastSyncRef.current.activitiesHash;
-    const settingsChanged = currentSettingsStr !== lastSyncRef.current.settings;
-    const badgesChanged = currentBadgesHash !== lastSyncRef.current.badgesHash;
-    const challengesChanged = currentChallengesHash !== lastSyncRef.current.challengesHash;
-
-    // Log changes for debugging
-    if (activitiesChanged || settingsChanged || badgesChanged || challengesChanged) {
-      console.log('🔄 Değişiklik tespit edildi:', {
-        activities: activitiesChanged,
-        settings: settingsChanged,
-        badges: badgesChanged,
-        challenges: challengesChanged,
-        activitiesCount: activities.length,
-        settingsName: settings?.name || 'null',
-        badgesCount: badges.length,
-        challengesCount: challenges.length,
-      });
-
-      // Show hash comparison for activities if changed
-      if (activitiesChanged) {
-        console.log('📊 Activities hash karşılaştırması:', {
-          önceki: lastSyncRef.current.activitiesHash,
-          şimdiki: currentActivitiesHash,
-          fark: 'Hash değişti, sync tetiklenecek',
-        });
+    // Periodic check function
+    const performPeriodicCheck = async () => {
+      // Check if there are changes
+      if (!hasChangesSinceLastSync()) {
+        console.log('⏭️ Periodic check: No changes detected, skipping sync');
+        return;
       }
-    } else {
-      // Log when no changes detected (for debugging)
-      console.log('✅ Değişiklik yok, sync atlanıyor', {
-        activitiesHash: currentActivitiesHash,
-        activitiesCount: activities.length,
-      });
-    }
 
-    // If nothing changed, don't sync (prevents infinite loops)
-    if (!activitiesChanged && !settingsChanged && !badgesChanged && !challengesChanged) {
-      return;
-    }
-
-    // Clear existing timeout
-    if (syncTimeoutRef.current) {
-      clearTimeout(syncTimeoutRef.current);
-    }
-
-    // Set new timeout for debounced sync
-    syncTimeoutRef.current = setTimeout(() => {
-      // Check throttle - don't sync if last sync was too recent
-      const lastSyncTime =
+      // Check if an activity was added recently (within last 30 seconds)
+      const lastActivityAdded =
         typeof window !== 'undefined'
-          ? parseInt(localStorage.getItem(LAST_SYNC_TIME_KEY) || '0', 10)
+          ? parseInt(localStorage.getItem(LAST_ACTIVITY_ADDED_KEY) || '0', 10)
           : 0;
       const now = Date.now();
-      const timeSinceLastSync = now - lastSyncTime;
+      const timeSinceActivityAdded = now - lastActivityAdded;
 
-      if (timeSinceLastSync < SYNC_THROTTLE_MS && lastSyncTime > 0) {
-        // Too soon, reschedule
-        const waitTime = SYNC_THROTTLE_MS - timeSinceLastSync;
-        console.log(
-          `⏱️ Throttle: Son sync ${Math.round(timeSinceLastSync / 1000)}s önce yapıldı, ${Math.round(waitTime / 1000)}s bekleniyor`
-        );
-        syncTimeoutRef.current = setTimeout(() => {
-          syncTimeoutRef.current = null;
-        }, waitTime);
+      // Only sync if activity was added recently (within last 30 seconds)
+      if (lastActivityAdded > 0 && timeSinceActivityAdded > PERIODIC_CHECK_INTERVAL_MS) {
+        console.log('⏭️ Periodic check: No recent activity, skipping sync');
         return;
       }
 
       // Prevent concurrent syncs
       if (isSyncingRef.current) {
-        console.log('⏭️ Auto-sync skipped: Zaten bir sync işlemi devam ediyor');
+        console.log('⏭️ Periodic check: Already syncing, skipping');
         return;
       }
 
-      const settingsStr = settings ? JSON.stringify(settings) : null;
-      const finalActivitiesHash = createArrayHash(activities);
-      const finalBadgesHash = createArrayHash(badges);
-      const finalChallengesHash = createArrayHash(challenges);
-
       isSyncingRef.current = true;
-      console.log('🚀 Auto-sync başlatılıyor...', {
-        activities: activities.length,
-        settings: settings ? 'present' : 'null',
-        badges: badges.length,
-        challenges: challenges.length,
+      console.log('🚀 Periodic check: Starting sync...', {
+        activities: activitiesRef.current.length,
+        settings: settingsRef.current ? 'present' : 'null',
+        badges: badgesRef.current.length,
+        challenges: challengesRef.current.length,
       });
 
-      syncToCloud({
-        activities,
-        settings,
-        badges,
-        challenges,
-      })
-        .then(() => {
-          // Update last sync time
-          const syncTime = Date.now();
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(LAST_SYNC_TIME_KEY, String(syncTime));
-          }
-          console.log('✅ Auto-sync başarılı!', {
-            syncTime: new Date(syncTime).toLocaleTimeString(),
-          });
-          // Show success toast
-          showToast(t('cloudSync.syncedToCloud'), 'success');
-        })
-        .catch((error) => {
-          console.error('❌ Auto-sync failed:', error);
-          // Type guard for Firebase errors
-          const isFirebaseError = (err: unknown): err is { code: string; message: string } => {
-            return typeof err === 'object' && err !== null && 'code' in err && 'message' in err;
-          };
-
-          console.error('Error details:', {
-            message: error instanceof Error ? error.message : String(error),
-            code: isFirebaseError(error) ? error.code : undefined,
-            stack: error instanceof Error ? error.stack : undefined,
-          });
-
-          // Check if error is related to invalid dates (RangeError)
-          const isDateError =
-            error instanceof RangeError ||
-            (error instanceof Error &&
-              (error.message.includes('Invalid time') ||
-                error.message.includes('RangeError') ||
-                error.message.includes('Invalid date')));
-
-          if (isDateError) {
-            console.error('⚠️ Date validation error detected. Activities may have invalid dates.');
-            console.error('💡 Attempting to sanitize activities and retry...');
-            // Don't show error toast for date errors, as they're being handled automatically
-            // The sync service will retry with sanitized dates
-          } else {
-            showToast(t('cloudSync.syncFailed'), 'error');
-          }
-        })
-        .finally(() => {
-          isSyncingRef.current = false;
-          console.log('🏁 Auto-sync tamamlandı (flag reset)');
+      try {
+        await syncToCloudRef.current({
+          activities: activitiesRef.current,
+          settings: settingsRef.current,
+          badges: badgesRef.current,
+          challenges: challengesRef.current,
         });
 
-      // Update last sync ref with current hashes
-      lastSyncRef.current = {
-        activitiesHash: finalActivitiesHash,
-        settings: settingsStr,
-        badgesHash: finalBadgesHash,
-        challengesHash: finalChallengesHash,
-      };
-    }, SYNC_DEBOUNCE_MS);
+        // Update last sync time and hash
+        const syncTime = Date.now();
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(LAST_SYNC_TIME_KEY, String(syncTime));
+        }
+        lastSyncHashRef.current = createDataHash();
+
+        console.log('✅ Periodic check sync başarılı!', {
+          syncTime: new Date(syncTime).toLocaleTimeString(),
+        });
+      } catch (error) {
+        console.error('❌ Periodic check sync failed:', error);
+      } finally {
+        isSyncingRef.current = false;
+      }
+    };
+
+    // Start periodic check (every 30 seconds)
+    periodicCheckRef.current = setInterval(() => {
+      performPeriodicCheck();
+    }, PERIODIC_CHECK_INTERVAL_MS);
+
+    console.log(
+      `⏰ Periodic sync check started (every ${PERIODIC_CHECK_INTERVAL_MS / 1000} seconds)`
+    );
 
     return () => {
-      if (syncTimeoutRef.current) {
-        clearTimeout(syncTimeoutRef.current);
+      if (periodicCheckRef.current) {
+        clearInterval(periodicCheckRef.current);
+        periodicCheckRef.current = null;
       }
     };
   }, [
@@ -300,12 +303,13 @@ export function useAutoSync() {
     syncToCloud,
   ]);
 
-  // Cleanup on unmount
+  // Initialize last activity count and sync hash
   useEffect(() => {
-    return () => {
-      if (syncTimeoutRef.current) {
-        clearTimeout(syncTimeoutRef.current);
+    if (allHydrated) {
+      lastActivityCountRef.current = activities.length;
+      if (lastSyncHashRef.current === null) {
+        lastSyncHashRef.current = createDataHash();
       }
-    };
-  }, []);
+    }
+  }, [allHydrated, activities.length]);
 }

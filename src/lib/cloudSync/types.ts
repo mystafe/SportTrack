@@ -15,6 +15,7 @@ export interface SyncMetadata {
   lastModified: Date;
   version: number;
   userId: string;
+  uploadId?: string; // Optional upload ID to prevent self-trigger
 }
 
 export interface CloudData {

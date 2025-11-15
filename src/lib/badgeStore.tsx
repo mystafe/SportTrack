@@ -53,6 +53,15 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(newBadges));
       setBadges(newBadges);
+
+      // Update local last modified date
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('sporttrack_last_sync', new Date().toISOString());
+        } catch (error) {
+          console.error('Failed to save local last modified:', error);
+        }
+      }
     } catch (error) {
       console.error('Failed to save badges:', error);
     }

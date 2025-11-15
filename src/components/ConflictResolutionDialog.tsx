@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
@@ -12,13 +12,13 @@ interface ConflictResolutionDialogProps {
   localCount: {
     activities: number;
     badges: number;
-    challenges: number;
   };
   cloudCount: {
     activities: number;
     badges: number;
-    challenges: number;
   };
+  localLastModified?: Date | null;
+  cloudLastModified?: Date | null;
 }
 
 export function ConflictResolutionDialog({
@@ -27,10 +27,74 @@ export function ConflictResolutionDialog({
   onCancel,
   localCount,
   cloudCount,
+  localLastModified,
+  cloudLastModified,
 }: ConflictResolutionDialogProps) {
   const { lang } = useI18n();
   const isMobile = useIsMobile();
-  const [selectedStrategy, setSelectedStrategy] = useState<ConflictStrategy>('newest');
+  const [selectedLocal, setSelectedLocal] = useState(false);
+  const [selectedCloud, setSelectedCloud] = useState(false);
+
+  // Reset selections when dialog opens
+  useEffect(() => {
+    if (open) {
+      setSelectedLocal(false);
+      setSelectedCloud(false);
+    }
+  }, [open]);
+
+  const handleLocalClick = (e: React.MouseEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl/Cmd click: toggle selection
+      setSelectedLocal(!selectedLocal);
+    } else {
+      // Regular click: select only this one
+      setSelectedLocal(true);
+      setSelectedCloud(false);
+    }
+  };
+
+  const handleCloudClick = (e: React.MouseEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl/Cmd click: toggle selection
+      setSelectedCloud(!selectedCloud);
+    } else {
+      // Regular click: select only this one
+      setSelectedCloud(true);
+      setSelectedLocal(false);
+    }
+  };
+
+  const handleContinue = () => {
+    if (selectedLocal && selectedCloud) {
+      // Both selected: merge
+      onResolve('merge');
+    } else if (selectedLocal) {
+      // Only local selected: use local
+      onResolve('local');
+    } else if (selectedCloud) {
+      // Only cloud selected: use cloud
+      onResolve('cloud');
+    } else {
+      // Nothing selected: use newest
+      onResolve('newest');
+    }
+  };
+
+  const formatDate = (date: Date | null | undefined): string => {
+    if (!date) return lang === 'tr' ? 'Bilinmiyor' : 'Unknown';
+    try {
+      return new Date(date).toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return lang === 'tr' ? 'Bilinmiyor' : 'Unknown';
+    }
+  };
 
   if (!open) return null;
 
@@ -51,95 +115,134 @@ export function ConflictResolutionDialog({
 
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
           {lang === 'tr'
-            ? 'Yerel ve bulut verileriniz arasında farklılıklar var. Nasıl devam etmek istersiniz?'
-            : 'There are differences between your local and cloud data. How would you like to proceed?'}
+            ? 'Yerel ve bulut verileriniz arasında farklılıklar var. Hangi veriyi kullanmak istersiniz?'
+            : 'There are differences between your local and cloud data. Which data would you like to use?'}
         </p>
 
         <div className="space-y-4 mb-6">
-          <div className="grid grid-cols-2 gap-4 text-xs">
-            <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
-              <div className="font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                {lang === 'tr' ? 'Yerel' : 'Local'}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Local Data Box */}
+            <button
+              type="button"
+              onClick={handleLocalClick}
+              className={`relative p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer ${
+                selectedLocal
+                  ? 'border-brand bg-brand/10 dark:bg-brand/20 shadow-lg'
+                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">📲</span>
+                  <div
+                    className={`font-semibold ${
+                      selectedLocal
+                        ? 'text-brand dark:text-brand-light'
+                        : 'text-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    {lang === 'tr' ? 'Yerel' : 'Local'}
+                  </div>
+                </div>
+                {selectedLocal && <span className="text-brand text-xl">✓</span>}
               </div>
-              <div className="text-gray-600 dark:text-gray-400">
-                {localCount.activities} {lang === 'tr' ? 'aktivite' : 'activities'}
+              <div
+                className={`space-y-1 text-sm ${
+                  selectedLocal
+                    ? 'text-gray-700 dark:text-gray-300'
+                    : 'text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                <div>
+                  {localCount.activities} {lang === 'tr' ? 'aktivite' : 'activities'}
+                </div>
+                <div>
+                  {localCount.badges} {lang === 'tr' ? 'rozet' : 'badges'}
+                </div>
               </div>
-              <div className="text-gray-600 dark:text-gray-400">
-                {localCount.badges} {lang === 'tr' ? 'rozet' : 'badges'}
+              <div
+                className={`mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 text-xs ${
+                  selectedLocal
+                    ? 'text-gray-600 dark:text-gray-400'
+                    : 'text-gray-500 dark:text-gray-500'
+                }`}
+              >
+                <div className="font-medium">
+                  {lang === 'tr' ? 'Son Değişiklik:' : 'Last Modified:'}
+                </div>
+                <div className="font-semibold mt-0.5">{formatDate(localLastModified)}</div>
               </div>
-              <div className="text-gray-600 dark:text-gray-400">
-                {localCount.challenges} {lang === 'tr' ? 'hedef' : 'challenges'}
+              {selectedLocal && (
+                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-brand flex items-center justify-center">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+              )}
+            </button>
+
+            {/* Cloud Data Box */}
+            <button
+              type="button"
+              onClick={handleCloudClick}
+              className={`relative p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer ${
+                selectedCloud
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-lg'
+                  : 'border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">☁️</span>
+                  <div
+                    className={`font-semibold ${
+                      selectedCloud
+                        ? 'text-blue-700 dark:text-blue-300'
+                        : 'text-blue-600 dark:text-blue-400'
+                    }`}
+                  >
+                    {lang === 'tr' ? 'Bulut' : 'Cloud'}
+                  </div>
+                </div>
+                {selectedCloud && <span className="text-blue-500 text-xl">✓</span>}
               </div>
-            </div>
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-              <div className="font-semibold text-blue-700 dark:text-blue-300 mb-1">
-                {lang === 'tr' ? 'Bulut' : 'Cloud'}
+              <div
+                className={`space-y-1 text-sm ${
+                  selectedCloud
+                    ? 'text-blue-700 dark:text-blue-300'
+                    : 'text-blue-600 dark:text-blue-400'
+                }`}
+              >
+                <div>
+                  {cloudCount.activities} {lang === 'tr' ? 'aktivite' : 'activities'}
+                </div>
+                <div>
+                  {cloudCount.badges} {lang === 'tr' ? 'rozet' : 'badges'}
+                </div>
               </div>
-              <div className="text-blue-600 dark:text-blue-400">
-                {cloudCount.activities} {lang === 'tr' ? 'aktivite' : 'activities'}
+              <div
+                className={`mt-2 pt-2 border-t border-blue-200 dark:border-blue-700 text-xs ${
+                  selectedCloud
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-blue-500 dark:text-blue-500'
+                }`}
+              >
+                <div className="font-medium">
+                  {lang === 'tr' ? 'Son Değişiklik:' : 'Last Modified:'}
+                </div>
+                <div className="font-semibold mt-0.5">{formatDate(cloudLastModified)}</div>
               </div>
-              <div className="text-blue-600 dark:text-blue-400">
-                {cloudCount.badges} {lang === 'tr' ? 'rozet' : 'badges'}
-              </div>
-              <div className="text-blue-600 dark:text-blue-400">
-                {cloudCount.challenges} {lang === 'tr' ? 'hedef' : 'challenges'}
-              </div>
-            </div>
+              {selectedCloud && (
+                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+              )}
+            </button>
           </div>
 
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-              <input
-                type="radio"
-                name="strategy"
-                value="newest"
-                checked={selectedStrategy === 'newest'}
-                onChange={() => setSelectedStrategy('newest')}
-                className="text-brand"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                {lang === 'tr' ? 'En yeni veriyi kullan' : 'Use newest data'}
-              </span>
-            </label>
-            <label className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-              <input
-                type="radio"
-                name="strategy"
-                value="merge"
-                checked={selectedStrategy === 'merge'}
-                onChange={() => setSelectedStrategy('merge')}
-                className="text-brand"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                {lang === 'tr' ? 'Birleştir' : 'Merge'}
-              </span>
-            </label>
-            <label className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-              <input
-                type="radio"
-                name="strategy"
-                value="local"
-                checked={selectedStrategy === 'local'}
-                onChange={() => setSelectedStrategy('local')}
-                className="text-brand"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                {lang === 'tr' ? 'Yerel veriyi kullan' : 'Use local data'}
-              </span>
-            </label>
-            <label className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-              <input
-                type="radio"
-                name="strategy"
-                value="cloud"
-                checked={selectedStrategy === 'cloud'}
-                onChange={() => setSelectedStrategy('cloud')}
-                className="text-brand"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                {lang === 'tr' ? 'Bulut verisini kullan' : 'Use cloud data'}
-              </span>
-            </label>
+          {/* Hint */}
+          <div className="text-xs text-gray-500 dark:text-gray-400 italic">
+            {lang === 'tr'
+              ? '💡 İpucu: Ctrl (Cmd) tuşuna basılı tutarak her ikisini de seçebilirsiniz (birleştirme)'
+              : '💡 Tip: Hold Ctrl (Cmd) to select both (merge)'}
           </div>
         </div>
 
@@ -151,7 +254,7 @@ export function ConflictResolutionDialog({
             {lang === 'tr' ? 'İptal' : 'Cancel'}
           </button>
           <button
-            onClick={() => onResolve(selectedStrategy)}
+            onClick={handleContinue}
             className="flex-1 px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300"
           >
             {lang === 'tr' ? 'Devam Et' : 'Continue'}

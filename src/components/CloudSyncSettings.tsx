@@ -283,67 +283,97 @@ export function CloudSyncSettings() {
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
             {isAuthenticated && (
-              <>
-                <button
-                  type="button"
-                  onClick={handleSyncToCloud}
-                  disabled={syncing || syncState.status === 'syncing'}
-                  className={`${isMobile ? 'p-1.5' : 'p-2'} rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${isMobile ? 'text-sm' : 'text-base'} flex items-center justify-center`}
-                  title={
-                    syncing || syncState.status === 'syncing'
-                      ? lang === 'tr'
-                        ? 'Senkronize ediliyor...'
-                        : 'Syncing...'
-                      : lang === 'tr'
-                        ? 'Yükle'
-                        : 'Upload'
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!isAuthenticated) {
+                    setShowAuthDialog(true);
+                    return;
                   }
-                  aria-label={lang === 'tr' ? 'Yükle' : 'Upload'}
-                >
-                  {syncing || syncState.status === 'syncing'
-                    ? '⏳'
-                    : syncState.status === 'synced'
-                      ? '✅'
-                      : '⬆️'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSyncFromCloud}
-                  disabled={syncing || syncState.status === 'syncing'}
-                  className={`${isMobile ? 'p-1.5' : 'p-2'} rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${isMobile ? 'text-sm' : 'text-base'} flex items-center justify-center`}
-                  title={
-                    syncing || syncState.status === 'syncing'
-                      ? lang === 'tr'
-                        ? 'Senkronize ediliyor...'
-                        : 'Syncing...'
-                      : lang === 'tr'
-                        ? 'İndir'
-                        : 'Download'
+
+                  setSyncing(true);
+                  try {
+                    const cloudData = await syncFromCloud();
+                    if (cloudData) {
+                      // Check for conflicts
+                      const localData = { activities, settings, badges, challenges };
+                      const hasConflicts = checkForConflicts(localData, cloudData);
+
+                      if (hasConflicts) {
+                        setConflictData({
+                          local: localData,
+                          cloud: cloudData,
+                        });
+                        setShowConflictDialog(true);
+                      } else {
+                        // No conflicts, sync both ways
+                        await syncToCloud({
+                          activities,
+                          settings,
+                          badges,
+                          challenges,
+                        });
+                        showToast(lang === 'tr' ? 'Senkronize edildi!' : 'Synced!', 'success');
+                      }
+                    } else {
+                      // No cloud data, just upload local
+                      await syncToCloud({
+                        activities,
+                        settings,
+                        badges,
+                        challenges,
+                      });
+                      showToast(
+                        lang === 'tr' ? 'Buluta senkronize edildi!' : 'Synced to cloud!',
+                        'success'
+                      );
+                    }
+                  } catch (error) {
+                    showToast(lang === 'tr' ? 'Senkronizasyon hatası' : 'Sync error', 'error');
+                  } finally {
+                    setSyncing(false);
                   }
-                  aria-label={lang === 'tr' ? 'İndir' : 'Download'}
-                >
-                  {syncing || syncState.status === 'syncing'
-                    ? '⏳'
-                    : syncState.status === 'synced'
-                      ? '✅'
-                      : '⬇️'}
-                </button>
-              </>
+                }}
+                disabled={syncing || syncState.status === 'syncing'}
+                className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-center box-border leading-none"
+                style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
+                title={
+                  syncing || syncState.status === 'syncing'
+                    ? lang === 'tr'
+                      ? 'Senkronize ediliyor...'
+                      : 'Syncing...'
+                    : lang === 'tr'
+                      ? 'Senkronize Et'
+                      : 'Sync'
+                }
+                aria-label={lang === 'tr' ? 'Senkronize Et' : 'Sync'}
+              >
+                {syncing || syncState.status === 'syncing'
+                  ? '⏳'
+                  : syncState.status === 'synced'
+                    ? '✅'
+                    : '🔄'}
+              </button>
             )}
             <div
-              className={`${isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-[10px] px-2 py-1'} rounded ${
-                isAuthenticated
-                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-              }`}
+              className="text-[8px] sm:text-[9px] px-1.5 rounded box-border leading-none flex items-center justify-center"
+              style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
             >
-              {isAuthenticated
-                ? lang === 'tr'
-                  ? 'Bağlı'
-                  : 'Connected'
-                : lang === 'tr'
-                  ? 'Bağlı Değil'
-                  : 'Not Connected'}
+              <span
+                className={`${
+                  isAuthenticated
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                } px-1.5 py-0.5 rounded`}
+              >
+                {isAuthenticated
+                  ? lang === 'tr'
+                    ? 'Bağlı'
+                    : 'Connected'
+                  : lang === 'tr'
+                    ? 'Bağlı Değil'
+                    : 'Not Connected'}
+              </span>
             </div>
           </div>
         </div>
@@ -402,13 +432,17 @@ export function CloudSyncSettings() {
           localCount={{
             activities: conflictData.local.activities.length,
             badges: conflictData.local.badges.length,
-            challenges: conflictData.local.challenges.length,
           }}
           cloudCount={{
             activities: conflictData.cloud.activities.length,
             badges: conflictData.cloud.badges.length,
-            challenges: conflictData.cloud.challenges.length,
           }}
+          localLastModified={null}
+          cloudLastModified={
+            (conflictData.cloud as any).metadata?.lastModified
+              ? new Date((conflictData.cloud as any).metadata.lastModified)
+              : null
+          }
         />
       )}
     </>

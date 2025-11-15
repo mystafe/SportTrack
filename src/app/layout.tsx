@@ -1,11 +1,9 @@
 import './globals.css';
 import { BottomNavigation } from '@/components/BottomNavigation';
-import { FloatingActionButton } from '@/components/FloatingActionButton';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { Providers } from '@/components/Providers';
 import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { QuoteTicker } from '@/components/QuoteTicker';
 
@@ -26,6 +24,11 @@ export const metadata = {
     ],
     apple: '/icon-192.png',
   },
+  // Performance optimizations
+  other: {
+    'dns-prefetch': 'https://fonts.googleapis.com',
+    preconnect: 'https://fonts.gstatic.com',
+  },
 };
 
 export const viewport = {
@@ -40,6 +43,26 @@ export const viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="tr" suppressHydrationWarning className="overflow-x-hidden h-full">
+      <head>
+        {/* Preconnect to external domains for faster loading */}
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Prevent layout shift by setting initial dimensions */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+            /* Prevent CLS - set initial dimensions for critical elements */
+            body { min-height: 100vh; }
+            main { min-height: calc(100vh - 200px); }
+            /* Optimize font loading */
+            @font-face {
+              font-family: system-ui;
+              font-display: swap;
+            }
+          `,
+          }}
+        />
+      </head>
       <body
         className="min-h-screen h-full bg-white dark:bg-black overflow-x-hidden safe-top safe-bottom"
         suppressHydrationWarning
@@ -85,14 +108,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         <Providers>
           <Header />
-          <main className="container py-4 sm:py-6 pb-24 sm:pb-6 mb-4 sm:mb-6 page-transition-wrapper">
+          <main
+            className="container py-4 sm:py-6 page-transition-wrapper"
+            style={{
+              paddingBottom:
+                'max(1.5rem, calc(64px + 32px + 1.5rem + env(safe-area-inset-bottom, 0px)))',
+            }}
+          >
             {children}
           </main>
-          <Footer />
           <ScrollToTop />
           <QuoteTicker />
           <BottomNavigation />
-          <FloatingActionButton />
         </Providers>
       </body>
     </html>

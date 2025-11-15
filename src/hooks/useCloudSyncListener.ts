@@ -235,21 +235,43 @@ export function useCloudSyncListener() {
       return;
     }
 
+    // Check if initial sync is already complete - if so, don't subscribe to listener
+    const initialSyncComplete =
+      typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
+
+    if (initialSyncComplete && initialSyncDoneRef.current) {
+      console.log('✅ Initial sync already complete, skipping cloud listener subscription');
+      return;
+    }
+
+    let unsubscribeFn: (() => void) | null = null;
+    let isUnsubscribed = false;
+
     // Set a timeout to mark initial sync as complete if listener doesn't fire within 5 seconds
     // This handles cases where Firebase connection is slow or fails
     const fallbackTimeout = setTimeout(() => {
-      if (!initialSyncDoneRef.current) {
+      if (!initialSyncDoneRef.current && !isUnsubscribed) {
         console.log('⏱️ Fallback: Marking initial sync as complete (listener timeout)');
         initialSyncDoneRef.current = true;
         if (typeof window !== 'undefined') {
           localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
         }
+        // Unsubscribe if not already done
+        if (unsubscribeFn && !isUnsubscribed) {
+          unsubscribeFn();
+          isUnsubscribed = true;
+        }
       }
     }, 5000);
 
-    const unsubscribe = cloudSyncService.subscribeToCloud((cloudData: CloudData | null) => {
+    unsubscribeFn = cloudSyncService.subscribeToCloud((cloudData: CloudData | null) => {
       // Clear fallback timeout since listener fired
       clearTimeout(fallbackTimeout);
+
+      // If already unsubscribed, don't process
+      if (isUnsubscribed) {
+        return;
+      }
 
       // Use refs to get current values without causing re-renders
       const currentActivities = activitiesRef.current;
@@ -277,11 +299,47 @@ export function useCloudSyncListener() {
         return;
       }
 
-      // Check if this is the initial sync (first time after login)
-      const isInitialSync = !initialSyncDoneRef.current;
+      // Check if initial sync is already complete
       const initialSyncComplete =
         typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
 
+      // If initial sync is complete, unsubscribe from listener and don't process snapshots
+      // External changes will be handled by auto-sync or manual sync
+      if (initialSyncComplete && initialSyncDoneRef.current) {
+        console.log('✅ Initial sync already complete, unsubscribing from cloud listener');
+        // Clear any stale conflict data
+        if (typeof window !== 'undefined') {
+          const existingConflict = localStorage.getItem(CONFLICT_STORAGE_KEY);
+          if (existingConflict) {
+            console.log('🧹 Clearing stale conflict data');
+            localStorage.removeItem(CONFLICT_STORAGE_KEY);
+          }
+        }
+        // Unsubscribe from listener to prevent continuous callbacks
+        if (unsubscribeFn && !isUnsubscribed) {
+          unsubscribeFn();
+          isUnsubscribed = true;
+        }
+        return;
+      }
+
+      // Check if this is the initial sync (first time after login)
+      const isInitialSync = !initialSyncDoneRef.current;
+
+      // Skip conflict detection if conflict is already stored (prevent re-detection)
+      const existingConflict =
+        typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
+
+      if (existingConflict) {
+        console.log('⏭️ Conflict already exists, skipping initial sync conflict detection');
+        initialSyncDoneRef.current = true;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
+        }
+        return;
+      }
+
+      // Only process initial sync if it hasn't been completed yet
       if (isInitialSync && !initialSyncComplete) {
         // Check if local is empty (0 activities, 0 badges, 0 challenges)
         const localIsEmpty = isLocalEmpty(localData);
@@ -381,21 +439,44 @@ export function useCloudSyncListener() {
             '📤 Initial sync: Cloud is empty (0 activities/badges/challenges), local has data - uploading local data to cloud automatically'
           );
 
-          // Mark initial sync as complete and let auto-sync handle the upload
-          initialSyncDoneRef.current = true;
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
-          }
+          // Upload immediately (async, don't block)
+          (async () => {
+            try {
+              await cloudSyncService.uploadToCloud({
+                activities: localData.activities as any[],
+                settings: localData.settings as any,
+                badges: localData.badges as any[],
+                challenges: localData.challenges as any[],
+              });
 
-          // Show info toast
-          showToastRef.current(
-            lang === 'tr'
-              ? 'Yerel verileriniz buluta yüklenecek'
-              : 'Your local data will be uploaded to cloud',
-            'info'
-          );
+              // Mark initial sync as complete
+              initialSyncDoneRef.current = true;
+              if (typeof window !== 'undefined') {
+                localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
+              }
 
-          return; // Exit early, auto-sync will upload
+              // Show success toast
+              showToastRef.current(
+                lang === 'tr'
+                  ? 'Yerel verileriniz buluta yüklendi'
+                  : 'Your local data has been uploaded to cloud',
+                'success'
+              );
+            } catch (error) {
+              console.error('❌ Failed to upload local data to cloud:', error);
+              showToastRef.current(
+                lang === 'tr' ? 'Buluta yükleme hatası' : 'Upload to cloud failed',
+                'error'
+              );
+              // Still mark as complete to prevent retry loops
+              initialSyncDoneRef.current = true;
+              if (typeof window !== 'undefined') {
+                localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
+              }
+            }
+          })();
+
+          return; // Exit early
         }
 
         // If both have data, check for conflicts (but only if local is not empty)
@@ -420,6 +501,20 @@ export function useCloudSyncListener() {
           });
 
           if (conflicts) {
+            // Check if conflict was already stored (prevent duplicate detection)
+            const existingConflict =
+              typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
+
+            if (existingConflict) {
+              console.log('⏭️ Conflict already stored, skipping duplicate detection');
+              // Mark initial sync as complete to prevent re-detection
+              initialSyncDoneRef.current = true;
+              if (typeof window !== 'undefined') {
+                localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
+              }
+              return;
+            }
+
             // Store conflict data for ConflictResolutionManager to handle
             const conflictData = {
               local: {
@@ -555,10 +650,18 @@ export function useCloudSyncListener() {
         if (typeof window !== 'undefined') {
           localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
         }
+
+        // Unsubscribe after initial sync is complete
+        if (unsubscribeFn && !isUnsubscribed) {
+          console.log('🔌 Unsubscribing from cloud listener after initial sync');
+          unsubscribeFn();
+          isUnsubscribed = true;
+        }
         return;
       }
 
       // Regular sync (not initial) - only sync settings for now
+      // NOTE: This should not happen if initial sync is complete, but keeping for safety
       if (cloudData.settings) {
         // Normalize both settings objects for comparison (handle undefined vs null)
         const normalizeSettings = (
@@ -609,7 +712,10 @@ export function useCloudSyncListener() {
 
     return () => {
       clearTimeout(fallbackTimeout);
-      unsubscribe();
+      if (unsubscribeFn && !isUnsubscribed) {
+        unsubscribeFn();
+        isUnsubscribed = true;
+      }
     };
   }, [isAuthenticated, isConfigured, allHydrated]); // Removed activities, settings, badges, challenges, saveSettings from dependencies
 }

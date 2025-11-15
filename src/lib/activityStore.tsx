@@ -204,6 +204,16 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
       input.duration
     );
     setActivities((prev) => [record, ...prev]);
+
+    // Update local last modified date
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('sporttrack_last_sync', new Date().toISOString());
+      } catch (error) {
+        console.error('Failed to save local last modified:', error);
+      }
+    }
+
     return record;
   }, []);
 
@@ -237,11 +247,30 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
         return updated;
       })
     );
+
+    // Update local last modified date
+    if (updated && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('sporttrack_last_sync', new Date().toISOString());
+      } catch (error) {
+        console.error('Failed to save local last modified:', error);
+      }
+    }
+
     return updated;
   }, []);
 
   const deleteActivity = useCallback((id: string) => {
     setActivities((prev) => prev.filter((record) => record.id !== id));
+
+    // Update local last modified date
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('sporttrack_last_sync', new Date().toISOString());
+      } catch (error) {
+        console.error('Failed to save local last modified:', error);
+      }
+    }
   }, []);
 
   const clearAllActivities = useCallback(() => {

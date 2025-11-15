@@ -19,11 +19,14 @@ export function FloatingActionButton() {
     router.push('/add');
   };
 
+  // Calculate bottom position: above BottomNavigation (64px) + QuoteTicker height (~45px) + spacing (16px) + safe area
+  const bottomPosition = `calc(64px + 45px + 16px + max(16px, env(safe-area-inset-bottom, 0px)))`;
+
   return (
     <button
       onClick={handleClick}
       className="
-        fixed right-4 z-40
+        fixed right-4 z-60
         w-14 h-14 rounded-full
         bg-gradient-to-r from-brand to-brand-dark
         text-white shadow-2xl
@@ -36,7 +39,7 @@ export function FloatingActionButton() {
         animate-bounce-subtle
       "
       style={{
-        bottom: 'calc(80px + max(16px, env(safe-area-inset-bottom, 0px)))',
+        bottom: bottomPosition,
       }}
       aria-label={t('actions.addActivity')}
     >

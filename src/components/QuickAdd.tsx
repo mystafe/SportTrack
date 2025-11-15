@@ -206,14 +206,14 @@ export const QuickAdd = memo(function QuickAdd() {
     return (
       <button
         type="button"
-        className="flex w-full items-center justify-between text-sm font-bold text-gray-900 dark:text-white mb-3 transition-all duration-200 hover:text-brand"
+        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls="quick-add"
       >
         <span className="font-bold">{t('quickAdd.title')}</span>
         <span
-          className="ml-2 text-lg font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light"
+          className="ml-2 text-base font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light"
           aria-hidden
           style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
         >
@@ -224,12 +224,12 @@ export const QuickAdd = memo(function QuickAdd() {
   };
 
   return (
-    <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300">
+    <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-3 shadow-md hover:shadow-xl transition-shadow duration-300">
       {renderHeader()}
       {isOpen && (
-        <div id="quick-add" className="space-y-3">
+        <div id="quick-add" className="space-y-2">
           <div
-            className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-6'} gap-3 sm:gap-4`}
+            className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-6'} gap-2 sm:gap-3`}
           >
             {mostUsedActivities.map(({ definition, averageAmount }) => {
               const isAddingThis = isAdding === definition.key;

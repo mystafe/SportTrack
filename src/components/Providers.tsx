@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, lazy, Suspense } from 'react';
 import { I18nProvider } from '@/lib/i18n';
 import { ActivitiesProvider } from '@/lib/activityStore';
 import { SettingsProvider } from '@/lib/settingsStore';
@@ -9,16 +9,28 @@ import { LevelProvider } from '@/lib/levelStore';
 import { ChallengeProvider } from '@/lib/challengeStore';
 import { ToasterProvider } from '@/components/Toaster';
 import { StorageErrorHandler } from '@/components/StorageErrorHandler';
-import { InstallPrompt } from '@/components/InstallPrompt';
 import { NotificationManager } from '@/components/NotificationManager';
-import { OnboardingManager } from '@/components/OnboardingManager';
-import { KeyboardShortcuts } from '@/components/KeyboardShortcuts';
 import { BadgeUnlockNotification } from '@/components/BadgeUnlockNotification';
 import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AutoSyncProvider } from '@/components/AutoSyncProvider';
 import { NameDialog } from '@/components/NameDialog';
-import { ConflictResolutionManager } from '@/components/ConflictResolutionManager';
+
+// Lazy load components that are not immediately needed
+const InstallPrompt = lazy(() =>
+  import('@/components/InstallPrompt').then((m) => ({ default: m.InstallPrompt }))
+);
+const OnboardingManager = lazy(() =>
+  import('@/components/OnboardingManager').then((m) => ({ default: m.OnboardingManager }))
+);
+const KeyboardShortcuts = lazy(() =>
+  import('@/components/KeyboardShortcuts').then((m) => ({ default: m.KeyboardShortcuts }))
+);
+const ConflictResolutionManager = lazy(() =>
+  import('@/components/ConflictResolutionManager').then((m) => ({
+    default: m.ConflictResolutionManager,
+  }))
+);
 
 export function Providers({ children }: { children: ReactNode }) {
   // Import console helpers to make them available in browser console (only in browser)
@@ -39,14 +51,22 @@ export function Providers({ children }: { children: ReactNode }) {
                   <ToasterProvider>
                     <AutoSyncProvider>
                       <StorageErrorHandler />
-                      <InstallPrompt />
+                      <Suspense fallback={null}>
+                        <InstallPrompt />
+                      </Suspense>
                       <NotificationManager />
-                      <OnboardingManager />
-                      <KeyboardShortcuts />
+                      <Suspense fallback={null}>
+                        <OnboardingManager />
+                      </Suspense>
+                      <Suspense fallback={null}>
+                        <KeyboardShortcuts />
+                      </Suspense>
                       <BadgeUnlockNotification />
                       <OnlineStatusIndicator />
                       <NameDialog />
-                      <ConflictResolutionManager />
+                      <Suspense fallback={null}>
+                        <ConflictResolutionManager />
+                      </Suspense>
                       {children}
                     </AutoSyncProvider>
                   </ToasterProvider>

@@ -1,19 +1,15 @@
 'use client';
 
-import { FormEvent, useEffect, useState, useRef } from 'react';
+import { FormEvent, useEffect, useState, useRef, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useSettings, Mood } from '@/lib/settingsStore';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 import { LIMITS } from '@/lib/constants';
-import { DataExportImport } from '@/components/DataExportImport';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { LevelDisplay } from '@/components/LevelDisplay';
-import { AppleHealthImport } from '@/components/AppleHealthImport';
-import { AppleHealthGuide } from '@/components/AppleHealthGuide';
-import { CloudSyncSettings } from '@/components/CloudSyncSettings';
 import { useKeyboardShortcuts } from '@/components/KeyboardShortcuts';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useAuth } from '@/hooks/useAuth';
@@ -25,6 +21,20 @@ import { useActivities } from '@/lib/activityStore';
 import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 import { STORAGE_KEYS } from '@/lib/constants';
+
+// Lazy load heavy components that are not always visible
+const DataExportImport = lazy(() =>
+  import('@/components/DataExportImport').then((m) => ({ default: m.DataExportImport }))
+);
+const AppleHealthImport = lazy(() =>
+  import('@/components/AppleHealthImport').then((m) => ({ default: m.AppleHealthImport }))
+);
+const AppleHealthGuide = lazy(() =>
+  import('@/components/AppleHealthGuide').then((m) => ({ default: m.AppleHealthGuide }))
+);
+const CloudSyncSettings = lazy(() =>
+  import('@/components/CloudSyncSettings').then((m) => ({ default: m.CloudSyncSettings }))
+);
 
 interface SettingsDialogProps {
   triggerButton?: React.ReactNode;
@@ -49,6 +59,9 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
     String(settings?.dailyTarget ?? DEFAULT_DAILY_TARGET)
   );
   const [mood, setMood] = useState<Mood>(settings?.mood ?? null);
+  const [listDensity, setListDensity] = useState<'compact' | 'comfortable'>(
+    settings?.listDensity ?? 'compact'
+  );
   const [error, setError] = useState<string | null>(null);
   const hasSyncedNameRef = useRef(false);
 
@@ -57,6 +70,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
       setName(settings.name || '');
       setDailyTarget(String(settings.dailyTarget));
       setMood(settings.mood ?? null);
+      setListDensity(settings.listDensity ?? 'compact');
     }
   }, [settings]);
 
@@ -115,6 +129,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
       dailyTarget: Math.round(targetValue),
       customActivities: settings?.customActivities ?? [],
       mood: mood ?? undefined,
+      listDensity: listDensity,
     });
     setOpen(false);
     setError(null);
@@ -238,12 +253,19 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
           <div
             className={`${isMobile ? 'mb-2.5 pb-2' : 'mb-3 pb-2.5'} border-b border-gray-200 dark:border-gray-700`}
           >
-            <h2
-              className={`${isMobile ? 'text-xs' : 'text-sm sm:text-base'} font-bold text-gray-950 dark:text-white flex items-center gap-1.5`}
-            >
-              <span className={isMobile ? 'text-sm' : 'text-base'}>⚙️</span>
-              {isAuthenticated ? (lang === 'tr' ? 'Ayarlar' : 'Settings') : t('settings.title')}
-            </h2>
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <h2
+                className={`${isMobile ? 'text-xs' : 'text-sm sm:text-base'} font-bold text-gray-950 dark:text-white flex items-center gap-1.5`}
+              >
+                <span className={isMobile ? 'text-sm' : 'text-base'}>⚙️</span>
+                {isAuthenticated ? (lang === 'tr' ? 'Ayarlar' : 'Settings') : t('settings.title')}
+              </h2>
+              <span
+                className={`${isMobile ? 'text-[7px]' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap`}
+              >
+                © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.18.7
+              </span>
+            </div>
             {!isMobile && (
               <p
                 className={`text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 mt-0.5`}
@@ -301,10 +323,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   />
                 </label>
 
-                {/* Daily Goal and Emotion/Feeling - Same Row */}
-                <div
-                  className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} ${isMobile ? 'gap-1.5' : 'gap-2'}`}
-                >
+                {/* Daily Goal and Emotion/Feeling - Same Row (always side by side) */}
+                <div className={`grid grid-cols-2 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
                       className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
@@ -357,7 +377,13 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   >
                     {t('data.export')} / {t('data.import')}
                   </span>
-                  <DataExportImport />
+                  <Suspense
+                    fallback={
+                      <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                    }
+                  >
+                    <DataExportImport />
+                  </Suspense>
                 </div>
 
                 {/* Language & Theme */}
@@ -395,10 +421,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   </div>
                 )}
 
-                {/* Daily Goal and Emotion/Feeling - Same Row */}
-                <div
-                  className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} ${isMobile ? 'gap-1.5' : 'gap-2'}`}
-                >
+                {/* Daily Goal and Emotion/Feeling - Same Row (always side by side) */}
+                <div className={`grid grid-cols-2 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
                       className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
@@ -412,7 +436,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       step={100}
                       value={dailyTarget}
                       onChange={(e) => setDailyTarget(e.target.value)}
-                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
+                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:px-2 sm:py-1 sm:text-[10px]'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
                       placeholder="10000"
                       autoComplete="off"
                       data-form-type="other"
@@ -428,7 +452,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     <select
                       value={mood || ''}
                       onChange={(e) => setMood((e.target.value || null) as Mood)}
-                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
+                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:px-2 sm:py-1 sm:text-[10px]'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
                       autoComplete="off"
                       data-form-type="other"
                     >
@@ -459,7 +483,13 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     >
                       {t('data.export')} / {t('data.import')}
                     </span>
-                    <DataExportImport />
+                    <Suspense
+                      fallback={
+                        <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                      }
+                    >
+                      <DataExportImport />
+                    </Suspense>
                   </div>
 
                   <div>
@@ -468,9 +498,36 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     >
                       {t('nav.main')}
                     </span>
-                    <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'}`}>
+                    <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'} flex-wrap`}>
                       <LanguageToggle />
                       <ThemeToggle />
+                      {/* List View - Compact/Comfortable */}
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setListDensity('compact')}
+                          className={`${isMobile ? 'px-1 py-0.5 text-[7px] min-h-[20px]' : 'px-1.5 py-0.5 text-[8px] sm:text-[9px] min-h-[24px]'} rounded border transition-all duration-200 font-semibold flex items-center justify-center ${
+                            listDensity === 'compact'
+                              ? 'border-brand bg-brand text-white dark:bg-brand-dark dark:text-white'
+                              : 'border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
+                          }`}
+                          title={t('settings.listDensityCompact')}
+                        >
+                          {t('settings.listDensityCompact')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setListDensity('comfortable')}
+                          className={`${isMobile ? 'px-1 py-0.5 text-[7px] min-h-[20px]' : 'px-1.5 py-0.5 text-[8px] sm:text-[9px] min-h-[24px]'} rounded border transition-all duration-200 font-semibold flex items-center justify-center ${
+                            listDensity === 'comfortable'
+                              ? 'border-brand bg-brand text-white dark:bg-brand-dark dark:text-white'
+                              : 'border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
+                          }`}
+                          title={t('settings.listDensityComfortable')}
+                        >
+                          {t('settings.listDensityComfortable')}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -479,7 +536,13 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   </div>
 
                   <div>
-                    <CloudSyncSettings />
+                    <Suspense
+                      fallback={
+                        <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                      }
+                    >
+                      <CloudSyncSettings />
+                    </Suspense>
                   </div>
 
                   {keyboardShortcuts && (
@@ -510,14 +573,14 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       <button
                         type="button"
                         onClick={handleLogout}
-                        className={`flex-1 px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-red-200 dark:border-red-800 bg-gradient-to-r from-red-50 to-white dark:from-red-900/20 dark:to-red-900/10 hover:from-red-100 hover:to-red-50 dark:hover:from-red-800/30 transition-all duration-200 text-red-700 dark:text-red-400 font-semibold`}
+                        className={`flex-1 ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:text-[10px] min-h-[28px]'} rounded-lg border-2 border-red-200 dark:border-red-800 bg-gradient-to-r from-red-50 to-white dark:from-red-900/20 dark:to-red-900/10 hover:from-red-100 hover:to-red-50 dark:hover:from-red-800/30 transition-all duration-200 text-red-700 dark:text-red-400 font-semibold flex items-center justify-center`}
                       >
                         {lang === 'tr' ? 'Çıkış Yap' : 'Sign Out'}
                       </button>
                       <button
                         type="button"
                         onClick={handleClearData}
-                        className={`flex-1 px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-red-200 dark:border-red-800 bg-gradient-to-r from-red-50 to-white dark:from-red-900/20 dark:to-red-900/10 hover:from-red-100 hover:to-red-50 dark:hover:from-red-800/30 transition-all duration-200 text-red-700 dark:text-red-400 font-semibold`}
+                        className={`flex-1 ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:text-[10px] min-h-[28px]'} rounded-lg border-2 border-red-200 dark:border-red-800 bg-gradient-to-r from-red-50 to-white dark:from-red-900/20 dark:to-red-900/10 hover:from-red-100 hover:to-red-50 dark:hover:from-red-800/30 transition-all duration-200 text-red-700 dark:text-red-400 font-semibold flex items-center justify-center`}
                       >
                         🗑️ {t('settings.clearData')}
                       </button>
@@ -549,7 +612,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
             <div className={`${isMobile ? 'pt-2' : 'pt-3'} flex ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
               <button
                 type="submit"
-                className={`flex-1 ${isMobile ? 'px-2.5 py-1.5 text-xs' : 'px-3 py-1.5 text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
+                className={`flex-1 ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-3 py-1.5 text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
               >
                 {t('settings.save') || 'Save'}
               </button>
@@ -563,7 +626,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     setDailyTarget(String(settings.dailyTarget));
                   }
                 }}
-                className={`${isMobile ? 'px-2.5 py-1.5 text-xs' : 'px-3 py-1.5 text-sm'} rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
+                className={`${isMobile ? 'px-2 py-1 text-[10px]' : 'px-3 py-1.5 text-sm'} rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
               >
                 {t('form.cancel')}
               </button>
@@ -594,19 +657,19 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
           onClick={() => setOpen(true)}
           className={`${
             isMobile
-              ? 'px-2.5 py-2 min-h-[36px] min-w-[44px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 gap-1.5 overflow-hidden max-w-[140px] sm:max-w-none'
-              : 'px-3 py-1.5 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center gap-2 max-w-[200px]'
+              ? 'px-3 py-2 min-h-[36px] min-w-[52px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 gap-1.5 overflow-hidden max-w-[280px] sm:max-w-none'
+              : 'px-4 py-1.5 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center gap-2 max-w-[420px]'
           } truncate`}
           title={displayName}
           aria-label={displayName}
           data-tour-id="profile"
         >
-          <span className={`${isMobile ? 'text-[10px] sm:text-xs' : 'text-xs'} truncate`}>
-            {isMobile && typeof displayName === 'string' && displayName.length > 7
-              ? displayName.substring(0, 7) + '...'
+          <span className={`${isMobile ? 'text-[11px] sm:text-xs' : 'text-xs'} truncate`}>
+            {isMobile && typeof displayName === 'string' && displayName.length > 12
+              ? displayName.substring(0, 12) + '...'
               : displayName}
           </span>
-          <span className={`${isMobile ? 'text-xs' : 'text-xs'} flex-shrink-0`}>⚙️</span>
+          <span className={`${isMobile ? 'text-sm' : 'text-xs'} flex-shrink-0`}>⚙️</span>
         </button>
       )}
       {typeof window !== 'undefined' && settingsDialog

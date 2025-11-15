@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, lazy, Suspense } from 'react';
 import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
 import { useI18n } from '@/lib/i18n';
@@ -9,14 +9,28 @@ import { ActivityRecord } from '@/lib/activityStore';
 import { UserSettings } from '@/lib/settingsStore';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { ExportDialog } from '@/components/ExportDialog';
-import { AppleHealthImport } from '@/components/AppleHealthImport';
-import { AppleHealthGuide } from '@/components/AppleHealthGuide';
 import { useAppleHealthReminder } from '@/hooks/useAppleHealthReminder';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useCloudSync } from '@/hooks/useCloudSync';
+import { useBadges } from '@/lib/badgeStore';
+import { useChallenges } from '@/lib/challengeStore';
+import { useAuth } from '@/hooks/useAuth';
+
+const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
+
+// Lazy load Apple Health components
+const AppleHealthImport = lazy(() =>
+  import('@/components/AppleHealthImport').then((m) => ({ default: m.AppleHealthImport }))
+);
+const AppleHealthGuide = lazy(() =>
+  import('@/components/AppleHealthGuide').then((m) => ({ default: m.AppleHealthGuide }))
+);
 
 export function DataExportImport() {
   const { activities } = useActivities();
   const { settings } = useSettings();
+  const { badges } = useBadges();
+  const { challenges } = useChallenges();
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,6 +39,8 @@ export function DataExportImport() {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showHealthGuide, setShowHealthGuide] = useState(false);
   const { shouldShowReminder, daysSinceLastImport, dismissReminder } = useAppleHealthReminder();
+  const { syncToCloud, isConfigured } = useCloudSync();
+  const { isAuthenticated } = useAuth();
 
   const handleExport = () => {
     try {
@@ -106,6 +122,49 @@ export function DataExportImport() {
       localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(validActivities));
       localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(data.settings));
 
+      // Clear conflict storage key to prevent conflict dialog from showing after import
+      // Imported data should always go to cloud without conflict check
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(CONFLICT_STORAGE_KEY);
+      }
+
+      // If user is authenticated and cloud sync is configured, upload to cloud immediately
+      // No conflict check - imported data should always go to cloud
+      if (isAuthenticated && isConfigured) {
+        try {
+          // Get current badges and challenges from localStorage (they might not be loaded yet)
+          const storedBadges = localStorage.getItem(STORAGE_KEYS.BADGES);
+          const storedChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+          const badgesToUpload = storedBadges ? JSON.parse(storedBadges) : [];
+          const challengesToUpload = storedChallenges ? JSON.parse(storedChallenges) : [];
+
+          await syncToCloud({
+            activities: validActivities,
+            settings: data.settings,
+            badges: badgesToUpload,
+            challenges: challengesToUpload,
+          });
+
+          showToast(
+            lang === 'tr'
+              ? 'Veriler içe aktarıldı ve buluta yüklendi!'
+              : 'Data imported and uploaded to cloud!',
+            'success'
+          );
+        } catch (error) {
+          console.error('Failed to sync imported data to cloud:', error);
+          // Still show success for import, but warn about cloud sync failure
+          showToast(
+            lang === 'tr'
+              ? 'Veriler içe aktarıldı, ancak buluta yükleme başarısız oldu.'
+              : 'Data imported, but cloud upload failed.',
+            'warning'
+          );
+        }
+      } else {
+        showToast(t('data.importSuccess'), 'success');
+      }
+
       // Reload page to apply changes
       window.location.reload();
     } catch (error) {
@@ -121,17 +180,21 @@ export function DataExportImport() {
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <button
           type="button"
           onClick={() => setShowExportDialog(true)}
-          className="px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 font-semibold"
+          className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 font-semibold flex items-center justify-center box-border leading-none whitespace-nowrap"
+          style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
           title={t('data.exportTooltip')}
           aria-label={t('data.exportTooltip')}
         >
           💾 {t('data.export')}
         </button>
-        <label className="px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold">
+        <label
+          className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none whitespace-nowrap"
+          style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
+        >
           <input
             ref={fileInputRef}
             type="file"
@@ -144,11 +207,28 @@ export function DataExportImport() {
           {isImporting ? '⏳' : '📥'} {t('data.import')}
         </label>
         <div className="flex items-center gap-1">
-          <AppleHealthImport />
+          <Suspense
+            fallback={
+              <div
+                className="w-20 bg-gray-100 dark:bg-gray-800 rounded animate-pulse"
+                style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
+              />
+            }
+          >
+            <AppleHealthImport />
+          </Suspense>
           <button
             type="button"
             onClick={() => setShowHealthGuide(!showHealthGuide)}
-            className="px-1.5 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 font-semibold"
+            className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 font-semibold flex items-center justify-center box-border leading-none"
+            style={{
+              height: '24px',
+              minHeight: '24px',
+              maxHeight: '24px',
+              width: '24px',
+              minWidth: '24px',
+              maxWidth: '24px',
+            }}
             title={lang === 'tr' ? 'Sağlık Verisi İçe Aktar Rehberi' : 'Import Health Data Guide'}
             aria-label={
               lang === 'tr' ? 'Sağlık Verisi İçe Aktar Rehberi' : 'Import Health Data Guide'
@@ -160,7 +240,11 @@ export function DataExportImport() {
       </div>
       {showHealthGuide && (
         <div className="mt-2">
-          <AppleHealthGuide />
+          <Suspense
+            fallback={<div className="h-32 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />}
+          >
+            <AppleHealthGuide />
+          </Suspense>
         </div>
       )}
       {shouldShowReminder && (

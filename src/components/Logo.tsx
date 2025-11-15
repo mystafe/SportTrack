@@ -53,14 +53,9 @@ export function Logo() {
             </g>
           </svg>
         </div>
-        <div className="flex flex-col leading-tight">
-          <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-brand via-sky-400 to-brand-dark bg-clip-text text-transparent uppercase tracking-tight">
-            SPORT
-          </span>
-          <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-brand-dark via-brand to-sky-400 bg-clip-text text-transparent uppercase tracking-tight">
-            TRACK
-          </span>
-        </div>
+        <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-brand via-sky-400 to-brand-dark bg-clip-text text-transparent uppercase tracking-tight whitespace-nowrap flex items-center">
+          SPORT TRACK
+        </span>
       </div>
     );
   }
@@ -113,7 +108,7 @@ export function Logo() {
           </g>
         </svg>
       </div>
-      <span className="font-bold text-xl sm:text-2xl bg-gradient-to-r from-brand via-sky-400 via-brand-light to-brand-dark bg-clip-text text-transparent tracking-tight uppercase">
+      <span className="font-bold text-2xl sm:text-3xl bg-gradient-to-r from-brand via-sky-400 via-brand-light to-brand-dark bg-clip-text text-transparent tracking-tight uppercase">
         SPORT TRACK
       </span>
     </div>

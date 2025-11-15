@@ -51,11 +51,49 @@ export function ConflictResolutionManager() {
     if (!isAuthenticated || !isConfigured) {
       setShowConflictDialog(false);
       setConflictData(null);
+      // Clear conflict storage on logout
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(CONFLICT_STORAGE_KEY);
+      }
+      return;
+    }
+
+    // Check if initial sync is complete - if so, don't show conflict dialog
+    const initialSyncComplete =
+      typeof window !== 'undefined' &&
+      localStorage.getItem('sporttrack_initial_sync_complete') === 'true';
+
+    if (initialSyncComplete) {
+      // Initial sync is complete, clear any stale conflict data
+      if (typeof window !== 'undefined') {
+        const conflictStr = localStorage.getItem(CONFLICT_STORAGE_KEY);
+        if (conflictStr) {
+          console.log('🧹 Clearing stale conflict data (initial sync already complete)');
+          localStorage.removeItem(CONFLICT_STORAGE_KEY);
+        }
+      }
+      setShowConflictDialog(false);
+      setConflictData(null);
       return;
     }
 
     // Function to check and show conflict dialog
     const checkConflict = () => {
+      // Double-check initial sync status
+      const syncComplete =
+        typeof window !== 'undefined' &&
+        localStorage.getItem('sporttrack_initial_sync_complete') === 'true';
+
+      if (syncComplete) {
+        // Initial sync is complete, don't show conflict dialog
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(CONFLICT_STORAGE_KEY);
+        }
+        setShowConflictDialog(false);
+        setConflictData(null);
+        return;
+      }
+
       const conflictStr =
         typeof window !== 'undefined' ? localStorage.getItem(CONFLICT_STORAGE_KEY) : null;
       if (conflictStr) {
@@ -90,35 +128,41 @@ export function ConflictResolutionManager() {
     // Check immediately
     checkConflict();
 
-    // Check after delays to catch late conflicts
+    // Check after delays to catch late conflicts (reduced frequency)
     const timeout1 = setTimeout(checkConflict, 500);
-    const timeout2 = setTimeout(checkConflict, 1000);
-    const timeout3 = setTimeout(checkConflict, 2000);
-    const timeout4 = setTimeout(checkConflict, 3000);
+    const timeout2 = setTimeout(checkConflict, 1500);
+    const timeout3 = setTimeout(checkConflict, 3000);
 
     // Listen to custom event from useCloudSyncListener
     const handleConflictDetected = () => {
       console.log('📢 Conflict detected event received');
-      checkConflict();
+      // Only check if dialog is not already showing
+      if (!showConflictDialog) {
+        checkConflict();
+      }
     };
     window.addEventListener('sporttrack:conflict-detected', handleConflictDetected);
 
     // Also listen to storage events (for cross-tab communication)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === CONFLICT_STORAGE_KEY) {
+      if (e.key === CONFLICT_STORAGE_KEY && !showConflictDialog) {
         checkConflict();
       }
     };
     window.addEventListener('storage', handleStorageChange);
 
-    // Poll localStorage periodically to catch conflicts set by other components
-    const pollInterval = setInterval(checkConflict, 1000);
+    // Poll localStorage periodically to catch conflicts set by other components (reduced frequency)
+    // Only poll if dialog is not showing to prevent infinite loops
+    const pollInterval = setInterval(() => {
+      if (!showConflictDialog) {
+        checkConflict();
+      }
+    }, 2000);
 
     return () => {
       clearTimeout(timeout1);
       clearTimeout(timeout2);
       clearTimeout(timeout3);
-      clearTimeout(timeout4);
       clearInterval(pollInterval);
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('sporttrack:conflict-detected', handleConflictDetected);
@@ -210,9 +254,11 @@ export function ConflictResolutionManager() {
     setShowConflictDialog(false);
 
     try {
-      // Clear conflict storage
+      // Clear conflict storage IMMEDIATELY to prevent re-detection
       if (typeof window !== 'undefined') {
         localStorage.removeItem(CONFLICT_STORAGE_KEY);
+        // Mark initial sync as complete to prevent re-detection
+        localStorage.setItem('sporttrack_initial_sync_complete', 'true');
       }
 
       // Add metadata to cloudData if missing (required by CloudData type)
@@ -243,6 +289,43 @@ export function ConflictResolutionManager() {
     return null;
   }
 
+  // Get local last modified date
+  const getLocalLastModified = (): Date | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const stored = localStorage.getItem('sporttrack_last_sync');
+      if (stored) {
+        const date = new Date(stored);
+        // Check if date is valid
+        if (!isNaN(date.getTime())) {
+          return date;
+        }
+      }
+      // If no stored date, check if there are activities and use current time as fallback
+      if (activities.length > 0) {
+        // Return current time as fallback if activities exist but no timestamp
+        return new Date();
+      }
+    } catch (error) {
+      console.error('Failed to get local last modified:', error);
+    }
+    return null;
+  };
+
+  // Get cloud last modified date from conflict data
+  const getCloudLastModified = (): Date | null => {
+    if (!conflictData) return null;
+    const cloudData = conflictData.cloud as any;
+    if (cloudData.metadata?.lastModified) {
+      try {
+        return new Date(cloudData.metadata.lastModified);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
   return (
     <ConflictResolutionDialog
       open={showConflictDialog}
@@ -250,21 +333,23 @@ export function ConflictResolutionManager() {
       onCancel={() => {
         setShowConflictDialog(false);
         setConflictData(null);
-        // Clear conflict storage on cancel
+        // Clear conflict storage on cancel and mark initial sync as complete
         if (typeof window !== 'undefined') {
           localStorage.removeItem(CONFLICT_STORAGE_KEY);
+          // Mark initial sync as complete to prevent re-detection
+          localStorage.setItem('sporttrack_initial_sync_complete', 'true');
         }
       }}
       localCount={{
         activities: conflictData.local.activities.length,
         badges: conflictData.local.badges.length,
-        challenges: conflictData.local.challenges.length,
       }}
       cloudCount={{
         activities: conflictData.cloud.activities.length,
         badges: conflictData.cloud.badges.length,
-        challenges: conflictData.cloud.challenges.length,
       }}
+      localLastModified={getLocalLastModified()}
+      cloudLastModified={getCloudLastModified()}
     />
   );
 }

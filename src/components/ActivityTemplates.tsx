@@ -84,14 +84,14 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
     return (
       <button
         type="button"
-        className="flex w-full items-center justify-between text-sm font-bold text-gray-900 dark:text-white mb-3 transition-all duration-200 hover:text-brand"
+        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls="activity-templates"
       >
         <span className="font-bold">{t('templates.title')}</span>
         <span
-          className="ml-2 text-lg font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light"
+          className="ml-2 text-base font-bold transition-transform duration-300 ease-in-out text-brand dark:text-brand-light"
           aria-hidden
           style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
         >
@@ -102,22 +102,22 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
   };
 
   return (
-    <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300">
+    <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-3 shadow-md hover:shadow-xl transition-shadow duration-300">
       {renderHeader()}
       {isOpen && (
-        <div id="activity-templates" className={isMobile ? 'space-y-3' : 'space-y-4'}>
+        <div id="activity-templates" className={isMobile ? 'space-y-2' : 'space-y-3'}>
           {templatesByCategory.map(({ category, templates }) => (
-            <div key={category} className={isMobile ? 'space-y-2' : 'space-y-3'}>
+            <div key={category} className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
               <h4
-                className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2`}
+                className={`${isMobile ? 'text-[8px]' : 'text-[9px] sm:text-[10px]'} font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5`}
               >
                 <span
-                  className={`inline-block w-1 ${isMobile ? 'h-3' : 'h-4'} bg-brand rounded-full`}
+                  className={`inline-block w-0.5 ${isMobile ? 'h-2.5' : 'h-3'} bg-brand rounded-full`}
                 ></span>
                 {t(`templates.category.${category}`)}
               </h4>
               <div
-                className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-2' : 'gap-3 sm:gap-4'}`}
+                className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-1.5' : 'gap-2 sm:gap-3'}`}
               >
                 {templates.map((template) => (
                   <button

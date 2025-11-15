@@ -26,14 +26,14 @@ export default function ChallengesPage() {
 
   if (!hydrated) {
     return (
-      <div className="container py-6 sm:py-8">
+      <main className="container py-6 sm:py-8" role="main" aria-label={t('nav.challenges')}>
         <PageSkeleton />
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
             <ChallengeCardSkeleton key={i} />
           ))}
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -75,7 +75,11 @@ export default function ChallengesPage() {
   };
 
   return (
-    <div className="container py-6 sm:py-8 page-transition">
+    <main
+      className="container py-6 sm:py-8 page-transition"
+      role="main"
+      aria-label={t('nav.challenges')}
+    >
       <div className="mb-6">
         <h1
           className={`text-2xl sm:text-3xl font-bold flex items-center gap-2 mb-2 ${isMobile ? 'title-entrance' : ''}`}
@@ -218,6 +222,6 @@ export default function ChallengesPage() {
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeletingChallenge(null)}
       />
-    </div>
+    </main>
   );
 }
