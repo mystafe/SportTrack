@@ -41,7 +41,6 @@ export const WithLabel: Story = {
   args: {
     label: 'Choose Option',
     options,
-    placeholder: 'Select...',
   },
 };
 
