@@ -181,19 +181,19 @@ export const Tooltip: React.FC<TooltipProps> = ({
     },
     onMouseEnter: (e: React.MouseEvent) => {
       showTooltip();
-      children.props.onMouseEnter?.(e);
+      (children as React.ReactElement<any>).props.onMouseEnter?.(e);
     },
     onMouseLeave: (e: React.MouseEvent) => {
       hideTooltip();
-      children.props.onMouseLeave?.(e);
+      (children as React.ReactElement<any>).props.onMouseLeave?.(e);
     },
     onFocus: (e: React.FocusEvent) => {
       showTooltip();
-      children.props.onFocus?.(e);
+      (children as React.ReactElement<any>).props.onFocus?.(e);
     },
     onBlur: (e: React.FocusEvent) => {
       hideTooltip();
-      children.props.onBlur?.(e);
+      (children as React.ReactElement<any>).props.onBlur?.(e);
     },
   });
 
