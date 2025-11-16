@@ -56,7 +56,7 @@ export const Error: Story = {
   args: {
     label: 'Choose Option',
     options,
-    error: true,
+    error: 'This field is required',
     helperText: 'This field is required',
   },
 };
