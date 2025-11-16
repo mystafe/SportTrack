@@ -245,7 +245,7 @@ export default function AchievementsPage() {
                             : badge.rarity === 'rare'
                               ? 'info'
                               : badge.rarity === 'epic'
-                                ? 'secondary'
+                                ? 'primary'
                                 : 'warning'
                           : 'default'
                       }
