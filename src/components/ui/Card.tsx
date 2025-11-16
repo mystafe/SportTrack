@@ -224,8 +224,26 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 CardFooter.displayName = 'CardFooter';
 
 // Attach sub-components
-Card.Header = CardHeader;
-Card.Content = CardContent;
-Card.Footer = CardFooter;
+(
+  Card as typeof Card & {
+    Header: typeof CardHeader;
+    Content: typeof CardContent;
+    Footer: typeof CardFooter;
+  }
+).Header = CardHeader;
+(
+  Card as typeof Card & {
+    Header: typeof CardHeader;
+    Content: typeof CardContent;
+    Footer: typeof CardFooter;
+  }
+).Content = CardContent;
+(
+  Card as typeof Card & {
+    Header: typeof CardHeader;
+    Content: typeof CardContent;
+    Footer: typeof CardFooter;
+  }
+).Footer = CardFooter;
 
 export default Card;
