@@ -69,6 +69,7 @@ export default function ActivitiesPage() {
 function ActivitiesClient() {
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
+  const router = useRouter();
   const { activities, deleteActivity, hydrated } = useActivities();
   const { settings } = useSettings();
   const { showToast } = useToaster();

@@ -63,11 +63,6 @@ export function OnboardingManager() {
     }, 500);
   };
 
-  // Expose reset function globally for settings dialog
-  if (typeof window !== 'undefined') {
-    window.resetOnboarding = resetOnboarding;
-  }
-
   const getTourSteps = (): TourStep[] => {
     return [
       {
