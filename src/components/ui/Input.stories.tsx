@@ -59,7 +59,7 @@ export const Error: Story = {
   args: {
     label: 'Email',
     type: 'email',
-    error: true,
+    error: 'Please enter a valid email address',
     helperText: 'Please enter a valid email address',
     defaultValue: 'invalid-email',
   },
