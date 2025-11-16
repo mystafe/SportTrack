@@ -422,7 +422,6 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           value={note}
           onChange={(e) => setNote(e.target.value)}
           size={isMobile ? 'md' : 'md'}
-          variant="default"
           fullWidth
           rows={isMobile ? 2 : 2}
           placeholder={t('form.notePlaceholder')}
