@@ -169,13 +169,14 @@ export const Tooltip: React.FC<TooltipProps> = ({
     };
   }, []);
 
-  const child = React.cloneElement(children, {
+  const child = React.cloneElement(children as React.ReactElement<any>, {
     ref: (node: HTMLElement | null) => {
       triggerRef.current = node;
-      if (typeof children.ref === 'function') {
-        children.ref(node);
-      } else if (children.ref) {
-        children.ref.current = node;
+      const childRef = (children as any).ref;
+      if (typeof childRef === 'function') {
+        childRef(node);
+      } else if (childRef) {
+        childRef.current = node;
       }
     },
     onMouseEnter: (e: React.MouseEvent) => {
