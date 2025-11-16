@@ -34,7 +34,6 @@ const options = [
 export const Default: Story = {
   args: {
     options,
-    placeholder: 'Select an option...',
   },
 };
 
