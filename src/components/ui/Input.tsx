@@ -7,7 +7,7 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 export type InputSize = 'sm' | 'md' | 'lg';
 export type InputVariant = 'default' | 'filled' | 'outlined';
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   /**
    * Input size
    * @default 'md'
