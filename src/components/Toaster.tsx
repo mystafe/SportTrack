@@ -44,13 +44,21 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
         createPortal(
           <div
             className={`fixed z-[10000] flex flex-col gap-2 ${
-              isMobile ? 'bottom-4 left-4 right-4 safe-bottom' : 'bottom-4 right-4'
+              isMobile ? 'left-4 right-4 safe-bottom' : 'bottom-4 right-4'
             }`}
+            style={
+              isMobile
+                ? {
+                    bottom:
+                      'calc(64px + 32px + 16px + max(16px, env(safe-area-inset-bottom, 0px)))', // Above BottomNavigation + QuoteTicker + spacing + safe area
+                  }
+                : undefined
+            }
           >
             {toasts.map((toast) => (
               <div
                 key={toast.id}
-                className={`${isMobile ? 'w-full max-w-sm' : 'max-w-md'} px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-slide-in-right transition-all duration-300 whitespace-pre-line ${
+                className={`${isMobile ? 'w-full max-w-sm' : 'max-w-md'} ${isMobile ? 'px-4 py-4 text-base' : 'px-4 py-3 text-sm'} rounded-lg shadow-lg font-medium animate-slide-in-right transition-all duration-300 whitespace-pre-line ${
                   toast.type === 'success'
                     ? 'bg-green-500 text-white'
                     : toast.type === 'error'

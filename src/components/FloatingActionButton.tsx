@@ -63,6 +63,7 @@ export function FloatingActionButton() {
         bottom: bottomPosition,
       }}
       aria-label={t('actions.addActivity')}
+      data-tour-id="add-activity"
     >
       <span className="drop-shadow-lg">➕</span>
     </Button>

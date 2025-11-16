@@ -15,6 +15,7 @@ import { DuplicateDetectionDialog } from '@/components/DuplicateDetectionDialog'
 import { useAppleHealthReminder } from '@/hooks/useAppleHealthReminder';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useCloudSync } from '@/hooks/useCloudSync';
+import { usePlatform } from '@/lib/hooks/usePlatform';
 import { Button } from '@/components/ui/Button';
 import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
@@ -110,6 +111,7 @@ export function DataExportImport() {
   const { shouldShowReminder, daysSinceLastImport, dismissReminder } = useAppleHealthReminder();
   const { syncToCloud, isConfigured } = useCloudSync();
   const { isAuthenticated } = useAuth();
+  const { isIOS } = usePlatform();
 
   const handleExport = () => {
     try {
@@ -657,32 +659,54 @@ export function DataExportImport() {
         <Button
           type="button"
           variant="outline"
-          size="sm"
+          size={isMobile ? 'md' : 'sm'}
           onClick={() => setShowExportDialog(true)}
-          className="px-1.5 text-base"
-          style={{
-            height: '24px',
-            minHeight: '24px',
-            maxHeight: '24px',
-            width: '24px',
-            minWidth: '24px',
-            maxWidth: '24px',
-          }}
+          className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-base flex items-center justify-center`}
+          style={
+            isMobile
+              ? {
+                  height: '44px',
+                  minHeight: '44px',
+                  maxHeight: '44px',
+                  width: '44px',
+                  minWidth: '44px',
+                  maxWidth: '44px',
+                }
+              : {
+                  height: '24px',
+                  minHeight: '24px',
+                  maxHeight: '24px',
+                  width: '24px',
+                  minWidth: '24px',
+                  maxWidth: '24px',
+                }
+          }
           title={t('data.exportTooltip')}
           aria-label={t('data.exportTooltip')}
         >
           💾
         </Button>
         <label
-          className="px-1.5 text-base rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none"
-          style={{
-            height: '24px',
-            minHeight: '24px',
-            maxHeight: '24px',
-            width: '24px',
-            minWidth: '24px',
-            maxWidth: '24px',
-          }}
+          className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-base rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none`}
+          style={
+            isMobile
+              ? {
+                  height: '44px',
+                  minHeight: '44px',
+                  maxHeight: '44px',
+                  width: '44px',
+                  minWidth: '44px',
+                  maxWidth: '44px',
+                }
+              : {
+                  height: '24px',
+                  minHeight: '24px',
+                  maxHeight: '24px',
+                  width: '24px',
+                  minWidth: '24px',
+                  maxWidth: '24px',
+                }
+          }
         >
           <input
             ref={fileInputRef}
@@ -695,65 +719,91 @@ export function DataExportImport() {
           />
           {isImporting ? '⏳' : '📥'}
         </label>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => setShowDuplicateDialog(true)}
-          className="px-1.5 text-base"
-          style={{
-            height: '24px',
-            minHeight: '24px',
-            maxHeight: '24px',
-            width: '24px',
-            minWidth: '24px',
-            maxWidth: '24px',
-          }}
-          title={lang === 'tr' ? 'Yinelenen Kayıt Tespiti' : 'Duplicate Detection'}
-          aria-label={lang === 'tr' ? 'Yinelenen Kayıt Tespiti' : 'Duplicate Detection'}
-        >
-          🔍
-        </Button>
-        <div className="flex items-center gap-1">
-          <Suspense
-            fallback={
-              <div
-                className="bg-gray-100 dark:bg-gray-800 rounded animate-pulse"
-                style={{
-                  height: '24px',
-                  minHeight: '24px',
-                  maxHeight: '24px',
-                  width: '24px',
-                  minWidth: '24px',
-                  maxWidth: '24px',
-                }}
-              />
-            }
-          >
-            <AppleHealthImport />
-          </Suspense>
+        {isAuthenticated && (
           <Button
             type="button"
             variant="outline"
-            size="sm"
-            onClick={() => setShowHealthGuide(!showHealthGuide)}
-            className="px-1.5 text-base"
-            style={{
-              height: '24px',
-              minHeight: '24px',
-              maxHeight: '24px',
-              width: '24px',
-              minWidth: '24px',
-              maxWidth: '24px',
-            }}
-            title={lang === 'tr' ? 'Sağlık Verisi İçe Aktar Rehberi' : 'Import Health Data Guide'}
-            aria-label={
-              lang === 'tr' ? 'Sağlık Verisi İçe Aktar Rehberi' : 'Import Health Data Guide'
+            size={isMobile ? 'md' : 'sm'}
+            onClick={() => setShowDuplicateDialog(true)}
+            className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-base flex items-center justify-center`}
+            style={
+              isMobile
+                ? {
+                    height: '44px',
+                    minHeight: '44px',
+                    maxHeight: '44px',
+                    width: '44px',
+                    minWidth: '44px',
+                    maxWidth: '44px',
+                  }
+                : {
+                    height: '24px',
+                    minHeight: '24px',
+                    maxHeight: '24px',
+                    width: '24px',
+                    minWidth: '24px',
+                    maxWidth: '24px',
+                  }
             }
+            title={lang === 'tr' ? 'Yinelenen Kayıt Tespiti' : 'Duplicate Detection'}
+            aria-label={lang === 'tr' ? 'Yinelenen Kayıt Tespiti' : 'Duplicate Detection'}
           >
-            ?
+            🔍
           </Button>
-        </div>
+        )}
+        {isAuthenticated && isIOS && (
+          <div className="flex items-center gap-1">
+            <Suspense
+              fallback={
+                <div
+                  className="bg-gray-100 dark:bg-gray-800 rounded animate-pulse"
+                  style={{
+                    height: '24px',
+                    minHeight: '24px',
+                    maxHeight: '24px',
+                    width: '24px',
+                    minWidth: '24px',
+                    maxWidth: '24px',
+                  }}
+                />
+              }
+            >
+              <AppleHealthImport />
+            </Suspense>
+            <Button
+              type="button"
+              variant="outline"
+              size={isMobile ? 'md' : 'sm'}
+              onClick={() => setShowHealthGuide(!showHealthGuide)}
+              className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-base flex items-center justify-center`}
+              style={
+                isMobile
+                  ? {
+                      height: '44px',
+                      minHeight: '44px',
+                      maxHeight: '44px',
+                      width: '44px',
+                      minWidth: '44px',
+                      maxWidth: '44px',
+                    }
+                  : {
+                      height: '24px',
+                      minHeight: '24px',
+                      maxHeight: '24px',
+                      width: '24px',
+                      minWidth: '24px',
+                      maxWidth: '24px',
+                    }
+              }
+              title={lang === 'tr' ? 'Sağlık Verisi İçe Aktar Rehberi' : 'Import Health Data Guide'}
+              aria-label={
+                lang === 'tr' ? 'Sağlık Verisi İçe Aktar Rehberi' : 'Import Health Data Guide'
+              }
+            >
+              ?
+            </Button>
+          </div>
+        )}
       </div>
       {showHealthGuide && (
         <div className="mt-2">

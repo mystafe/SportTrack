@@ -3,6 +3,7 @@
 import React from 'react';
 import { designTokens } from '@/lib/design-tokens';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { LoadingSpinner } from './LoadingSpinner';
 
 export type ButtonVariant =
   | 'primary'
@@ -66,6 +67,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     active:scale-[0.98]
     disabled:from-gray-400 disabled:to-gray-500 disabled:shadow-none
     disabled:cursor-not-allowed
+    disabled:opacity-70
   `,
   secondary: `
     bg-gradient-to-r from-gray-100 to-white
@@ -80,7 +82,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     active:scale-[0.98]
     disabled:from-gray-100 disabled:to-gray-100
     disabled:dark:from-gray-800 disabled:dark:to-gray-800
-    disabled:text-gray-400 disabled:dark:text-gray-600
+    disabled:text-gray-500 dark:disabled:text-gray-500
     disabled:border-gray-200 disabled:dark:border-gray-700
     disabled:cursor-not-allowed
   `,
@@ -91,17 +93,18 @@ const variantStyles: Record<ButtonVariant, string> = {
     hover:bg-gray-50 dark:hover:bg-gray-800
     hover:border-gray-400 dark:hover:border-gray-500
     active:scale-[0.98]
-    disabled:text-gray-400 disabled:dark:text-gray-600
+    disabled:text-gray-500 dark:disabled:text-gray-500
     disabled:border-gray-200 disabled:dark:border-gray-700
     disabled:cursor-not-allowed
   `,
   ghost: `
     bg-transparent
-    text-gray-700 dark:text-gray-300
+    text-gray-800 dark:text-gray-200
     hover:bg-gray-100 dark:hover:bg-gray-800
     active:scale-[0.98]
-    disabled:text-gray-400 disabled:dark:text-gray-600
+    disabled:text-gray-500 dark:disabled:text-gray-500
     disabled:cursor-not-allowed
+    disabled:opacity-70
   `,
   danger: `
     bg-gradient-to-r from-error to-error-dark
@@ -112,6 +115,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     active:scale-[0.98]
     disabled:from-gray-400 disabled:to-gray-500 disabled:shadow-none
     disabled:cursor-not-allowed
+    disabled:opacity-70
   `,
   success: `
     bg-gradient-to-r from-success to-success-dark
@@ -122,6 +126,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     active:scale-[0.98]
     disabled:from-gray-400 disabled:to-gray-500 disabled:shadow-none
     disabled:cursor-not-allowed
+    disabled:opacity-70
   `,
   warning: `
     bg-gradient-to-r from-warning to-warning-dark
@@ -132,6 +137,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     active:scale-[0.98]
     disabled:from-gray-400 disabled:to-gray-500 disabled:shadow-none
     disabled:cursor-not-allowed
+    disabled:opacity-70
   `,
 };
 
@@ -142,7 +148,7 @@ const sizeStyles: Record<
   sm: {
     padding: 'px-3 py-1.5',
     fontSize: 'text-sm',
-    minHeight: 'min-h-[36px]',
+    minHeight: 'min-h-[44px]', // Mobile minimum touch target (44x44px)
     gap: 'gap-1.5',
   },
   md: {
@@ -210,13 +216,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       duration-fast
       ease-out
       focus:outline-none
-      focus:ring-2
-      focus:ring-offset-2
-      focus:ring-brand
-      focus:ring-offset-white
-      dark:focus:ring-offset-gray-900
+      focus-visible:ring-2
+      focus-visible:ring-offset-2
+      focus-visible:ring-brand
+      focus-visible:ring-offset-white
+      dark:focus-visible:ring-offset-gray-900
       touch-feedback
       mobile-press
+      ${isMobile ? 'active:scale-[0.95] active:brightness-95' : ''}
       ${sizeConfig.padding}
       ${sizeConfig.fontSize}
       ${sizeConfig.minHeight}
@@ -239,27 +246,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {loading && (
-          <svg
-            className="animate-spin h-4 w-4"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
+          <LoadingSpinner
+            size={size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'}
+            variant={
+              variant === 'primary' ? 'primary' : variant === 'secondary' ? 'secondary' : 'primary'
+            }
+            aria-label="Loading"
+            className="flex-shrink-0"
+          />
         )}
         {!loading && icon && (
           <span className="flex-shrink-0" aria-hidden="true">

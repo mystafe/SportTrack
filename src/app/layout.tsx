@@ -6,6 +6,7 @@ import { Providers } from '@/components/Providers';
 import { Header } from '@/components/Header';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { QuoteTicker } from '@/components/QuoteTicker';
+import { SkipLink } from '@/components/SkipLink';
 
 export const metadata = {
   title: 'SportTrack',
@@ -43,7 +44,7 @@ export const viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="tr" suppressHydrationWarning className="overflow-x-hidden h-full">
+    <html lang="tr" suppressHydrationWarning className="overflow-x-hidden h-full scroll-smooth">
       <head>
         {/* Preconnect to external domains for faster loading */}
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
@@ -108,13 +109,24 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
         <Providers>
+          <SkipLink />
+          <div
+            id="aria-live-region"
+            className="sr-only"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          />
           <Header />
           <main
+            id="main-content"
             className="container py-4 sm:py-6 page-transition-wrapper"
             style={{
               paddingBottom:
                 'max(1.5rem, calc(64px + 32px + 1.5rem + env(safe-area-inset-bottom, 0px)))',
             }}
+            role="main"
+            aria-label="Main content"
           >
             {children}
           </main>

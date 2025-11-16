@@ -14,3 +14,9 @@ export { Checkbox, type CheckboxProps, type CheckboxSize } from './Checkbox';
 export { Switch, type SwitchProps, type SwitchSize } from './Switch';
 export { Radio, RadioGroup, type RadioProps, type RadioSize, type RadioGroupProps } from './Radio';
 export { Tooltip, type TooltipProps, type TooltipPosition } from './Tooltip';
+export {
+  LoadingSpinner,
+  type LoadingSpinnerProps,
+  type SpinnerSize,
+  type SpinnerVariant,
+} from './LoadingSpinner';

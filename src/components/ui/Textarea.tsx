@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { designTokens } from '@/lib/design-tokens';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 export type TextareaSize = 'sm' | 'md' | 'lg';
@@ -110,15 +111,17 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       ease-out
       resize-y
       focus:outline-none
-      focus:ring-2
-      focus:ring-offset-2
-      ${hasError ? 'focus:ring-error/20 focus:border-error' : 'focus:ring-brand/20 focus:border-brand'}
-      focus:ring-offset-white dark:focus:ring-offset-gray-900
+      focus-visible:ring-2
+      focus-visible:ring-offset-2
+      ${hasError ? 'focus-visible:ring-error/30 focus:border-error' : 'focus-visible:ring-brand/30 focus:border-brand'}
+      focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900
+      active:border-brand active:ring-1 active:ring-brand/10
       hover:border-gray-300 dark:hover:border-gray-600
       disabled:bg-gray-50 dark:disabled:bg-gray-800
-      disabled:text-gray-400 dark:disabled:text-gray-600
+      disabled:text-gray-500 dark:disabled:text-gray-500
       disabled:border-gray-200 dark:disabled:border-gray-700
       disabled:cursor-not-allowed
+      disabled:opacity-60
       ${fullWidth ? 'w-full' : ''}
       ${className}
     `

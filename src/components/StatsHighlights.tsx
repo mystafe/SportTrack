@@ -102,8 +102,8 @@ export const StatsHighlights = memo(function StatsHighlights() {
       <Button
         type="button"
         variant="ghost"
-        size="sm"
-        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand p-0 h-auto"
+        size={isMobile ? 'md' : 'sm'}
+        className={`flex w-full items-center justify-between ${isMobile ? 'text-sm' : 'text-xs'} font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand ${isMobile ? 'p-2 min-h-[44px]' : 'p-0 h-auto'}`}
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls="stats-highlights"

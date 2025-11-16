@@ -85,10 +85,13 @@ const variantStyles: Record<InputVariant, string> = {
     focus:border-brand focus:ring-2 focus:ring-brand/20
     focus:outline-none
     hover:border-gray-300 dark:hover:border-gray-600
+    active:border-brand active:ring-1 active:ring-brand/10
+    transition-all duration-fast ease-out
     disabled:bg-gray-50 dark:disabled:bg-gray-800
-    disabled:text-gray-400 dark:disabled:text-gray-600
+    disabled:text-gray-500 dark:disabled:text-gray-500
     disabled:border-gray-200 dark:disabled:border-gray-700
     disabled:cursor-not-allowed
+    disabled:opacity-60
   `,
   filled: `
     bg-gray-50 dark:bg-gray-800
@@ -98,10 +101,14 @@ const variantStyles: Record<InputVariant, string> = {
     focus:bg-white dark:focus:bg-gray-900
     focus:border-brand focus:ring-2 focus:ring-brand/20
     focus:outline-none
+    focus-visible:ring-2 focus-visible:ring-brand/30
     hover:bg-gray-100 dark:hover:bg-gray-700
+    active:border-brand active:ring-1 active:ring-brand/10
+    transition-all duration-fast ease-out
     disabled:bg-gray-50 dark:disabled:bg-gray-800
-    disabled:text-gray-400 dark:disabled:text-gray-600
+    disabled:text-gray-500 dark:disabled:text-gray-500
     disabled:cursor-not-allowed
+    disabled:opacity-60
   `,
   outlined: `
     bg-transparent
@@ -111,9 +118,12 @@ const variantStyles: Record<InputVariant, string> = {
     focus:border-brand focus:ring-2 focus:ring-brand/20
     focus:outline-none
     hover:border-gray-400 dark:hover:border-gray-500
-    disabled:text-gray-400 dark:disabled:text-gray-600
+    active:border-brand active:ring-1 active:ring-brand/10
+    transition-all duration-fast ease-out
+    disabled:text-gray-500 dark:disabled:text-gray-500
     disabled:border-gray-200 dark:disabled:border-gray-700
     disabled:cursor-not-allowed
+    disabled:opacity-60
   `,
 };
 
@@ -164,7 +174,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
     const hasError = !!error;
 
-    const sizeConfig = sizeStyles[size];
+    // Adjust minHeight for mobile touch targets (44x44px minimum)
+    const sizeConfig = {
+      ...sizeStyles[size],
+      minHeight: isMobile && size === 'sm' ? 'min-h-[44px]' : sizeStyles[size].minHeight,
+    };
     const variantStyle = variantStyles[variant].trim().replace(/\s+/g, ' ');
 
     const inputClasses = `
@@ -179,7 +193,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       ${fullWidth ? 'w-full' : ''}
       ${icon ? 'pl-10' : ''}
       ${iconRight ? 'pr-10' : ''}
-      ${hasError ? 'border-error focus:border-error focus:ring-error/20' : ''}
+      ${hasError ? 'border-error focus:border-error focus:ring-error/20 animate-shake' : ''}
       ${className}
     `
       .trim()

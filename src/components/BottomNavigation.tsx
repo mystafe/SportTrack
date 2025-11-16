@@ -66,8 +66,8 @@ export function BottomNavigation() {
       role="navigation"
       aria-label={t('nav.main')}
     >
-      <div className="container mx-auto px-2">
-        <div className="flex items-center justify-around h-16">
+      <div className="container mx-auto px-2 safe-left safe-right">
+        <div className="flex items-center justify-around h-16 safe-bottom">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -77,23 +77,25 @@ export function BottomNavigation() {
                 onClick={handleNavClick}
                 className={`
                   flex flex-col items-center justify-center gap-1
-                  min-w-[44px] min-h-[44px] px-2 py-1.5
+                  min-w-[56px] min-h-[56px] px-3 py-2
                   rounded-xl transition-all duration-200
                   touch-feedback mobile-press
                   ${isActive ? 'bg-brand/10 dark:bg-brand/20 text-brand dark:text-brand-light' : 'text-gray-600 dark:text-gray-400'}
                   ${isActive ? 'scale-105' : 'scale-100'}
                   active:scale-95
+                  hover:bg-gray-100 dark:hover:bg-gray-800
                 `}
                 aria-label={item.ariaLabel}
                 aria-current={isActive ? 'page' : undefined}
               >
                 <span
-                  className={`text-xl ${isActive ? 'scale-110' : 'scale-100'} transition-transform duration-200`}
+                  className={`text-2xl ${isActive ? 'scale-110' : 'scale-100'} transition-transform duration-200`}
+                  aria-hidden="true"
                 >
                   {item.icon}
                 </span>
                 <span
-                  className={`text-[10px] font-semibold leading-tight ${isActive ? 'opacity-100' : 'opacity-70'}`}
+                  className={`text-xs font-semibold leading-tight ${isActive ? 'opacity-100' : 'opacity-70'}`}
                 >
                   {item.label}
                 </span>

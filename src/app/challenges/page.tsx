@@ -8,6 +8,7 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { PageSkeleton, ChallengeCardSkeleton } from '@/components/LoadingSkeleton';
 import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/EmptyState';
 
 // Lazy load challenge components
 const ChallengeCard = lazy(() =>
@@ -108,34 +109,20 @@ export default function ChallengesPage() {
       </div>
 
       {challenges.length === 0 ? (
-        <div className="card-entrance text-center py-16 px-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-md hover:shadow-xl transition-shadow duration-300">
-          <div
-            className={`${isMobile ? 'text-5xl' : 'text-6xl'} mb-4 ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}
-          >
-            🎯
-          </div>
-          <p
-            className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-950 dark:text-gray-100 mb-2`}
-          >
-            {t('challenges.noChallenges')}
-          </p>
-          <p
-            className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-600 dark:text-gray-400 mb-6`}
-          >
-            {lang === 'tr'
+        <EmptyState
+          variant="challenges"
+          title={t('challenges.noChallenges')}
+          description={
+            lang === 'tr'
               ? 'İlk hedefini oluştur ve başarıya ulaş!'
-              : 'Create your first goal and achieve success!'}
-          </p>
-          <Button
-            type="button"
-            variant="primary"
-            size={isMobile ? 'md' : 'lg'}
-            onClick={handleAddChallenge}
-            className={`${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'}`}
-          >
-            + {t('challenges.addChallenge')}
-          </Button>
-        </div>
+              : 'Create your first goal and achieve success!'
+          }
+          action={{
+            label: `+ ${t('challenges.addChallenge')}`,
+            onClick: handleAddChallenge,
+            variant: 'primary',
+          }}
+        />
       ) : (
         <div className="space-y-8">
           {activeChallenges.length > 0 && (

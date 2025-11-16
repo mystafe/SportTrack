@@ -142,6 +142,15 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
     setError(null);
   }
 
+  // Listen for open-settings event from CommandPalette
+  useEffect(() => {
+    const handleOpenSettings = () => {
+      setOpen(true);
+    };
+    window.addEventListener('open-settings', handleOpenSettings);
+    return () => window.removeEventListener('open-settings', handleOpenSettings);
+  }, []);
+
   // Auto-save on change instead of requiring explicit save
   useEffect(() => {
     if (!open) return;
@@ -312,9 +321,6 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         localStorage.removeItem('sporttrack_last_login_time'); // Clear for WelcomeToast
         localStorage.removeItem('sporttrack_last_user_id'); // Clear for WelcomeToast
 
-        // Prevent onboarding from showing after logout
-        localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
-
         // Prevent login popup from showing
         localStorage.setItem('sporttrack.skip_login_popup', 'true');
       }
@@ -369,7 +375,6 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
             key.startsWith('sporttrack.') ||
             key === 'theme' ||
             key === 'lang' ||
-            key === 'onboarding_completed' ||
             key === 'name_dialog_shown'
           ) {
             localStorage.removeItem(key);
@@ -397,7 +402,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const settingsDialog =
     open && !showAuthDialog ? (
       <div
-        className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 py-4 overflow-y-auto"
+        className={`fixed inset-0 z-[10000] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/40 ${isMobile ? '' : 'backdrop-blur-sm'} px-4 py-4 overflow-y-auto safe-top safe-bottom safe-left safe-right`}
         onClick={(e) => {
           if (e.target === e.currentTarget && settings) {
             setOpen(false);
@@ -408,7 +413,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         }}
       >
         <div
-          className={`relative w-full ${isMobile ? 'max-w-full' : 'max-w-lg'} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 ${isMobile ? 'p-2.5' : 'p-4 sm:p-5'} my-auto max-h-[90vh] overflow-y-auto`}
+          className={`relative w-full ${isMobile ? 'max-w-full' : 'max-w-lg'} ${isMobile ? 'rounded-t-xl' : 'rounded-xl'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 ${isMobile ? 'p-2.5' : 'p-4 sm:p-5'} ${isMobile ? '' : 'my-auto'} max-h-[90vh] overflow-y-auto ${isMobile ? 'slide-up-bottom' : 'animate-scale-in'}`}
         >
           {/* Header */}
           <div
@@ -423,9 +428,9 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   {isAuthenticated ? (lang === 'tr' ? 'Ayarlar' : 'Settings') : t('settings.title')}
                 </h2>
                 <span
-                  className={`${isMobile ? 'text-[7px]' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
+                  className={`${isMobile ? 'text-xs' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
                 >
-                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.19.3
+                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.19.4
                 </span>
               </div>
               <button
@@ -438,7 +443,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     setDailyTarget(String(settings.dailyTarget));
                   }
                 }}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-lg leading-none"
+                className={`text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-lg leading-none flex items-center justify-center ${isMobile ? 'min-h-[44px] min-w-[44px]' : 'min-h-[36px] min-w-[36px]'}`}
                 aria-label={lang === 'tr' ? 'Kapat' : 'Close'}
                 title={lang === 'tr' ? 'Kapat' : 'Close'}
               >
@@ -486,7 +491,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 {/* Name Field */}
                 <label className={`block ${isMobile ? 'space-y-1' : 'space-y-1.5'}`}>
                   <span
-                    className={`${isMobile ? 'text-[10px]' : 'text-[11px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
+                    className={`${isMobile ? 'text-xs' : 'text-[11px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
                   >
                     {t('settings.nameLabel')}
                   </span>
@@ -506,7 +511,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <div className={`grid grid-cols-2 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.goalLabel')}
                     </span>
@@ -527,7 +532,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.moodLabel')}
                     </span>
@@ -553,7 +558,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700`}
                 >
                   <span
-                    className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
+                    className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
                   >
                     {t('data.export')} / {t('data.import')}
                   </span>
@@ -571,7 +576,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700`}
                 >
                   <span
-                    className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
+                    className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
                   >
                     {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
                   </span>
@@ -605,7 +610,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <div className={`grid grid-cols-2 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.goalLabel')}
                     </span>
@@ -626,7 +631,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.moodLabel')}
                     </span>
@@ -660,7 +665,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 >
                   <div>
                     <span
-                      className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
+                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
                     >
                       {lang === 'tr' ? 'Veri İşlemleri' : 'Data Operations'}
                     </span>
@@ -677,44 +682,32 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                           <Button
                             type="button"
                             variant="outline"
-                            size="sm"
+                            size={isMobile ? 'md' : 'sm'}
                             onClick={handleClearData}
-                            className="px-1.5 text-base"
-                            style={{
-                              height: '24px',
-                              minHeight: '24px',
-                              maxHeight: '24px',
-                              width: '24px',
-                              minWidth: '24px',
-                              maxWidth: '24px',
-                            }}
+                            className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-base flex items-center justify-center`}
+                            style={
+                              isMobile
+                                ? {
+                                    height: '44px',
+                                    minHeight: '44px',
+                                    maxHeight: '44px',
+                                    width: '44px',
+                                    minWidth: '44px',
+                                    maxWidth: '44px',
+                                  }
+                                : {
+                                    height: '24px',
+                                    minHeight: '24px',
+                                    maxHeight: '24px',
+                                    width: '24px',
+                                    minWidth: '24px',
+                                    maxWidth: '24px',
+                                  }
+                            }
                             title={t('settings.clearData')}
                             aria-label={t('settings.clearData')}
                           >
                             🗑️
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              if (typeof window !== 'undefined' && window.resetOnboarding) {
-                                window.resetOnboarding();
-                              }
-                            }}
-                            className="px-1.5 text-base"
-                            style={{
-                              height: '24px',
-                              minHeight: '24px',
-                              maxHeight: '24px',
-                              width: '24px',
-                              minWidth: '24px',
-                              maxWidth: '24px',
-                            }}
-                            title={t('settings.showOnboarding') || 'Show Onboarding Tour'}
-                            aria-label={t('settings.showOnboarding') || 'Show Onboarding Tour'}
-                          >
-                            🎓
                           </Button>
                         </>
                       )}
@@ -723,7 +716,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                   <div>
                     <span
-                      className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
+                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
                     >
                       {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
                     </span>
@@ -779,7 +772,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   {keyboardShortcuts && (
                     <div>
                       <span
-                        className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
+                        className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
                       >
                         {t('settings.keyboardShortcuts')}
                       </span>
@@ -791,7 +784,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       <button
                         type="button"
                         onClick={() => keyboardShortcuts.showHelp()}
-                        className={`w-full px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
+                        className={`w-full px-2 py-1 ${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
                       >
                         {t('settings.keyboardShortcuts')}
                       </button>
@@ -847,14 +840,14 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
           onClick={() => setOpen(true)}
           className={`${
             isMobile
-              ? 'px-3 py-2 min-h-[36px] min-w-[52px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 gap-1.5 overflow-hidden max-w-[320px] sm:max-w-none'
-              : 'px-4 py-1.5 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center gap-2 max-w-[480px]'
+              ? 'px-3 py-2 min-h-[36px] min-w-[280px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 gap-1.5 overflow-hidden max-w-[400px] sm:max-w-none'
+              : 'px-4 py-1.5 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center gap-2 max-w-[1400px]'
           } truncate`}
           title={displayName}
           aria-label={displayName}
           data-tour-id="profile"
         >
-          <span className={`${isMobile ? 'text-[11px] sm:text-xs' : 'text-xs'} truncate`}>
+          <span className={`${isMobile ? 'text-xs' : 'text-xs'} truncate`}>
             {isMobile && typeof displayName === 'string' && displayName.length > 12
               ? displayName.substring(0, 12) + '...'
               : displayName}

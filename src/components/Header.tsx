@@ -25,7 +25,7 @@ export function Header() {
         <Link href="/" className="flex-shrink-0 flex items-center" aria-label={t('nav.home')}>
           <Logo />
         </Link>
-        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm min-w-0 flex-1 justify-end">
+        <div className="flex items-center gap-2 sm:gap-2 text-xs sm:text-sm min-w-0 flex-1 justify-end">
           {/* Navigation Icons - Hidden on mobile (BottomNavigation handles this) */}
           {!isMobile && (
             <div className="flex items-center gap-0.5 sm:gap-0.5 flex-shrink-0">

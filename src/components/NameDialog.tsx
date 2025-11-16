@@ -92,7 +92,7 @@ export function NameDialog() {
 
   const dialog = open ? (
     <div
-      className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/50 px-4 py-4 overflow-y-auto"
+      className={`fixed inset-0 z-[10001] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} px-4 py-4 overflow-y-auto safe-top safe-bottom safe-left safe-right`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           // Don't allow closing by clicking outside - user must enter name
@@ -102,7 +102,7 @@ export function NameDialog() {
       <Card
         variant="default"
         size="md"
-        className="relative w-full max-w-md my-auto"
+        className={`relative w-full ${isMobile ? 'max-w-full rounded-t-xl' : 'max-w-md rounded-xl'} ${isMobile ? '' : 'my-auto'} ${isMobile ? 'slide-up-bottom' : 'animate-scale-in'} max-h-[90vh] overflow-y-auto`}
         header={
           <>
             <h2

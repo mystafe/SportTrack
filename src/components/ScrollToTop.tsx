@@ -9,7 +9,6 @@ import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 import { Button } from '@/components/ui/Button';
 
 export function ScrollToTop() {
-  const [mounted, setMounted] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const isMobile = useIsMobile();
   const { t } = useI18n();
@@ -17,8 +16,6 @@ export function ScrollToTop() {
   const { triggerHaptic } = useHapticFeedback();
 
   useEffect(() => {
-    setMounted(true);
-
     // Check if settings dialog is open
     const checkSettingsOpen = () => {
       const settingsDialog = document.querySelector('[class*="z-[10000]"]');
@@ -33,9 +30,6 @@ export function ScrollToTop() {
     return () => observer.disconnect();
   }, []);
 
-  // Don't show if settings is open
-  if (settingsOpen) return null;
-
   const scrollToTop = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -43,20 +37,27 @@ export function ScrollToTop() {
 
     triggerHaptic('light');
 
-    // Try multiple scroll methods for better compatibility
-    const scrollToTop = () => {
-      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-      if (currentScroll > 0) {
-        window.requestAnimationFrame(scrollToTop);
-        window.scrollTo(0, currentScroll - currentScroll / 8);
-      } else {
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-      }
-    };
+    // Use smooth scroll behavior for better UX
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
 
-    scrollToTop();
+    // Fallback for older browsers
+    if (!('scrollBehavior' in document.documentElement.style)) {
+      const scrollToTop = () => {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        if (currentScroll > 0) {
+          window.requestAnimationFrame(scrollToTop);
+          window.scrollTo(0, currentScroll - currentScroll / 8);
+        } else {
+          window.scrollTo(0, 0);
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        }
+      };
+      scrollToTop();
+    }
   };
 
   const handleAddActivity = (e: MouseEvent<HTMLButtonElement>) => {
@@ -84,56 +85,71 @@ export function ScrollToTop() {
     }, 150);
   };
 
-  if (!mounted) return null;
-
   // Calculate position above QuoteTicker - just above scrolling text
   // QuoteTicker height: ~32px + BottomNavigation: 64px + safe-bottom
   // Position button just above QuoteTicker with small gap
-  const bottomOffset = isMobile ? 'bottom-[112px]' : 'bottom-[104px]';
+  const bottomOffset = isMobile
+    ? `calc(112px + max(0px, env(safe-area-inset-bottom, 0px)))`
+    : '104px';
 
   return (
     <div
-      className={`fixed ${bottomOffset} right-4 sm:right-6 z-[99999] transition-all duration-500 ease-in-out flex flex-col items-center gap-2`}
+      className={`fixed right-4 sm:right-6 z-[9999] transition-all duration-500 ease-in-out flex flex-col items-center gap-2`}
       style={{
         willChange: 'opacity, transform',
         position: 'fixed',
+        bottom: bottomOffset,
       }}
     >
       {/* Add Exercise Button - Above Top Button */}
-      <Button
-        onClick={handleAddActivity}
-        type="button"
-        variant="ghost"
-        size={isMobile ? 'sm' : 'md'}
-        className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-transparent text-brand dark:text-brand-light shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''} opacity-100 relative p-0`}
-        aria-label={t('actions.addActivity')}
-        title={t('actions.addActivity')}
-      >
+      <div className="flex flex-col items-center gap-1">
+        <div className="relative">
+          {/* Backdrop blur effect (Apple liquid glass effect) */}
+          <div className="absolute inset-0 rounded-full bg-white/30 dark:bg-gray-900/30 backdrop-blur-md backdrop-saturate-150 -z-10"></div>
+          <Button
+            onClick={handleAddActivity}
+            type="button"
+            variant="ghost"
+            size={isMobile ? 'sm' : 'md'}
+            className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-white/20 dark:bg-gray-900/20 backdrop-blur-sm text-brand dark:text-brand-light shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''} opacity-100 relative p-0 border border-white/20 dark:border-gray-700/30`}
+            aria-label={t('actions.addActivity')}
+            title={t('actions.addActivity')}
+            data-tour-id="add-activity"
+          >
+            <span
+              className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black drop-shadow-lg relative z-10 whitespace-nowrap`}
+            >
+              𓂃🪶
+            </span>
+          </Button>
+        </div>
         <span
-          className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black drop-shadow-lg relative z-10 whitespace-nowrap`}
+          className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400 font-medium whitespace-nowrap`}
         >
-          𓂃🪶
+          {t('actions.addActivity')}
         </span>
-      </Button>
+      </div>
 
-      {/* Scroll To Top Button */}
-      <Button
-        onClick={scrollToTop}
-        type="button"
-        variant="primary"
-        size={isMobile ? 'sm' : 'md'}
-        className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''} border-2 border-white/20 dark:border-white/15 opacity-30 hover:opacity-60 relative overflow-visible p-0`}
-        aria-label={t('scrollToTop') || 'Scroll to top'}
-        title={t('scrollToTop') || 'Scroll to top'}
-      >
-        <span
-          className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black drop-shadow-md relative z-10`}
+      {/* Scroll To Top Button - Hide if settings is open */}
+      {!settingsOpen && (
+        <Button
+          onClick={scrollToTop}
+          type="button"
+          variant="primary"
+          size={isMobile ? 'sm' : 'md'}
+          className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''} border-2 border-white/20 dark:border-white/15 opacity-30 hover:opacity-60 relative overflow-visible p-0`}
+          aria-label={t('scrollToTop') || 'Scroll to top'}
+          title={t('scrollToTop') || 'Scroll to top'}
         >
-          ↑
-        </span>
-        {/* Subtle glow effect - only on hover */}
-        <div className="absolute inset-0 rounded-full bg-brand/20 blur-sm -z-10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-      </Button>
+          <span
+            className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black drop-shadow-md relative z-10`}
+          >
+            ↑
+          </span>
+          {/* Subtle glow effect - only on hover */}
+          <div className="absolute inset-0 rounded-full bg-brand/20 blur-sm -z-10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+        </Button>
+      )}
     </div>
   );
 }

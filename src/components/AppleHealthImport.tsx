@@ -241,15 +241,26 @@ export function AppleHealthImport() {
   return (
     <>
       <label
-        className="px-1.5 text-base rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none"
-        style={{
-          height: '24px',
-          minHeight: '24px',
-          maxHeight: '24px',
-          width: '24px',
-          minWidth: '24px',
-          maxWidth: '24px',
-        }}
+        className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-base rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none`}
+        style={
+          isMobile
+            ? {
+                height: '44px',
+                minHeight: '44px',
+                maxHeight: '44px',
+                width: '44px',
+                minWidth: '44px',
+                maxWidth: '44px',
+              }
+            : {
+                height: '24px',
+                minHeight: '24px',
+                maxHeight: '24px',
+                width: '24px',
+                minWidth: '24px',
+                maxWidth: '24px',
+              }
+        }
         title={lang === 'tr' ? 'Sağlık Verisi İçe Aktar' : 'Import Health Data'}
       >
         <input

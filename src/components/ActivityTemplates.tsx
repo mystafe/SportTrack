@@ -87,8 +87,8 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
       <Button
         type="button"
         variant="ghost"
-        size="sm"
-        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand p-0 h-auto"
+        size={isMobile ? 'md' : 'sm'}
+        className={`flex w-full items-center justify-between ${isMobile ? 'text-sm' : 'text-xs'} font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand ${isMobile ? 'p-2 min-h-[44px]' : 'p-0 h-auto'}`}
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls="activity-templates"
@@ -127,7 +127,7 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
                     key={template.id}
                     type="button"
                     variant="outline"
-                    size="sm"
+                    size={isMobile ? 'md' : 'sm'}
                     onClick={() => handleTemplateClick(template)}
                     disabled={isAdding}
                     className={`stagger-item template-card-enhanced ${isMobile ? 'touch-feedback mobile-press mobile-card-lift fade-in-scale-mobile' : 'ripple-effect magnetic-hover tilt-3d'} relative flex flex-col items-start ${isMobile ? 'gap-2 p-2.5 rounded-lg min-h-[100px]' : 'gap-3 p-4 rounded-xl min-h-[120px]'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 hover:border-brand dark:hover:border-brand/60 hover:bg-gradient-to-br hover:from-brand/5 hover:via-brand/3 hover:to-brand/5 dark:hover:from-brand/10 dark:hover:via-brand/8 dark:hover:to-brand/10 hover:shadow-xl hover:shadow-brand/20 dark:hover:shadow-brand/30 transition-all duration-300 scale-on-interact disabled:opacity-50 disabled:cursor-not-allowed group gpu-accelerated`}

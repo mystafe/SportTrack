@@ -41,8 +41,8 @@ export const StatsCards = memo(function StatsCards() {
       <Button
         type="button"
         variant="ghost"
-        size="sm"
-        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand p-0 h-auto"
+        size={isMobile ? 'md' : 'sm'}
+        className={`flex w-full items-center justify-between ${isMobile ? 'text-sm' : 'text-xs'} font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand ${isMobile ? 'p-2 min-h-[44px]' : 'p-0 h-auto'}`}
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls={`stats-section-${id}`}
@@ -100,8 +100,8 @@ export const StatsCards = memo(function StatsCards() {
       <Button
         type="button"
         variant="ghost"
-        size="sm"
-        className="flex w-full items-center justify-between text-xs font-semibold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand p-0 h-auto"
+        size={isMobile ? 'md' : 'sm'}
+        className={`flex w-full items-center justify-between ${isMobile ? 'text-sm' : 'text-xs'} font-semibold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand ${isMobile ? 'p-2 min-h-[44px]' : 'p-0 h-auto'}`}
         onClick={() => setOverviewOpen(!overviewOpen)}
         aria-expanded={overviewOpen}
         aria-controls="stats-overview"
@@ -152,10 +152,10 @@ export const StatsCards = memo(function StatsCards() {
         {overviewOpen && (
           <div
             id="stats-overview"
-            className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-2' : 'gap-3'}`}
+            className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} ${isMobile ? 'gap-3' : 'gap-3'}`}
           >
             <div
-              className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-emerald-500 dark:border-emerald-400/50 ring-2 ring-emerald-500/20 dark:ring-emerald-400/20 pulse-glow-mobile' : ''}`}
+              className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-4 space-y-2' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated ${showGoalAnimation ? 'goal-completed border-emerald-500 dark:border-emerald-400/50 ring-2 ring-emerald-500/20 dark:ring-emerald-400/20 pulse-glow-mobile' : ''}`}
             >
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -178,7 +178,7 @@ export const StatsCards = memo(function StatsCards() {
                 )}
               </div>
               <div
-                className={`${isMobile ? 'h-3' : 'h-2.5'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden relative shadow-inner`}
+                className={`${isMobile ? 'h-3.5' : 'h-2.5'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden relative shadow-inner`}
                 role="progressbar"
                 aria-valuenow={pct}
                 aria-valuemin={0}
@@ -201,7 +201,7 @@ export const StatsCards = memo(function StatsCards() {
               </div>
             </div>
             <div
-              className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated`}
+              className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-4 space-y-2' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated`}
               role="region"
               aria-label={t('stats.totalPoints')}
             >
@@ -223,7 +223,7 @@ export const StatsCards = memo(function StatsCards() {
               </div>
             </div>
             <div
-              className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated`}
+              className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-4 space-y-2' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated`}
               role="region"
               aria-label={t('stats.streak')}
             >
@@ -245,7 +245,7 @@ export const StatsCards = memo(function StatsCards() {
               </div>
             </div>
             <div
-              className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated`}
+              className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-4 space-y-2' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover tilt-3d gpu-accelerated`}
             >
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -269,7 +269,7 @@ export const StatsCards = memo(function StatsCards() {
         )}
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4">
+      <div className={`grid grid-cols-1 lg:grid-cols-2 ${isMobile ? 'gap-4' : 'gap-3'} mt-4`}>
         <Card
           variant="default"
           size="sm"
@@ -289,11 +289,11 @@ export const StatsCards = memo(function StatsCards() {
                   {t('stats.noActivityToday')}
                 </div>
               ) : (
-                <ul className="space-y-2">
+                <ul className={isMobile ? 'space-y-2.5' : 'space-y-2'}>
                   {summary.breakdownToday.map((item) => (
                     <li
                       key={item.key}
-                      className="flex items-center justify-between gap-3 border-2 rounded-lg px-3 py-2.5 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900/50 dark:to-gray-800/50 transition-all duration-200 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 hover:shadow-md "
+                      className={`flex items-center justify-between gap-3 border-2 rounded-lg ${isMobile ? 'px-3 py-3' : 'px-3 py-2.5'} border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900/50 dark:to-gray-800/50 transition-all duration-200 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 hover:shadow-md`}
                     >
                       <div className="flex items-center gap-3">
                         <div className="text-xl">{item.icon}</div>
@@ -333,11 +333,11 @@ export const StatsCards = memo(function StatsCards() {
               {summary.lastSevenDays.length === 0 ? (
                 <div className="text-sm text-gray-700 dark:text-gray-300">{t('stats.noData')}</div>
               ) : (
-                <ul className={`${isMobile ? 'space-y-1.5' : 'space-y-2'}`}>
+                <ul className={isMobile ? 'space-y-2' : 'space-y-2'}>
                   {summary.lastSevenDays.map((day) => (
                     <li
                       key={day.date}
-                      className={`flex items-center justify-between gap-2 border-2 rounded-lg ${isMobile ? 'px-2 py-1.5' : 'px-3 py-2'} border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900/50 dark:to-gray-800/50 transition-all duration-200 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 hover:shadow-md`}
+                      className={`flex items-center justify-between gap-2 border-2 rounded-lg ${isMobile ? 'px-3 py-2' : 'px-3 py-2'} border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900/50 dark:to-gray-800/50 transition-all duration-200 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 hover:shadow-md`}
                     >
                       <div
                         className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-gray-950 dark:text-gray-100 truncate`}

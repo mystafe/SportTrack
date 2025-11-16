@@ -74,6 +74,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   const triggerRef = useRef<HTMLElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const tooltipId = useRef(`tooltip-${Math.random().toString(36).substr(2, 9)}`);
   const isMobile = useIsMobile();
 
   const positionConfig = positionStyles[position];
@@ -195,6 +196,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
       hideTooltip();
       (children as React.ReactElement<any>).props.onBlur?.(e);
     },
+    'aria-describedby': isVisible ? `tooltip-${tooltipId.current}` : undefined,
+    'aria-label': typeof content === 'string' ? content : undefined,
   });
 
   const tooltipClasses = `
@@ -235,6 +238,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       {typeof window !== 'undefined' &&
         createPortal(
           <div
+            id={`tooltip-${tooltipId.current}`}
             ref={tooltipRef}
             className={tooltipClasses}
             style={{
@@ -244,6 +248,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
             }}
             role="tooltip"
             aria-hidden={!isVisible}
+            aria-live="polite"
           >
             {content}
             <div className={arrowClasses} />

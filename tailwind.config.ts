@@ -12,6 +12,13 @@ export default {
           dark: '#0284c7',
           light: '#38bdf8',
         },
+        primary: designTokens.colors.primary,
+        secondary: designTokens.colors.secondary,
+        success: designTokens.colors.success,
+        warning: designTokens.colors.warning,
+        error: designTokens.colors.error,
+        info: designTokens.colors.info,
+        neutral: designTokens.colors.neutral,
       },
       boxShadow: {
         card: designTokens.shadows.elevation[2],

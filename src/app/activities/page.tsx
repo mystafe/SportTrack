@@ -19,6 +19,8 @@ import { ActivityCard } from '@/components/ActivityCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/EmptyState';
+import { useRouter } from 'next/navigation';
 
 function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
   const hours = Math.floor(seconds / 3600);
@@ -34,6 +36,7 @@ function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
 export default function ActivitiesPage() {
   const { t } = useI18n();
   const isMobile = useIsMobile();
+  const router = useRouter();
   return (
     <main className="space-y-4 sm:space-y-5" role="main" aria-label={t('nav.activities')}>
       <div className="flex items-center justify-between">
@@ -129,7 +132,7 @@ function ActivitiesClient() {
   };
 
   return (
-    <PullToRefresh onRefresh={handleRefresh} className="space-y-3 sm:space-y-4">
+    <PullToRefresh onRefresh={handleRefresh} className="space-y-4 sm:space-y-5">
       {/* Compact Filters */}
       <ActivityFilters filters={filters} onFiltersChange={setFilters} />
 
@@ -151,7 +154,7 @@ function ActivitiesClient() {
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-3 sm:space-y-2">
         <div className="flex items-center justify-between text-xs sm:text-sm font-medium px-1">
           <span>{t('list.records')}</span>
           {filteredActivities.length !== activities.length && (
@@ -210,6 +213,10 @@ function ActivitiesClient() {
                   }}
                   onSaved={() => {
                     setEditingId(null);
+                    // Redirect to home after edit
+                    setTimeout(() => {
+                      router.push('/');
+                    }, 500);
                   }}
                   onCancel={() => setEditingId(null)}
                 />
@@ -236,6 +243,10 @@ function ActivitiesClient() {
                   setEditingId(null);
                 }
                 setDeleteConfirm(null);
+                // Redirect to home after delete
+                setTimeout(() => {
+                  router.push('/');
+                }, 500);
               }
             }}
             onCancel={() => setDeleteConfirm(null)}
@@ -246,14 +257,39 @@ function ActivitiesClient() {
               <div className="h-10 rounded skeleton" />
               <div className="h-10 rounded skeleton" />
             </div>
+          ) : filteredActivities.length === 0 && activities.length === 0 ? (
+            <EmptyState
+              variant="activities"
+              title={lang === 'tr' ? 'Henüz aktivite yok' : 'No activities yet'}
+              description={
+                lang === 'tr'
+                  ? 'Fitness yolculuğunuza başlamak için ilk aktivitenizi ekleyin.'
+                  : 'Add your first activity to start tracking your fitness journey.'
+              }
+              action={
+                isMobile
+                  ? undefined
+                  : {
+                      label: t('actions.addActivity'),
+                      onClick: () => (window.location.href = '/add'),
+                      variant: 'primary',
+                    }
+              }
+            />
           ) : filteredActivities.length === 0 ? (
-            <div className="p-4 text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium">
-              {t('filters.noResults')}
-            </div>
+            <EmptyState
+              variant="search"
+              title={t('filters.noResults')}
+              description={
+                lang === 'tr'
+                  ? 'Filtreleri değiştirerek tekrar deneyin.'
+                  : 'Try changing the filters.'
+              }
+            />
           ) : (
-            <div className="space-y-1">
+            <div className={isMobile ? 'space-y-3' : 'space-y-2'}>
               {groups.map(({ day, acts }, groupIndex) => (
-                <div key={day} className="space-y-1">
+                <div key={day} className={isMobile ? 'space-y-2' : 'space-y-1'}>
                   <div className="sticky top-0 z-10 date-header-entrance bg-gradient-to-r from-brand/10 via-brand/5 to-brand/10 dark:from-brand/20 dark:via-brand/10 dark:to-brand/20 backdrop-blur-md px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white border-b-2 border-brand/30 dark:border-brand/40 rounded-t-xl shadow-sm">
                     <div className="flex items-center gap-2">
                       <span className="text-brand dark:text-brand-light">📅</span>
@@ -263,7 +299,7 @@ function ActivitiesClient() {
                     </div>
                   </div>
                   <ul
-                    className={`${(settings?.listDensity ?? 'comfortable') === 'compact' ? 'space-y-1' : 'space-y-2'} px-1 pb-2`}
+                    className={`${(settings?.listDensity ?? 'comfortable') === 'compact' ? (isMobile ? 'space-y-2' : 'space-y-1') : isMobile ? 'space-y-3' : 'space-y-2'} ${isMobile ? 'px-0 pb-3' : 'px-1 pb-2'}`}
                   >
                     {acts.map((activity, actIndex) => {
                       const isToday =

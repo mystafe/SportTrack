@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only:focus,
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
 /* ============================================================================
    DESIGN TOKENS - CSS Custom Properties
    ============================================================================ */
@@ -144,6 +169,92 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+/* Platform-specific optimizations */
+@media (display-mode: standalone) {
+  body {
+    /* PWA standalone mode optimizations */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Prevent text selection on long press in standalone mode */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* iOS-specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* iOS momentum scrolling */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent iOS text size adjustment */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents zoom on focus */
+  }
+
+  @media (max-width: 640px) {
+    input,
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* Android-specific optimizations */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  /* Android Chrome specific */
+  body {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Material Design ripple effect support */
+  * {
+    -webkit-tap-highlight-color: rgba(14, 165, 233, 0.2);
+  }
+}
+
+/* Desktop-specific optimizations */
+@media (min-width: 1024px) {
+  /* Desktop hover effects */
+  * {
+    cursor: default;
+  }
+
+  button,
+  a,
+  [role='button'] {
+    cursor: pointer;
+  }
+
+  /* Desktop scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(14, 165, 233, 0.4);
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(14, 165, 233, 0.6);
+  }
 }
 
 html {
@@ -372,6 +483,145 @@ body {
   }
 }
 
+/* Ripple animation */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Shake animation for errors */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* Checkmark animation */
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.animate-checkmark {
+  animation: checkmark 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+/* Slide up animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Slide down animation */
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scale bounce animation */
+@keyframes scaleBounce {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-scale-bounce {
+  animation: scaleBounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Fade in with scale */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pulse glow animation */
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(14, 165, 233, 0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 @keyframes slideDownFadeIn {
   from {
     transform: translateY(-20px) translateX(-50%);
@@ -401,18 +651,25 @@ body {
 
 .animate-slide-in-right {
   animation: slideInRight 0.5s ease-out;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .animate-slide-out-right {
   animation: slideOutRight 0.3s ease-in;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .animate-fade-in {
   animation: fadeIn 0.2s ease-out;
+  will-change: opacity;
 }
 
 .animate-scale-in {
   animation: scaleIn 0.2s ease-out;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .animate-progress {
@@ -655,6 +912,8 @@ body {
 
 .page-transition {
   animation: pageFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .page-transitioning {
@@ -685,6 +944,9 @@ body {
 .stagger-item {
   opacity: 1 !important; /* Always visible */
   animation: staggerFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  contain: layout style paint;
 }
 
 .stagger-item:nth-child(1) {
@@ -731,11 +993,15 @@ body {
 
 .float-animation {
   animation: float 3s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .float-animation-delayed {
   animation: float 3s ease-in-out infinite;
   animation-delay: 1.5s;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* Gradient animation */
@@ -985,6 +1251,46 @@ body {
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
+  /* Smooth scrolling for all browsers */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(14, 165, 233, 0.3);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(14, 165, 233, 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 0.6);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(14, 165, 233, 0.3) transparent;
+}
+
+.dark * {
+  scrollbar-color: rgba(14, 165, 233, 0.4) transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -996,6 +1302,42 @@ html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* Disable smooth scroll for users who prefer reduced motion */
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Platform-specific utility classes */
+.platform-ios {
+  /* iOS-specific styles */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+
+.platform-android {
+  /* Android-specific styles */
+  -webkit-tap-highlight-color: rgba(14, 165, 233, 0.2);
+}
+
+.platform-desktop {
+  /* Desktop-specific styles */
+  cursor: default;
+}
+
+.platform-desktop button,
+.platform-desktop a,
+.platform-desktop [role='button'] {
+  cursor: pointer;
+}
+
+.platform-standalone {
+  /* PWA standalone mode styles */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 /* ============================================
@@ -1022,6 +1364,7 @@ html {
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  contain: layout style paint;
 }
 
 .touch-feedback::before {
@@ -1032,18 +1375,30 @@ html {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(14, 165, 233, 0.3);
+  background: rgba(14, 165, 233, 0.4);
   transform: translate(-50%, -50%);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition:
+    opacity 0.2s ease,
+    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .touch-feedback:active::before {
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   opacity: 1;
-  animation: touchRipple 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: touchRipple 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced ripple for mobile */
+@media (max-width: 640px) {
+  .touch-feedback:active::before {
+    width: 400px;
+    height: 400px;
+    background: rgba(14, 165, 233, 0.5);
+  }
 }
 
 /* Press animation for mobile */
@@ -1060,13 +1415,23 @@ html {
 }
 
 .mobile-press {
-  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.15s ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .mobile-press:active {
   animation: pressDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: brightness(0.95);
+}
+
+/* Smooth active state for better visual feedback */
+.mobile-press:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 /* Swipe gesture hint animation */
@@ -1098,6 +1463,31 @@ html {
 
 .pull-refresh {
   animation: pullRefresh 1s linear infinite;
+}
+
+/* Pull-to-refresh support for mobile */
+@media (max-width: 640px) {
+  body {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Enable pull-to-refresh on mobile */
+  main {
+    overscroll-behavior-y: auto;
+  }
+}
+
+/* Smooth scroll for anchor links */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Smooth scroll for programmatic scrolling */
+  [data-smooth-scroll] {
+    scroll-behavior: smooth;
+  }
 }
 
 /* Long press menu animation */
@@ -1355,16 +1745,62 @@ html {
 /* Performance optimizations */
 .will-change-transform {
   will-change: transform;
+  transform: translateZ(0);
 }
 
 .will-change-opacity {
   will-change: opacity;
 }
 
+.will-change-auto {
+  will-change: auto;
+}
+
 .gpu-accelerated {
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
+}
+
+/* CSS containment for better performance */
+.contain-layout {
+  contain: layout;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+.contain-size {
+  contain: size;
+}
+
+.contain-strict {
+  contain: strict;
+}
+
+.contain-content {
+  contain: layout style paint;
+}
+
+/* Optimize animations - remove will-change after animation completes */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-slide-in-right,
+  .animate-slide-out-right,
+  .animate-fade-in,
+  .animate-scale-in,
+  .stagger-item,
+  .float-animation,
+  .float-animation-delayed {
+    will-change: transform, opacity;
+  }
+
+  /* Animation fill mode for proper cleanup */
+  .animate-slide-in-right,
+  .animate-fade-in,
+  .animate-scale-in {
+    animation-fill-mode: forwards;
+  }
 }
 
 /* ============================================

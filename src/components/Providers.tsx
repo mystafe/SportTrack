@@ -20,11 +20,11 @@ import { NameDialog } from '@/components/NameDialog';
 const InstallPrompt = lazy(() =>
   import('@/components/InstallPrompt').then((m) => ({ default: m.InstallPrompt }))
 );
-const OnboardingManager = lazy(() =>
-  import('@/components/OnboardingManager').then((m) => ({ default: m.OnboardingManager }))
-);
 const KeyboardShortcuts = lazy(() =>
   import('@/components/KeyboardShortcuts').then((m) => ({ default: m.KeyboardShortcuts }))
+);
+const CommandPalette = lazy(() =>
+  import('@/components/CommandPalette').then((m) => ({ default: m.CommandPalette }))
 );
 const ConflictResolutionManager = lazy(() =>
   import('@/components/ConflictResolutionManager').then((m) => ({
@@ -61,10 +61,10 @@ export function Providers({ children }: { children: ReactNode }) {
                       </Suspense>
                       <NotificationManager />
                       <Suspense fallback={null}>
-                        <OnboardingManager />
+                        <KeyboardShortcuts />
                       </Suspense>
                       <Suspense fallback={null}>
-                        <KeyboardShortcuts />
+                        <CommandPalette />
                       </Suspense>
                       <BadgeUnlockNotification />
                       <OnlineStatusIndicator />

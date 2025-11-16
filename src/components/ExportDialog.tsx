@@ -171,7 +171,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[9999] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
+      className={`fixed inset-0 z-[10001] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"

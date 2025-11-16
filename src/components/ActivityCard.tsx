@@ -99,10 +99,10 @@ export function ActivityCard({
         className={`activity-card-entrance activity-card-shimmer activity-card-hover activity-ripple gpu-accelerated group relative rounded-2xl ${isToday ? 'ring-4 ring-brand/40 dark:ring-brand/50 shadow-2xl' : 'shadow-xl'} border-2 ${isToday ? 'border-brand/50 dark:border-brand/60' : 'border-gray-300/60 dark:border-gray-600/60'} bg-gradient-to-br ${isToday ? 'from-brand/10 via-white to-brand/5 dark:from-brand/20 dark:via-gray-900 dark:to-brand/10' : 'from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'} ${
           density === 'compact'
             ? isMobile
-              ? 'px-3 py-2'
+              ? 'px-4 py-2.5'
               : 'px-4 py-2.5'
             : isMobile
-              ? 'px-4 py-3'
+              ? 'px-5 py-4'
               : 'px-5 py-4'
         } hover:shadow-2xl hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 overflow-hidden ${swipeHandlers.isSwiping ? 'cursor-grabbing scale-[0.98]' : ''}`}
         style={{ animationDelay }}
@@ -147,14 +147,18 @@ export function ActivityCard({
                 >
                   <span className="text-sm drop-shadow-md">✨</span>
                   <span className="ml-2 font-black">{numberFormatter.format(activity.points)}</span>
-                  <span className="ml-1.5 text-[10px] opacity-95 font-bold">
+                  <span
+                    className={`ml-1.5 ${isMobile ? 'text-xs' : 'text-[10px]'} opacity-95 font-bold`}
+                  >
                     {t('list.pointsUnit')}
                   </span>
                 </Badge>
               </div>
             </div>
             {isToday && (
-              <span className="px-2 py-1 rounded-lg bg-green-500/20 dark:bg-green-500/30 text-green-700 dark:text-green-400 text-[10px] font-bold uppercase tracking-wide border border-green-500/30">
+              <span
+                className={`px-2 py-1 rounded-lg bg-green-500/20 dark:bg-green-500/30 text-green-700 dark:text-green-400 ${isMobile ? 'text-xs' : 'text-[10px]'} font-bold uppercase tracking-wide border border-green-500/30`}
+              >
                 {lang === 'tr' ? 'Bugün' : 'Today'}
               </span>
             )}
@@ -197,10 +201,12 @@ export function ActivityCard({
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 pt-2 border-t border-gray-200/50 dark:border-gray-700/50 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all duration-300">
+          <div
+            className={`flex items-center gap-2 pt-2 border-t border-gray-200/50 dark:border-gray-700/50 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'} transition-all duration-300`}
+          >
             <Button
               variant="primary"
-              size={isMobile ? 'sm' : 'md'}
+              size={isMobile ? 'md' : 'md'}
               onClick={() => onEdit(activity.id)}
               icon="✏️"
               className="flex-1"
@@ -209,7 +215,7 @@ export function ActivityCard({
             </Button>
             <Button
               variant="danger"
-              size={isMobile ? 'sm' : 'md'}
+              size={isMobile ? 'md' : 'md'}
               onClick={() => {
                 if (!isToday) return;
                 onDelete(activity.id, activity);

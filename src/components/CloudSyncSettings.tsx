@@ -176,72 +176,50 @@ export function CloudSyncSettings() {
       return;
     }
 
+    // Instead of syncing directly, open conflict dialog
     setSyncing(true);
     try {
-      // Debug log only in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Data to sync:', {
-          activities: activities.length,
-          settings: settings ? 'present' : 'null',
-          badges: badges.length,
-          challenges: challenges.length,
+      const cloudData = await syncFromCloud();
+      const localData = { activities, settings, badges, challenges };
+
+      if (cloudData) {
+        // Convert CloudData to conflict format
+        setConflictData({
+          local: localData,
+          cloud: {
+            activities: (cloudData.exercises || cloudData.activities || []) as unknown[],
+            settings: cloudData.settings,
+            badges: (cloudData.badges || []) as unknown[],
+            challenges: (cloudData.challenges || []) as unknown[],
+            metadata: cloudData.metadata,
+            points: cloudData.points,
+          },
         });
-      }
-
-      await syncToCloud({
-        activities,
-        settings,
-        badges,
-        challenges,
-      });
-
-      // Show toast only for manual sync
-      showToast(lang === 'tr' ? 'Buluta senkronize edildi!' : 'Synced to cloud!', 'success');
-    } catch (error) {
-      // Log error only in development
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Sync error in handleSyncToCloud:', error);
-      }
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
-      // Check if error is due to offline mode
-      // Note: syncToCloud now returns silently when offline, so this catch block
-      // should only catch real errors, not offline mode
-      if (errorMessage.includes('Offline') || errorMessage.includes('offline')) {
-        // Offline mode - data is queued, show info message instead of error
-        // Get current pending count from sync state
-        const currentPendingCount = syncState.pendingChanges || 0;
-        showToast(
-          lang === 'tr'
-            ? `Offline: ${currentPendingCount} değişiklik senkronizasyon için kuyruğa eklendi`
-            : `Offline: ${currentPendingCount} changes queued for sync`,
-          'info'
-        );
+        setShowConflictDialog(true);
       } else {
-        // Real error - show error message
-        showToast(
-          lang === 'tr' ? `Senkronizasyon hatası: ${errorMessage}` : `Sync error: ${errorMessage}`,
-          'error'
-        );
+        // No cloud data, show local data only
+        setConflictData({
+          local: localData,
+          cloud: {
+            activities: [],
+            settings: null,
+            badges: [],
+            challenges: [],
+            points: 0,
+            metadata: {
+              lastModified: new Date(),
+              version: Date.now(),
+              userId: user?.uid || 'unknown',
+            },
+          },
+        });
+        setShowConflictDialog(true);
       }
+    } catch (error) {
+      console.error('Failed to fetch cloud data:', error);
+      showToast(lang === 'tr' ? 'Bulut verileri alınamadı' : 'Failed to fetch cloud data', 'error');
     } finally {
       setSyncing(false);
-
-      // Check for conflicts after sync completes (optimized: only if needed)
-      if (isAuthenticated && isConfigured) {
-        setTimeout(async () => {
-          try {
-            const cloudData = await syncFromCloud();
-            if (cloudData) {
-              const localData = { activities, settings, badges, challenges };
-              const conflicts = checkForConflicts(localData, cloudData);
-              setHasConflicts(conflicts);
-            }
-          } catch (error) {
-            // Silent fail
-          }
-        }, 1000); // Small delay to allow cloud to process
-      }
     }
   };
 
@@ -488,17 +466,25 @@ export function CloudSyncSettings() {
               {lang === 'tr' ? 'Cloud Sync' : 'Cloud Sync'}
             </div>
             <div
-              className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-400 ${isMobile ? 'mt-0.5' : 'mt-1'} truncate`}
+              className={`${isMobile ? 'text-[10px]' : 'text-[9px] sm:text-[10px]'} font-medium text-gray-600 dark:text-gray-400 ${isMobile ? 'mt-0.5' : 'mt-1'} flex flex-col`}
+              title={isAuthenticated && user?.email ? user.email : undefined}
             >
-              {isAuthenticated
-                ? user?.email
-                  ? `${lang === 'tr' ? 'Giriş: ' : 'Signed in: '}${user.email}`
-                  : lang === 'tr'
-                    ? 'Giriş yapıldı'
-                    : 'Signed in'
-                : lang === 'tr'
-                  ? 'Verilerinizi bulutta saklayın'
-                  : 'Store your data in the cloud'}
+              {isAuthenticated ? (
+                user?.email ? (
+                  <>
+                    <span>{lang === 'tr' ? 'Giriş:' : 'Signed in:'}</span>
+                    <span className="truncate">{user.email}</span>
+                  </>
+                ) : lang === 'tr' ? (
+                  'Giriş yapıldı'
+                ) : (
+                  'Signed in'
+                )
+              ) : lang === 'tr' ? (
+                'Verilerinizi bulutta saklayın'
+              ) : (
+                'Store your data in the cloud'
+              )}
             </div>
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -565,8 +551,19 @@ export function CloudSyncSettings() {
                   }
                 }}
                 disabled={syncing || syncState.status === 'syncing'}
-                className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800/50 dark:hover:to-blue-700/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-center box-border leading-none"
-                style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
+                className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} ${isMobile ? 'text-sm' : 'text-xs sm:text-xs'} rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800/50 dark:hover:to-blue-700/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-center box-border leading-none`}
+                style={
+                  isMobile
+                    ? {
+                        height: '44px',
+                        minHeight: '44px',
+                        maxHeight: '44px',
+                        width: '44px',
+                        minWidth: '44px',
+                        maxWidth: '44px',
+                      }
+                    : { height: '24px', minHeight: '24px', maxHeight: '24px' }
+                }
                 title={
                   lang === 'tr'
                     ? 'Cloud ve Local verileri karşılaştır'
@@ -590,7 +587,7 @@ export function CloudSyncSettings() {
               </Button>
             )}
             <div
-              className="text-[8px] sm:text-[9px] px-1.5 rounded box-border leading-none flex items-center justify-center gap-2"
+              className={`${isMobile ? 'text-xs' : 'text-[8px] sm:text-[9px]'} px-1.5 rounded box-border leading-none flex items-center justify-center gap-2`}
               style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
             >
               <span
@@ -616,7 +613,7 @@ export function CloudSyncSettings() {
                       setSyncStatistics(syncHistoryService.getStatistics());
                       setShowHistoryDialog(true);
                     }}
-                    className="text-base hover:opacity-70 transition-opacity"
+                    className={`text-base hover:opacity-70 transition-opacity flex items-center justify-center ${isMobile ? 'min-h-[44px] min-w-[44px]' : 'min-h-[24px] min-w-[24px]'}`}
                     title={lang === 'tr' ? 'Senkronizasyon geçmişi' : 'Sync history'}
                     aria-label={lang === 'tr' ? 'Senkronizasyon geçmişi' : 'Sync history'}
                   >
@@ -637,7 +634,7 @@ export function CloudSyncSettings() {
           <button
             type="button"
             onClick={() => setShowAuthDialog(true)}
-            className={`w-full ${isMobile ? 'px-2.5 py-1.5 text-[10px]' : 'px-3 py-2 text-xs sm:text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
+            className={`w-full ${isMobile ? 'px-2.5 py-1.5 text-xs' : 'px-3 py-2 text-xs sm:text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
           >
             {lang === 'tr' ? 'Giriş Yap / Kayıt Ol' : 'Sign In / Sign Up'}
           </button>
@@ -666,7 +663,7 @@ export function CloudSyncSettings() {
 
                 {/* Status Text */}
                 <div
-                  className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} ${
+                  className={`${isMobile ? 'text-xs' : 'text-[10px]'} ${
                     syncState.status === 'syncing' || isProcessing
                       ? 'text-blue-500 dark:text-blue-400'
                       : syncState.status === 'synced'

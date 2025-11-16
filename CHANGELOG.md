@@ -2,6 +2,42 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.19.4] - 2025-01
+
+### Removed
+
+- **Onboarding Tour Feature**: Completely removed onboarding tour functionality
+  - Removed OnboardingTour and OnboardingManager components from Providers
+  - Removed "Show Onboarding Tour" button from Settings dialog
+  - Removed onboarding-related localStorage references
+  - Cleaned up onboarding-related code and dependencies
+
+### Fixed
+
+- **Sync Conflict Dialog Z-Index**: Fixed conflict resolution dialog appearing behind Settings dialog
+  - Increased conflict dialog z-index from `z-[9999]` to `z-[10001]` to ensure it appears above Settings (`z-[10000]`)
+
+- **Add Exercise Button Visibility**: Fixed "Egzersiz Ekle" button not appearing when Settings dialog is open
+  - Removed settingsOpen check that was hiding the entire ScrollToTop component
+  - Now only the "Scroll to Top" button is hidden when Settings is open
+  - "Egzersiz Ekle" button remains visible at all times
+
+### Changed
+
+- **Add Exercise Button Enhancements**:
+  - Added "Aktivite Ekle" label below the button for better clarity
+  - Implemented Apple-style liquid glass blur effect with backdrop-blur
+  - Added semi-transparent background with border for depth
+  - Improved visual hierarchy and user experience
+
+- **Profile Button Width**: Increased profile button width for better readability
+  - Mobile: `min-w-[200px]` → `min-w-[280px]`, `max-w-[320px]` → `max-w-[400px]`
+  - Desktop: `max-w-[1200px]` → `max-w-[1400px]`
+
+- **Z-Index Hierarchy**: Adjusted z-index values for proper layering
+  - ScrollToTop component: `z-[99999]` → `z-[9999]` (below Settings)
+  - ConflictResolutionDialog: `z-[9999]` → `z-[10001]` (above Settings)
+
 ## [0.19.3] - 2025-01
 
 ### Changed

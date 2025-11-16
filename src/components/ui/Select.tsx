@@ -102,7 +102,11 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
     const hasError = !!error;
 
-    const sizeConfig = sizeStyles[size];
+    // Adjust minHeight for mobile touch targets (44x44px minimum)
+    const sizeConfig = {
+      ...sizeStyles[size],
+      minHeight: isMobile && size === 'sm' ? 'min-h-[44px]' : sizeStyles[size].minHeight,
+    };
 
     const selectClasses = `
       ${sizeConfig.padding}
@@ -116,15 +120,17 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       duration-fast
       ease-out
       focus:outline-none
-      focus:ring-2
-      focus:ring-offset-2
-      ${hasError ? 'focus:ring-error/20 focus:border-error' : 'focus:ring-brand/20 focus:border-brand'}
-      focus:ring-offset-white dark:focus:ring-offset-gray-900
+      focus-visible:ring-2
+      focus-visible:ring-offset-2
+      ${hasError ? 'focus-visible:ring-error/30 focus:border-error' : 'focus-visible:ring-brand/30 focus:border-brand'}
+      focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900
       hover:border-gray-300 dark:hover:border-gray-600
+      active:border-brand active:ring-1 active:ring-brand/10
       disabled:bg-gray-50 dark:disabled:bg-gray-800
-      disabled:text-gray-400 dark:disabled:text-gray-600
+      disabled:text-gray-500 dark:disabled:text-gray-500
       disabled:border-gray-200 dark:disabled:border-gray-700
       disabled:cursor-not-allowed
+      disabled:opacity-60
       appearance-none
       bg-[url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")] bg-[length:1.5em_1.5em] bg-[right_0.75rem_center] bg-no-repeat
       dark:bg-[url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%9ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")]

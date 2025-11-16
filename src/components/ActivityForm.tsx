@@ -263,7 +263,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   return (
     <form
       onSubmit={submit}
-      className={isMobile ? 'space-y-3' : 'space-y-5'}
+      className={isMobile ? 'space-y-4' : 'space-y-5'}
       autoComplete="off"
       data-form-type="other"
       noValidate
@@ -274,7 +274,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         >
           {t('form.selectActivity')}
         </div>
-        <div className={`grid grid-cols-3 sm:grid-cols-3 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
+        <div className={`grid grid-cols-3 sm:grid-cols-3 ${isMobile ? 'gap-2' : 'gap-2'}`}>
           {definitions.map((def) => {
             const active = def.key === activityKey;
             return (
@@ -282,7 +282,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                 type="button"
                 key={def.key}
                 variant={active ? 'primary' : 'outline'}
-                size="sm"
+                size={isMobile ? 'md' : 'sm'}
                 onClick={() => {
                   setActivityKey(def.key);
                   setAmount((current) => {
@@ -292,7 +292,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     return String(def.defaultAmount);
                   });
                 }}
-                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} ${isMobile ? 'px-1.5 py-1' : 'px-2 py-1.5'} shadow-md hover:shadow-xl transition-all duration-300 ${
+                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} ${isMobile ? 'px-2 py-1.5 min-h-[44px]' : 'px-2 py-1.5'} shadow-md hover:shadow-xl transition-all duration-300 ${
                   active
                     ? 'active ring-2 ring-brand/30 dark:ring-brand/20 scale-105'
                     : 'scale-on-interact'
@@ -322,12 +322,12 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                   </div>
                 </div>
                 <div
-                  className={`${isMobile ? 'mt-0.5' : 'mt-1'} ${isMobile ? 'text-[9px]' : 'text-[10px]'} font-bold transition-colors text-gray-950 dark:text-gray-100 leading-tight`}
+                  className={`${isMobile ? 'mt-1' : 'mt-1'} ${isMobile ? 'text-xs' : 'text-[10px]'} font-bold transition-colors text-gray-950 dark:text-gray-100 leading-tight`}
                 >
                   {getActivityLabel(def, lang)}
                 </div>
                 <div
-                  className={`${isMobile ? 'text-[8px]' : 'text-[9px]'} font-medium text-gray-600 dark:text-gray-400 leading-tight`}
+                  className={`${isMobile ? 'text-[10px]' : 'text-[9px]'} font-medium text-gray-600 dark:text-gray-400 leading-tight`}
                 >
                   {def.defaultAmount} {getActivityUnit(def, lang)}
                 </div>
@@ -337,7 +337,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         </div>
       </div>
       <div
-        className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} ${isMobile ? 'gap-2' : 'gap-3'}`}
+        className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} ${isMobile ? 'gap-3' : 'gap-3'}`}
       >
         <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
           <div
@@ -372,14 +372,14 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           {getActivityDescription(definition, lang) ? (
             <div
               id="amount-description"
-              className={`${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-500 dark:text-gray-400 mt-0.5`}
+              className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400 mt-0.5`}
               role="note"
             >
               {getActivityDescription(definition, lang)}
             </div>
           ) : null}
           <div
-            className={`${isMobile ? 'text-[8px]' : 'text-[10px]'} text-gray-500 dark:text-gray-400 ${isMobile ? 'mt-0.5' : 'mt-1'} flex items-center gap-2`}
+            className={`${isMobile ? 'text-xs' : 'text-[10px]'} text-gray-500 dark:text-gray-400 ${isMobile ? 'mt-1' : 'mt-1'} flex items-center gap-2`}
           >
             <span>{definition.multiplier}x</span>
             <span>·</span>
@@ -398,7 +398,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             type="datetime-local"
             value={performedAt}
             onChange={(e) => setPerformedAt(e.target.value)}
-            className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2 py-1.5 min-h-[40px] text-sm' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 min-w-0 max-w-full transition-all duration-200`}
+            className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-3 py-2 min-h-[44px] text-base' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 min-w-0 max-w-full transition-all duration-200`}
             required
             autoComplete="off"
             data-form-type="other"
@@ -414,7 +414,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       </div>
       <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
         <div
-          className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}
+          className={`${isMobile ? 'text-xs' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}
         >
           {t('form.noteOptional')}
         </div>
@@ -441,7 +441,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         <Button
           type="submit"
           variant="primary"
-          size={isMobile ? 'sm' : 'md'}
+          size={isMobile ? 'md' : 'md'}
           fullWidth={isMobile && !isEditing}
           disabled={loading}
           loading={loading}
@@ -453,7 +453,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           <Button
             type="button"
             variant="secondary"
-            size={isMobile ? 'sm' : 'md'}
+            size={isMobile ? 'md' : 'md'}
             onClick={onCancel}
             aria-label={t('form.cancel')}
           >

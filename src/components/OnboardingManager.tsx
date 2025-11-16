@@ -86,7 +86,7 @@ export function OnboardingManager() {
       },
       {
         id: 'add-activity',
-        target: 'a[href="/add"]',
+        target: '[data-tour-id="add-activity"]',
         title: lang === 'tr' ? 'Aktivite Ekleme ➕' : 'Add Activity ➕',
         content:
           lang === 'tr'

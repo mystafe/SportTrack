@@ -132,7 +132,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
       ease-out
       ${variantStyle}
       ${hoverable ? 'hover:shadow-elevation-5 hover:scale-[1.02] hover:border-brand/50' : ''}
-      ${clickable ? 'cursor-pointer active:scale-[0.98] touch-feedback' : ''}
+      ${clickable ? `cursor-pointer touch-feedback mobile-press ${isMobile ? 'active:scale-[0.97] active:brightness-95' : 'active:scale-[0.98]'}` : ''}
       ${className}
     `
       .trim()
