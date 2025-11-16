@@ -54,7 +54,7 @@ export const WithHelperText: Story = {
 export const Error: Story = {
   args: {
     label: 'Error Checkbox',
-    error: true,
+    error: 'This field has an error',
     helperText: 'This field has an error',
   },
 };
