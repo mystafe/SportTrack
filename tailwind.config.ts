@@ -36,9 +36,9 @@ export default {
       transitionTimingFunction: {
         ...designTokens.animations.easing,
       },
-      zIndex: {
-        ...designTokens.zIndex,
-      },
+      zIndex: Object.fromEntries(
+        Object.entries(designTokens.zIndex).map(([key, value]) => [key, String(value)])
+      ),
       screens: {
         xs: '475px',
         // Tailwind defaults: sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px
