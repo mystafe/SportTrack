@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Button } from '@/components/ui/Button';
 
 interface LongPressMenuProps {
   isOpen: boolean;
@@ -118,23 +119,21 @@ export function LongPressMenuItem({
   const isMobile = useIsMobile();
 
   return (
-    <button
+    <Button
       type="button"
+      variant={variant === 'danger' ? 'danger' : 'ghost'}
+      size="sm"
       onClick={() => {
         if (!disabled) {
           onClick();
         }
       }}
       disabled={disabled}
-      className={`w-full ${isMobile ? 'px-4 py-3' : 'px-5 py-3.5'} text-left flex items-center gap-3 ${
-        variant === 'danger'
-          ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
-          : 'text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
-      } disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 touch-target`}
+      className={`w-full ${isMobile ? 'px-4 py-3' : 'px-5 py-3.5'} text-left justify-start h-auto touch-target`}
       role="menuitem"
     >
       {icon && <span className={`${isMobile ? 'text-lg' : 'text-xl'}`}>{icon}</span>}
       <span className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{label}</span>
-    </button>
+    </Button>
   );
 }

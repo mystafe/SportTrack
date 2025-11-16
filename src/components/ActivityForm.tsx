@@ -10,6 +10,9 @@ import { getActivityLabel, getActivityUnit, getActivityDescription } from '@/lib
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
+import { Button } from '@/components/ui/Button';
 import { useBadges } from '@/lib/badgeStore';
 import { useLevel } from '@/lib/levelStore';
 import { useChallenges } from '@/lib/challengeStore';
@@ -275,9 +278,11 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           {definitions.map((def) => {
             const active = def.key === activityKey;
             return (
-              <button
+              <Button
                 type="button"
                 key={def.key}
+                variant={active ? 'primary' : 'outline'}
+                size="sm"
                 onClick={() => {
                   setActivityKey(def.key);
                   setAmount((current) => {
@@ -287,10 +292,10 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     return String(def.defaultAmount);
                   });
                 }}
-                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} border-2 ${isMobile ? 'px-1.5 py-1' : 'px-2 py-1.5'} shadow-md hover:shadow-xl transition-all duration-300 ${
+                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} ${isMobile ? 'px-1.5 py-1' : 'px-2 py-1.5'} shadow-md hover:shadow-xl transition-all duration-300 ${
                   active
-                    ? 'active border-brand dark:border-brand/60 bg-gradient-to-br from-brand/10 via-brand/5 to-brand/10 dark:from-brand/20 dark:via-brand/10 dark:to-brand/20 ring-2 ring-brand/30 dark:ring-brand/20 scale-105'
-                    : 'border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 hover:from-gray-100 hover:via-gray-50 hover:to-gray-100 dark:hover:from-gray-800 dark:hover:via-gray-700 dark:hover:to-gray-800 scale-on-interact'
+                    ? 'active ring-2 ring-brand/30 dark:ring-brand/20 scale-105'
+                    : 'scale-on-interact'
                 }`}
                 aria-pressed={active}
                 aria-label={t('form.selectActivityLabel', {
@@ -326,7 +331,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                 >
                   {def.defaultAmount} {getActivityUnit(def, lang)}
                 </div>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -340,13 +345,15 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           >
             {t('form.amount')} ({getActivityUnit(definition, lang)})
           </div>
-          <input
+          <Input
             type="number"
             min={1}
             step={1}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2 py-1.5 min-h-[40px] text-sm' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 transition-all duration-200`}
+            size={isMobile ? 'md' : 'md'}
+            variant="default"
+            fullWidth
             required
             autoComplete="off"
             data-form-type="other"
@@ -360,6 +367,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             }
             name=""
             inputMode="decimal"
+            helperText={getActivityDescription(definition, lang) || undefined}
           />
           {getActivityDescription(definition, lang) ? (
             <div
@@ -410,10 +418,12 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
         >
           {t('form.noteOptional')}
         </div>
-        <textarea
+        <Textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2 py-1.5 min-h-[60px] text-xs' : 'rounded-lg px-3 py-2 min-h-[70px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-200`}
+          size={isMobile ? 'md' : 'md'}
+          variant="default"
+          fullWidth
           rows={isMobile ? 2 : 2}
           placeholder={t('form.notePlaceholder')}
           aria-label={t('form.noteOptional')}
@@ -429,25 +439,28 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       <div
         className={`flex items-center ${isMobile ? 'gap-1.5' : 'gap-2'} ${isMobile && !isEditing ? 'flex-col' : ''}`}
       >
-        <button
+        <Button
           type="submit"
+          variant="primary"
+          size={isMobile ? 'sm' : 'md'}
+          fullWidth={isMobile && !isEditing}
           disabled={loading}
-          className={`btn-enhanced ${isMobile ? 'touch-feedback mobile-press' : 'ripple-effect'} button-glow ${isMobile && !isEditing ? 'w-full' : ''} ${isMobile ? 'px-2.5 py-1.5 min-h-[36px] text-[10px] rounded-lg bounce-in-mobile' : 'px-4 py-3 min-h-[44px] text-sm rounded-lg'} bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold disabled:opacity-50 shadow-md hover:shadow-xl transition-all duration-300 scale-on-interact disabled:hover:scale-100`}
+          loading={loading}
           aria-label={loading ? t('form.loading') : isEditing ? t('form.save') : t('form.add')}
-          aria-busy={loading}
         >
-          {loading ? '...' : isEditing ? t('form.save') : t('form.add')}
-        </button>
-        {isEditing ? (
-          <button
+          {isEditing ? t('form.save') : t('form.add')}
+        </Button>
+        {isEditing && (
+          <Button
             type="button"
+            variant="secondary"
+            size={isMobile ? 'sm' : 'md'}
             onClick={onCancel}
-            className={`${isMobile ? 'px-2.5 py-1.5 min-h-[36px] text-[10px] rounded-lg' : 'px-4 py-3 min-h-[44px] text-sm rounded-lg'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 font-semibold hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95`}
             aria-label={t('form.cancel')}
           >
             {t('form.cancel')}
-          </button>
-        ) : null}
+          </Button>
+        )}
       </div>
     </form>
   );

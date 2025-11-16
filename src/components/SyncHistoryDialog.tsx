@@ -9,6 +9,7 @@ import {
   type SyncStatistics,
 } from '@/lib/cloudSync/syncHistory';
 import { format } from 'date-fns';
+import { Button } from '@/components/ui/Button';
 
 interface SyncHistoryDialogProps {
   open: boolean;
@@ -169,13 +170,14 @@ export function SyncHistoryDialog({ open, statistics, onClose }: SyncHistoryDial
 
           {/* Actions */}
           <div className="flex justify-end gap-2">
-            <button
-              type="button"
+            <Button
+              variant="primary"
+              size={isMobile ? 'md' : 'md'}
               onClick={onClose}
-              className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-white bg-gradient-to-r from-brand to-brand-dark rounded-lg hover:from-brand-dark hover:to-brand transition-all duration-200 active:scale-95 shadow-md`}
+              fullWidth={isMobile}
             >
               {lang === 'tr' ? 'Kapat' : 'Close'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

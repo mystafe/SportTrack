@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useI18n } from '@/lib/i18n';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { Button } from '@/components/ui/Button';
 
 export function ScrollToTop() {
   const [mounted, setMounted] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const isMobile = useIsMobile();
   const { t } = useI18n();
   const router = useRouter();
@@ -16,7 +18,23 @@ export function ScrollToTop() {
 
   useEffect(() => {
     setMounted(true);
+
+    // Check if settings dialog is open
+    const checkSettingsOpen = () => {
+      const settingsDialog = document.querySelector('[class*="z-[10000]"]');
+      setSettingsOpen(!!settingsDialog);
+    };
+
+    // Use MutationObserver to detect settings dialog
+    const observer = new MutationObserver(checkSettingsOpen);
+    observer.observe(document.body, { childList: true, subtree: true });
+    checkSettingsOpen();
+
+    return () => observer.disconnect();
   }, []);
+
+  // Don't show if settings is open
+  if (settingsOpen) return null;
 
   const scrollToTop = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -82,10 +100,12 @@ export function ScrollToTop() {
       }}
     >
       {/* Add Exercise Button - Above Top Button */}
-      <button
+      <Button
         onClick={handleAddActivity}
         type="button"
-        className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-transparent text-brand dark:text-brand-light shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center ${isMobile ? 'touch-feedback mobile-press' : ''} opacity-100 relative`}
+        variant="ghost"
+        size={isMobile ? 'sm' : 'md'}
+        className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-transparent text-brand dark:text-brand-light shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''} opacity-100 relative p-0`}
         aria-label={t('actions.addActivity')}
         title={t('actions.addActivity')}
       >
@@ -94,13 +114,15 @@ export function ScrollToTop() {
         >
           𓂃🪶
         </span>
-      </button>
+      </Button>
 
       {/* Scroll To Top Button */}
-      <button
+      <Button
         onClick={scrollToTop}
         type="button"
-        className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center ${isMobile ? 'touch-feedback mobile-press' : ''} border-2 border-white/20 dark:border-white/15 opacity-30 hover:opacity-60 relative overflow-visible`}
+        variant="primary"
+        size={isMobile ? 'sm' : 'md'}
+        className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''} border-2 border-white/20 dark:border-white/15 opacity-30 hover:opacity-60 relative overflow-visible p-0`}
         aria-label={t('scrollToTop') || 'Scroll to top'}
         title={t('scrollToTop') || 'Scroll to top'}
       >
@@ -111,7 +133,7 @@ export function ScrollToTop() {
         </span>
         {/* Subtle glow effect - only on hover */}
         <div className="absolute inset-0 rounded-full bg-brand/20 blur-sm -z-10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-      </button>
+      </Button>
     </div>
   );
 }

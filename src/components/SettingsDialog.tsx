@@ -23,6 +23,9 @@ import { useChallenges } from '@/lib/challengeStore';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { useCloudSync } from '@/hooks/useCloudSync';
 import { useAutoSync } from '@/hooks/useAutoSync';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 
 // Lazy load heavy components that are not always visible
 const DataExportImport = lazy(() =>
@@ -139,6 +142,43 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
     setError(null);
   }
 
+  // Auto-save on change instead of requiring explicit save
+  useEffect(() => {
+    if (!open) return;
+
+    const timer = setTimeout(() => {
+      const trimmedName = name.trim();
+      const targetValue = Number(dailyTarget);
+
+      if (
+        Number.isFinite(targetValue) &&
+        targetValue > 0 &&
+        targetValue >= LIMITS.DAILY_TARGET_MIN &&
+        targetValue <= LIMITS.DAILY_TARGET_MAX &&
+        (trimmedName || isAuthenticated)
+      ) {
+        saveSettings({
+          name: trimmedName || (isAuthenticated && user?.displayName ? user.displayName : ''),
+          dailyTarget: Math.round(targetValue),
+          customActivities: settings?.customActivities ?? [],
+          mood: mood ?? undefined,
+          listDensity: listDensity,
+        });
+      }
+    }, 1000); // Auto-save after 1 second of no changes
+
+    return () => clearTimeout(timer);
+  }, [
+    name,
+    dailyTarget,
+    mood,
+    listDensity,
+    open,
+    isAuthenticated,
+    user?.displayName,
+    settings?.customActivities,
+  ]);
+
   const handleLoginClick = () => {
     setOpen(false); // Close settings dialog first
     setError(null);
@@ -203,29 +243,43 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         latestChallenges = challenges;
       }
 
-      // Sync to cloud before logout (using latest data from localStorage)
-      try {
+      // Sync to cloud before logout ONLY if there's actual data to sync
+      // Don't sync empty data as it will overwrite cloud data
+      const hasDataToSync =
+        latestActivities.length > 0 ||
+        latestBadges.length > 0 ||
+        latestChallenges.length > 0 ||
+        (latestSettings && latestSettings !== null);
+
+      if (hasDataToSync) {
+        try {
+          // Debug log only in development
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Syncing latest data to cloud before logout...', {
+              activitiesCount: latestActivities.length,
+              badgesCount: latestBadges.length,
+              challengesCount: latestChallenges.length,
+              hasSettings: !!latestSettings,
+            });
+          }
+          await syncToCloud({
+            activities: latestActivities,
+            settings: latestSettings,
+            badges: latestBadges,
+            challenges: latestChallenges,
+          });
+        } catch (syncError) {
+          // Log only in development
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Failed to sync before logout:', syncError);
+          }
+          // Continue with logout even if sync fails
+        }
+      } else {
         // Debug log only in development
         if (process.env.NODE_ENV === 'development') {
-          console.log('Syncing latest data to cloud before logout...', {
-            activitiesCount: latestActivities.length,
-            badgesCount: latestBadges.length,
-            challengesCount: latestChallenges.length,
-            hasSettings: !!latestSettings,
-          });
+          console.log('Skipping sync before logout - no data to sync');
         }
-        await syncToCloud({
-          activities: latestActivities,
-          settings: latestSettings,
-          badges: latestBadges,
-          challenges: latestChallenges,
-        });
-      } catch (syncError) {
-        // Log only in development
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Failed to sync before logout:', syncError);
-        }
-        // Continue with logout even if sync fails
       }
 
       await logout();
@@ -343,7 +397,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const settingsDialog =
     open && !showAuthDialog ? (
       <div
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 py-4 overflow-y-auto"
+        className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 py-4 overflow-y-auto"
         onClick={(e) => {
           if (e.target === e.currentTarget && settings) {
             setOpen(false);
@@ -361,17 +415,35 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
             className={`${isMobile ? 'mb-2.5 pb-2' : 'mb-3 pb-2.5'} border-b border-gray-200 dark:border-gray-700`}
           >
             <div className="flex items-center justify-between gap-2 flex-wrap">
-              <h2
-                className={`${isMobile ? 'text-xs' : 'text-sm sm:text-base'} font-bold text-gray-950 dark:text-white flex items-center gap-1.5`}
+              <div className="flex items-center gap-2 flex-1">
+                <h2
+                  className={`${isMobile ? 'text-xs' : 'text-sm sm:text-base'} font-bold text-gray-950 dark:text-white flex items-center gap-1.5`}
+                >
+                  <span className={isMobile ? 'text-sm' : 'text-base'}>⚙️</span>
+                  {isAuthenticated ? (lang === 'tr' ? 'Ayarlar' : 'Settings') : t('settings.title')}
+                </h2>
+                <span
+                  className={`${isMobile ? 'text-[7px]' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
+                >
+                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.19.3
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setError(null);
+                  if (settings) {
+                    setName(settings.name || '');
+                    setDailyTarget(String(settings.dailyTarget));
+                  }
+                }}
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-lg leading-none"
+                aria-label={lang === 'tr' ? 'Kapat' : 'Close'}
+                title={lang === 'tr' ? 'Kapat' : 'Close'}
               >
-                <span className={isMobile ? 'text-sm' : 'text-base'}>⚙️</span>
-                {isAuthenticated ? (lang === 'tr' ? 'Ayarlar' : 'Settings') : t('settings.title')}
-              </h2>
-              <span
-                className={`${isMobile ? 'text-[7px]' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap`}
-              >
-                © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.18.17
-              </span>
+                ×
+              </button>
             </div>
             {!isMobile && (
               <p
@@ -438,17 +510,18 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     >
                       {t('settings.goalLabel')}
                     </span>
-                    <input
+                    <Input
                       type="number"
                       min={LIMITS.DAILY_TARGET_MIN}
                       max={LIMITS.DAILY_TARGET_MAX}
                       step={100}
                       value={dailyTarget}
                       onChange={(e) => setDailyTarget(e.target.value)}
-                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
                       placeholder="10000"
                       autoComplete="off"
                       data-form-type="other"
+                      size={isMobile ? 'sm' : 'sm'}
+                      className="w-full"
                     />
                   </label>
 
@@ -458,20 +531,20 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     >
                       {t('settings.moodLabel')}
                     </span>
-                    <select
+                    <Select
                       value={mood || ''}
                       onChange={(e) => setMood((e.target.value || null) as Mood)}
-                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
-                      autoComplete="off"
-                      data-form-type="other"
-                    >
-                      <option value="">{t('settings.moodNone')}</option>
-                      <option value="happy">{t('settings.moodHappy')}</option>
-                      <option value="cheerful">{t('settings.moodCheerful')}</option>
-                      <option value="sad">{t('settings.moodSad')}</option>
-                      <option value="unhappy">{t('settings.moodUnhappy')}</option>
-                      <option value="tired">{t('settings.moodTired')}</option>
-                    </select>
+                      size={isMobile ? 'sm' : 'sm'}
+                      options={[
+                        { value: '', label: t('settings.moodNone') },
+                        { value: 'happy', label: t('settings.moodHappy') },
+                        { value: 'cheerful', label: t('settings.moodCheerful') },
+                        { value: 'sad', label: t('settings.moodSad') },
+                        { value: 'unhappy', label: t('settings.moodUnhappy') },
+                        { value: 'tired', label: t('settings.moodTired') },
+                      ]}
+                      className="w-full"
+                    />
                   </label>
                 </div>
 
@@ -500,7 +573,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   <span
                     className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
                   >
-                    {t('nav.main')}
+                    {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
                   </span>
                   <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'}`}>
                     <LanguageToggle />
@@ -536,17 +609,18 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     >
                       {t('settings.goalLabel')}
                     </span>
-                    <input
+                    <Input
                       type="number"
                       min={LIMITS.DAILY_TARGET_MIN}
                       max={LIMITS.DAILY_TARGET_MAX}
                       step={100}
                       value={dailyTarget}
                       onChange={(e) => setDailyTarget(e.target.value)}
-                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:px-2 sm:py-1 sm:text-[10px]'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
                       placeholder="10000"
                       autoComplete="off"
                       data-form-type="other"
+                      size={isMobile ? 'sm' : 'sm'}
+                      className="w-full"
                     />
                   </label>
 
@@ -556,20 +630,20 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     >
                       {t('settings.moodLabel')}
                     </span>
-                    <select
+                    <Select
                       value={mood || ''}
                       onChange={(e) => setMood((e.target.value || null) as Mood)}
-                      className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:px-2 sm:py-1 sm:text-[10px]'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
-                      autoComplete="off"
-                      data-form-type="other"
-                    >
-                      <option value="">{t('settings.moodNone')}</option>
-                      <option value="happy">{t('settings.moodHappy')}</option>
-                      <option value="cheerful">{t('settings.moodCheerful')}</option>
-                      <option value="sad">{t('settings.moodSad')}</option>
-                      <option value="unhappy">{t('settings.moodUnhappy')}</option>
-                      <option value="tired">{t('settings.moodTired')}</option>
-                    </select>
+                      size={isMobile ? 'sm' : 'sm'}
+                      options={[
+                        { value: '', label: t('settings.moodNone') },
+                        { value: 'happy', label: t('settings.moodHappy') },
+                        { value: 'cheerful', label: t('settings.moodCheerful') },
+                        { value: 'sad', label: t('settings.moodSad') },
+                        { value: 'unhappy', label: t('settings.moodUnhappy') },
+                        { value: 'tired', label: t('settings.moodTired') },
+                      ]}
+                      className="w-full"
+                    />
                   </label>
                 </div>
 
@@ -588,51 +662,101 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     <span
                       className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
                     >
-                      {t('data.export')} / {t('data.import')}
+                      {lang === 'tr' ? 'Veri İşlemleri' : 'Data Operations'}
                     </span>
-                    <Suspense
-                      fallback={
-                        <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                      }
-                    >
-                      <DataExportImport />
-                    </Suspense>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <Suspense
+                        fallback={
+                          <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                        }
+                      >
+                        <DataExportImport />
+                      </Suspense>
+                      {isAuthenticated && (
+                        <>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleClearData}
+                            className="px-1.5 text-base"
+                            style={{
+                              height: '24px',
+                              minHeight: '24px',
+                              maxHeight: '24px',
+                              width: '24px',
+                              minWidth: '24px',
+                              maxWidth: '24px',
+                            }}
+                            title={t('settings.clearData')}
+                            aria-label={t('settings.clearData')}
+                          >
+                            🗑️
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (typeof window !== 'undefined' && window.resetOnboarding) {
+                                window.resetOnboarding();
+                              }
+                            }}
+                            className="px-1.5 text-base"
+                            style={{
+                              height: '24px',
+                              minHeight: '24px',
+                              maxHeight: '24px',
+                              width: '24px',
+                              minWidth: '24px',
+                              maxWidth: '24px',
+                            }}
+                            title={t('settings.showOnboarding') || 'Show Onboarding Tour'}
+                            aria-label={t('settings.showOnboarding') || 'Show Onboarding Tour'}
+                          >
+                            🎓
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
 
                   <div>
                     <span
                       className={`${isMobile ? 'text-[9px]' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
                     >
-                      {t('nav.main')}
+                      {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
                     </span>
                     <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'} flex-wrap`}>
                       <LanguageToggle />
                       <ThemeToggle />
-                      {/* List View - Compact/Comfortable */}
-                      <div className="flex items-center gap-1">
+                      {/* List View - Compact/Comfortable Switch */}
+                      <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5">
                         <button
                           type="button"
                           onClick={() => setListDensity('compact')}
-                          className={`${isMobile ? 'px-1 py-0.5 text-[7px] min-h-[20px]' : 'px-1.5 py-0.5 text-[8px] sm:text-[9px] min-h-[24px]'} rounded border transition-all duration-200 font-semibold flex items-center justify-center ${
+                          className={`px-1.5 py-0.5 text-base min-h-[22px] rounded transition-all ${
                             listDensity === 'compact'
-                              ? 'border-brand bg-brand text-white dark:bg-brand-dark dark:text-white'
-                              : 'border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
+                              ? 'bg-brand text-white'
+                              : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                           }`}
                           title={t('settings.listDensityCompact')}
+                          aria-pressed={listDensity === 'compact'}
                         >
-                          {t('settings.listDensityCompact')}
+                          📋
                         </button>
                         <button
                           type="button"
                           onClick={() => setListDensity('comfortable')}
-                          className={`${isMobile ? 'px-1 py-0.5 text-[7px] min-h-[20px]' : 'px-1.5 py-0.5 text-[8px] sm:text-[9px] min-h-[24px]'} rounded border transition-all duration-200 font-semibold flex items-center justify-center ${
+                          className={`px-1.5 py-0.5 text-base min-h-[22px] rounded transition-all ${
                             listDensity === 'comfortable'
-                              ? 'border-brand bg-brand text-white dark:bg-brand-dark dark:text-white'
-                              : 'border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
+                              ? 'bg-brand text-white'
+                              : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                           }`}
                           title={t('settings.listDensityComfortable')}
+                          aria-pressed={listDensity === 'comfortable'}
                         >
-                          {t('settings.listDensityComfortable')}
+                          📄
                         </button>
                       </div>
                     </div>
@@ -674,63 +798,18 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     </div>
                   )}
 
-                  {/* Sign Out, Sync to Cloud, Clear All Data, Show Onboarding Tour - Same Row */}
+                  {/* Sign Out - Separate Row */}
                   {isAuthenticated && (
-                    <div className="flex items-center gap-2">
-                      <button
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Button
                         type="button"
+                        variant="danger"
+                        size="sm"
                         onClick={handleLogout}
-                        className={`flex-1 ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:text-[10px] min-h-[28px]'} rounded-lg border-2 border-red-200 dark:border-red-800 bg-gradient-to-r from-red-50 to-white dark:from-red-900/20 dark:to-red-900/10 hover:from-red-100 hover:to-red-50 dark:hover:from-red-800/30 transition-all duration-200 text-red-700 dark:text-red-400 font-semibold flex items-center justify-center`}
+                        className="flex-1 min-w-[80px]"
                       >
                         {lang === 'tr' ? 'Çıkış Yap' : 'Sign Out'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          try {
-                            await syncToCloud({
-                              activities: activities,
-                              settings: settings,
-                              badges: badges,
-                              challenges: challenges,
-                            });
-                            showToast(
-                              lang === 'tr'
-                                ? 'Veriler buluta senkronize edildi'
-                                : 'Data synced to cloud',
-                              'success'
-                            );
-                          } catch (error) {
-                            showToast(
-                              lang === 'tr' ? 'Senkronizasyon hatası' : 'Sync error',
-                              'error'
-                            );
-                          }
-                        }}
-                        className={`flex-1 ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:text-[10px] min-h-[28px]'} rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/20 dark:to-blue-900/10 hover:from-blue-100 hover:to-blue-50 dark:hover:from-blue-800/30 transition-all duration-200 text-blue-700 dark:text-blue-400 font-semibold flex items-center justify-center`}
-                        title={lang === 'tr' ? 'Buluta Senkronize Et' : 'Sync to Cloud'}
-                      >
-                        ☁️ {lang === 'tr' ? 'Sync' : 'Sync'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleClearData}
-                        className={`flex-1 ${isMobile ? 'px-1 py-0.5 text-[8px] min-h-[24px]' : 'px-1.5 py-0.5 text-[9px] sm:text-[10px] min-h-[28px]'} rounded-lg border-2 border-red-200 dark:border-red-800 bg-gradient-to-r from-red-50 to-white dark:from-red-900/20 dark:to-red-900/10 hover:from-red-100 hover:to-red-50 dark:hover:from-red-800/30 transition-all duration-200 text-red-700 dark:text-red-400 font-semibold flex items-center justify-center`}
-                      >
-                        🗑️ {t('settings.clearData')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (typeof window !== 'undefined' && window.resetOnboarding) {
-                            window.resetOnboarding();
-                          }
-                        }}
-                        className={`px-2 py-1 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 text-gray-700 dark:text-gray-300 font-semibold flex-shrink-0`}
-                        title={t('settings.showOnboarding') || 'Show Onboarding Tour'}
-                      >
-                        🎓
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -742,30 +821,6 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 {error}
               </p>
             ) : null}
-
-            {/* Action Buttons */}
-            <div className={`${isMobile ? 'pt-2' : 'pt-3'} flex ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
-              <button
-                type="submit"
-                className={`flex-1 ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-3 py-1.5 text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
-              >
-                {t('settings.save') || 'Save'}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  setError(null);
-                  if (settings) {
-                    setName(settings.name || '');
-                    setDailyTarget(String(settings.dailyTarget));
-                  }
-                }}
-                className={`${isMobile ? 'px-2 py-1 text-[10px]' : 'px-3 py-1.5 text-sm'} rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
-              >
-                {t('form.cancel')}
-              </button>
-            </div>
           </form>
         </div>
       </div>

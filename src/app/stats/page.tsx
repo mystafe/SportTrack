@@ -11,6 +11,8 @@ import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { PageSkeleton } from '@/components/LoadingSkeleton';
 import { ChartSkeleton } from '@/components/ChartSkeleton';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 
 // Lazy load chart components for better performance
 const TrendChart = lazy(() =>
@@ -206,8 +208,11 @@ export default function StatsPage() {
       <div
         className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${isMobile ? 'gap-2' : 'gap-4'}`}
       >
-        <div
-          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-2.5' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 gpu-accelerated`}
+        <Card
+          variant="default"
+          size="sm"
+          hoverable
+          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card gpu-accelerated`}
         >
           <div
             className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300 mb-1`}
@@ -219,10 +224,13 @@ export default function StatsPage() {
           >
             {numberFormatter.format(activities.length)}
           </div>
-        </div>
+        </Card>
 
-        <div
-          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-2.5' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 gpu-accelerated`}
+        <Card
+          variant="default"
+          size="sm"
+          hoverable
+          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card gpu-accelerated`}
         >
           <div
             className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300 mb-1`}
@@ -234,10 +242,13 @@ export default function StatsPage() {
           >
             {numberFormatter.format(allDays.length)}
           </div>
-        </div>
+        </Card>
 
-        <div
-          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-2.5' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 gpu-accelerated`}
+        <Card
+          variant="default"
+          size="sm"
+          hoverable
+          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card gpu-accelerated`}
         >
           <div
             className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300 mb-1`}
@@ -254,10 +265,13 @@ export default function StatsPage() {
               : '0'}{' '}
             {t('list.pointsUnit')}
           </div>
-        </div>
+        </Card>
 
-        <div
-          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-2.5' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 gpu-accelerated`}
+        <Card
+          variant="default"
+          size="sm"
+          hoverable
+          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card gpu-accelerated`}
         >
           <div
             className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300 mb-1`}
@@ -270,14 +284,21 @@ export default function StatsPage() {
             {bestStreak}{' '}
             {bestStreak === 1 ? t('stats.highlight.sessions') : t('stats.highlight.sessions')}
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Activity Breakdown */}
-      <div className="chart-container card-entrance slide-in-left rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
-        <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">
-          {t('stats.detailed.activityBreakdown')}
-        </h2>
+      <Card
+        variant="default"
+        size="md"
+        hoverable
+        className="chart-container card-entrance slide-in-left magnetic-hover gpu-accelerated"
+        header={
+          <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+            {t('stats.detailed.activityBreakdown')}
+          </h2>
+        }
+      >
         {activityBreakdown.length === 0 ? (
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {t('stats.detailed.noActivities')}
@@ -318,7 +339,7 @@ export default function StatsPage() {
             ))}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Trend Chart */}
       <div className="rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
@@ -328,17 +349,15 @@ export default function StatsPage() {
           </h2>
           <div className="flex items-center gap-2">
             {([7, 30, 90] as const).map((days) => (
-              <button
+              <Button
                 key={days}
+                type="button"
+                variant={trendDays === days ? 'primary' : 'outline'}
+                size="sm"
                 onClick={() => setTrendDays(days)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-300 ${
-                  trendDays === days
-                    ? 'bg-gradient-to-r from-brand to-brand-dark text-white shadow-md'
-                    : 'bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-200 hover:to-gray-100 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:shadow-md'
-                }`}
               >
                 {days} {lang === 'tr' ? 'gün' : 'days'}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -463,15 +482,12 @@ export default function StatsPage() {
                 const isCompleted = day.points >= target;
 
                 return (
-                  <button
+                  <Button
                     key={dayKey}
                     type="button"
+                    variant={isSelected ? 'primary' : 'outline'}
+                    className="w-full flex items-center justify-between p-3 text-left h-auto"
                     onClick={() => setSelectedDate(isSelected ? null : dayKey)}
-                    className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all duration-300 text-left ${
-                      isSelected
-                        ? 'border-brand bg-gradient-to-r from-brand/15 via-brand/10 to-brand/15 dark:from-brand/25 dark:via-brand/20 dark:to-brand/25 shadow-md'
-                        : 'border-gray-200 dark:border-gray-700 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800/50 dark:to-gray-800/30 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700/50 dark:hover:to-gray-700/30 hover:shadow-md'
-                    }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
@@ -500,7 +516,7 @@ export default function StatsPage() {
                         {Math.round((day.points / target) * 100)}%
                       </div>
                     </div>
-                  </button>
+                  </Button>
                 );
               })}
             </div>

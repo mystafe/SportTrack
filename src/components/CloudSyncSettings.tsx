@@ -23,6 +23,7 @@ import { syncHistoryService } from '@/lib/cloudSync/syncHistory';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
 import { formatDistanceToNow } from 'date-fns';
 import { tr, enUS } from 'date-fns/locale';
+import { Button } from '@/components/ui/Button';
 
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 
@@ -502,8 +503,10 @@ export function CloudSyncSettings() {
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
             {isAuthenticated && (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={async () => {
                   if (!isAuthenticated) {
                     setShowAuthDialog(true);
@@ -584,10 +587,10 @@ export function CloudSyncSettings() {
                       : syncState.status === 'synced'
                         ? '✅'
                         : '🔄'}
-              </button>
+              </Button>
             )}
             <div
-              className="text-[8px] sm:text-[9px] px-1.5 rounded box-border leading-none flex items-center justify-center"
+              className="text-[8px] sm:text-[9px] px-1.5 rounded box-border leading-none flex items-center justify-center gap-2"
               style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
             >
               <span
@@ -605,6 +608,27 @@ export function CloudSyncSettings() {
                     ? 'Bağlı Değil'
                     : 'Not Connected'}
               </span>
+              {isAuthenticated && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSyncStatistics(syncHistoryService.getStatistics());
+                      setShowHistoryDialog(true);
+                    }}
+                    className="text-base hover:opacity-70 transition-opacity"
+                    title={lang === 'tr' ? 'Senkronizasyon geçmişi' : 'Sync history'}
+                    aria-label={lang === 'tr' ? 'Senkronizasyon geçmişi' : 'Sync history'}
+                  >
+                    📊
+                  </button>
+                  {syncState.lastSyncAt && syncState.status !== 'syncing' && (
+                    <span className="text-gray-400 dark:text-gray-500">
+                      {formatRelativeTime(syncState.lastSyncAt, lang)}
+                    </span>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -667,15 +691,6 @@ export function CloudSyncSettings() {
                         : ''}
                 </div>
               </div>
-
-              {/* Last Sync Time Tooltip */}
-              {syncState.lastSyncAt && syncState.status !== 'syncing' && (
-                <div
-                  className={`${isMobile ? 'text-[8px]' : 'text-[9px]'} text-gray-400 dark:text-gray-500`}
-                >
-                  {formatRelativeTime(syncState.lastSyncAt, lang)}
-                </div>
-              )}
             </div>
 
             {/* Queue Status */}
@@ -715,19 +730,6 @@ export function CloudSyncSettings() {
                 )}
               </div>
             )}
-
-            {/* Sync History Button */}
-            <button
-              type="button"
-              onClick={() => {
-                setSyncStatistics(syncHistoryService.getStatistics());
-                setShowHistoryDialog(true);
-              }}
-              className={`${isMobile ? 'text-[8px]' : 'text-[9px]'} px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors mt-1`}
-              title={lang === 'tr' ? 'Senkronizasyon geçmişi' : 'Sync history'}
-            >
-              📊 {lang === 'tr' ? 'Geçmiş' : 'History'}
-            </button>
           </div>
         )}
       </div>

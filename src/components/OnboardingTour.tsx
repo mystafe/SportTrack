@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useSettings } from '@/lib/settingsStore';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Button } from '@/components/ui/Button';
 
 export interface TourStep {
   id: string;
@@ -259,7 +260,9 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        maxWidth: '90vw',
+        maxWidth: isMobile ? 'calc(100vw - 2rem)' : '90vw',
+        position: 'fixed' as const,
+        zIndex: 9999,
       };
       break;
   }
@@ -345,7 +348,8 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
           />
 
           {/* Highlight - More visible, less dark overlay */}
-          {position && (
+          {/* Don't show highlight for center position */}
+          {position && currentStepData.position !== 'center' && (
             <div
               className="fixed z-[9999] rounded-xl border-4 border-brand animate-scale-in pointer-events-none"
               style={{
@@ -375,13 +379,16 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   {lang === 'tr' ? currentStepData.title : currentStepData.title}
                 </h3>
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={skipTour}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-xl leading-none"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xl leading-none h-auto p-0 min-w-0"
                   aria-label={t('onboarding.skip')}
                 >
                   ×
-                </button>
+                </Button>
               </div>
 
               <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -394,21 +401,15 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
                 </div>
                 <div className="flex items-center gap-2">
                   {currentStep > 0 && (
-                    <button
-                      onClick={prevStep}
-                      className="px-3 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
+                    <Button type="button" variant="outline" size="sm" onClick={prevStep}>
                       {t('onboarding.previous')}
-                    </button>
+                    </Button>
                   )}
-                  <button
-                    onClick={nextStep}
-                    className="px-4 py-1.5 text-xs rounded-lg bg-brand text-white hover:bg-brand-dark transition-colors font-medium"
-                  >
+                  <Button type="button" variant="primary" size="sm" onClick={nextStep}>
                     {currentStep === steps.length - 1
                       ? t('onboarding.finish')
                       : t('onboarding.next')}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

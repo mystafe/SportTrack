@@ -7,6 +7,7 @@ import { Challenge, ChallengeType } from '@/lib/challenges';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { PageSkeleton, ChallengeCardSkeleton } from '@/components/LoadingSkeleton';
+import { Button } from '@/components/ui/Button';
 
 // Lazy load challenge components
 const ChallengeCard = lazy(() =>
@@ -95,13 +96,15 @@ export default function ChallengesPage() {
       </div>
 
       <div className="mb-6">
-        <button
+        <Button
           type="button"
+          variant="primary"
+          size={isMobile ? 'sm' : 'md'}
           onClick={handleAddChallenge}
-          className={`px-4 py-2 bg-gradient-to-r from-brand to-brand-dark text-white rounded-lg hover:from-brand-dark hover:to-brand font-semibold transition-all duration-300 hover:scale-105 active:scale-95 shadow-md hover:shadow-xl ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'}`}
+          className={`${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'}`}
         >
           + {t('challenges.addChallenge')}
-        </button>
+        </Button>
       </div>
 
       {challenges.length === 0 ? (
@@ -123,13 +126,15 @@ export default function ChallengesPage() {
               ? 'İlk hedefini oluştur ve başarıya ulaş!'
               : 'Create your first goal and achieve success!'}
           </p>
-          <button
+          <Button
             type="button"
+            variant="primary"
+            size={isMobile ? 'md' : 'lg'}
             onClick={handleAddChallenge}
-            className={`px-6 py-3 bg-gradient-to-r from-brand to-brand-dark text-white rounded-lg hover:from-brand-dark hover:to-brand font-semibold transition-all duration-300 hover:scale-105 active:scale-95 shadow-md hover:shadow-xl ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'}`}
+            className={`${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'}`}
           >
             + {t('challenges.addChallenge')}
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="space-y-8">

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Button } from '@/components/ui/Button';
 
 export interface TimerState {
   isRunning: boolean;
@@ -95,14 +96,16 @@ export function ActivityTimer({ onDurationChange, initialDuration = 0 }: Activit
           {t('timer.title')}
         </span>
         {state.elapsed > 0 && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={handleReset}
             className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
             aria-label={t('timer.reset')}
           >
             {t('timer.reset')}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -117,23 +120,27 @@ export function ActivityTimer({ onDurationChange, initialDuration = 0 }: Activit
 
         <div className="flex items-center gap-2">
           {!state.isRunning ? (
-            <button
+            <Button
               type="button"
+              variant="success"
+              size="md"
               onClick={handleStart}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md min-h-[44px]"
+              className="min-h-[44px]"
               aria-label={t('timer.start')}
             >
               ▶️ {t('timer.start')}
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               type="button"
+              variant="danger"
+              size="md"
               onClick={handleStop}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md min-h-[44px]"
+              className="min-h-[44px]"
               aria-label={t('timer.stop')}
             >
               ⏸️ {t('timer.stop')}
-            </button>
+            </Button>
           )}
         </div>
       </div>

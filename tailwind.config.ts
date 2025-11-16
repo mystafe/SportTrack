@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import { designTokens } from './src/lib/design-tokens';
 
 export default {
   darkMode: 'class',
@@ -13,7 +14,30 @@ export default {
         },
       },
       boxShadow: {
-        card: '0 1px 2px 0 rgb(0 0 0 / 0.06), 0 1px 3px 0 rgb(0 0 0 / 0.08)',
+        card: designTokens.shadows.elevation[2],
+        'elevation-1': designTokens.shadows.elevation[1],
+        'elevation-2': designTokens.shadows.elevation[2],
+        'elevation-3': designTokens.shadows.elevation[3],
+        'elevation-4': designTokens.shadows.elevation[4],
+        'elevation-5': designTokens.shadows.elevation[5],
+        'elevation-6': designTokens.shadows.elevation[6],
+        'colored-primary': designTokens.shadows.colored.primary,
+        'colored-primary-hover': designTokens.shadows.colored.primaryHover,
+        'colored-success': designTokens.shadows.colored.success,
+        'colored-warning': designTokens.shadows.colored.warning,
+        'colored-error': designTokens.shadows.colored.error,
+      },
+      borderRadius: {
+        ...designTokens.borderRadius,
+      },
+      transitionDuration: {
+        ...designTokens.animations.duration,
+      },
+      transitionTimingFunction: {
+        ...designTokens.animations.easing,
+      },
+      zIndex: {
+        ...designTokens.zIndex,
       },
       screens: {
         xs: '475px',

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -99,7 +101,11 @@ export function InstallPrompt() {
   return (
     <div className="fixed bottom-4 left-4 right-4 z-[10001] safe-bottom animate-slide-in-right flex justify-center">
       <div className="w-full max-w-md mx-auto">
-        <div className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-xl shadow-xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+        <Card
+          variant="default"
+          size="md"
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3"
+        >
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-xs sm:text-sm mb-0.5 sm:mb-1 text-gray-950 dark:text-white">
               {t('pwa.installTitle')}
@@ -109,20 +115,24 @@ export function InstallPrompt() {
             </div>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleDismiss}
-              className="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold text-gray-700 dark:text-gray-300"
+              className="flex-1 sm:flex-none"
             >
               {t('pwa.dismiss')}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
               onClick={handleInstall}
-              className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+              className="flex-1 sm:flex-none"
             >
               {t('pwa.install')}
-            </button>
+            </Button>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

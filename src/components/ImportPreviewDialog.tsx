@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Button } from '@/components/ui/Button';
 import { ActivityRecord } from '@/lib/activityStore';
 import { UserSettings } from '@/lib/settingsStore';
 import { Badge } from '@/lib/badges';
@@ -401,20 +402,26 @@ export function ImportPreviewDialog({
           <div
             className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-3'} mt-6`}
           >
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size={isMobile ? 'md' : 'md'}
               onClick={onCancel}
-              className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95`}
+              fullWidth={isMobile}
+              className={isMobile ? 'min-h-[44px]' : ''}
             >
               {t('form.cancel')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="primary"
+              size={isMobile ? 'md' : 'md'}
               onClick={onConfirm}
-              className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-white rounded-lg transition-all duration-300 active:scale-95 hover:shadow-xl bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-brand shadow-md`}
+              fullWidth={isMobile}
+              className={isMobile ? 'min-h-[44px]' : ''}
             >
               {lang === 'tr' ? '✅ Import Et' : '✅ Import'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

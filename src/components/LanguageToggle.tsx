@@ -1,6 +1,7 @@
 'use client';
 
 import { useI18n, Language } from '@/lib/i18n';
+import { Button } from '@/components/ui/Button';
 
 export function LanguageToggle() {
   const { lang, setLang } = useI18n();
@@ -10,17 +11,19 @@ export function LanguageToggle() {
   ];
 
   return (
-    <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5 sm:p-1">
+    <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5">
       {options.map((opt) => (
-        <button
+        <Button
           key={opt.code}
           type="button"
-          className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded transition-all duration-200 hover:scale-110 active:scale-95 ${lang === opt.code ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+          variant={lang === opt.code ? 'primary' : 'ghost'}
+          size="sm"
+          className="px-1 py-0.5 text-[8px] sm:text-[9px] min-h-[22px] hover:scale-110 active:scale-95"
           onClick={() => setLang(opt.code)}
           aria-pressed={lang === opt.code}
         >
           {opt.label}
-        </button>
+        </Button>
       ))}
     </div>
   );

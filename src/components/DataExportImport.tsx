@@ -15,6 +15,7 @@ import { DuplicateDetectionDialog } from '@/components/DuplicateDetectionDialog'
 import { useAppleHealthReminder } from '@/hooks/useAppleHealthReminder';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useCloudSync } from '@/hooks/useCloudSync';
+import { Button } from '@/components/ui/Button';
 import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 import type { Badge } from '@/lib/badges';
@@ -653,19 +654,35 @@ export function DataExportImport() {
   return (
     <>
       <div className="flex items-center gap-1.5">
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={() => setShowExportDialog(true)}
-          className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 font-semibold flex items-center justify-center box-border leading-none whitespace-nowrap"
-          style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
+          className="px-1.5 text-base"
+          style={{
+            height: '24px',
+            minHeight: '24px',
+            maxHeight: '24px',
+            width: '24px',
+            minWidth: '24px',
+            maxWidth: '24px',
+          }}
           title={t('data.exportTooltip')}
           aria-label={t('data.exportTooltip')}
         >
-          💾 {t('data.export')}
-        </button>
+          💾
+        </Button>
         <label
-          className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none whitespace-nowrap"
-          style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
+          className="px-1.5 text-base rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none"
+          style={{
+            height: '24px',
+            minHeight: '24px',
+            maxHeight: '24px',
+            width: '24px',
+            minWidth: '24px',
+            maxWidth: '24px',
+          }}
         >
           <input
             ref={fileInputRef}
@@ -676,47 +693,51 @@ export function DataExportImport() {
             className="hidden"
             aria-label={t('data.importTooltip')}
           />
-          {isImporting ? '⏳' : '📥'} {t('data.import')}
+          {isImporting ? '⏳' : '📥'}
         </label>
-        <button
+        <Button
           type="button"
-          onClick={() => setShowConversionDialog(true)}
-          className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20 hover:from-purple-100 hover:to-purple-50 dark:hover:from-purple-800 dark:hover:to-purple-700 transition-all duration-200 hover:scale-105 active:scale-95 text-purple-700 dark:text-purple-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none whitespace-nowrap"
-          style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
-          title={
-            lang === 'tr'
-              ? 'Eski Formatı Yeni Formata Çevir'
-              : 'Convert Legacy Format to New Format'
-          }
-          aria-label={lang === 'tr' ? 'Eski Formatı Yeni Formata Çevir' : 'Convert Legacy Format'}
-        >
-          🔄 {lang === 'tr' ? 'Dönüştür' : 'Convert'}
-        </button>
-        <button
-          type="button"
+          variant="outline"
+          size="sm"
           onClick={() => setShowDuplicateDialog(true)}
-          className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-orange-200 dark:border-orange-700 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/20 hover:from-orange-100 hover:to-orange-50 dark:hover:from-orange-800 dark:hover:to-orange-700 transition-all duration-200 hover:scale-105 active:scale-95 text-orange-700 dark:text-orange-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none whitespace-nowrap"
-          style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
+          className="px-1.5 text-base"
+          style={{
+            height: '24px',
+            minHeight: '24px',
+            maxHeight: '24px',
+            width: '24px',
+            minWidth: '24px',
+            maxWidth: '24px',
+          }}
           title={lang === 'tr' ? 'Yinelenen Kayıt Tespiti' : 'Duplicate Detection'}
           aria-label={lang === 'tr' ? 'Yinelenen Kayıt Tespiti' : 'Duplicate Detection'}
         >
-          🔍 {lang === 'tr' ? 'Yinelenen' : 'Duplicates'}
-        </button>
+          🔍
+        </Button>
         <div className="flex items-center gap-1">
           <Suspense
             fallback={
               <div
-                className="w-20 bg-gray-100 dark:bg-gray-800 rounded animate-pulse"
-                style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
+                className="bg-gray-100 dark:bg-gray-800 rounded animate-pulse"
+                style={{
+                  height: '24px',
+                  minHeight: '24px',
+                  maxHeight: '24px',
+                  width: '24px',
+                  minWidth: '24px',
+                  maxWidth: '24px',
+                }}
               />
             }
           >
             <AppleHealthImport />
           </Suspense>
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setShowHealthGuide(!showHealthGuide)}
-            className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 font-semibold flex items-center justify-center box-border leading-none"
+            className="px-1.5 text-base"
             style={{
               height: '24px',
               minHeight: '24px',
@@ -731,7 +752,7 @@ export function DataExportImport() {
             }
           >
             ?
-          </button>
+          </Button>
         </div>
       </div>
       {showHealthGuide && (
@@ -771,14 +792,16 @@ export function DataExportImport() {
                       : `You imported ${daysSinceLastImport} days ago.`}
               </p>
             </div>
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => dismissReminder(7)}
-              className={`${isMobile ? 'px-1.5 py-1 text-[10px]' : 'px-2 py-1 text-xs'} rounded border border-blue-300 dark:border-blue-700 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all flex-shrink-0`}
+              className={`${isMobile ? 'px-1.5 py-1 text-[10px]' : 'px-2 py-1 text-xs'} border-blue-300 dark:border-blue-700 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 flex-shrink-0`}
               title={lang === 'tr' ? '7 gün hatırlatma' : 'Remind in 7 days'}
             >
               ✕
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -994,14 +1017,17 @@ function LegacyConversionDialog({
           </label>
 
           <div className="mt-4 flex items-center justify-end gap-3">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size={isMobile ? 'md' : 'md'}
               onClick={onClose}
               disabled={isConverting}
-              className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95 disabled:opacity-50`}
+              fullWidth={isMobile}
+              className={isMobile ? 'min-h-[44px]' : ''}
             >
               {lang === 'tr' ? 'İptal' : 'Cancel'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

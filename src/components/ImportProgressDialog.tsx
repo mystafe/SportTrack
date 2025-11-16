@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Button } from '@/components/ui/Button';
 
 interface ImportProgressDialogProps {
   open: boolean;
@@ -264,22 +265,28 @@ export function ImportProgressDialog({
           {/* Action Buttons */}
           <div className="flex justify-end gap-2 mt-6">
             {percentage < 100 && onCancel && (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size={isMobile ? 'md' : 'md'}
                 onClick={onCancel}
-                className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95`}
+                fullWidth={isMobile}
+                className={isMobile ? 'min-h-[44px]' : ''}
               >
                 {lang === 'tr' ? 'İptal' : 'Cancel'}
-              </button>
+              </Button>
             )}
             {percentage === 100 && onClose && (
-              <button
+              <Button
                 type="button"
+                variant="primary"
+                size={isMobile ? 'md' : 'md'}
                 onClick={onClose}
-                className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-white bg-gradient-to-r from-brand to-brand-dark rounded-lg hover:from-brand-dark hover:to-brand transition-all duration-200 active:scale-95 shadow-md`}
+                fullWidth={isMobile}
+                className={isMobile ? 'min-h-[44px]' : ''}
               >
                 {lang === 'tr' ? 'Kapat' : 'Close'}
-              </button>
+              </Button>
             )}
           </div>
         </div>

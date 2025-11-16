@@ -1,18 +1,38 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { Button } from '@/components/ui/Button';
 
 export function FloatingActionButton() {
   const router = useRouter();
   const { t } = useI18n();
   const isMobile = useIsMobile();
   const { triggerHaptic } = useHapticFeedback();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Only show on mobile
   if (!isMobile) return null;
+
+  // Check if settings dialog is open
+  useEffect(() => {
+    const checkSettingsOpen = () => {
+      const settingsDialog = document.querySelector('[class*="z-[10000]"]');
+      setSettingsOpen(!!settingsDialog);
+    };
+
+    const observer = new MutationObserver(checkSettingsOpen);
+    observer.observe(document.body, { childList: true, subtree: true });
+    checkSettingsOpen();
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Don't show if settings is open
+  if (settingsOpen) return null;
 
   const handleClick = () => {
     triggerHaptic('medium');
@@ -23,16 +43,17 @@ export function FloatingActionButton() {
   const bottomPosition = `calc(64px + 45px + 16px + max(16px, env(safe-area-inset-bottom, 0px)))`;
 
   return (
-    <button
+    <Button
+      type="button"
+      variant="primary"
+      size="lg"
       onClick={handleClick}
       className="
         fixed right-4 z-60
         w-14 h-14 rounded-full
-        bg-gradient-to-r from-brand to-brand-dark
-        text-white shadow-2xl
+        shadow-2xl
         flex items-center justify-center
         text-2xl font-bold
-        hover:from-brand-dark hover:to-brand
         active:scale-95
         transition-all duration-300
         touch-feedback mobile-press
@@ -44,6 +65,6 @@ export function FloatingActionButton() {
       aria-label={t('actions.addActivity')}
     >
       <span className="drop-shadow-lg">➕</span>
-    </button>
+    </Button>
   );
 }

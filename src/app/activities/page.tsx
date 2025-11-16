@@ -18,6 +18,7 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ActivityCard } from '@/components/ActivityCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 
 function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
   const hours = Math.floor(seconds / 3600);
@@ -182,12 +183,15 @@ function ActivitiesClient() {
             <div className="border-b border-gray-200 dark:border-gray-800">
               <div className="flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-gray-800 dark:text-gray-200">
                 <span>{t('list.editingTitle')}</span>
-                <button
-                  className="text-xs underline-offset-2 hover:underline"
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs underline-offset-2 hover:underline h-auto p-0"
                   onClick={() => setEditingId(null)}
                 >
                   {t('form.cancel')}
-                </button>
+                </Button>
               </div>
               <div className="px-3 pb-3">
                 <ActivityForm

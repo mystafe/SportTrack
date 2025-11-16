@@ -10,6 +10,9 @@ import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { format as formatDate, startOfDay, endOfDay, subDays, parseISO } from 'date-fns';
 import { getActivityLabel } from '@/lib/activityUtils';
+import { Button } from '@/components/ui/Button';
+import { Select } from '@/components/ui/Select';
+import { Input } from '@/components/ui/Input';
 
 type ExportDialogProps = {
   open: boolean;
@@ -191,138 +194,109 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
               {t('export.format')}
             </label>
             <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-2`}>
-              <button
+              <Button
                 type="button"
+                variant={exportFormat === 'csv' ? 'primary' : 'outline'}
+                size={isMobile ? 'sm' : 'md'}
                 onClick={() => setExportFormat('csv')}
-                className={`flex-1 px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                  exportFormat === 'csv'
-                    ? 'bg-gradient-to-r from-brand to-brand-dark text-white border-brand shadow-md'
-                    : 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600'
-                }`}
+                className="flex-1"
               >
                 CSV
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant={exportFormat === 'pdf' ? 'primary' : 'outline'}
+                size={isMobile ? 'sm' : 'md'}
                 onClick={() => setExportFormat('pdf')}
-                className={`flex-1 px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                  exportFormat === 'pdf'
-                    ? 'bg-gradient-to-r from-brand to-brand-dark text-white border-brand shadow-md'
-                    : 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600'
-                }`}
+                className="flex-1"
               >
                 PDF
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant={exportFormat === 'json' ? 'primary' : 'outline'}
+                size={isMobile ? 'sm' : 'md'}
                 onClick={() => setExportFormat('json')}
-                className={`flex-1 px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                  exportFormat === 'json'
-                    ? 'bg-gradient-to-r from-brand to-brand-dark text-white border-brand shadow-md'
-                    : 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600'
-                }`}
+                className="flex-1"
               >
                 JSON
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Date Range Selection */}
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
-              {t('export.dateRange')}
-            </label>
-            <select
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value as typeof dateRange)}
-              className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 text-sm input-enhanced"
-            >
-              <option value="all">{t('export.allTime')}</option>
-              <option value="7days">{t('export.last7Days')}</option>
-              <option value="30days">{t('export.last30Days')}</option>
-              <option value="custom">{t('export.customRange')}</option>
-            </select>
-          </div>
+          <Select
+            label={t('export.dateRange')}
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value as typeof dateRange)}
+            size={isMobile ? 'sm' : 'md'}
+            options={[
+              { value: 'all', label: t('export.allTime') },
+              { value: '7days', label: t('export.last7Days') },
+              { value: '30days', label: t('export.last30Days') },
+              { value: 'custom', label: t('export.customRange') },
+            ]}
+          />
 
           {/* Custom Date Range */}
           {dateRange === 'custom' && (
             <div className="mb-4 grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                  {t('export.startDate')}
-                </label>
-                <input
-                  type="date"
-                  value={customStart}
-                  onChange={(e) => setCustomStart(e.target.value)}
-                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 text-sm input-enhanced"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                  {t('export.endDate')}
-                </label>
-                <input
-                  type="date"
-                  value={customEnd}
-                  onChange={(e) => setCustomEnd(e.target.value)}
-                  max={formatDate(new Date(), 'yyyy-MM-dd')}
-                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 text-sm input-enhanced"
-                />
-              </div>
+              <Input
+                type="date"
+                label={t('export.startDate')}
+                value={customStart}
+                onChange={(e) => setCustomStart(e.target.value)}
+                size={isMobile ? 'sm' : 'md'}
+              />
+              <Input
+                type="date"
+                label={t('export.endDate')}
+                value={customEnd}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                max={formatDate(new Date(), 'yyyy-MM-dd')}
+                size={isMobile ? 'sm' : 'md'}
+              />
             </div>
           )}
 
           {/* Activity Filter */}
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
-              {lang === 'tr' ? 'Aktivite Filtresi' : 'Activity Filter'}
-            </label>
-            <select
-              value={activityFilter}
-              onChange={(e) => setActivityFilter(e.target.value)}
-              className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 text-sm input-enhanced"
-            >
-              <option value="all">{lang === 'tr' ? 'Tüm Aktiviteler' : 'All Activities'}</option>
-              {activityKeys.map((key) => {
+          <Select
+            label={lang === 'tr' ? 'Aktivite Filtresi' : 'Activity Filter'}
+            value={activityFilter}
+            onChange={(e) => setActivityFilter(e.target.value)}
+            size={isMobile ? 'sm' : 'md'}
+            options={[
+              { value: 'all', label: lang === 'tr' ? 'Tüm Aktiviteler' : 'All Activities' },
+              ...activityKeys.map((key) => {
                 const activity = activities.find((a) => a.activityKey === key);
-                return (
-                  <option key={key} value={key}>
-                    {activity ? getActivityLabel(activity, lang) : key}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
+                return {
+                  value: key,
+                  label: activity ? getActivityLabel(activity, lang) : key,
+                };
+              }),
+            ]}
+          />
 
           {/* Points Filter */}
           <div className="mb-4 grid grid-cols-2 gap-2">
-            <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                {lang === 'tr' ? 'Min Puan' : 'Min Points'}
-              </label>
-              <input
-                type="number"
-                value={minPoints}
-                onChange={(e) => setMinPoints(e.target.value)}
-                placeholder={lang === 'tr' ? 'Min' : 'Min'}
-                min="0"
-                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 text-sm input-enhanced"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                {lang === 'tr' ? 'Max Puan' : 'Max Points'}
-              </label>
-              <input
-                type="number"
-                value={maxPoints}
-                onChange={(e) => setMaxPoints(e.target.value)}
-                placeholder={lang === 'tr' ? 'Max' : 'Max'}
-                min="0"
-                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 text-sm input-enhanced"
-              />
-            </div>
+            <Input
+              type="number"
+              label={lang === 'tr' ? 'Min Puan' : 'Min Points'}
+              value={minPoints}
+              onChange={(e) => setMinPoints(e.target.value)}
+              placeholder={lang === 'tr' ? 'Min' : 'Min'}
+              min="0"
+              size={isMobile ? 'sm' : 'md'}
+            />
+            <Input
+              type="number"
+              label={lang === 'tr' ? 'Max Puan' : 'Max Points'}
+              value={maxPoints}
+              onChange={(e) => setMaxPoints(e.target.value)}
+              placeholder={lang === 'tr' ? 'Max' : 'Max'}
+              min="0"
+              size={isMobile ? 'sm' : 'md'}
+            />
           </div>
 
           {/* Preview */}
@@ -387,21 +361,26 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
           <div
             className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-3'}`}
           >
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size={isMobile ? 'sm' : 'md'}
               onClick={onClose}
-              className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95`}
+              fullWidth={isMobile}
             >
               {t('form.cancel')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="primary"
+              size={isMobile ? 'sm' : 'md'}
               onClick={handleExport}
               disabled={isExporting}
-              className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-white rounded-lg transition-all duration-300 active:scale-95 hover:shadow-xl bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-brand disabled:opacity-50 disabled:hover:scale-100 shadow-md`}
+              loading={isExporting}
+              fullWidth={isMobile}
             >
-              {isExporting ? '...' : t('export.export')}
-            </button>
+              {t('export.export')}
+            </Button>
           </div>
         </div>
       </div>

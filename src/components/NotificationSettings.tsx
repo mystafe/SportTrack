@@ -11,6 +11,9 @@ import {
 import { STORAGE_KEYS } from '@/lib/constants';
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Switch } from '@/components/ui/Switch';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 
 export function NotificationSettings() {
   const { t, lang } = useI18n();
@@ -102,35 +105,22 @@ export function NotificationSettings() {
             {t('notifications.subtitle')}
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => updateSetting('enabled', !notificationSettings.enabled)}
-          className={`relative inline-flex ${isMobile ? 'h-5 w-9' : 'h-6 w-11'} items-center rounded-full transition-all duration-300 flex-shrink-0 ${
-            notificationSettings.enabled
-              ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md'
-              : 'bg-gray-300 dark:bg-gray-700'
-          }`}
-        >
-          <span
-            className={`inline-block ${isMobile ? 'h-3 w-3' : 'h-4 w-4'} transform rounded-full bg-white transition-transform ${
-              notificationSettings.enabled
-                ? isMobile
-                  ? 'translate-x-5'
-                  : 'translate-x-6'
-                : 'translate-x-1'
-            }`}
-          />
-        </button>
+        <Switch
+          checked={notificationSettings.enabled}
+          onChange={(e) => updateSetting('enabled', e.target.checked)}
+          size={isMobile ? 'sm' : 'md'}
+        />
       </div>
 
       {permission !== 'granted' && (
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          size={isMobile ? 'sm' : 'sm'}
           onClick={handleRequestPermission}
-          className={`w-full ${isMobile ? 'px-2.5 py-1.5 text-[10px]' : 'px-3 py-2 text-xs sm:text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
+          fullWidth
         >
           {t('notifications.requestPermission')}
-        </button>
+        </Button>
       )}
 
       {permission === 'granted' && notificationSettings.enabled && (
@@ -145,32 +135,19 @@ export function NotificationSettings() {
               >
                 {t('notifications.dailyReminder')}
               </label>
-              <button
-                type="button"
-                onClick={() => updateSetting('dailyReminder', !notificationSettings.dailyReminder)}
-                className={`relative inline-flex ${isMobile ? 'h-4 w-7' : 'h-5 w-9'} items-center rounded-full transition-all duration-300 flex-shrink-0 ${
-                  notificationSettings.dailyReminder
-                    ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md'
-                    : 'bg-gray-300 dark:bg-gray-700'
-                }`}
-              >
-                <span
-                  className={`inline-block ${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'} transform rounded-full bg-white transition-transform ${
-                    notificationSettings.dailyReminder
-                      ? isMobile
-                        ? 'translate-x-4'
-                        : 'translate-x-5'
-                      : 'translate-x-1'
-                  }`}
-                />
-              </button>
+              <Switch
+                checked={notificationSettings.dailyReminder}
+                onChange={(e) => updateSetting('dailyReminder', e.target.checked)}
+                size={isMobile ? 'sm' : 'sm'}
+              />
             </div>
             {notificationSettings.dailyReminder && (
-              <input
+              <Input
                 type="time"
                 value={notificationSettings.dailyReminderTime}
                 onChange={(e) => updateSetting('dailyReminderTime', e.target.value)}
-                className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-2 py-1 text-xs sm:text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
+                size={isMobile ? 'sm' : 'sm'}
+                className="w-full"
               />
             )}
           </div>
@@ -182,25 +159,11 @@ export function NotificationSettings() {
             >
               {t('notifications.goalCompletion')}
             </label>
-            <button
-              type="button"
-              onClick={() => updateSetting('goalCompletion', !notificationSettings.goalCompletion)}
-              className={`relative inline-flex ${isMobile ? 'h-4 w-7' : 'h-5 w-9'} items-center rounded-full transition-all duration-300 flex-shrink-0 ${
-                notificationSettings.goalCompletion
-                  ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md'
-                  : 'bg-gray-300 dark:bg-gray-700'
-              }`}
-            >
-              <span
-                className={`inline-block ${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'} transform rounded-full bg-white transition-transform ${
-                  notificationSettings.goalCompletion
-                    ? isMobile
-                      ? 'translate-x-4'
-                      : 'translate-x-5'
-                    : 'translate-x-1'
-                }`}
-              />
-            </button>
+            <Switch
+              checked={notificationSettings.goalCompletion}
+              onChange={(e) => updateSetting('goalCompletion', e.target.checked)}
+              size={isMobile ? 'sm' : 'sm'}
+            />
           </div>
 
           {/* Streak Reminder */}
@@ -211,34 +174,19 @@ export function NotificationSettings() {
               >
                 {t('notifications.streakReminder')}
               </label>
-              <button
-                type="button"
-                onClick={() =>
-                  updateSetting('streakReminder', !notificationSettings.streakReminder)
-                }
-                className={`relative inline-flex ${isMobile ? 'h-4 w-7' : 'h-5 w-9'} items-center rounded-full transition-all duration-300 flex-shrink-0 ${
-                  notificationSettings.streakReminder
-                    ? 'bg-gradient-to-r from-brand to-brand-dark shadow-md'
-                    : 'bg-gray-300 dark:bg-gray-700'
-                }`}
-              >
-                <span
-                  className={`inline-block ${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'} transform rounded-full bg-white transition-transform ${
-                    notificationSettings.streakReminder
-                      ? isMobile
-                        ? 'translate-x-4'
-                        : 'translate-x-5'
-                      : 'translate-x-1'
-                  }`}
-                />
-              </button>
+              <Switch
+                checked={notificationSettings.streakReminder}
+                onChange={(e) => updateSetting('streakReminder', e.target.checked)}
+                size={isMobile ? 'sm' : 'sm'}
+              />
             </div>
             {notificationSettings.streakReminder && (
-              <input
+              <Input
                 type="time"
                 value={notificationSettings.streakReminderTime}
                 onChange={(e) => updateSetting('streakReminderTime', e.target.value)}
-                className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-2 py-1 text-[10px]' : 'px-2 py-1 text-xs sm:text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced`}
+                size={isMobile ? 'sm' : 'sm'}
+                className="w-full"
               />
             )}
           </div>

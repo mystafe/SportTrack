@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Button } from '@/components/ui/Button';
 
 export function AppleHealthGuide() {
   const { t, lang } = useI18n();
@@ -13,10 +14,12 @@ export function AppleHealthGuide() {
     <div
       className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 ${isMobile ? 'p-2' : 'p-2.5'} ${isMobile ? 'space-y-1.5' : 'space-y-2'}`}
     >
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between gap-1.5 text-left"
+        className="w-full flex items-center justify-between gap-1.5 text-left h-auto p-0"
         aria-expanded={isExpanded}
       >
         <div className="flex items-center gap-1.5">
@@ -32,7 +35,7 @@ export function AppleHealthGuide() {
         >
           ▼
         </span>
-      </button>
+      </Button>
 
       {isExpanded && (
         <div

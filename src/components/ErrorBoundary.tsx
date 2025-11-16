@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Component, ReactNode } from 'react';
+import { Button } from '@/components/ui/Button';
 
 interface Props {
   children: ReactNode;
@@ -107,18 +108,24 @@ function ErrorFallback({ error }: { error: Error | null }) {
           )}
 
           <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-3 justify-center`}>
-            <button
+            <Button
+              type="button"
+              variant="primary"
+              size={isMobile ? 'md' : 'lg'}
               onClick={handleReload}
-              className={`px-6 py-3 bg-gradient-to-r from-brand to-brand-dark text-white rounded-lg hover:from-brand-dark hover:to-brand font-semibold transition-all duration-300 hover:scale-105 active:scale-95 shadow-md hover:shadow-xl ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile w-full' : 'btn-enhanced scale-on-interact'}`}
+              className={`${isMobile ? 'touch-feedback mobile-press bounce-in-mobile w-full' : 'btn-enhanced scale-on-interact'}`}
             >
               {lang === 'tr' ? 'Sayfayı Yenile' : 'Reload Page'}
-            </button>
-            <button
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size={isMobile ? 'md' : 'lg'}
               onClick={handleReset}
-              className={`px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold transition-all duration-300 hover:scale-105 active:scale-95 shadow-md hover:shadow-xl ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile w-full' : 'btn-enhanced scale-on-interact'}`}
+              className={`${isMobile ? 'touch-feedback mobile-press bounce-in-mobile w-full' : 'btn-enhanced scale-on-interact'}`}
             >
               {lang === 'tr' ? 'Verileri Sıfırla' : 'Reset Data'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

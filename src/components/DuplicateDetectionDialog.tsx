@@ -9,6 +9,7 @@ import { detectDuplicates } from '@/lib/dataValidation';
 import { format, parseISO } from 'date-fns';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useToaster } from './Toaster';
+import { Button } from '@/components/ui/Button';
 
 interface DuplicateDetectionDialogProps {
   open: boolean;
@@ -138,39 +139,33 @@ export function DuplicateDetectionDialog({ open, onClose }: DuplicateDetectionDi
               {lang === 'tr' ? 'Tespit Modu' : 'Detection Mode'}
             </label>
             <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-2`}>
-              <button
+              <Button
                 type="button"
+                variant={detectionMode === 'id' ? 'primary' : 'outline'}
+                size="sm"
                 onClick={() => setDetectionMode('id')}
-                className={`flex-1 px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                  detectionMode === 'id'
-                    ? 'bg-gradient-to-r from-brand to-brand-dark text-white border-brand shadow-md'
-                    : 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600'
-                }`}
+                className="flex-1"
               >
                 {lang === 'tr' ? 'ID' : 'ID'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant={detectionMode === 'content' ? 'primary' : 'outline'}
+                size="sm"
                 onClick={() => setDetectionMode('content')}
-                className={`flex-1 px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                  detectionMode === 'content'
-                    ? 'bg-gradient-to-r from-brand to-brand-dark text-white border-brand shadow-md'
-                    : 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600'
-                }`}
+                className="flex-1"
               >
                 {lang === 'tr' ? 'İçerik' : 'Content'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant={detectionMode === 'both' ? 'primary' : 'outline'}
+                size="sm"
                 onClick={() => setDetectionMode('both')}
-                className={`flex-1 px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                  detectionMode === 'both'
-                    ? 'bg-gradient-to-r from-brand to-brand-dark text-white border-brand shadow-md'
-                    : 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600'
-                }`}
+                className="flex-1"
               >
                 {lang === 'tr' ? 'Her İkisi' : 'Both'}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -269,18 +264,25 @@ export function DuplicateDetectionDialog({ open, onClose }: DuplicateDetectionDi
 
               {/* Actions */}
               <div className="flex items-center gap-2">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size={isMobile ? 'md' : 'md'}
                   onClick={onClose}
-                  className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95`}
+                  fullWidth={isMobile}
+                  className={isMobile ? 'min-h-[44px]' : ''}
                 >
                   {lang === 'tr' ? 'İptal' : 'Cancel'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="danger"
+                  size={isMobile ? 'md' : 'md'}
                   onClick={handleRemoveSelected}
                   disabled={isRemoving || selectedDuplicates.size === 0}
-                  className={`${isMobile ? 'w-full min-h-[44px]' : 'px-4 py-2'} text-sm font-semibold text-white rounded-lg transition-all duration-300 active:scale-95 hover:shadow-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 disabled:opacity-50 disabled:hover:scale-100 shadow-md`}
+                  loading={isRemoving}
+                  fullWidth={isMobile}
+                  className={isMobile ? 'min-h-[44px]' : ''}
                 >
                   {isRemoving
                     ? lang === 'tr'
@@ -289,7 +291,7 @@ export function DuplicateDetectionDialog({ open, onClose }: DuplicateDetectionDi
                     : lang === 'tr'
                       ? `Seçilenleri Kaldır (${selectedDuplicates.size})`
                       : `Remove Selected (${selectedDuplicates.size})`}
-                </button>
+                </Button>
               </div>
             </>
           ) : (

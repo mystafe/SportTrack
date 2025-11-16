@@ -8,6 +8,9 @@ import { ActivityDefinition } from '@/lib/activityConfig';
 import { useActivities } from '@/lib/activityStore';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
+import { Button } from '@/components/ui/Button';
 
 function slugify(value: string) {
   return (
@@ -509,19 +512,12 @@ export function ManageActivitiesDialog() {
                     })()}
                     {error ? <p className="text-xs text-red-500">{error}</p> : null}
                     <div className="flex items-center justify-end gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={closeDialog}
-                        className="px-2.5 py-1.5 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold"
-                      >
+                      <Button type="button" variant="outline" size="sm" onClick={closeDialog}>
                         {t('form.cancel')}
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-2.5 py-1.5 text-xs rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300"
-                      >
+                      </Button>
+                      <Button type="submit" variant="primary" size="sm">
                         {isEditing ? t('activities.custom.save') : t('activities.custom.add')}
-                      </button>
+                      </Button>
                     </div>
                   </form>
                   <div className="space-y-2.5">

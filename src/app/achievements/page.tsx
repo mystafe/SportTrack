@@ -8,6 +8,8 @@ import { format } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { PageSkeleton, BadgeCardSkeleton } from '@/components/LoadingSkeleton';
+import { Card } from '@/components/ui/Card';
+import { Badge as BadgeComponent } from '@/components/ui/Badge';
 
 export default function AchievementsPage() {
   const { badges, hydrated } = useBadges();
@@ -149,15 +151,22 @@ export default function AchievementsPage() {
       </div>
 
       {/* Progress Summary */}
-      <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-200">
-            {t('achievements.progress')}
-          </span>
-          <span className="text-lg sm:text-xl font-bold text-gray-950 dark:text-gray-100">
-            {unlockedCount} / {totalBadges}
-          </span>
-        </div>
+      <Card
+        variant="default"
+        size="md"
+        hoverable
+        className="card-entrance"
+        header={
+          <div className="flex items-center justify-between">
+            <span className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-200">
+              {t('achievements.progress')}
+            </span>
+            <span className="text-lg sm:text-xl font-bold text-gray-950 dark:text-gray-100">
+              {unlockedCount} / {totalBadges}
+            </span>
+          </div>
+        }
+      >
         <div
           className={`${isMobile ? 'h-3' : 'h-4'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner relative`}
           role="progressbar"
@@ -177,17 +186,22 @@ export default function AchievementsPage() {
         <div className="text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-400 mt-2">
           {progress}% {lang === 'tr' ? 'tamamlandı' : 'complete'}
         </div>
-      </div>
+      </Card>
 
       {/* Badges by Category */}
       {(['streak', 'points', 'activities', 'special'] as const).map((category) => (
-        <div
+        <Card
           key={category}
-          className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300"
+          variant="default"
+          size="md"
+          hoverable
+          className="card-entrance"
+          header={
+            <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white">
+              {categoryLabels[category]}
+            </h2>
+          }
         >
-          <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white mb-4">
-            {categoryLabels[category]}
-          </h2>
           <div
             className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'} gap-3 sm:gap-4`}
           >
@@ -223,21 +237,23 @@ export default function AchievementsPage() {
                     {badge.description[lang]}
                   </div>
                   <div className="flex items-center justify-between">
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${
+                    <BadgeComponent
+                      variant={
                         isUnlocked
                           ? badge.rarity === 'common'
-                            ? 'bg-gray-200 dark:bg-gray-700'
+                            ? 'default'
                             : badge.rarity === 'rare'
-                              ? 'bg-blue-200 dark:bg-blue-800'
+                              ? 'info'
                               : badge.rarity === 'epic'
-                                ? 'bg-purple-200 dark:bg-purple-800'
-                                : 'bg-yellow-200 dark:bg-yellow-800'
-                          : 'bg-gray-200 dark:bg-gray-700'
-                      }`}
+                                ? 'secondary'
+                                : 'warning'
+                          : 'default'
+                      }
+                      size="sm"
+                      className={!isUnlocked ? 'opacity-50' : ''}
                     >
                       {getRarityLabel(badge.rarity)}
-                    </span>
+                    </BadgeComponent>
                     {(() => {
                       const formattedDate = formatBadgeDate(badge.unlockedAt);
                       return formattedDate ? (
@@ -249,7 +265,7 @@ export default function AchievementsPage() {
               );
             })}
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   );

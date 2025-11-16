@@ -241,8 +241,16 @@ export function AppleHealthImport() {
   return (
     <>
       <label
-        className="px-1.5 text-[8px] sm:text-[9px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none whitespace-nowrap"
-        style={{ height: '24px', minHeight: '24px', maxHeight: '24px' }}
+        className="px-1.5 text-base rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none"
+        style={{
+          height: '24px',
+          minHeight: '24px',
+          maxHeight: '24px',
+          width: '24px',
+          minWidth: '24px',
+          maxWidth: '24px',
+        }}
+        title={lang === 'tr' ? 'Sağlık Verisi İçe Aktar' : 'Import Health Data'}
       >
         <input
           ref={fileInputRef}
@@ -253,9 +261,8 @@ export function AppleHealthImport() {
           className="hidden"
           aria-label={t('appleHealth.importLabel')}
         />
-        <span className="flex items-center gap-1 leading-none">
-          {isImporting ? '⏳' : '📱'}
-          <span>{lang === 'tr' ? 'Sağlık Verisi İçe Aktar' : 'Import Health Data'}</span>
+        <span className="flex items-center gap-0.5 leading-none text-base">
+          {isImporting ? '⏳' : '📲'}
         </span>
       </label>
 

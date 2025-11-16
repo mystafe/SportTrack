@@ -10,6 +10,8 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ActivityDefinition } from '@/lib/activityConfig';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { startOfDay, subDays, isSameDay } from 'date-fns';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 
 export const QuickAdd = memo(function QuickAdd() {
   const [isOpen, setIsOpen] = useState(true);
@@ -204,9 +206,11 @@ export const QuickAdd = memo(function QuickAdd() {
 
   const renderHeader = () => {
     return (
-      <button
+      <Button
         type="button"
-        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand"
+        variant="ghost"
+        size="sm"
+        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand p-0 h-auto"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls="quick-add"
@@ -219,13 +223,12 @@ export const QuickAdd = memo(function QuickAdd() {
         >
           ▼
         </span>
-      </button>
+      </Button>
     );
   };
 
   return (
-    <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-3 shadow-md hover:shadow-xl transition-shadow duration-300">
-      {renderHeader()}
+    <Card variant="default" size="sm" hoverable className="card-entrance" header={renderHeader()}>
       {isOpen && (
         <div id="quick-add" className="space-y-2">
           <div
@@ -235,11 +238,14 @@ export const QuickAdd = memo(function QuickAdd() {
               const isAddingThis = isAdding === definition.key;
               const displayAmount = averageAmount ?? definition.defaultAmount;
               return (
-                <button
+                <Button
                   key={definition.key}
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => handleQuickAddClick(definition)}
                   disabled={isAddingThis}
+                  loading={isAddingThis}
                   className={`
                 stagger-item touch-feedback mobile-press mobile-card-lift fade-in-scale-mobile
                 relative flex flex-col items-center justify-center gap-2
@@ -285,7 +291,7 @@ export const QuickAdd = memo(function QuickAdd() {
                       <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent"></div>
                     </div>
                   )}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -315,6 +321,6 @@ export const QuickAdd = memo(function QuickAdd() {
         onConfirm={handleConfirmAdd}
         onCancel={handleCancelAdd}
       />
-    </div>
+    </Card>
   );
 });

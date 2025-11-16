@@ -6,6 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useToaster } from './Toaster';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 interface AuthDialogProps {
   open: boolean;
@@ -205,58 +207,49 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'signup' && (
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                {lang === 'tr' ? 'İsim' : 'Name'}
-              </label>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-3 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-950 dark:text-white focus:border-brand dark:focus:border-brand/60 focus:ring-2 focus:ring-brand/20"
-                placeholder={lang === 'tr' ? 'İsim (opsiyonel)' : 'Name (optional)'}
-              />
-            </div>
+            <Input
+              type="text"
+              label={lang === 'tr' ? 'İsim' : 'Name'}
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder={lang === 'tr' ? 'İsim (opsiyonel)' : 'Name (optional)'}
+              size={isMobile ? 'sm' : 'md'}
+            />
           )}
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              {lang === 'tr' ? 'E-posta' : 'Email'}
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-3 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-950 dark:text-white focus:border-brand dark:focus:border-brand/60 focus:ring-2 focus:ring-brand/20"
-              placeholder={lang === 'tr' ? 'ornek@email.com' : 'example@email.com'}
-            />
-          </div>
+          <Input
+            type="email"
+            label={lang === 'tr' ? 'E-posta' : 'Email'}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder={lang === 'tr' ? 'ornek@email.com' : 'example@email.com'}
+            size={isMobile ? 'sm' : 'md'}
+          />
 
           {mode !== 'reset' && (
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                {lang === 'tr' ? 'Şifre' : 'Password'}
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="w-full px-3 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-950 dark:text-white focus:border-brand dark:focus:border-brand/60 focus:ring-2 focus:ring-brand/20"
-                placeholder={lang === 'tr' ? 'Şifre (min. 6 karakter)' : 'Password (min. 6 chars)'}
-              />
-            </div>
+            <Input
+              type="password"
+              label={lang === 'tr' ? 'Şifre' : 'Password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              placeholder={lang === 'tr' ? 'Şifre (min. 6 karakter)' : 'Password (min. 6 chars)'}
+              size={isMobile ? 'sm' : 'md'}
+            />
           )}
 
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            size={isMobile ? 'sm' : 'md'}
             disabled={loading}
-            className={`w-full py-2.5 px-4 bg-gradient-to-r from-brand to-brand-dark text-white rounded-lg font-semibold hover:from-brand-dark hover:to-brand transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${isMobile ? 'touch-feedback mobile-press' : ''}`}
+            loading={loading}
+            fullWidth
           >
             {loading
-              ? '...'
+              ? ''
               : mode === 'login'
                 ? lang === 'tr'
                   ? 'Giriş Yap'
@@ -268,7 +261,7 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
                   : lang === 'tr'
                     ? 'Gönder'
                     : 'Send'}
-          </button>
+          </Button>
         </form>
 
         {mode === 'login' && (
@@ -281,14 +274,16 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
               <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
             </div>
 
-            <button
+            <Button
+              variant="outline"
+              size={isMobile ? 'sm' : 'md'}
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="w-full py-2.5 px-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
+              icon="🔵"
+              fullWidth
             >
-              <span>🔵</span>
               {lang === 'tr' ? 'Google ile Giriş' : 'Sign in with Google'}
-            </button>
+            </Button>
           </>
         )}
 

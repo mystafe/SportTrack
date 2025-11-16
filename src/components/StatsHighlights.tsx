@@ -11,6 +11,8 @@ import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 import { getActivityLabel } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { StatsHighlightsSkeleton } from '@/components/LoadingSkeleton';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 
 export const StatsHighlights = memo(function StatsHighlights() {
   const [isOpen, setIsOpen] = useState(true);
@@ -97,9 +99,11 @@ export const StatsHighlights = memo(function StatsHighlights() {
 
   const renderHeader = () => {
     return (
-      <button
+      <Button
         type="button"
-        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand"
+        variant="ghost"
+        size="sm"
+        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand p-0 h-auto"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls="stats-highlights"
@@ -112,14 +116,13 @@ export const StatsHighlights = memo(function StatsHighlights() {
         >
           ▼
         </span>
-      </button>
+      </Button>
     );
   };
 
   return (
     <section className="mt-0">
-      <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-3 shadow-md hover:shadow-xl transition-shadow duration-300">
-        {renderHeader()}
+      <Card variant="default" size="sm" hoverable className="card-entrance" header={renderHeader()}>
         {isOpen && (
           <div
             id="stats-highlights"
@@ -295,7 +298,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
             </Link>
           </div>
         )}
-      </div>
+      </Card>
     </section>
   );
 });

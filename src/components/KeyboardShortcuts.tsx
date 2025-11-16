@@ -4,6 +4,7 @@ import { useEffect, useState, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Button } from '@/components/ui/Button';
 
 interface Shortcut {
   key: string;
@@ -218,13 +219,16 @@ export function KeyboardShortcuts() {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
               {lang === 'tr' ? '⌨️ Klavye Kısayolları' : '⌨️ Keyboard Shortcuts'}
             </h2>
-            <button
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => setShowHelp(false)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none h-auto p-0 min-w-0"
               aria-label={lang === 'tr' ? 'Kapat' : 'Close'}
             >
               ×
-            </button>
+            </Button>
           </div>
 
           <div className="space-y-6">

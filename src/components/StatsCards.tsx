@@ -10,6 +10,8 @@ import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { StatsCardSkeleton } from '@/components/LoadingSkeleton';
 import { notificationService } from '@/lib/notificationService';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 
 export const StatsCards = memo(function StatsCards() {
   const { t, lang } = useI18n();
@@ -36,9 +38,11 @@ export const StatsCards = memo(function StatsCards() {
     setIsOpen: (open: boolean) => void
   ) => {
     return (
-      <button
+      <Button
         type="button"
-        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand"
+        variant="ghost"
+        size="sm"
+        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand p-0 h-auto"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls={`stats-section-${id}`}
@@ -51,7 +55,7 @@ export const StatsCards = memo(function StatsCards() {
         >
           ▼
         </span>
-      </button>
+      </Button>
     );
   };
 
@@ -93,9 +97,11 @@ export const StatsCards = memo(function StatsCards() {
 
   const renderOverviewHeader = () => {
     return (
-      <button
+      <Button
         type="button"
-        className="flex w-full items-center justify-between text-xs font-semibold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand"
+        variant="ghost"
+        size="sm"
+        className="flex w-full items-center justify-between text-xs font-semibold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand p-0 h-auto"
         onClick={() => setOverviewOpen(!overviewOpen)}
         aria-expanded={overviewOpen}
         aria-controls="stats-overview"
@@ -108,7 +114,7 @@ export const StatsCards = memo(function StatsCards() {
         >
           ▼
         </span>
-      </button>
+      </Button>
     );
   };
 
@@ -136,8 +142,13 @@ export const StatsCards = memo(function StatsCards() {
       )}
 
       {/* Overview Section */}
-      <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-3 shadow-md hover:shadow-xl transition-shadow duration-300">
-        {renderOverviewHeader()}
+      <Card
+        variant="default"
+        size="sm"
+        hoverable
+        className="card-entrance"
+        header={renderOverviewHeader()}
+      >
         {overviewOpen && (
           <div
             id="stats-overview"
@@ -256,16 +267,21 @@ export const StatsCards = memo(function StatsCards() {
             </div>
           </div>
         )}
-      </div>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4">
-        <div className="card-entrance slide-in-left rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-3 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
-          {renderSectionHeader(
+        <Card
+          variant="default"
+          size="sm"
+          hoverable
+          className="card-entrance slide-in-left magnetic-hover gpu-accelerated"
+          header={renderSectionHeader(
             'breakdown',
             t('stats.breakdownToday'),
             breakdownOpen,
             setBreakdownOpen
           )}
+        >
           {breakdownOpen && (
             <div id="stats-section-breakdown">
               {summary.breakdownToday.length === 0 ? (
@@ -299,9 +315,19 @@ export const StatsCards = memo(function StatsCards() {
               )}
             </div>
           )}
-        </div>
-        <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-3 shadow-md hover:shadow-xl transition-shadow duration-300 hover-lift transition-smooth">
-          {renderSectionHeader('lastSeven', t('stats.lastSeven'), lastSevenOpen, setLastSevenOpen)}
+        </Card>
+        <Card
+          variant="default"
+          size="sm"
+          hoverable
+          className="hover-lift transition-smooth"
+          header={renderSectionHeader(
+            'lastSeven',
+            t('stats.lastSeven'),
+            lastSevenOpen,
+            setLastSevenOpen
+          )}
+        >
           {lastSevenOpen && (
             <div id="stats-section-lastSeven">
               {summary.lastSevenDays.length === 0 ? (
@@ -332,7 +358,7 @@ export const StatsCards = memo(function StatsCards() {
               )}
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );

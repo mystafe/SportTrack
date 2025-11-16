@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useEffect, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Button } from '@/components/ui/Button';
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -102,27 +103,25 @@ export function ConfirmDialog({
           <div
             className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-3'}`}
           >
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size={isMobile ? 'md' : 'md'}
+              fullWidth={isMobile}
               onClick={handleCancel}
-              className={`${isMobile ? 'w-full min-h-[44px] touch-feedback mobile-press' : 'px-4 py-2'} text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 active:scale-95`}
               aria-label={cancelLabel || t('form.cancel')}
             >
               {cancelLabel || t('form.cancel')}
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant={variant === 'danger' ? 'danger' : 'primary'}
+              size={isMobile ? 'md' : 'md'}
+              fullWidth={isMobile}
               onClick={handleConfirm}
-              className={`${isMobile ? 'w-full min-h-[44px] touch-feedback mobile-press' : 'px-4 py-2'} text-sm font-semibold text-white rounded-lg transition-all duration-200 active:scale-95 hover:shadow-xl ${
-                variant === 'danger'
-                  ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-600'
-                  : 'bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-brand'
-              }`}
               aria-label={confirmLabel || t('form.confirm')}
               autoFocus
             >
               {confirmLabel || t('form.confirm')}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -355,17 +355,14 @@ export function useCloudSyncListener() {
                 }
               }
 
-              // Verify data was loaded
-              const verifyActivities = JSON.parse(
-                localStorage.getItem(STORAGE_KEYS.ACTIVITIES) || '[]'
-              );
-              if (verifyActivities.length > 0) {
-                initialSyncDoneRef.current = true;
-                localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
-                // Silent sync - no toast for automatic sync
-                setTimeout(() => window.location.reload(), 500);
-                return;
-              }
+              // Mark initial sync as complete and reload to apply data
+              initialSyncDoneRef.current = true;
+              localStorage.setItem(INITIAL_SYNC_COMPLETE_KEY, 'true');
+              // Clear conflict storage if exists
+              localStorage.removeItem(CONFLICT_STORAGE_KEY);
+              // Silent sync - no toast for automatic sync
+              setTimeout(() => window.location.reload(), 500);
+              return;
             }
           }
 

@@ -7,6 +7,9 @@ import { useSettings } from '@/lib/settingsStore';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useAuth } from '@/hooks/useAuth';
 import { STORAGE_KEYS } from '@/lib/constants';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 
 export function NameDialog() {
   const { settings, hydrated, saveSettings } = useSettings();
@@ -96,64 +99,54 @@ export function NameDialog() {
         }
       }}
     >
-      <div className="relative w-full max-w-md rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-5 sm:p-6 my-auto">
-        {/* Header */}
-        <div className="mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
-          <h2
-            className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-white flex items-center gap-2`}
-          >
-            <span>👋</span>
-            {lang === 'tr' ? 'Bize Kendinizden Bahsedin' : 'Tell Us About You'}
-          </h2>
-          <p
-            className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-600 dark:text-gray-400 mt-0.5`}
-          >
-            {lang === 'tr'
-              ? 'Kişiselleştirilmiş bir deneyim için isminizi girin'
-              : 'Enter your name for a personalized experience'}
-          </p>
-        </div>
-
+      <Card
+        variant="default"
+        size="md"
+        className="relative w-full max-w-md my-auto"
+        header={
+          <>
+            <h2
+              className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-white flex items-center gap-2`}
+            >
+              <span>👋</span>
+              {lang === 'tr' ? 'Bize Kendinizden Bahsedin' : 'Tell Us About You'}
+            </h2>
+            <p
+              className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-600 dark:text-gray-400 mt-0.5`}
+            >
+              {lang === 'tr'
+                ? 'Kişiselleştirilmiş bir deneyim için isminizi girin'
+                : 'Enter your name for a personalized experience'}
+            </p>
+          </>
+        }
+      >
         {/* Form */}
         <form className="space-y-3" onSubmit={submit} autoComplete="off">
-          <label className="block space-y-1.5">
-            <span
-              className={`${isMobile ? 'text-[11px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
-            >
-              {t('settings.nameLabel')}
-            </span>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                setError(null);
-              }}
-              className={`w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-3 py-2 text-sm' : 'px-4 py-2.5 text-base'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
-              placeholder={lang === 'tr' ? 'İsminiz' : 'Your name'}
-              autoFocus
-              autoComplete="off"
-              data-form-type="other"
-            />
-          </label>
-
-          {error ? (
-            <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-red-500 font-medium`}>
-              {error}
-            </p>
-          ) : null}
+          <Input
+            type="text"
+            label={t('settings.nameLabel')}
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              setError(null);
+            }}
+            placeholder={lang === 'tr' ? 'İsminiz' : 'Your name'}
+            error={error || undefined}
+            autoFocus
+            autoComplete="off"
+            data-form-type="other"
+            size={isMobile ? 'sm' : 'md'}
+          />
 
           {/* Action Button */}
           <div className="pt-2">
-            <button
-              type="submit"
-              className={`w-full px-4 py-2.5 ${isMobile ? 'text-sm' : 'text-base'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
-            >
+            <Button type="submit" variant="primary" size={isMobile ? 'sm' : 'md'} fullWidth>
               {t('settings.save') || 'Save'}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
+      </Card>
     </div>
   ) : null;
 

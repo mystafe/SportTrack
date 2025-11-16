@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { STORAGE_KEYS } from '@/lib/constants';
+import { Button } from '@/components/ui/Button';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -32,34 +33,40 @@ export function ThemeToggle() {
   }
 
   return (
-    <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5 sm:p-1">
-      <button
+    <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5">
+      <Button
         type="button"
-        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded transition-all duration-200 hover:scale-110 active:scale-95 ${theme === 'light' ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+        variant={theme === 'light' ? 'primary' : 'ghost'}
+        size="sm"
+        className="px-1 py-0.5 text-base min-h-[22px] hover:scale-110 active:scale-95"
         onClick={() => update('light')}
         aria-pressed={theme === 'light'}
         title="Light"
       >
         ☀️
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
-        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded transition-all duration-200 hover:scale-110 active:scale-95 ${theme === 'system' ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+        variant={theme === 'system' ? 'primary' : 'ghost'}
+        size="sm"
+        className="px-1 py-0.5 text-base min-h-[22px] hover:scale-110 active:scale-95"
         onClick={() => update('system')}
         aria-pressed={theme === 'system'}
         title="System"
       >
         🖥️
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
-        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded transition-all duration-200 hover:scale-110 active:scale-95 ${theme === 'dark' ? 'bg-brand text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+        variant={theme === 'dark' ? 'primary' : 'ghost'}
+        size="sm"
+        className="px-1 py-0.5 text-base min-h-[22px] hover:scale-110 active:scale-95"
         onClick={() => update('dark')}
         aria-pressed={theme === 'dark'}
         title="Dark"
       >
         🌙
-      </button>
+      </Button>
     </div>
   );
 }

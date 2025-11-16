@@ -9,6 +9,8 @@ import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { getActivityLabel } from '@/lib/activityUtils';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 
 export const ActivityTemplates = memo(function ActivityTemplates() {
   const [isOpen, setIsOpen] = useState(true);
@@ -82,9 +84,11 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
 
   const renderHeader = () => {
     return (
-      <button
+      <Button
         type="button"
-        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand"
+        variant="ghost"
+        size="sm"
+        className="flex w-full items-center justify-between text-xs font-bold text-gray-900 dark:text-white mb-2 transition-all duration-200 hover:text-brand p-0 h-auto"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls="activity-templates"
@@ -97,13 +101,12 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
         >
           ▼
         </span>
-      </button>
+      </Button>
     );
   };
 
   return (
-    <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-3 shadow-md hover:shadow-xl transition-shadow duration-300">
-      {renderHeader()}
+    <Card variant="default" size="sm" hoverable className="card-entrance" header={renderHeader()}>
       {isOpen && (
         <div id="activity-templates" className={isMobile ? 'space-y-2' : 'space-y-3'}>
           {templatesByCategory.map(({ category, templates }) => (
@@ -120,9 +123,11 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
                 className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} ${isMobile ? 'gap-1.5' : 'gap-2 sm:gap-3'}`}
               >
                 {templates.map((template) => (
-                  <button
+                  <Button
                     key={template.id}
                     type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleTemplateClick(template)}
                     disabled={isAdding}
                     className={`stagger-item template-card-enhanced ${isMobile ? 'touch-feedback mobile-press mobile-card-lift fade-in-scale-mobile' : 'ripple-effect magnetic-hover tilt-3d'} relative flex flex-col items-start ${isMobile ? 'gap-2 p-2.5 rounded-lg min-h-[100px]' : 'gap-3 p-4 rounded-xl min-h-[120px]'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 hover:border-brand dark:hover:border-brand/60 hover:bg-gradient-to-br hover:from-brand/5 hover:via-brand/3 hover:to-brand/5 dark:hover:from-brand/10 dark:hover:via-brand/8 dark:hover:to-brand/10 hover:shadow-xl hover:shadow-brand/20 dark:hover:shadow-brand/30 transition-all duration-300 scale-on-interact disabled:opacity-50 disabled:cursor-not-allowed group gpu-accelerated`}
@@ -181,7 +186,7 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
                         <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent"></div>
                       </div>
                     )}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -213,6 +218,6 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
         onConfirm={handleConfirmAdd}
         onCancel={handleCancel}
       />
-    </div>
+    </Card>
   );
 });

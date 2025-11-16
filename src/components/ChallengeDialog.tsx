@@ -13,6 +13,10 @@ import {
   createCustomChallenge,
 } from '@/lib/challenges';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
+import { Button } from '@/components/ui/Button';
 
 interface ChallengeDialogProps {
   open: boolean;
@@ -146,144 +150,101 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-xs font-semibold text-gray-800 dark:text-gray-200 block mb-2">
-              {t('challenges.custom')} / {t('challenges.daily')} / {t('challenges.weekly')} /{' '}
-              {t('challenges.monthly')}
-            </label>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value as ChallengeType)}
-              className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
-            >
-              <option value="daily">{t('challenges.daily')}</option>
-              <option value="weekly">{t('challenges.weekly')}</option>
-              <option value="monthly">{t('challenges.monthly')}</option>
-              <option value="custom">{t('challenges.custom')}</option>
-            </select>
-          </div>
+          <Select
+            label={`${t('challenges.custom')} / ${t('challenges.daily')} / ${t('challenges.weekly')} / ${t('challenges.monthly')}`}
+            value={type}
+            onChange={(e) => setType(e.target.value as ChallengeType)}
+            size={isMobile ? 'sm' : 'md'}
+            options={[
+              { value: 'daily', label: t('challenges.daily') },
+              { value: 'weekly', label: t('challenges.weekly') },
+              { value: 'monthly', label: t('challenges.monthly') },
+              { value: 'custom', label: t('challenges.custom') },
+            ]}
+          />
 
           {type === 'custom' && (
             <>
-              <div>
-                <label className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
-                  {t('challenges.name')} (TR)
-                </label>
-                <input
-                  type="text"
-                  value={nameTr}
-                  onChange={(e) => setNameTr(e.target.value)}
-                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
-                  {t('challenges.name')} (EN)
-                </label>
-                <input
-                  type="text"
-                  value={nameEn}
-                  onChange={(e) => setNameEn(e.target.value)}
-                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
-                  {t('challenges.description')} (TR)
-                </label>
-                <textarea
-                  value={descriptionTr}
-                  onChange={(e) => setDescriptionTr(e.target.value)}
-                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
-                  rows={2}
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
-                  {t('challenges.description')} (EN)
-                </label>
-                <textarea
-                  value={descriptionEn}
-                  onChange={(e) => setDescriptionEn(e.target.value)}
-                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
-                  rows={2}
-                />
-              </div>
+              <Input
+                type="text"
+                label={`${t('challenges.name')} (TR)`}
+                value={nameTr}
+                onChange={(e) => setNameTr(e.target.value)}
+                required
+                size={isMobile ? 'sm' : 'md'}
+              />
+              <Input
+                type="text"
+                label={`${t('challenges.name')} (EN)`}
+                value={nameEn}
+                onChange={(e) => setNameEn(e.target.value)}
+                required
+                size={isMobile ? 'sm' : 'md'}
+              />
+              <Textarea
+                label={`${t('challenges.description')} (TR)`}
+                value={descriptionTr}
+                onChange={(e) => setDescriptionTr(e.target.value)}
+                rows={2}
+                size={isMobile ? 'sm' : 'md'}
+              />
+              <Textarea
+                label={`${t('challenges.description')} (EN)`}
+                value={descriptionEn}
+                onChange={(e) => setDescriptionEn(e.target.value)}
+                rows={2}
+                size={isMobile ? 'sm' : 'md'}
+              />
             </>
           )}
 
-          <div>
-            <label className="text-xs font-semibold text-gray-800 dark:text-gray-200 block mb-2">
-              {t('challenges.targetPoints')}
-            </label>
-            <input
-              type="number"
-              value={target}
-              onChange={(e) => setTarget(e.target.value)}
-              className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
-              min="1"
-              required
-            />
-          </div>
+          <Input
+            type="number"
+            label={t('challenges.targetPoints')}
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            min="1"
+            required
+            size={isMobile ? 'sm' : 'md'}
+          />
 
           {type === 'custom' && (
             <>
-              <div>
-                <label className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
-                  {t('challenges.startDate')}
-                </label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-2">
-                  {t('challenges.endDate')}
-                </label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
-                  required
-                />
-              </div>
+              <Input
+                type="date"
+                label={t('challenges.startDate')}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                required
+                size={isMobile ? 'sm' : 'md'}
+              />
+              <Input
+                type="date"
+                label={t('challenges.endDate')}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                required
+                size={isMobile ? 'sm' : 'md'}
+              />
             </>
           )}
 
-          <div>
-            <label className="text-xs font-semibold text-gray-800 dark:text-gray-200 block mb-2">
-              Emoji/Icon
-            </label>
-            <input
-              type="text"
-              value={icon}
-              onChange={(e) => setIcon(e.target.value)}
-              className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
-              placeholder="🎯"
-            />
-          </div>
+          <Input
+            type="text"
+            label="Emoji/Icon"
+            value={icon}
+            onChange={(e) => setIcon(e.target.value)}
+            placeholder="🎯"
+            size={isMobile ? 'sm' : 'md'}
+          />
 
           <div className="flex items-center justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3 py-2 text-xs rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold"
-            >
+            <Button type="button" variant="outline" size={isMobile ? 'sm' : 'md'} onClick={onClose}>
               {t('challenges.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="px-3 py-2 text-xs rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300"
-            >
+            </Button>
+            <Button type="submit" variant="primary" size={isMobile ? 'sm' : 'md'}>
               {t('challenges.save')}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

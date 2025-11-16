@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useChallenges } from '@/lib/challengeStore';
+import { Button } from '@/components/ui/Button';
 import { Challenge } from '@/lib/challenges';
 import { format, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
@@ -77,23 +78,27 @@ export const ChallengeCard = memo(function ChallengeCard({
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size={isMobile ? 'sm' : 'sm'}
             onClick={onEdit}
-            className={`${isMobile ? 'p-2 min-h-[36px] min-w-[36px]' : 'p-1.5'} text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:scale-110 active:scale-95 transition-all duration-200 ${isMobile ? 'touch-feedback mobile-press' : ''}`}
+            className={`${isMobile ? 'p-2 min-h-[36px] min-w-[36px]' : 'p-1.5'} hover:scale-110 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''}`}
             aria-label={t('challenges.editChallenge')}
           >
             ✏️
-          </button>
+          </Button>
           {challenge.type !== 'daily' || !challenge.id.startsWith('daily-') ? (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size={isMobile ? 'sm' : 'sm'}
               onClick={onDelete}
-              className={`${isMobile ? 'p-2 min-h-[36px] min-w-[36px]' : 'p-1.5'} text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:scale-110 active:scale-95 transition-all duration-200 ${isMobile ? 'touch-feedback mobile-press' : ''}`}
+              className={`${isMobile ? 'p-2 min-h-[36px] min-w-[36px]' : 'p-1.5'} hover:text-red-600 dark:hover:text-red-400 hover:scale-110 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''}`}
               aria-label={t('challenges.deleteChallenge')}
             >
               🗑️
-            </button>
+            </Button>
           ) : null}
         </div>
       </div>

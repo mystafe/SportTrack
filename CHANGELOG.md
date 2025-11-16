@@ -2,6 +2,100 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.19.3] - 2025-01
+
+### Changed
+
+- **Settings Dialog UI/UX Improvements**:
+  - Renamed "Dışa Aktar/İçe Aktar" section to "Veri İşlemleri" (Data Operations)
+  - Moved "Tüm Verileri Temizle" (Clear All Data) button to Data Operations section
+  - Moved "Show Onboarding Tour" button to Data Operations section
+  - All buttons in Data Operations section now have consistent 24x24px size and outline variant
+  - "Görünüm Ayarları" (Display Settings) section restructured:
+    - Title displayed separately above controls
+    - Language, Theme, and List Density controls displayed in a single row below title
+    - List Density toggle redesigned as switch-style buttons with icons (📋 for compact, 📄 for comfortable)
+  - Improved visual consistency across all settings buttons
+  - Better mobile responsiveness with consistent spacing and sizing
+
+### Fixed
+
+- Button size consistency in settings dialog
+- Layout alignment issues in Display Settings section
+- Improved button grouping and visual hierarchy
+
+## [0.19.2] - 2025-01
+
+### Added
+
+- **Design System**: Comprehensive design system implementation
+  - Design tokens for colors, typography, spacing, border radius, shadows, animations
+  - Centralized design token definitions in `src/lib/design-tokens.ts`
+  - CSS custom properties for design tokens in `globals.css`
+  - Tailwind configuration integration with design tokens
+
+- **UI Component Library**: Reusable React components
+  - `Button`: Multiple variants (primary, secondary, outline, ghost, danger, success, warning) and sizes
+  - `Input`: Form inputs with variants, labels, helper text, error states, and icon support
+  - `Card`: Container component with variants, header/footer, hoverable, and clickable states
+  - `Select`: Dropdown selection with labels, helper text, and error states
+  - `Textarea`: Multi-line text input with validation states
+  - `Badge`: Status indicator with multiple variants and sizes
+  - `Checkbox`: Form checkbox with label, helper text, and indeterminate state
+  - `Switch`: Toggle switch component with multiple sizes
+  - `Radio` & `RadioGroup`: Radio button components with group management
+  - `Tooltip`: Contextual information component with multiple positions
+
+- **Component Integration**: 52 components now use new UI components
+  - All dialog components (ConfirmDialog, AuthDialog, ExportDialog, etc.)
+  - All form components (ActivityForm, ChallengeDialog, etc.)
+  - All page components (Activities, Stats, Challenges, Achievements)
+  - All utility components (ScrollToTop, FloatingActionButton, etc.)
+  - All settings components (SettingsDialog, NotificationSettings, etc.)
+
+- **Storybook Setup**: Component documentation and testing
+  - Storybook 10.0.7 installation and configuration
+  - Next.js Vite builder integration
+  - Dark mode support in Storybook
+  - Accessibility addon configuration
+  - Story files for Button, Input, Card, Badge, Select, Checkbox components
+  - Interactive component documentation
+
+- **Documentation**: Design system documentation
+  - `docs/DESIGN_SYSTEM.md`: Comprehensive design system documentation
+  - Component usage examples and guidelines
+  - Accessibility guidelines
+  - Responsive design principles
+
+### Changed
+
+- **Component Architecture**: Migrated from native HTML elements to reusable UI components
+  - All `<button>` elements replaced with `Button` component
+  - All `<input>` elements replaced with `Input` component
+  - All `<select>` elements replaced with `Select` component
+  - All `<textarea>` elements replaced with `Textarea` component
+  - Consistent styling and behavior across all components
+
+- **Design Consistency**: Unified design language across the application
+  - Consistent spacing using 4px base unit system
+  - Consistent color usage through design tokens
+  - Consistent typography through design tokens
+  - Consistent border radius and shadows
+
+### Improved
+
+- **Developer Experience**: Better component reusability and maintainability
+  - Centralized component definitions
+  - Type-safe component props
+  - Consistent API across components
+  - Storybook for component development and testing
+
+- **User Experience**: Improved visual consistency and accessibility
+  - WCAG 2.1 AA compliant components
+  - Consistent interaction patterns
+  - Better mobile responsiveness
+  - Improved dark mode support
+
 ## [0.19.1] - 2025-01
 
 ### Fixed

@@ -10,6 +10,8 @@ import { useSwipeGesture } from '@/lib/hooks/useSwipeGesture';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 import { useLongPress } from '@/lib/hooks/useLongPress';
 import { LongPressMenu, LongPressMenuItem } from '@/components/LongPressMenu';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 
 interface ActivityCardProps {
   activity: ActivityRecord;
@@ -138,13 +140,17 @@ export function ActivityCard({
                 >
                   {getActivityLabel(activity, lang)}
                 </h3>
-                <div className="inline-flex items-center rounded-full points-badge-animated bg-gradient-to-r from-brand via-brand-dark to-brand text-white px-3 py-1 text-xs sm:text-sm font-black whitespace-nowrap border-2 border-white/30 dark:border-white/20 shadow-xl">
+                <Badge
+                  variant="primary"
+                  size={isMobile ? 'sm' : 'md'}
+                  className="points-badge-animated shadow-xl"
+                >
                   <span className="text-sm drop-shadow-md">✨</span>
                   <span className="ml-2 font-black">{numberFormatter.format(activity.points)}</span>
                   <span className="ml-1.5 text-[10px] opacity-95 font-bold">
                     {t('list.pointsUnit')}
                   </span>
-                </div>
+                </Badge>
               </div>
             </div>
             {isToday && (
@@ -192,25 +198,29 @@ export function ActivityCard({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 pt-2 border-t border-gray-200/50 dark:border-gray-700/50 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all duration-300">
-            <button
-              className="flex-1 px-4 py-2 rounded-xl bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-black text-xs sm:text-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+            <Button
+              variant="primary"
+              size={isMobile ? 'sm' : 'md'}
               onClick={() => onEdit(activity.id)}
+              icon="✏️"
+              className="flex-1"
             >
-              <span className="text-base">✏️</span>
-              <span>{t('list.edit')}</span>
-            </button>
-            <button
-              className="flex-1 px-4 py-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-black text-xs sm:text-sm shadow-lg hover:shadow-xl disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 active:scale-95 disabled:hover:scale-100 flex items-center justify-center gap-2"
-              disabled={!isToday}
-              title={!isToday ? t('list.deleteDisabled') : undefined}
+              {t('list.edit')}
+            </Button>
+            <Button
+              variant="danger"
+              size={isMobile ? 'sm' : 'md'}
               onClick={() => {
                 if (!isToday) return;
                 onDelete(activity.id, activity);
               }}
+              disabled={!isToday}
+              title={!isToday ? t('list.deleteDisabled') : undefined}
+              icon="🗑️"
+              className="flex-1"
             >
-              <span className="text-base">🗑️</span>
-              <span>{t('list.delete')}</span>
-            </button>
+              {t('list.delete')}
+            </Button>
           </div>
         </div>
       </li>

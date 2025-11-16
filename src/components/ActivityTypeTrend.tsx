@@ -23,6 +23,7 @@ import {
 } from 'recharts';
 import { format, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
+import { Button } from '@/components/ui/Button';
 
 export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
   const { t, lang } = useI18n();
@@ -104,17 +105,15 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
         </div>
         <div className="flex items-center gap-2">
           {([7, 30, 90] as const).map((days) => (
-            <button
+            <Button
               key={days}
+              type="button"
+              variant={trendDays === days ? 'primary' : 'outline'}
+              size="sm"
               onClick={() => setTrendDays(days)}
-              className={`px-2 py-1 text-xs rounded transition-colors ${
-                trendDays === days
-                  ? 'bg-brand text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-              }`}
             >
               {days} {lang === 'tr' ? 'gün' : 'days'}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
