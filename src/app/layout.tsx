@@ -78,18 +78,23 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   const saved = localStorage.getItem('theme');
                   const theme = saved || 'system';
                   
-                  // Check system preference immediately
-                  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  const isDark = theme === 'dark' || (theme === 'system' && systemPrefersDark);
+                  // Function to apply theme
+                  function applyTheme(themeValue) {
+                    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    const isDark = themeValue === 'dark' || (themeValue === 'system' && systemPrefersDark);
+                    document.documentElement.classList.toggle('dark', isDark);
+                    // Also set data attribute for CSS selectors
+                    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                  }
                   
-                  // Apply theme before page renders to prevent flash
-                  document.documentElement.classList.toggle('dark', isDark);
+                  // Apply theme immediately before page renders to prevent flash
+                  applyTheme(theme);
                   
                   // Listen for system theme changes if using system theme
                   if (theme === 'system') {
                     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
                     const handleChange = (e) => {
-                      document.documentElement.classList.toggle('dark', e.matches);
+                      applyTheme('system');
                     };
                     // Modern browsers
                     if (mediaQuery.addEventListener) {
@@ -99,10 +104,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       mediaQuery.addListener(handleChange);
                     }
                   }
+                  
+                  // Listen for theme changes from other tabs/windows
+                  window.addEventListener('storage', function(e) {
+                    if (e.key === 'theme') {
+                      const newTheme = e.newValue || 'system';
+                      applyTheme(newTheme);
+                    }
+                  });
                 } catch (e) {
                   // Fallback: check system preference if localStorage fails
                   const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                   document.documentElement.classList.toggle('dark', systemPrefersDark);
+                  document.documentElement.setAttribute('data-theme', systemPrefersDark ? 'dark' : 'light');
                 }
               })();
             `,

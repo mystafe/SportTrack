@@ -11,12 +11,43 @@ export function ThemeToggle() {
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.THEME) as Theme | null;
-    if (saved) {
-      setTheme(saved);
-      applyTheme(saved);
+    const themeToUse = saved || 'system';
+    setTheme(themeToUse);
+    applyTheme(themeToUse);
+
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = () => {
+      if (themeToUse === 'system') {
+        applyTheme('system');
+      }
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleSystemThemeChange);
     } else {
-      applyTheme('system');
+      mediaQuery.addListener(handleSystemThemeChange);
     }
+
+    // Listen for theme changes from other tabs/windows
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEYS.THEME) {
+        const newTheme = (e.newValue as Theme) || 'system';
+        setTheme(newTheme);
+        applyTheme(newTheme);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleSystemThemeChange);
+      } else {
+        mediaQuery.removeListener(handleSystemThemeChange);
+      }
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   function applyTheme(next: Theme) {

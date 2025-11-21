@@ -2,6 +2,43 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.20.0] - 2025-01
+
+### Added
+
+- **Base Activity Override System**: Base activities can now be edited directly
+  - Added `BaseActivityOverride` type to allow customization of base activities
+  - Base activity edits are stored as overrides and merged with base definitions
+  - Overrides persist across sessions and sync with cloud storage
+  - Base activity overrides are applied when displaying activities
+
+- **Animation Reduction Setting**: Added option to reduce animations
+  - New "Reduce Animations" setting in Settings dialog
+  - Applies global CSS class to minimize animation durations
+  - Respects system `prefers-reduced-motion` preference
+  - Improves accessibility and performance for users who prefer less motion
+
+### Changed
+
+- **Page Transition Performance**: Significantly improved page transition speed
+  - Reduced transition durations from 0.3s to 0.1s
+  - Optimized animation easing functions
+  - Reduced transform values for smoother transitions
+  - Implemented shallow routing in navigation for faster page loads
+
+- **Animation Durations**: Reduced default animation durations
+  - Fast duration: 150ms → 100ms
+  - Normal duration: 300ms → 150ms
+  - Slow duration: 500ms → 200ms
+
+### Fixed
+
+- **Base Activity Editing**: Fixed base activity edit functionality
+  - Base activities can now be edited and saved correctly
+  - Override system properly merges base definitions with user customizations
+  - Fixed issue where base activity edits were not persisting
+  - Improved override key handling in `updateBaseActivity` function
+
 ## [0.19.4] - 2025-01
 
 ### Removed

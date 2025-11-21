@@ -70,6 +70,8 @@ export function ConflictResolutionDialog({
   }, [selectedLocal, selectedCloud]);
 
   const handleLocalClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (e.ctrlKey || e.metaKey) {
       // Ctrl/Cmd click: toggle selection
       setSelectedLocal(!selectedLocal);
@@ -81,6 +83,8 @@ export function ConflictResolutionDialog({
   };
 
   const handleCloudClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (e.ctrlKey || e.metaKey) {
       // Ctrl/Cmd click: toggle selection
       setSelectedCloud(!selectedCloud);
@@ -91,7 +95,11 @@ export function ConflictResolutionDialog({
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (selectedLocal && selectedCloud) {
       // Both selected: merge
       onResolve('merge');
@@ -314,7 +322,12 @@ export function ConflictResolutionDialog({
   const dialog = (
     <div
       className={`fixed inset-0 z-[10001] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
-      onClick={onCancel}
+      onClick={(e) => {
+        // Only close if clicking the backdrop, not the card content
+        if (e.target === e.currentTarget) {
+          onCancel();
+        }
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="conflict-resolution-title"
@@ -323,7 +336,10 @@ export function ConflictResolutionDialog({
         variant="elevated"
         size="md"
         className={`${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-xl max-w-3xl w-full mx-4'} animate-scale-in`}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          // Prevent clicks inside card from closing dialog
+          e.stopPropagation();
+        }}
         header={
           <h2
             id="conflict-resolution-title"
@@ -751,7 +767,11 @@ export function ConflictResolutionDialog({
           <Button
             variant="primary"
             size={isMobile ? 'sm' : 'md'}
-            onClick={handleContinue}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleContinue(e);
+            }}
             className="flex-1"
           >
             {lang === 'tr' ? 'Devam Et' : 'Continue'}

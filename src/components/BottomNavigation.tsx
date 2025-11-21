@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -8,6 +8,7 @@ import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 
 export function BottomNavigation() {
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useI18n();
   const isMobile = useIsMobile();
   const { triggerHaptic } = useHapticFeedback();
@@ -48,8 +49,18 @@ export function BottomNavigation() {
     },
   ];
 
-  const handleNavClick = () => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
     triggerHaptic('selection');
+    // Use router.push for client-side navigation
+    router.push(href);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLAnchorElement>) => {
+    // Prevent double-tap zoom
+    if (e.touches.length > 1) {
+      e.preventDefault();
+    }
   };
 
   return (
@@ -74,12 +85,13 @@ export function BottomNavigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={handleNavClick}
+                onClick={(e) => handleNavClick(e, item.href)}
+                onTouchStart={handleTouchStart}
                 className={`
                   flex flex-col items-center justify-center gap-1
                   min-w-[56px] min-h-[56px] px-3 py-2
                   rounded-xl transition-all duration-200
-                  touch-feedback mobile-press
+                  touch-feedback mobile-press touch-manipulation
                   ${isActive ? 'bg-brand/10 dark:bg-brand/20 text-brand dark:text-brand-light' : 'text-gray-600 dark:text-gray-400'}
                   ${isActive ? 'scale-105' : 'scale-100'}
                   active:scale-95

@@ -51,7 +51,13 @@ const INITIAL_FORM: FormState = {
 export function ManageActivitiesDialog() {
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
-  const { settings, addCustomActivity, updateCustomActivity, removeCustomActivity } = useSettings();
+  const {
+    settings,
+    addCustomActivity,
+    updateCustomActivity,
+    removeCustomActivity,
+    updateBaseActivity,
+  } = useSettings();
   const { activities } = useActivities();
   const definitions = useActivityDefinitions();
   const customActivities = useMemo(() => {
@@ -97,20 +103,42 @@ export function ManageActivitiesDialog() {
 
   function handleEdit(activity: CustomActivityDefinition | ActivityDefinition) {
     const activityId = 'id' in activity ? activity.id : activity.key;
-    setEditingId(activityId);
-    setForm({
-      id: activityId,
-      label: activity.label,
-      labelEn: activity.labelEn ?? '',
-      icon: activity.icon,
-      unit: activity.unit,
-      unitEn: activity.unitEn ?? '',
-      multiplier: activity.multiplier,
-      defaultAmount: String(activity.defaultAmount),
-      description: activity.description ?? '',
-      descriptionEn: activity.descriptionEn ?? '',
-    });
-    setOpen(true);
+    const isBaseActivity = baseDefinitions.some((def) => def.key === activityId);
+
+    // Now base activities can be edited directly
+    if (isBaseActivity) {
+      // Editing base activity - use the key as editingId
+      setEditingId(activityId);
+      setForm({
+        id: activityId,
+        label: activity.label,
+        labelEn: activity.labelEn ?? '',
+        icon: activity.icon,
+        unit: activity.unit,
+        unitEn: activity.unitEn ?? '',
+        multiplier: activity.multiplier,
+        defaultAmount: String(activity.defaultAmount),
+        description: activity.description ?? '',
+        descriptionEn: activity.descriptionEn ?? '',
+      });
+      setOpen(true);
+    } else {
+      // Editing custom activity
+      setEditingId(activityId);
+      setForm({
+        id: activityId,
+        label: activity.label,
+        labelEn: activity.labelEn ?? '',
+        icon: activity.icon,
+        unit: activity.unit,
+        unitEn: activity.unitEn ?? '',
+        multiplier: activity.multiplier,
+        defaultAmount: String(activity.defaultAmount),
+        description: activity.description ?? '',
+        descriptionEn: activity.descriptionEn ?? '',
+      });
+      setOpen(true);
+    }
   }
 
   function handleDelete(id: string) {
@@ -172,23 +200,42 @@ export function ManageActivitiesDialog() {
     const unitEn = form.unitEn.trim() || form.unit.trim();
     const descriptionEn = form.descriptionEn.trim() || form.description.trim() || undefined;
 
-    const payload: CustomActivityDefinition = {
-      id,
-      label: trimmedLabel,
-      labelEn: labelEn !== trimmedLabel ? labelEn : undefined,
-      icon: form.icon,
-      unit: form.unit.trim(),
-      unitEn: unitEn !== form.unit.trim() ? unitEn : undefined,
-      multiplier: Math.round(form.multiplier * 10) / 10,
-      defaultAmount: Math.round(defaultAmountValue),
-      description: form.description.trim() || undefined,
-      descriptionEn: descriptionEn,
-    };
+    // Check if editing a base activity
+    const isBaseActivity = baseDefinitions.some((def) => def.key === id);
 
-    if (isEditing) {
-      updateCustomActivity(id, payload);
+    if (isBaseActivity && isEditing) {
+      // Update base activity override (don't include 'key' in updates)
+      updateBaseActivity(id, {
+        label: trimmedLabel,
+        labelEn: labelEn !== trimmedLabel ? labelEn : undefined,
+        icon: form.icon,
+        unit: form.unit.trim(),
+        unitEn: unitEn !== form.unit.trim() ? unitEn : undefined,
+        multiplier: Math.round(form.multiplier * 10) / 10,
+        defaultAmount: Math.round(defaultAmountValue),
+        description: form.description.trim() || undefined,
+        descriptionEn: descriptionEn,
+      });
     } else {
-      addCustomActivity(payload);
+      // Custom activity
+      const payload: CustomActivityDefinition = {
+        id,
+        label: trimmedLabel,
+        labelEn: labelEn !== trimmedLabel ? labelEn : undefined,
+        icon: form.icon,
+        unit: form.unit.trim(),
+        unitEn: unitEn !== form.unit.trim() ? unitEn : undefined,
+        multiplier: Math.round(form.multiplier * 10) / 10,
+        defaultAmount: Math.round(defaultAmountValue),
+        description: form.description.trim() || undefined,
+        descriptionEn: descriptionEn,
+      };
+
+      if (isEditing) {
+        updateCustomActivity(id, payload);
+      } else {
+        addCustomActivity(payload);
+      }
     }
     resetForm();
     setOpen(false);

@@ -69,6 +69,9 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const [listDensity, setListDensity] = useState<'compact' | 'comfortable'>(
     settings?.listDensity ?? 'compact'
   );
+  const [reduceAnimations, setReduceAnimations] = useState<boolean>(
+    settings?.reduceAnimations ?? false
+  );
   const [error, setError] = useState<string | null>(null);
   const hasSyncedNameRef = useRef(false);
 
@@ -78,6 +81,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
       setDailyTarget(String(settings.dailyTarget));
       setMood(settings.mood ?? null);
       setListDensity(settings.listDensity ?? 'compact');
+      setReduceAnimations(settings.reduceAnimations ?? false);
     }
   }, [settings]);
 
@@ -137,6 +141,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
       customActivities: settings?.customActivities ?? [],
       mood: mood ?? undefined,
       listDensity: listDensity,
+      reduceAnimations: reduceAnimations,
     });
     setOpen(false);
     setError(null);
@@ -172,6 +177,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
           customActivities: settings?.customActivities ?? [],
           mood: mood ?? undefined,
           listDensity: listDensity,
+          reduceAnimations: reduceAnimations,
         });
       }
     }, 1000); // Auto-save after 1 second of no changes
@@ -182,6 +188,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
     dailyTarget,
     mood,
     listDensity,
+    reduceAnimations,
     open,
     isAuthenticated,
     user?.displayName,
@@ -430,7 +437,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <span
                   className={`${isMobile ? 'text-xs' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
                 >
-                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.19.4
+                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.20.0
                 </span>
               </div>
               <button
@@ -584,6 +591,32 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     <LanguageToggle />
                     <ThemeToggle />
                   </div>
+                </div>
+
+                {/* Animation Settings */}
+                <div
+                  className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700`}
+                >
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <span
+                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-700 dark:text-gray-300`}
+                    >
+                      {lang === 'tr' ? 'Animasyonları Azalt' : 'Reduce Animations'}
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={reduceAnimations}
+                      onChange={(e) => setReduceAnimations(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand"
+                    />
+                  </label>
+                  <p
+                    className={`${isMobile ? 'text-[10px]' : 'text-[9px] sm:text-[10px]'} text-gray-500 dark:text-gray-400 mt-1`}
+                  >
+                    {lang === 'tr'
+                      ? 'Animasyonları azaltarak performansı artırın'
+                      : 'Improve performance by reducing animations'}
+                  </p>
                 </div>
               </>
             ) : (

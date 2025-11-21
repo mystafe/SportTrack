@@ -29,12 +29,27 @@ export type CustomActivityDefinition = {
 export type Mood = 'happy' | 'cheerful' | 'sad' | 'unhappy' | 'tired' | null;
 export type ListDensity = 'compact' | 'comfortable';
 
+export type BaseActivityOverride = {
+  key: ActivityKey;
+  label?: string;
+  labelEn?: string;
+  icon?: string;
+  multiplier?: number;
+  unit?: string;
+  unitEn?: string;
+  defaultAmount?: number;
+  description?: string;
+  descriptionEn?: string;
+};
+
 export type UserSettings = {
   name: string;
   dailyTarget: number;
   customActivities: CustomActivityDefinition[];
+  baseActivityOverrides?: BaseActivityOverride[];
   mood?: Mood;
   listDensity?: ListDensity;
+  reduceAnimations?: boolean;
 };
 
 function dedupeCustomActivities(list?: CustomActivityDefinition[]): CustomActivityDefinition[] {
@@ -57,6 +72,7 @@ type SettingsContextValue = {
   addCustomActivity: (activity: CustomActivityDefinition) => void;
   updateCustomActivity: (id: ActivityKey, updates: Partial<CustomActivityDefinition>) => void;
   removeCustomActivity: (id: ActivityKey) => void;
+  updateBaseActivity: (key: ActivityKey, updates: Partial<BaseActivityOverride>) => void;
 };
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
@@ -85,11 +101,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
             customActivities: dedupeCustomActivities(
               parsed.customActivities as CustomActivityDefinition[]
             ),
+            baseActivityOverrides: parsed.baseActivityOverrides ?? [],
             mood: parsed.mood ?? undefined,
             listDensity:
               parsed.listDensity === 'compact' || parsed.listDensity === 'comfortable'
                 ? parsed.listDensity
                 : 'compact', // Default to compact
+            reduceAnimations: parsed.reduceAnimations ?? false,
           });
         }
       }
@@ -182,6 +200,38 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     [persist]
   );
 
+  const updateBaseActivity = useCallback(
+    (key: ActivityKey, updates: Partial<BaseActivityOverride>) => {
+      setSettings((prev) => {
+        if (!prev) return prev;
+        const overrides = prev.baseActivityOverrides ?? [];
+        const existingIndex = overrides.findIndex((override) => override.key === key);
+
+        // Remove 'key' from updates if present (it's already set)
+        const { key: _, ...cleanUpdates } = updates as BaseActivityOverride;
+
+        let newOverrides: BaseActivityOverride[];
+        if (existingIndex >= 0) {
+          // Update existing override
+          newOverrides = overrides.map((override, index) =>
+            index === existingIndex ? { ...override, ...cleanUpdates } : override
+          );
+        } else {
+          // Add new override
+          newOverrides = [...overrides, { key, ...cleanUpdates }];
+        }
+
+        const next: UserSettings = {
+          ...prev,
+          baseActivityOverrides: newOverrides,
+        };
+        persist(next);
+        return next;
+      });
+    },
+    [persist]
+  );
+
   const value = useMemo<SettingsContextValue>(
     () => ({
       settings,
@@ -190,6 +240,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       addCustomActivity,
       updateCustomActivity,
       removeCustomActivity,
+      updateBaseActivity,
     }),
     [
       settings,
@@ -198,6 +249,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       addCustomActivity,
       updateCustomActivity,
       removeCustomActivity,
+      updateBaseActivity,
     ]
   );
 
@@ -216,12 +268,30 @@ export function useActivityDefinitions(): ActivityDefinition[] {
   const { settings } = useSettings();
   return useMemo(() => {
     const custom = dedupeCustomActivities(settings?.customActivities);
-    const ordered = new Map<ActivityKey, ActivityDefinition>();
+    const overrides = settings?.baseActivityOverrides ?? [];
+    const overrideMap = new Map<ActivityKey, BaseActivityOverride>();
 
-    for (const definition of BASE_ACTIVITY_DEFINITIONS) {
-      ordered.set(definition.key, definition);
+    for (const override of overrides) {
+      overrideMap.set(override.key, override);
     }
 
+    const ordered = new Map<ActivityKey, ActivityDefinition>();
+
+    // Apply base activities with overrides
+    for (const definition of BASE_ACTIVITY_DEFINITIONS) {
+      const override = overrideMap.get(definition.key);
+      if (override) {
+        // Merge base definition with override
+        ordered.set(definition.key, {
+          ...definition,
+          ...override,
+        });
+      } else {
+        ordered.set(definition.key, definition);
+      }
+    }
+
+    // Add custom activities (these override base activities if same key)
     for (const activity of custom) {
       ordered.set(activity.id, {
         ...activity,
@@ -246,5 +316,18 @@ export function findActivityDefinition(
       isCustom: true,
     };
   }
-  return BASE_ACTIVITY_MAP[key];
+
+  const base = BASE_ACTIVITY_MAP[key];
+  if (!base) return undefined;
+
+  // Apply base activity overrides if any
+  const override = settings?.baseActivityOverrides?.find((o) => o.key === key);
+  if (override) {
+    return {
+      ...base,
+      ...override,
+    };
+  }
+
+  return base;
 }
