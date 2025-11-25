@@ -3,16 +3,10 @@
 import Link from 'next/link';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useI18n } from '@/lib/i18n';
-import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 
 export function FloatingAddButton() {
   const isMobile = useIsMobile();
   const { t } = useI18n();
-  const { triggerHaptic } = useHapticFeedback();
-
-  const handleClick = () => {
-    triggerHaptic('medium');
-  };
 
   // Calculate position above QuoteTicker - just above scrolling text
   // QuoteTicker height: ~32px + BottomNavigation: 64px + safe-bottom
@@ -37,13 +31,9 @@ export function FloatingAddButton() {
           <div className="absolute inset-0 rounded-full bg-white/30 dark:bg-gray-900/30 backdrop-blur-md backdrop-saturate-150 -z-10"></div>
           <Link
             href="/add"
-            onClick={handleClick}
-            className={`${isMobile ? 'w-12 h-12' : 'w-14 h-14'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center touch-feedback mobile-press opacity-100 relative p-0 border-2 border-white/30 dark:border-white/20 z-50 ring-2 ring-brand/30`}
+            className={`${isMobile ? 'w-12 h-12' : 'w-14 h-14'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center opacity-100 relative p-0 border-2 border-white/30 dark:border-white/20 z-50 ring-2 ring-brand/30`}
             style={{
-              touchAction: 'manipulation',
               WebkitTapHighlightColor: 'transparent',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
             }}
             aria-label={t('actions.addActivity')}
             title={t('actions.addActivity')}

@@ -4,13 +4,11 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
-import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 
 export function BottomNavigation() {
   const pathname = usePathname();
   const { t } = useI18n();
   const isMobile = useIsMobile();
-  const { triggerHaptic } = useHapticFeedback();
 
   // Only show on mobile
   if (!isMobile) return null;
@@ -48,11 +46,6 @@ export function BottomNavigation() {
     },
   ];
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // Don't prevent default - let Link handle navigation naturally
-    triggerHaptic('selection');
-  };
-
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t-2 border-gray-200 dark:border-gray-700 safe-bottom"
@@ -75,22 +68,17 @@ export function BottomNavigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={handleNavClick}
                 className={`
                   flex flex-col items-center justify-center gap-1
                   min-w-[56px] min-h-[56px] px-3 py-2
                   rounded-xl transition-all duration-200
-                  touch-feedback mobile-press
                   ${isActive ? 'bg-brand/10 dark:bg-brand/20 text-brand dark:text-brand-light' : 'text-gray-600 dark:text-gray-400'}
                   ${isActive ? 'scale-105' : 'scale-100'}
                   active:scale-95
                   hover:bg-gray-100 dark:hover:bg-gray-800
                 `}
                 style={{
-                  touchAction: 'manipulation',
                   WebkitTapHighlightColor: 'transparent',
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
                 }}
                 aria-label={item.ariaLabel}
                 aria-current={isActive ? 'page' : undefined}
