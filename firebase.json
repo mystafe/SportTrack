@@ -8,6 +8,22 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
+        "source": "/_next/static/**",
+        "destination": "/_next/static/**"
+      },
+      {
+        "source": "/sw.js",
+        "destination": "/sw.js"
+      },
+      {
+        "source": "/manifest.json",
+        "destination": "/manifest.json"
+      },
+      {
+        "source": "/icon*",
+        "destination": "/icon*"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

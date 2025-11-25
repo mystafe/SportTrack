@@ -42,6 +42,29 @@ const pwaConfig = withPWA({
   disable: process.env.NODE_ENV === 'development',
   runtimeCaching: [
     {
+      // Don't cache navigation requests - always use network
+      urlPattern: /^https?:\/\/.*\/$/,
+      handler: 'NetworkOnly',
+    },
+    {
+      // Don't cache page routes - always use network
+      urlPattern: /^https?:\/\/.*\/(activities|stats|achievements|challenges|add)(\/.*)?$/,
+      handler: 'NetworkOnly',
+    },
+    {
+      // Cache static assets
+      urlPattern: /^https?.*\/_next\/static\/.*/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'static-assets',
+        expiration: {
+          maxEntries: 200,
+          maxAgeSeconds: 31536000, // 1 year
+        },
+      },
+    },
+    {
+      // Cache other resources with NetworkFirst
       urlPattern: /^https?.*/,
       handler: 'NetworkFirst',
       options: {
