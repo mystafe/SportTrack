@@ -74,7 +74,7 @@ export default function HomePage() {
       aria-label={t('header.overviewTitle')}
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className={isMobile ? 'title-entrance' : ''}>
+        <div>
           <h1
             className={`text-2xl sm:text-3xl font-bold ${isMobile ? 'text-brand dark:text-brand-light' : 'text-gray-950 dark:text-white'}`}
           >

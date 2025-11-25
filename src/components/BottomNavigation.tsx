@@ -49,12 +49,9 @@ export function BottomNavigation() {
     },
   ];
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Let Link handle navigation naturally
     triggerHaptic('selection');
-    // Use router.push for client-side navigation
-    router.push(href);
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLAnchorElement>) => {
@@ -64,12 +61,9 @@ export function BottomNavigation() {
     }
   };
 
-  const handleTouchEnd = (e: React.TouchEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleTouchEnd = (e: React.TouchEvent<HTMLAnchorElement>) => {
+    // Let Link handle navigation naturally
     triggerHaptic('selection');
-    // Use router.push for client-side navigation
-    router.push(href);
   };
 
   return (
@@ -94,9 +88,9 @@ export function BottomNavigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={(e) => handleNavClick(e, item.href)}
+                onClick={handleNavClick}
                 onTouchStart={handleTouchStart}
-                onTouchEnd={(e) => handleTouchEnd(e, item.href)}
+                onTouchEnd={handleTouchEnd}
                 className={`
                   flex flex-col items-center justify-center gap-1
                   min-w-[56px] min-h-[56px] px-3 py-2

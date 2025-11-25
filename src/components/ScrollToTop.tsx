@@ -63,6 +63,14 @@ export function ScrollToTop() {
   const handleAddActivity = (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Prevent double-trigger
+    const target = e.currentTarget;
+    if (target.hasAttribute('data-processing')) {
+      return;
+    }
+    target.setAttribute('data-processing', 'true');
+
     triggerHaptic('medium');
 
     // Smooth page transition with fade effect
@@ -81,11 +89,19 @@ export function ScrollToTop() {
           mainElement.style.opacity = '1';
           mainElement.style.transform = 'translateY(0)';
         }
+        target.removeAttribute('data-processing');
       }, 100);
     }, 150);
   };
 
-  const handleAddActivityTouch = (e: TouchEvent<HTMLButtonElement>) => {
+  const handleAddActivityTouchStart = (e: TouchEvent<HTMLButtonElement>) => {
+    // Prevent double-tap zoom
+    if (e.touches.length > 1) {
+      e.preventDefault();
+    }
+  };
+
+  const handleAddActivityTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     handleAddActivity(e);
@@ -114,7 +130,8 @@ export function ScrollToTop() {
           <div className="absolute inset-0 rounded-full bg-white/30 dark:bg-gray-900/30 backdrop-blur-md backdrop-saturate-150 -z-10"></div>
           <Button
             onClick={handleAddActivity}
-            onTouchStart={handleAddActivityTouch}
+            onTouchStart={handleAddActivityTouchStart}
+            onTouchEnd={handleAddActivityTouchEnd}
             type="button"
             variant="primary"
             size={isMobile ? 'sm' : 'md'}
