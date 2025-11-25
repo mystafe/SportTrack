@@ -257,26 +257,41 @@ export function ConflictResolutionDialog({
     }[] = [];
 
     if (localSettings || cloudSettings) {
-      const fieldsToCompare: (keyof UserSettings)[] = [
-        'theme',
-        'language',
-        'name',
-        'dailyTarget',
-        'listDensity',
-        'reduceAnimations',
-      ];
+      const fieldsToCompare: Array<
+        keyof Pick<
+          UserSettings,
+          'theme' | 'language' | 'name' | 'dailyTarget' | 'listDensity' | 'reduceAnimations'
+        >
+      > = ['theme', 'language', 'name', 'dailyTarget', 'listDensity', 'reduceAnimations'];
 
       fieldsToCompare.forEach((field) => {
         const localValue = localSettings?.[field];
         const cloudValue = cloudSettings?.[field];
 
         // Compare values (treat undefined/null as same)
+        // Only compare simple types (string, number, boolean)
         if (localValue !== cloudValue && (localValue !== undefined || cloudValue !== undefined)) {
-          settingsDifferences.push({
-            field,
-            local: localValue ?? null,
-            cloud: cloudValue ?? null,
-          });
+          // Ensure we only push simple types
+          const localSimple =
+            typeof localValue === 'string' ||
+            typeof localValue === 'number' ||
+            typeof localValue === 'boolean'
+              ? localValue
+              : null;
+          const cloudSimple =
+            typeof cloudValue === 'string' ||
+            typeof cloudValue === 'number' ||
+            typeof cloudValue === 'boolean'
+              ? cloudValue
+              : null;
+
+          if (localSimple !== cloudSimple) {
+            settingsDifferences.push({
+              field,
+              local: localSimple ?? null,
+              cloud: cloudSimple ?? null,
+            });
+          }
         }
       });
     }
