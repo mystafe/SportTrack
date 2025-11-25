@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ReactNode } from 'react';
 import { Providers } from '@/components/Providers';
 import { Header } from '@/components/Header';
-import { ScrollToTop } from '@/components/ScrollToTop';
+import { FloatingAddButton } from '@/components/FloatingAddButton';
 import { QuoteTicker } from '@/components/QuoteTicker';
 import { SkipLink } from '@/components/SkipLink';
 
@@ -195,7 +195,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Header />
           <main
             id="main-content"
-            className="container py-4 sm:py-6 page-transition-wrapper"
+            className="container py-4 sm:py-6"
             style={{
               paddingBottom:
                 'max(1.5rem, calc(64px + 32px + 1.5rem + env(safe-area-inset-bottom, 0px)))',
@@ -205,7 +205,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           >
             {children}
           </main>
-          <ScrollToTop />
+          <FloatingAddButton />
           <QuoteTicker />
           <BottomNavigation />
         </Providers>

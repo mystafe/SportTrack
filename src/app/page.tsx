@@ -68,11 +68,7 @@ export default function HomePage() {
   }, [motivationalMessage, mounted]);
 
   return (
-    <main
-      className="space-y-4 sm:space-y-6 page-transition"
-      role="main"
-      aria-label={t('header.overviewTitle')}
-    >
+    <main className="space-y-4 sm:space-y-6" role="main" aria-label={t('header.overviewTitle')}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1

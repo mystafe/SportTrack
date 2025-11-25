@@ -17,7 +17,6 @@ const translations: Translations = {
   'nav.home': { tr: 'Ana sayfa', en: 'Home page' },
   'nav.login': { tr: 'Giriş Yap', en: 'Login' },
   'nav.logout': { tr: 'Çıkış Yap', en: 'Logout' },
-  scrollToTop: { tr: 'Yukarı çık', en: 'Scroll to top' },
   'header.overviewTitle': { tr: 'Genel Bakış', en: 'Overview' },
   'header.overviewSubtitle': {
     tr: 'Günlük puan hedefin doğrultusunda ilerlemeni takip et.',
