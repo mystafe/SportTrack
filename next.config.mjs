@@ -35,11 +35,12 @@ const nextConfig = {
   },
 };
 
+// Disable PWA/Service Worker for Firebase deployments to prevent navigation issues
 const pwaConfig = withPWA({
   dest: 'public',
-  register: true,
+  register: process.env.FIREBASE_DEPLOY !== 'true', // Disable SW for Firebase
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
+  disable: process.env.NODE_ENV === 'development' || process.env.FIREBASE_DEPLOY === 'true',
   runtimeCaching: [
     {
       // Don't cache navigation requests - always use network

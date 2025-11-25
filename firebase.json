@@ -13,7 +13,7 @@
       },
       {
         "source": "/sw.js",
-        "destination": "/sw.js"
+        "destination": "/404.html"
       },
       {
         "source": "/manifest.json",
