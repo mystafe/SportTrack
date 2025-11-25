@@ -437,7 +437,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <span
                   className={`${isMobile ? 'text-xs' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
                 >
-                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.20.0
+                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.21.1
                 </span>
               </div>
               <button
@@ -578,7 +578,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   </Suspense>
                 </div>
 
-                {/* Language & Theme */}
+                {/* Language & Theme & Reduce Animations */}
                 <div
                   className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700`}
                 >
@@ -587,36 +587,21 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   >
                     {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
                   </span>
-                  <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'}`}>
+                  <div className={`flex items-center flex-wrap ${isMobile ? 'gap-1.5' : 'gap-3'}`}>
                     <LanguageToggle />
                     <ThemeToggle />
-                  </div>
-                </div>
-
-                {/* Animation Settings */}
-                <div
-                  className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700`}
-                >
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <span
-                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-700 dark:text-gray-300`}
+                    <Button
+                      type="button"
+                      variant={reduceAnimations ? 'primary' : 'ghost'}
+                      size="sm"
+                      className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                      onClick={() => setReduceAnimations(!reduceAnimations)}
+                      aria-pressed={reduceAnimations}
+                      title={lang === 'tr' ? 'Animasyonları Azalt' : 'Reduce Animations'}
                     >
-                      {lang === 'tr' ? 'Animasyonları Azalt' : 'Reduce Animations'}
-                    </span>
-                    <input
-                      type="checkbox"
-                      checked={reduceAnimations}
-                      onChange={(e) => setReduceAnimations(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand"
-                    />
-                  </label>
-                  <p
-                    className={`${isMobile ? 'text-[10px]' : 'text-[9px] sm:text-[10px]'} text-gray-500 dark:text-gray-400 mt-1`}
-                  >
-                    {lang === 'tr'
-                      ? 'Animasyonları azaltarak performansı artırın'
-                      : 'Improve performance by reducing animations'}
-                  </p>
+                      {lang === 'tr' ? '⚡' : '⚡'}
+                    </Button>
+                  </div>
                 </div>
               </>
             ) : (
@@ -753,15 +738,29 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     >
                       {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
                     </span>
-                    <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-3'} flex-wrap`}>
+                    <div
+                      className={`flex items-center flex-wrap ${isMobile ? 'gap-1.5' : 'gap-3'}`}
+                    >
                       <LanguageToggle />
                       <ThemeToggle />
+                      {/* Reduce Animations Button */}
+                      <Button
+                        type="button"
+                        variant={reduceAnimations ? 'primary' : 'ghost'}
+                        size="sm"
+                        className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                        onClick={() => setReduceAnimations(!reduceAnimations)}
+                        aria-pressed={reduceAnimations}
+                        title={lang === 'tr' ? 'Animasyonları Azalt' : 'Reduce Animations'}
+                      >
+                        {lang === 'tr' ? '⚡' : '⚡'}
+                      </Button>
                       {/* List View - Compact/Comfortable Switch */}
                       <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5">
                         <button
                           type="button"
                           onClick={() => setListDensity('compact')}
-                          className={`px-1.5 py-0.5 text-base min-h-[22px] rounded transition-all ${
+                          className={`px-1.5 py-0.5 ${isMobile ? 'text-sm min-h-[20px]' : 'text-base min-h-[22px]'} rounded transition-all ${
                             listDensity === 'compact'
                               ? 'bg-brand text-white'
                               : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -774,7 +773,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                         <button
                           type="button"
                           onClick={() => setListDensity('comfortable')}
-                          className={`px-1.5 py-0.5 text-base min-h-[22px] rounded transition-all ${
+                          className={`px-1.5 py-0.5 ${isMobile ? 'text-sm min-h-[20px]' : 'text-base min-h-[22px]'} rounded transition-all ${
                             listDensity === 'comfortable'
                               ? 'bg-brand text-white'
                               : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -873,19 +872,19 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
           onClick={() => setOpen(true)}
           className={`${
             isMobile
-              ? 'px-3 py-2 min-h-[36px] min-w-[280px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 gap-1.5 overflow-hidden max-w-[400px] sm:max-w-none'
-              : 'px-4 py-1.5 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center gap-2 max-w-[1400px]'
+              ? 'px-4 py-2.5 min-h-[44px] min-w-[360px] text-sm rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 gap-2 overflow-hidden max-w-[500px] sm:max-w-none font-medium'
+              : 'px-5 py-2 text-sm rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center gap-2.5 max-w-[1800px] font-medium'
           } truncate`}
           title={displayName}
           aria-label={displayName}
           data-tour-id="profile"
         >
-          <span className={`${isMobile ? 'text-xs' : 'text-xs'} truncate`}>
-            {isMobile && typeof displayName === 'string' && displayName.length > 12
-              ? displayName.substring(0, 12) + '...'
+          <span className={`${isMobile ? 'text-sm' : 'text-sm'} truncate`}>
+            {isMobile && typeof displayName === 'string' && displayName.length > 18
+              ? displayName.substring(0, 18) + '...'
               : displayName}
           </span>
-          <span className={`${isMobile ? 'text-sm' : 'text-xs'} flex-shrink-0`}>⚙️</span>
+          <span className={`${isMobile ? 'text-base' : 'text-sm'} flex-shrink-0`}>⚙️</span>
         </button>
       )}
       {typeof window !== 'undefined' && settingsDialog

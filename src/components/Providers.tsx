@@ -15,6 +15,7 @@ import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AutoSyncProvider } from '@/components/AutoSyncProvider';
 import { NameDialog } from '@/components/NameDialog';
+import { CloudSyncLoading } from '@/components/CloudSyncLoading';
 
 // Lazy load components that are not immediately needed
 const InstallPrompt = lazy(() =>
@@ -75,6 +76,7 @@ export function Providers({ children }: { children: ReactNode }) {
                           <InstallPrompt />
                         </Suspense>
                         <NotificationManager />
+                        <CloudSyncLoading />
                         <Suspense fallback={null}>
                           <KeyboardShortcuts />
                         </Suspense>

@@ -766,15 +766,72 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLang] = useState<Language>('tr');
 
   useEffect(() => {
-    const saved = (
-      typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.LANGUAGE) : null
-    ) as Language | null;
-    if (saved === 'tr' || saved === 'en') {
-      setLang(saved);
-      return;
+    // Try to get language from settings store first (if available)
+    // This requires SettingsProvider to be rendered before I18nProvider
+    // For now, fallback to localStorage
+    const loadLanguage = () => {
+      let saved: Language | null = null;
+
+      // Check localStorage for settings
+      if (typeof window !== 'undefined') {
+        try {
+          const settingsRaw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+          if (settingsRaw) {
+            const settings = JSON.parse(settingsRaw);
+            if (settings?.language && (settings.language === 'tr' || settings.language === 'en')) {
+              saved = settings.language;
+            }
+          }
+        } catch (e) {
+          // Ignore parse errors
+        }
+
+        // Fallback to direct language key
+        if (!saved) {
+          saved = localStorage.getItem(STORAGE_KEYS.LANGUAGE) as Language | null;
+        }
+      }
+
+      if (saved === 'tr' || saved === 'en') {
+        setLang(saved);
+        return;
+      }
+      const device = typeof window !== 'undefined' ? navigator.language : 'tr';
+      setLang(device.toLowerCase().startsWith('tr') ? 'tr' : 'en');
+    };
+
+    // Load language initially
+    loadLanguage();
+
+    // Listen for language changes from localStorage (e.g., from cloud sync)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEYS.LANGUAGE || e.key === STORAGE_KEYS.SETTINGS) {
+        loadLanguage();
+      }
+    };
+
+    // Also listen for custom events (same-tab changes)
+    const handleLanguageChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ language: Language }>;
+      if (
+        customEvent.detail?.language &&
+        (customEvent.detail.language === 'tr' || customEvent.detail.language === 'en')
+      ) {
+        setLang(customEvent.detail.language);
+      } else {
+        loadLanguage();
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorageChange);
+      window.addEventListener('sporttrack:language-changed', handleLanguageChange);
+
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('sporttrack:language-changed', handleLanguageChange);
+      };
     }
-    const device = typeof window !== 'undefined' ? navigator.language : 'tr';
-    setLang(device.toLowerCase().startsWith('tr') ? 'tr' : 'en');
   }, []);
 
   const value = useMemo<I18nContextValue>(() => {
@@ -790,6 +847,17 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       setLang(l);
       if (typeof window !== 'undefined') {
         localStorage.setItem(STORAGE_KEYS.LANGUAGE, l);
+        // Also update settings store if available
+        try {
+          const settingsRaw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+          if (settingsRaw) {
+            const settings = JSON.parse(settingsRaw);
+            settings.language = l;
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+          }
+        } catch (e) {
+          // Ignore parse errors
+        }
       }
     };
     return { lang, setLang: setter, t };

@@ -24,6 +24,7 @@ type ChallengeContextValue = {
   getChallengeProgress: (challengeId: string) => ChallengeProgress | null;
   checkCompletedChallenges: () => Challenge[];
   clearAllChallenges: () => void;
+  reloadFromStorage: () => void;
 };
 
 const ChallengeContext = createContext<ChallengeContextValue | null>(null);
@@ -194,6 +195,37 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const reloadFromStorage = useCallback(() => {
+    if (typeof window === 'undefined' || !activitiesHydrated || !settingsHydrated) return;
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+      if (stored) {
+        const parsed = JSON.parse(stored) as Challenge[];
+        // Check if we need to add default weekly challenge
+        const hasWeekly = parsed.some((c) => c.type === 'weekly' && c.id.startsWith('weekly-'));
+        if (!hasWeekly) {
+          const weeklyChallenge = getDefaultWeeklyChallenge();
+          setChallenges([...parsed, weeklyChallenge]);
+        } else {
+          setChallenges(parsed);
+        }
+      } else {
+        // Create default daily and weekly challenges
+        const dailyTarget = settings?.dailyTarget ?? DEFAULT_DAILY_TARGET;
+        const defaultDaily = getDefaultDailyChallenge(dailyTarget);
+        const defaultWeekly = getDefaultWeeklyChallenge();
+        setChallenges([defaultDaily, defaultWeekly]);
+      }
+    } catch (error) {
+      console.error('Failed to load challenges:', error);
+      // Create default challenges on error
+      const dailyTarget = settings?.dailyTarget ?? DEFAULT_DAILY_TARGET;
+      const defaultDaily = getDefaultDailyChallenge(dailyTarget);
+      const defaultWeekly = getDefaultWeeklyChallenge();
+      setChallenges([defaultDaily, defaultWeekly]);
+    }
+  }, [activitiesHydrated, settingsHydrated, settings?.dailyTarget]);
+
   const value = useMemo<ChallengeContextValue>(
     () => ({
       challenges,
@@ -204,6 +236,7 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
       getChallengeProgress,
       checkCompletedChallenges,
       clearAllChallenges,
+      reloadFromStorage,
     }),
     [
       challenges,
@@ -214,6 +247,7 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
       getChallengeProgress,
       checkCompletedChallenges,
       clearAllChallenges,
+      reloadFromStorage,
     ]
   );
 

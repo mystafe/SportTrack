@@ -37,10 +37,10 @@ export function QuoteTicker() {
 
   // Calculate bottom position: above BottomNavigation (64px) + safe area
   // QuoteTicker height is now ~32px (reduced from ~45px)
-  // Slightly lower position (reduced by 4px)
+  // Position higher (increased by 8px)
   const bottomPosition = isMobile
-    ? 'calc(64px + max(4px, env(safe-area-inset-bottom, 0px)))'
-    : 'max(4px, env(safe-area-inset-bottom, 0px))';
+    ? 'calc(64px + max(12px, env(safe-area-inset-bottom, 0px)))'
+    : 'max(12px, env(safe-area-inset-bottom, 0px))';
 
   return (
     <div

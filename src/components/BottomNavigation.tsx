@@ -51,6 +51,7 @@ export function BottomNavigation() {
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
+    e.stopPropagation();
     triggerHaptic('selection');
     // Use router.push for client-side navigation
     router.push(href);
@@ -61,6 +62,14 @@ export function BottomNavigation() {
     if (e.touches.length > 1) {
       e.preventDefault();
     }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    triggerHaptic('selection');
+    // Use router.push for client-side navigation
+    router.push(href);
   };
 
   return (
@@ -87,6 +96,7 @@ export function BottomNavigation() {
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item.href)}
                 onTouchStart={handleTouchStart}
+                onTouchEnd={(e) => handleTouchEnd(e, item.href)}
                 className={`
                   flex flex-col items-center justify-center gap-1
                   min-w-[56px] min-h-[56px] px-3 py-2
@@ -97,6 +107,12 @@ export function BottomNavigation() {
                   active:scale-95
                   hover:bg-gray-100 dark:hover:bg-gray-800
                 `}
+                style={{
+                  touchAction: 'manipulation',
+                  WebkitTapHighlightColor: 'transparent',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                }}
                 aria-label={item.ariaLabel}
                 aria-current={isActive ? 'page' : undefined}
               >

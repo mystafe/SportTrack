@@ -89,6 +89,27 @@ export function useAutoSync() {
       .sort()
       .join('|');
 
+    // Create a normalized settings hash that includes all settings fields
+    const settingsHash = settingsRef.current
+      ? JSON.stringify({
+          name: settingsRef.current.name || '',
+          dailyTarget: settingsRef.current.dailyTarget || 10000,
+          customActivities: (settingsRef.current.customActivities || [])
+            .map((a) => a.id)
+            .sort()
+            .join(','),
+          baseActivityOverrides: (settingsRef.current.baseActivityOverrides || [])
+            .map((a) => a.key)
+            .sort()
+            .join(','),
+          mood: settingsRef.current.mood || null,
+          listDensity: settingsRef.current.listDensity || 'compact',
+          reduceAnimations: settingsRef.current.reduceAnimations || false,
+          theme: settingsRef.current.theme || 'system',
+          language: settingsRef.current.language || 'tr',
+        })
+      : null;
+
     return JSON.stringify({
       activities: activitiesHash,
       activitiesCount: activitiesRef.current.length,
@@ -96,7 +117,7 @@ export function useAutoSync() {
       badgesCount: badgesRef.current.length,
       challenges: challengesHash,
       challengesCount: challengesRef.current.length,
-      settings: settingsRef.current ? JSON.stringify(settingsRef.current) : null,
+      settings: settingsHash,
     });
   };
 
@@ -221,7 +242,7 @@ export function useAutoSync() {
     };
   }, [activities, allHydrated, isAuthenticated, isConfigured]);
 
-  // Check if custom activity was added/updated/removed - trigger debounced sync
+  // Check if settings changed (custom activities, theme, language, etc.) - trigger debounced sync
   useEffect(() => {
     if (!allHydrated || !isAuthenticated || !isConfigured) {
       return;
@@ -229,12 +250,18 @@ export function useAutoSync() {
 
     const currentCustomActivitiesCount = settings?.customActivities?.length || 0;
     const lastCustomCount = lastCustomActivitiesCountRef.current;
+    const currentHash = createDataHash();
+    const lastHash = lastSyncHashRef.current;
 
-    // If custom activities count changed, trigger debounced sync
-    if (currentCustomActivitiesCount !== lastCustomCount && lastCustomCount >= 0) {
+    // If custom activities count changed OR settings content changed (theme, language, etc.), trigger debounced sync
+    const customActivitiesCountChanged =
+      currentCustomActivitiesCount !== lastCustomCount && lastCustomCount >= 0;
+    const settingsContentChanged = lastHash !== null && currentHash !== lastHash;
+
+    if (customActivitiesCountChanged || settingsContentChanged) {
       if (typeof window !== 'undefined') {
         localStorage.setItem(LAST_ACTIVITY_ADDED_KEY, String(Date.now()));
-        // Custom activity change detected, scheduling debounced sync
+        // Settings change detected, scheduling debounced sync
       }
 
       // Clear existing debounce timer
@@ -257,7 +284,7 @@ export function useAutoSync() {
         debounceTimerRef.current = null;
       }
     };
-  }, [settings?.customActivities?.length, allHydrated, isAuthenticated, isConfigured]);
+  }, [settings, allHydrated, isAuthenticated, isConfigured]);
 
   // Periodic check: runs every 30 seconds to check for changes
   useEffect(() => {

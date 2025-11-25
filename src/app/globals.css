@@ -142,11 +142,11 @@
 
   /* Animation Durations - Reduced for better performance */
   --duration-instant: 0ms;
-  --duration-fast: 100ms;
-  --duration-normal: 150ms;
-  --duration-slow: 200ms;
-  --duration-slower: 300ms;
-  --duration-slowest: 400ms;
+  --duration-fast: 50ms;
+  --duration-normal: 75ms;
+  --duration-slow: 100ms;
+  --duration-slower: 150ms;
+  --duration-slowest: 200ms;
 
   /* Animation Easing */
   --ease-linear: linear;
@@ -312,8 +312,8 @@ html.dark {
 body {
   @apply bg-white text-gray-900 dark:bg-black dark:text-gray-100;
   transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+    background-color 0.1s ease,
+    color 0.1s ease;
   min-height: 100%;
   /* Ensure body background covers safe area insets */
   background-color: inherit;
@@ -331,7 +331,7 @@ body {
     background-color: inherit;
     z-index: 999999;
     pointer-events: none;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.1s ease;
   }
 
   html.dark::before {
@@ -358,7 +358,7 @@ body {
     background-color: inherit;
     z-index: 999999;
     pointer-events: none;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.1s ease;
   }
 
   html.dark::after {
@@ -601,7 +601,7 @@ body {
 }
 
 .animate-slide-down {
-  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideDown 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Scale bounce animation */
@@ -618,7 +618,7 @@ body {
 }
 
 .animate-scale-bounce {
-  animation: scaleBounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation: scaleBounce 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 /* Fade in with scale */
@@ -634,7 +634,7 @@ body {
 }
 
 .animate-fade-in-scale {
-  animation: fadeInScale 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInScale 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Pulse glow animation */
@@ -649,7 +649,7 @@ body {
 }
 
 .animate-pulse-glow {
-  animation: pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulseGlow 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes slideDownFadeIn {
@@ -680,19 +680,19 @@ body {
 }
 
 .animate-slide-in-right {
-  animation: slideInRight 0.5s ease-out;
+  animation: slideInRight 0.15s ease-out;
   will-change: transform, opacity;
   transform: translateZ(0);
 }
 
 .animate-slide-out-right {
-  animation: slideOutRight 0.3s ease-in;
+  animation: slideOutRight 0.1s ease-in;
   will-change: transform, opacity;
   transform: translateZ(0);
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.1s ease-out;
   will-change: opacity;
 }
 
@@ -2874,7 +2874,7 @@ html {
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
-  animation: quoteMarquee 30s linear infinite;
+  animation: quoteMarquee 20s linear infinite;
   will-change: transform;
   gap: 0;
   vertical-align: middle;

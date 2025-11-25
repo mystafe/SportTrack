@@ -2,6 +2,45 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.21.1] - 2025-01
+
+### Fixed
+
+- **Cloud Sync Infinite Loop**: Fixed infinite reload loop when downloading cloud data
+  - Added `isReloadingRef` flag to prevent multiple simultaneous reloads
+  - Added `initialSyncCheckStartedRef` flag to prevent multiple initial sync checks
+  - Improved coordination between `performInitialSyncCheck` and `subscribeToCloud` callback
+  - Reload delay reduced from 500ms to 100ms for faster sync
+  - Flags are properly reset on logout and user change
+  - Error handling improved to reset flags on failure
+
+## [0.21.0] - 2025-01
+
+### Changed
+
+- **Base Activity Multipliers**: Updated activity multipliers for better point calculation
+  - Merdiven Çıkma (Stairs): multiplier increased from x20 to x50
+  - Crunch renamed to Plank: multiplier increased from x5 to x10
+  - Ağırlık Çalışması (Weight Lifting): multiplier decreased from x20 to x10
+
+- **Cloud Sync Improvements**: Enhanced cloud synchronization
+  - Base activity overrides now sync to cloud storage
+  - Custom activities and base activity overrides automatically sync without conflict resolution
+  - Settings (including custom activities and base overrides) sync automatically
+  - Conflict resolution dialog no longer shows activities/settings comparison (they sync automatically)
+
+- **UI Improvements**: Enhanced user interface elements
+  - Profile button width increased for better visibility (mobile: 320px → 360px, desktop: 1600px → 1800px)
+  - Add Exercise button text enhanced with subtle glow effect for better visibility
+  - Profile button text truncation adjusted to show more characters (15 → 18 on mobile)
+
+### Fixed
+
+- **Cloud Sync Base Activity Overrides**: Base activity overrides are now properly synced to and from cloud storage
+  - Base activity overrides are stored in activities subcollection
+  - Overrides are correctly restored when downloading from cloud
+  - Settings include baseActivityOverrides field in sync operations
+
 ## [0.20.0] - 2025-01
 
 ### Added

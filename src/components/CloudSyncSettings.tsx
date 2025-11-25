@@ -751,7 +751,9 @@ export function CloudSyncSettings() {
             activities: (conflictData.local.activities as ActivityRecord[]) || [],
             badges: (conflictData.local.badges as Badge[]) || [],
             challenges: conflictData.local.challenges || [],
-            settings: (conflictData.local.settings as UserSettings | null) || settings || null,
+            // Always use current settings from store, as conflict data may not include updated settings
+            // This ensures that any settings changes made after conflict detection are reflected
+            settings: settings || (conflictData.local.settings as UserSettings | null) || null,
           }}
           cloudData={{
             exercises: (conflictData.cloud.activities || []) as ActivityRecord[],

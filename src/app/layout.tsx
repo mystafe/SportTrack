@@ -74,9 +74,42 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             __html: `
               (function() {
                 try {
-                  // Use the same key as ThemeToggle component
-                  const saved = localStorage.getItem('theme');
-                  const theme = saved || 'system';
+                  // Function to read theme from localStorage
+                  function readTheme() {
+                    // Try to get theme from theme key first (fastest, always available)
+                    let theme = null;
+                    const themeFromKey = localStorage.getItem('theme');
+                    if (themeFromKey && (themeFromKey === 'light' || themeFromKey === 'dark' || themeFromKey === 'system')) {
+                      theme = themeFromKey;
+                    }
+                    
+                    // If theme key doesn't have a value, try settings store
+                    if (!theme) {
+                      try {
+                        const settingsRaw = localStorage.getItem('sporttrack.settings.v1');
+                        if (settingsRaw) {
+                          const settings = JSON.parse(settingsRaw);
+                          if (settings && settings.theme && (settings.theme === 'light' || settings.theme === 'dark' || settings.theme === 'system')) {
+                            theme = settings.theme;
+                            // Also write to theme key for faster access next time
+                            localStorage.setItem('theme', settings.theme);
+                          }
+                        }
+                      } catch (e) {
+                        // Settings parse failed, use system
+                      }
+                    }
+                    
+                    // Default to system if nothing found
+                    if (!theme) {
+                      theme = 'system';
+                    }
+                    
+                    return theme;
+                  }
+                  
+                  // Read theme immediately
+                  let theme = readTheme();
                   
                   // Function to apply theme
                   function applyTheme(themeValue) {
@@ -105,13 +138,41 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     }
                   }
                   
-                  // Listen for theme changes from other tabs/windows
+                  // Listen for theme changes from other tabs/windows and same-tab updates
+                  function handleThemeChange() {
+                    // Re-read theme from localStorage using the same function
+                    const newTheme = readTheme();
+                    if (newTheme && newTheme !== theme) {
+                      theme = newTheme;
+                      applyTheme(theme);
+                    }
+                  }
+                  
+                  // Listen for storage events (cross-tab)
                   window.addEventListener('storage', function(e) {
-                    if (e.key === 'theme') {
-                      const newTheme = e.newValue || 'system';
-                      applyTheme(newTheme);
+                    if (e.key === 'theme' || e.key === 'sporttrack.settings.v1') {
+                      handleThemeChange();
                     }
                   });
+                  
+                  // Also listen for custom events (same-tab updates)
+                  window.addEventListener('sporttrack:theme-changed', handleThemeChange);
+                  
+                  // Poll for theme changes periodically (in case settings store loads after script)
+                  // This ensures theme is applied even if settings store loads after page load
+                  let pollCount = 0;
+                  const maxPolls = 10; // Poll for 2 seconds (10 * 200ms)
+                  const pollInterval = setInterval(function() {
+                    pollCount++;
+                    const currentTheme = readTheme();
+                    if (currentTheme !== theme) {
+                      theme = currentTheme;
+                      applyTheme(theme);
+                    }
+                    if (pollCount >= maxPolls) {
+                      clearInterval(pollInterval);
+                    }
+                  }, 200);
                 } catch (e) {
                   // Fallback: check system preference if localStorage fails
                   const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;

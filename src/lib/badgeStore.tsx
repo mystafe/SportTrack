@@ -13,6 +13,7 @@ type BadgeContextValue = {
   checkNewBadges: () => Badge[];
   unlockBadge: (badge: Badge) => void;
   clearAllBadges: () => void;
+  reloadFromStorage: () => void;
 };
 
 const BadgeContext = createContext<BadgeContextValue | null>(null);
@@ -104,6 +105,26 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const reloadFromStorage = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.BADGES);
+      if (stored) {
+        const parsed = JSON.parse(stored) as Badge[];
+        // Convert unlockedAt strings back to Date objects
+        const badgesWithDates = parsed.map((badge) => ({
+          ...badge,
+          unlockedAt: badge.unlockedAt ? new Date(badge.unlockedAt) : undefined,
+        }));
+        setBadges(badgesWithDates);
+      } else {
+        setBadges([]);
+      }
+    } catch (error) {
+      console.error('Failed to load badges:', error);
+    }
+  }, []);
+
   const value = useMemo<BadgeContextValue>(
     () => ({
       badges,
@@ -111,8 +132,9 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
       checkNewBadges,
       unlockBadge,
       clearAllBadges,
+      reloadFromStorage,
     }),
-    [badges, hydrated, checkNewBadges, unlockBadge, clearAllBadges]
+    [badges, hydrated, checkNewBadges, unlockBadge, clearAllBadges, reloadFromStorage]
   );
 
   return <BadgeContext.Provider value={value}>{children}</BadgeContext.Provider>;

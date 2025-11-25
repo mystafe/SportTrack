@@ -42,6 +42,9 @@ export type BaseActivityOverride = {
   descriptionEn?: string;
 };
 
+export type Theme = 'light' | 'dark' | 'system';
+export type Language = 'tr' | 'en';
+
 export type UserSettings = {
   name: string;
   dailyTarget: number;
@@ -50,6 +53,8 @@ export type UserSettings = {
   mood?: Mood;
   listDensity?: ListDensity;
   reduceAnimations?: boolean;
+  theme?: Theme;
+  language?: Language;
 };
 
 function dedupeCustomActivities(list?: CustomActivityDefinition[]): CustomActivityDefinition[] {
@@ -95,6 +100,27 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           Number.isFinite(parsed.dailyTarget) &&
           parsed.dailyTarget > 0
         ) {
+          // Get theme and language from localStorage for backward compatibility
+          const themeFromStorage =
+            typeof window !== 'undefined'
+              ? (localStorage.getItem(STORAGE_KEYS.THEME) as Theme | null)
+              : null;
+          const languageFromStorage =
+            typeof window !== 'undefined'
+              ? (localStorage.getItem(STORAGE_KEYS.LANGUAGE) as Language | null)
+              : null;
+
+          // Use theme from settings if explicitly set, otherwise use themeFromStorage, otherwise default to system
+          // But if parsed.theme is explicitly undefined/null, don't override themeFromStorage
+          const finalTheme =
+            parsed.theme !== undefined && parsed.theme !== null
+              ? parsed.theme
+              : themeFromStorage || 'system';
+          const finalLanguage =
+            parsed.language !== undefined && parsed.language !== null
+              ? parsed.language
+              : languageFromStorage || 'tr';
+
           setSettings({
             name: parsed.name,
             dailyTarget: parsed.dailyTarget,
@@ -108,11 +134,83 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 ? parsed.listDensity
                 : 'compact', // Default to compact
             reduceAnimations: parsed.reduceAnimations ?? false,
+            theme: finalTheme,
+            language: finalLanguage,
           });
+
+          // Also write theme and language to separate localStorage keys for layout.tsx script
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(STORAGE_KEYS.THEME, finalTheme);
+            localStorage.setItem(STORAGE_KEYS.LANGUAGE, finalLanguage);
+            // Apply theme immediately
+            const root = document.documentElement;
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = finalTheme === 'dark' || (finalTheme === 'system' && systemPrefersDark);
+            root.classList.toggle('dark', isDark);
+            root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+          }
+        } else {
+          // Settings store exists but doesn't have required fields
+          // Still try to preserve theme and language from localStorage
+          const themeFromStorage = localStorage.getItem(STORAGE_KEYS.THEME) as Theme | null;
+          const languageFromStorage = localStorage.getItem(
+            STORAGE_KEYS.LANGUAGE
+          ) as Language | null;
+
+          if (
+            themeFromStorage &&
+            (themeFromStorage === 'light' ||
+              themeFromStorage === 'dark' ||
+              themeFromStorage === 'system')
+          ) {
+            // Apply theme even if settings store doesn't have required fields
+            const root = document.documentElement;
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark =
+              themeFromStorage === 'dark' || (themeFromStorage === 'system' && systemPrefersDark);
+            root.classList.toggle('dark', isDark);
+            root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+          }
+        }
+      } else {
+        // No settings store - try to preserve theme from localStorage
+        const themeFromStorage = localStorage.getItem(STORAGE_KEYS.THEME) as Theme | null;
+        if (
+          themeFromStorage &&
+          (themeFromStorage === 'light' ||
+            themeFromStorage === 'dark' ||
+            themeFromStorage === 'system')
+        ) {
+          // Apply theme even if settings store doesn't exist
+          const root = document.documentElement;
+          const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const isDark =
+            themeFromStorage === 'dark' || (themeFromStorage === 'system' && systemPrefersDark);
+          root.classList.toggle('dark', isDark);
+          root.setAttribute('data-theme', isDark ? 'dark' : 'light');
         }
       }
     } catch (error) {
       console.error('Failed to read settings', error);
+      // Even on error, try to preserve theme from localStorage
+      try {
+        const themeFromStorage = localStorage.getItem(STORAGE_KEYS.THEME) as Theme | null;
+        if (
+          themeFromStorage &&
+          (themeFromStorage === 'light' ||
+            themeFromStorage === 'dark' ||
+            themeFromStorage === 'system')
+        ) {
+          const root = document.documentElement;
+          const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const isDark =
+            themeFromStorage === 'dark' || (themeFromStorage === 'system' && systemPrefersDark);
+          root.classList.toggle('dark', isDark);
+          root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        }
+      } catch (themeError) {
+        // Ignore theme error
+      }
     } finally {
       setHydrated(true);
     }
@@ -125,6 +223,25 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     };
     setSettings(normalized);
     if (typeof window !== 'undefined') {
+      // ALWAYS write theme and language to separate localStorage keys FIRST (before settings)
+      // This ensures layout.tsx script can read them immediately
+      if (normalized.theme) {
+        window.localStorage.setItem(STORAGE_KEYS.THEME, normalized.theme);
+        // Apply theme immediately
+        const root = document.documentElement;
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark =
+          normalized.theme === 'dark' || (normalized.theme === 'system' && systemPrefersDark);
+        root.classList.toggle('dark', isDark);
+        root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        // Trigger custom event for layout.tsx script
+        window.dispatchEvent(new CustomEvent('sporttrack:theme-changed'));
+      }
+      if (normalized.language) {
+        window.localStorage.setItem(STORAGE_KEYS.LANGUAGE, normalized.language);
+      }
+
+      // Then save settings to localStorage
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
 
       // Update local last modified date

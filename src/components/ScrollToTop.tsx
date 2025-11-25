@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { MouseEvent } from 'react';
+import type { MouseEvent, TouchEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useI18n } from '@/lib/i18n';
@@ -60,7 +60,7 @@ export function ScrollToTop() {
     }
   };
 
-  const handleAddActivity = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleAddActivity = (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     triggerHaptic('medium');
@@ -83,6 +83,12 @@ export function ScrollToTop() {
         }
       }, 100);
     }, 150);
+  };
+
+  const handleAddActivityTouch = (e: TouchEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleAddActivity(e);
   };
 
   // Calculate position above QuoteTicker - just above scrolling text
@@ -108,10 +114,17 @@ export function ScrollToTop() {
           <div className="absolute inset-0 rounded-full bg-white/30 dark:bg-gray-900/30 backdrop-blur-md backdrop-saturate-150 -z-10"></div>
           <Button
             onClick={handleAddActivity}
+            onTouchStart={handleAddActivityTouch}
             type="button"
-            variant="ghost"
+            variant="primary"
             size={isMobile ? 'sm' : 'md'}
-            className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-white/20 dark:bg-gray-900/20 backdrop-blur-sm text-brand dark:text-brand-light shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''} opacity-100 relative p-0 border border-white/20 dark:border-gray-700/30`}
+            className={`${isMobile ? 'w-12 h-12' : 'w-14 h-14'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 ${isMobile ? 'touch-feedback mobile-press touch-manipulation' : ''} opacity-100 relative p-0 border-2 border-white/30 dark:border-white/20 z-50 ring-2 ring-brand/30`}
+            style={{
+              touchAction: 'manipulation',
+              WebkitTapHighlightColor: 'transparent',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+            }}
             aria-label={t('actions.addActivity')}
             title={t('actions.addActivity')}
             data-tour-id="add-activity"
@@ -124,7 +137,14 @@ export function ScrollToTop() {
           </Button>
         </div>
         <span
-          className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-600 dark:text-gray-400 font-medium whitespace-nowrap`}
+          className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-700 dark:text-gray-300 font-semibold whitespace-nowrap drop-shadow-md ${
+            isMobile ? 'text-shadow-glow' : ''
+          }`}
+          style={{
+            textShadow: isMobile
+              ? '0 0 8px rgba(14, 165, 233, 0.4), 0 0 4px rgba(14, 165, 233, 0.3)'
+              : '0 0 6px rgba(14, 165, 233, 0.3), 0 0 3px rgba(14, 165, 233, 0.2)',
+          }}
         >
           {t('actions.addActivity')}
         </span>

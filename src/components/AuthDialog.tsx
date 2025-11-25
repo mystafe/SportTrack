@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -26,6 +27,7 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
   const { showToast } = useToaster();
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -48,10 +50,14 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
         await login(email, password);
         showToast(lang === 'tr' ? 'Giriş başarılı!' : 'Login successful!', 'success');
         onClose();
+        // Redirect to home page after login
+        router.push('/');
       } else if (mode === 'signup') {
         await register(email, password, displayName || undefined);
         showToast(lang === 'tr' ? 'Kayıt başarılı!' : 'Registration successful!', 'success');
         onClose();
+        // Redirect to home page after signup
+        router.push('/');
       } else if (mode === 'reset') {
         await resetPasswordEmail(email);
         showToast(
@@ -140,6 +146,8 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
       await loginWithGoogle();
       showToast(lang === 'tr' ? 'Giriş başarılı!' : 'Login successful!', 'success');
       onClose();
+      // Redirect to home page after Google login
+      router.push('/');
     } catch (error) {
       let errorMessage = '';
       if (error instanceof Error) {

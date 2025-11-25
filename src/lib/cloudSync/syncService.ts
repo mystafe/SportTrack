@@ -26,6 +26,7 @@ import { Challenge } from '@/lib/challenges';
 import { ActivityDefinition, BASE_ACTIVITY_DEFINITIONS } from '@/lib/activityConfig';
 import { calculateOverallStatistics, calculatePeriodStatistics } from './statisticsCalculator';
 import { subDays, startOfDay, endOfDay } from 'date-fns';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 export class CloudSyncService {
   private userId: string | null = null;
@@ -613,14 +614,51 @@ export class CloudSyncService {
 
       // Clean settings: remove undefined fields (Firestore doesn't accept undefined)
       // Always include mood with a default value (null) if not set
+      // For theme and language, read from localStorage if not in settings to ensure correct values
       const cleanedSettings: UserSettings | null = data.settings
         ? (() => {
+            // Read theme and language from localStorage if not in settings
+            let themeValue = data.settings.theme;
+            if (!themeValue || themeValue === 'system') {
+              // Try to read from localStorage
+              if (typeof window !== 'undefined') {
+                const themeFromStorage = localStorage.getItem(STORAGE_KEYS.THEME);
+                if (themeFromStorage && themeFromStorage !== 'system') {
+                  themeValue = themeFromStorage as 'light' | 'dark' | 'system';
+                } else {
+                  themeValue = data.settings.theme || 'system';
+                }
+              } else {
+                themeValue = data.settings.theme || 'system';
+              }
+            }
+
+            let languageValue = data.settings.language;
+            if (!languageValue) {
+              // Try to read from localStorage
+              if (typeof window !== 'undefined') {
+                const langFromStorage = localStorage.getItem(STORAGE_KEYS.LANGUAGE);
+                if (langFromStorage) {
+                  languageValue = langFromStorage as 'tr' | 'en';
+                } else {
+                  languageValue = data.settings.language || 'tr';
+                }
+              } else {
+                languageValue = data.settings.language || 'tr';
+              }
+            }
+
             const cleaned: UserSettings = {
               name: data.settings.name || '',
               dailyTarget: data.settings.dailyTarget || 10000,
               customActivities:
                 (data.settings.customActivities as CustomActivityDefinition[]) || [],
+              baseActivityOverrides: data.settings.baseActivityOverrides || [],
               mood: data.settings.mood !== undefined ? data.settings.mood : null, // Always include mood
+              listDensity: data.settings.listDensity || 'compact',
+              reduceAnimations: data.settings.reduceAnimations || false,
+              theme: themeValue,
+              language: languageValue,
             };
             return removeUndefined(cleaned) as UserSettings;
           })()
@@ -999,6 +1037,35 @@ export class CloudSyncService {
         }
       }
 
+      // Write base activity overrides to subcollection
+      if (
+        cleanedSettings?.baseActivityOverrides &&
+        Array.isArray(cleanedSettings.baseActivityOverrides)
+      ) {
+        const baseActivityOverrides = cleanedSettings.baseActivityOverrides;
+        for (const override of baseActivityOverrides) {
+          if (override.key) {
+            // Convert BaseActivityOverride to ActivityDefinition format for storage
+            const baseDefinition = BASE_ACTIVITY_DEFINITIONS.find(
+              (def) => def.key === override.key
+            );
+            if (baseDefinition) {
+              // Merge base definition with override
+              const mergedActivity: ActivityDefinition = {
+                ...baseDefinition,
+                ...override,
+                isCustom: false, // Base activity override, not custom
+              };
+              const activityDocRef = doc(activitiesCollectionRef, override.key);
+              const cleanedActivity = Object.fromEntries(
+                Object.entries(mergedActivity).filter(([_, value]) => value !== undefined)
+              ) as ActivityDefinition;
+              subcollectionBatch.set(activityDocRef, cleanedActivity);
+            }
+          }
+        }
+      }
+
       // Commit subcollections batch
       await subcollectionBatch.commit();
       // Successfully uploaded exercises, badges and challenges to subcollections
@@ -1193,6 +1260,46 @@ export class CloudSyncService {
       // Filter only custom activities (not default ones)
       const customActivities = activities.filter((activity) => activity.isCustom);
 
+      // Extract base activity overrides from activities collection
+      // Base activity overrides are activities that match base keys but are not custom
+      const baseActivityOverrides = activities
+        .filter((activity) => {
+          // Check if this is a base activity (exists in BASE_ACTIVITY_DEFINITIONS)
+          const isBaseActivity = BASE_ACTIVITY_DEFINITIONS.some((def) => def.key === activity.key);
+          // Must be base activity and not custom
+          return isBaseActivity && !activity.isCustom;
+        })
+        .map((activity) => {
+          // Convert ActivityDefinition back to BaseActivityOverride format
+          const baseDefinition = BASE_ACTIVITY_DEFINITIONS.find((def) => def.key === activity.key);
+          if (!baseDefinition) return null;
+
+          // Extract only the override fields (fields that differ from base)
+          const override: import('@/lib/settingsStore').BaseActivityOverride = {
+            key: activity.key,
+          };
+
+          if (activity.label !== baseDefinition.label) override.label = activity.label;
+          if (activity.labelEn !== baseDefinition.labelEn) override.labelEn = activity.labelEn;
+          if (activity.icon !== baseDefinition.icon) override.icon = activity.icon;
+          if (activity.multiplier !== baseDefinition.multiplier)
+            override.multiplier = activity.multiplier;
+          if (activity.unit !== baseDefinition.unit) override.unit = activity.unit;
+          if (activity.unitEn !== baseDefinition.unitEn) override.unitEn = activity.unitEn;
+          if (activity.defaultAmount !== baseDefinition.defaultAmount)
+            override.defaultAmount = activity.defaultAmount;
+          if (activity.description !== baseDefinition.description)
+            override.description = activity.description;
+          if (activity.descriptionEn !== baseDefinition.descriptionEn)
+            override.descriptionEn = activity.descriptionEn;
+
+          return override;
+        })
+        .filter(
+          (override): override is import('@/lib/settingsStore').BaseActivityOverride =>
+            override !== null
+        );
+
       const settings = settingsFromDoc
         ? {
             ...settingsFromDoc,
@@ -1200,13 +1307,25 @@ export class CloudSyncService {
               customActivities.length > 0
                 ? customActivities
                 : settingsFromDoc.customActivities || [],
+            baseActivityOverrides:
+              baseActivityOverrides.length > 0
+                ? baseActivityOverrides
+                : settingsFromDoc.baseActivityOverrides || [],
+            // Ensure theme and language are included
+            theme: settingsFromDoc.theme || 'system',
+            language: settingsFromDoc.language || 'tr',
+            listDensity: settingsFromDoc.listDensity || 'compact',
+            reduceAnimations: settingsFromDoc.reduceAnimations || false,
           }
-        : customActivities.length > 0
+        : customActivities.length > 0 || baseActivityOverrides.length > 0
           ? {
               name: '',
               dailyTarget: 10000,
               customActivities,
+              baseActivityOverrides,
               mood: null,
+              theme: 'system',
+              language: 'tr',
             }
           : null;
 

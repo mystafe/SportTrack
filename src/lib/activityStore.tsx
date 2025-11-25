@@ -53,6 +53,7 @@ type ActivitiesContextValue = {
   updateActivity: (id: string, input: UpdateActivityInput) => ActivityRecord | null;
   deleteActivity: (id: string) => void;
   clearAllActivities: () => void;
+  reloadFromStorage: () => void;
 };
 
 const ActivitiesContext = createContext<ActivitiesContextValue | null>(null);
@@ -286,6 +287,24 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
     setStorageError(null);
   }, []);
 
+  const reloadFromStorage = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as Partial<ActivityRecord>[];
+        const normalized = parsed.map((record) => normalizeRecord(record));
+        setActivities(normalized);
+        setStorageError(null);
+      } catch (error) {
+        console.error('Failed to parse activities from storage', error);
+        setStorageError('parse');
+      }
+    } else {
+      setActivities([]);
+    }
+  }, []);
+
   const value = useMemo<ActivitiesContextValue>(
     () => ({
       activities,
@@ -296,6 +315,7 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
       updateActivity,
       deleteActivity,
       clearAllActivities,
+      reloadFromStorage,
     }),
     [
       activities,
@@ -306,6 +326,7 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
       updateActivity,
       deleteActivity,
       clearAllActivities,
+      reloadFromStorage,
     ]
   );
 
