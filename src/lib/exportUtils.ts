@@ -152,7 +152,7 @@ export async function exportToPDF(
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
   const titleLines = doc.splitTextToSize(title, pageWidth - 2 * margin);
-  doc.text(titleLines, margin, yPos, { encoding: 'UTF8' });
+  doc.text(titleLines, margin, yPos);
   yPos += 10;
 
   // User info
@@ -169,7 +169,7 @@ export async function exportToPDF(
         ? `Kullanıcı: ${settings.name} | Günlük Hedef: ${settings.dailyTarget.toLocaleString()} puan${moodText}`
         : `User: ${settings.name} | Daily Goal: ${settings.dailyTarget.toLocaleString()} points${moodText}`;
     const userInfoLines = doc.splitTextToSize(userInfo, pageWidth - 2 * margin);
-    doc.text(userInfoLines, margin, yPos, { encoding: 'UTF8' });
+    doc.text(userInfoLines, margin, yPos);
     yPos += 8;
   }
 
@@ -180,7 +180,7 @@ export async function exportToPDF(
         ? `Tarih Aralığı: ${format(options.dateRange.start, 'dd.MM.yyyy', { locale })} - ${format(options.dateRange.end, 'dd.MM.yyyy', { locale })}`
         : `Date Range: ${format(options.dateRange.start, 'MM/dd/yyyy', { locale })} - ${format(options.dateRange.end, 'MM/dd/yyyy', { locale })}`;
     const dateRangeLines = doc.splitTextToSize(dateRangeText, pageWidth - 2 * margin);
-    doc.text(dateRangeLines, margin, yPos, { encoding: 'UTF8' });
+    doc.text(dateRangeLines, margin, yPos);
     yPos += 8;
   }
 
@@ -190,7 +190,7 @@ export async function exportToPDF(
       ? `Rapor Tarihi: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale })}`
       : `Report Date: ${format(new Date(), 'MM/dd/yyyy HH:mm', { locale })}`;
   const exportDateLines = doc.splitTextToSize(exportDateText, pageWidth - 2 * margin);
-  doc.text(exportDateLines, margin, yPos, { encoding: 'UTF8' });
+  doc.text(exportDateLines, margin, yPos);
   yPos += 10;
 
   // Summary statistics
@@ -202,7 +202,7 @@ export async function exportToPDF(
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
   const summaryLabelLines = doc.splitTextToSize(summaryLabel, pageWidth - 2 * margin);
-  doc.text(summaryLabelLines, margin, yPos, { encoding: 'UTF8' });
+  doc.text(summaryLabelLines, margin, yPos);
   yPos += 8;
 
   doc.setFontSize(10);
@@ -222,7 +222,7 @@ export async function exportToPDF(
 
   summaryText.forEach((text) => {
     const textLines = doc.splitTextToSize(text, pageWidth - 2 * margin);
-    doc.text(textLines, margin + 5, yPos, { encoding: 'UTF8' });
+    doc.text(textLines, margin + 5, yPos);
     yPos += 6;
   });
   yPos += 5;
