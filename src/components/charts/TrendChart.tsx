@@ -82,8 +82,11 @@ export function TrendChart({ activities, target, days }: TrendChartProps) {
             backgroundColor: 'var(--tw-bg-white)',
             border: '1px solid var(--tw-border-gray-200)',
             borderRadius: '0.5rem',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.2s ease-in-out',
           }}
-          labelStyle={{ color: 'var(--tw-text-gray-900)' }}
+          labelStyle={{ color: 'var(--tw-text-gray-900)', fontWeight: '600' }}
+          animationDuration={200}
         />
         <Legend />
         <Line
@@ -91,9 +94,12 @@ export function TrendChart({ activities, target, days }: TrendChartProps) {
           dataKey="points"
           stroke="#0ea5e9"
           strokeWidth={2}
-          dot={{ r: 4 }}
-          activeDot={{ r: 6 }}
+          dot={{ r: 4, fill: '#0ea5e9', strokeWidth: 2, stroke: '#fff' }}
+          activeDot={{ r: 6, fill: '#0ea5e9', strokeWidth: 2, stroke: '#fff' }}
           name={lang === 'tr' ? 'Puanlar' : 'Points'}
+          animationDuration={1000}
+          animationEasing="ease-out"
+          isAnimationActive={true}
         />
         <Line
           type="monotone"
@@ -103,6 +109,9 @@ export function TrendChart({ activities, target, days }: TrendChartProps) {
           strokeDasharray="5 5"
           dot={false}
           name={lang === 'tr' ? 'Hedef' : 'Target'}
+          animationDuration={1000}
+          animationEasing="ease-out"
+          isAnimationActive={true}
         />
       </LineChart>
     </ResponsiveContainer>

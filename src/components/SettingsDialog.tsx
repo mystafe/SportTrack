@@ -65,6 +65,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [showSyncSuccess, setShowSyncSuccess] = useState(false);
+  const [isClearingData, setIsClearingData] = useState(false);
+  const [showClearDataSuccess, setShowClearDataSuccess] = useState(false);
   const [name, setName] = useState<string>(settings?.name ?? '');
   const [dailyTarget, setDailyTarget] = useState<string>(
     String(settings?.dailyTarget ?? DEFAULT_DAILY_TARGET)
@@ -356,6 +358,10 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   };
 
   const confirmClearData = async () => {
+    // Close dialog and show clearing animation
+    setShowClearDataDialog(false);
+    setIsClearingData(true);
+
     try {
       // If user is authenticated, upload empty data to cloud to clear cloud storage
       // This is the ONLY place where empty data can be uploaded to cloud
@@ -377,6 +383,19 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         }
       }
 
+      // Clear all data stores
+      clearAllActivities();
+      clearAllBadges();
+      clearAllChallenges();
+
+      // Reset settings to default values
+      saveSettings({
+        name: '',
+        dailyTarget: 10000,
+        customActivities: [],
+        mood: undefined,
+      });
+
       // Clear all localStorage data
       if (typeof window !== 'undefined') {
         Object.keys(localStorage).forEach((key) => {
@@ -389,20 +408,32 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
             localStorage.removeItem(key);
           }
         });
+
+        // Clear initial sync flags to allow fresh sync on next login
+        localStorage.removeItem('sporttrack_initial_sync_complete');
+        localStorage.removeItem('sporttrack_sync_conflict');
+        localStorage.removeItem('sporttrack_last_login_time'); // Clear for WelcomeToast
+        localStorage.removeItem('sporttrack_last_user_id'); // Clear for WelcomeToast
+
+        // Prevent login popup from showing
+        localStorage.setItem('sporttrack.skip_login_popup', 'true');
       }
-      setShowClearDataDialog(false);
+
+      // Close settings dialog
       setOpen(false);
-      showToast(
-        lang === 'tr'
-          ? 'Tüm veriler temizlendi. Sayfa yenileniyor...'
-          : 'All data cleared. Refreshing page...',
-        'success'
-      );
-      // Reload page after a short delay
+
+      // Show success animation
+      setIsClearingData(false);
+      setShowClearDataSuccess(true);
+
+      // Wait for animation, then navigate to homepage
       setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+        setShowClearDataSuccess(false);
+        router.push('/');
+      }, 2000);
     } catch (error) {
+      console.error('Failed to clear data:', error);
+      setIsClearingData(false);
       showToast(lang === 'tr' ? 'Veri temizleme hatası' : 'Error clearing data', 'error');
     }
   };
@@ -439,7 +470,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <span
                   className={`${isMobile ? 'text-xs' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
                 >
-                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.22.2
+                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.22.5
                 </span>
               </div>
               <button
@@ -1573,6 +1604,84 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         onCancel={() => setShowClearDataDialog(false)}
         variant="danger"
       />
+
+      {/* Clear Data Overlay - Shows while clearing */}
+      {isClearingData && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-6 rounded-3xl bg-white p-10 shadow-2xl dark:bg-gray-800 animate-in fade-in zoom-in duration-300">
+            {/* Loading Spinner */}
+            <div className="relative h-20 w-20">
+              <div className="absolute inset-0 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700"></div>
+              <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-red-600 dark:border-t-red-400"></div>
+            </div>
+
+            {/* Clearing Message */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {lang === 'tr' ? 'Veriler Siliniyor...' : 'Clearing Data...'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {lang === 'tr'
+                  ? 'Lütfen bekleyin, tüm verileriniz siliniyor.'
+                  : 'Please wait, all your data is being cleared.'}
+              </p>
+            </div>
+
+            {/* Loading dots */}
+            <div className="flex gap-2">
+              <div className="h-2 w-2 animate-bounce rounded-full bg-red-600 dark:bg-red-400 [animation-delay:-0.3s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-red-600 dark:bg-red-400 [animation-delay:-0.15s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-red-600 dark:bg-red-400"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clear Data Success Overlay */}
+      {showClearDataSuccess && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-6 rounded-3xl bg-white p-10 shadow-2xl dark:bg-gray-800 animate-in fade-in zoom-in duration-300">
+            {/* Success Checkmark Animation */}
+            <div className="relative h-20 w-20">
+              <div className="absolute inset-0 rounded-full bg-green-500/20 animate-ping"></div>
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-green-500 dark:bg-green-600">
+                <svg
+                  className="h-12 w-12 text-white animate-in zoom-in duration-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Success Message */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {lang === 'tr' ? 'Veriler Başarıyla Silindi!' : 'Data Successfully Cleared!'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {lang === 'tr'
+                  ? 'Tüm verileriniz temizlendi. Anasayfaya yönlendiriliyorsunuz...'
+                  : 'All your data has been cleared. Redirecting to homepage...'}
+              </p>
+            </div>
+
+            {/* Loading dots */}
+            <div className="flex gap-2">
+              <div className="h-2 w-2 animate-bounce rounded-full bg-green-500 dark:bg-green-400 [animation-delay:-0.3s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-green-500 dark:bg-green-400 [animation-delay:-0.15s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-green-500 dark:bg-green-400"></div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Syncing Overlay - Shows while syncing */}
       {isSyncing && !showSyncSuccess && (

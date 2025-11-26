@@ -11,6 +11,7 @@ import { ToasterProvider } from '@/components/Toaster';
 import { StorageErrorHandler } from '@/components/StorageErrorHandler';
 import { NotificationManager } from '@/components/NotificationManager';
 import { BadgeUnlockNotification } from '@/components/BadgeUnlockNotification';
+import { ChallengeCompletionNotification } from '@/components/ChallengeCompletionNotification';
 import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AutoSyncProvider } from '@/components/AutoSyncProvider';
@@ -86,6 +87,7 @@ export function Providers({ children }: { children: ReactNode }) {
                             <CommandPalette />
                           </Suspense>
                           <BadgeUnlockNotification />
+                          <ChallengeCompletionNotification />
                           <OnlineStatusIndicator />
                           <NameDialog />
                           <Suspense fallback={null}>

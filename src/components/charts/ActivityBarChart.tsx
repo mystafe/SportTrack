@@ -77,17 +77,30 @@ export function ActivityBarChart({ activities }: ActivityBarChartProps) {
             backgroundColor: 'var(--tw-bg-white)',
             border: '1px solid var(--tw-border-gray-200)',
             borderRadius: '0.5rem',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.2s ease-in-out',
           }}
-          labelStyle={{ color: 'var(--tw-text-gray-900)' }}
+          labelStyle={{ color: 'var(--tw-text-gray-900)', fontWeight: '600' }}
+          animationDuration={200}
         />
         <Legend />
         <Bar
           dataKey="points"
           name={lang === 'tr' ? 'Toplam Puan' : 'Total Points'}
           radius={[8, 8, 0, 0]}
+          animationDuration={1000}
+          animationEasing="ease-out"
+          isAnimationActive={true}
         >
           {chartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell
+              key={`cell-${index}`}
+              fill={COLORS[index % COLORS.length]}
+              style={{
+                transition: 'opacity 0.2s ease-in-out',
+                cursor: 'pointer',
+              }}
+            />
           ))}
         </Bar>
       </BarChart>
