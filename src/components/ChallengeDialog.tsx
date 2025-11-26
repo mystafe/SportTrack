@@ -10,6 +10,11 @@ import {
   createDailyChallenge,
   createWeeklyChallenge,
   createMonthlyChallenge,
+  createYearlyChallenge,
+  createSeasonalChallenge,
+  createActivitySpecificChallenge,
+  createTimeBasedChallenge,
+  createStreakBasedChallenge,
   createCustomChallenge,
 } from '@/lib/challenges';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
@@ -113,6 +118,54 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
           icon
         );
         break;
+      case 'yearly':
+        newChallenge = createYearlyChallenge(
+          { tr: nameTr || t('challenges.yearly'), en: nameEn || 'Yearly' },
+          targetValue,
+          start,
+          icon
+        );
+        break;
+      case 'seasonal':
+        newChallenge = createSeasonalChallenge(
+          { tr: nameTr || t('challenges.seasonal'), en: nameEn || 'Seasonal' },
+          targetValue,
+          start,
+          icon
+        );
+        break;
+      case 'activity_specific':
+        newChallenge = createActivitySpecificChallenge(
+          { tr: nameTr || t('challenges.activity_specific'), en: nameEn || 'Activity Specific' },
+          { tr: descriptionTr || '', en: descriptionEn || '' },
+          targetValue,
+          'custom', // Activity key - would need to be selected from UI
+          start,
+          end,
+          icon
+        );
+        break;
+      case 'time_based':
+        newChallenge = createTimeBasedChallenge(
+          { tr: nameTr || t('challenges.time_based'), en: nameEn || 'Time Based' },
+          { tr: descriptionTr || '', en: descriptionEn || '' },
+          targetValue,
+          6, // Start hour - would need to be selected from UI
+          9, // End hour - would need to be selected from UI
+          start,
+          end,
+          icon
+        );
+        break;
+      case 'streak_based':
+        newChallenge = createStreakBasedChallenge(
+          { tr: nameTr || t('challenges.streak_based'), en: nameEn || 'Streak Based' },
+          { tr: descriptionTr || '', en: descriptionEn || '' },
+          targetValue, // For streak challenges, target is number of days
+          start,
+          icon
+        );
+        break;
       case 'custom':
         if (!nameTr && !nameEn) {
           return;
@@ -151,7 +204,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Select
-            label={`${t('challenges.custom')} / ${t('challenges.daily')} / ${t('challenges.weekly')} / ${t('challenges.monthly')}`}
+            label={`${t('challenges.daily')} / ${t('challenges.weekly')} / ${t('challenges.monthly')} / ${t('challenges.yearly')} / ${t('challenges.seasonal')} / ${t('challenges.activity_specific')} / ${t('challenges.time_based')} / ${t('challenges.streak_based')} / ${t('challenges.custom')}`}
             value={type}
             onChange={(e) => setType(e.target.value as ChallengeType)}
             size={isMobile ? 'sm' : 'md'}
@@ -159,6 +212,11 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
               { value: 'daily', label: t('challenges.daily') },
               { value: 'weekly', label: t('challenges.weekly') },
               { value: 'monthly', label: t('challenges.monthly') },
+              { value: 'yearly', label: t('challenges.yearly') },
+              { value: 'seasonal', label: t('challenges.seasonal') },
+              { value: 'activity_specific', label: t('challenges.activity_specific') },
+              { value: 'time_based', label: t('challenges.time_based') },
+              { value: 'streak_based', label: t('challenges.streak_based') },
               { value: 'custom', label: t('challenges.custom') },
             ]}
           />

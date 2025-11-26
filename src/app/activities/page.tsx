@@ -4,7 +4,7 @@ import { ActivityForm } from '@/components/ActivityForm';
 import { ActivityFilters, useFilteredActivities } from '@/components/ActivityFilters';
 import { ManageActivitiesDialog } from '@/components/ManageActivitiesDialog';
 import type { FilterState } from '@/components/ActivityFilters';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { format, startOfDay } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { useRouter } from 'next/navigation';
+import { useUIState } from '@/lib/uiState';
 
 function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
   const hours = Math.floor(seconds / 3600);
@@ -73,6 +74,7 @@ function ActivitiesClient() {
   const { activities, deleteActivity, hydrated } = useActivities();
   const { settings } = useSettings();
   const { showToast } = useToaster();
+  const { setHideFloatingAddButton } = useUIState();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     id: string;
@@ -86,6 +88,14 @@ function ActivitiesClient() {
     sortBy: 'date-desc',
   });
   const filteredActivities = useFilteredActivities(filters);
+
+  // Hide FloatingAddButton when editing or deleting
+  useEffect(() => {
+    setHideFloatingAddButton(editingId !== null || deleteConfirm !== null);
+    return () => {
+      setHideFloatingAddButton(false);
+    };
+  }, [editingId, deleteConfirm, setHideFloatingAddButton]);
 
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),

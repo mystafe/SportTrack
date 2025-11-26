@@ -48,7 +48,7 @@ export function BottomNavigation() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t-2 border-gray-200 dark:border-gray-700 safe-bottom"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-white via-white to-white/95 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900/95 backdrop-blur-xl border-t border-gray-200/80 dark:border-gray-700/80 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)] safe-bottom"
       style={{
         position: 'fixed',
         bottom: 0,
@@ -71,11 +71,16 @@ export function BottomNavigation() {
                 className={`
                   flex flex-col items-center justify-center gap-1
                   min-w-[56px] min-h-[56px] px-3 py-2
-                  rounded-xl transition-all duration-200
-                  ${isActive ? 'bg-brand/10 dark:bg-brand/20 text-brand dark:text-brand-light' : 'text-gray-600 dark:text-gray-400'}
-                  ${isActive ? 'scale-105' : 'scale-100'}
+                  rounded-2xl transition-all duration-300 ease-out
+                  ${
+                    isActive
+                      ? 'bg-gradient-to-br from-brand/15 via-brand/10 to-brand/5 dark:from-brand/25 dark:via-brand/20 dark:to-brand/15 text-brand dark:text-brand-light shadow-lg shadow-brand/20 dark:shadow-brand/30'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }
+                  ${isActive ? 'scale-110' : 'scale-100 hover:scale-105'}
                   active:scale-95
-                  hover:bg-gray-100 dark:hover:bg-gray-800
+                  hover:bg-gray-100/80 dark:hover:bg-gray-800/80
+                  relative
                 `}
                 style={{
                   WebkitTapHighlightColor: 'transparent',
@@ -83,14 +88,20 @@ export function BottomNavigation() {
                 aria-label={item.ariaLabel}
                 aria-current={isActive ? 'page' : undefined}
               >
+                {isActive && (
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand dark:bg-brand-light rounded-full animate-pulse" />
+                )}
                 <span
-                  className={`text-2xl ${isActive ? 'scale-110' : 'scale-100'} transition-transform duration-200`}
+                  className={`text-2xl ${isActive ? 'scale-110 drop-shadow-lg' : 'scale-100'} transition-all duration-300 ease-out`}
                   aria-hidden="true"
+                  style={{
+                    filter: isActive ? 'drop-shadow(0 2px 4px rgba(14, 165, 233, 0.3))' : 'none',
+                  }}
                 >
                   {item.icon}
                 </span>
                 <span
-                  className={`text-xs font-semibold leading-tight ${isActive ? 'opacity-100' : 'opacity-70'}`}
+                  className={`text-[10px] font-bold leading-tight tracking-tight ${isActive ? 'opacity-100' : 'opacity-70'} transition-opacity duration-300`}
                 >
                   {item.label}
                 </span>

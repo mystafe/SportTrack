@@ -21,6 +21,7 @@ import { useActivities } from '@/lib/activityStore';
 import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
 import { STORAGE_KEYS } from '@/lib/constants';
+import type { ActivityDefinition } from '@/lib/activityConfig';
 import { useCloudSync } from '@/hooks/useCloudSync';
 import { useAutoSync } from '@/hooks/useAutoSync';
 import { Button } from '@/components/ui/Button';
@@ -53,25 +54,26 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const { isAuthenticated, isConfigured, user, logout } = useAuth();
   const { showToast } = useToaster();
   const router = useRouter();
-  const { activities, clearAllActivities } = useActivities();
-  const { badges, clearAllBadges } = useBadges();
-  const { challenges, clearAllChallenges } = useChallenges();
+  const { activities, clearAllActivities, addActivity } = useActivities();
+  const { badges, clearAllBadges, checkNewBadges } = useBadges();
+  const { challenges, clearAllChallenges, addChallenge } = useChallenges();
   const { syncToCloud } = useCloudSync();
   const { flushPendingSync } = useAutoSync();
   const [open, setOpen] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [showSyncSuccess, setShowSyncSuccess] = useState(false);
   const [name, setName] = useState<string>(settings?.name ?? '');
   const [dailyTarget, setDailyTarget] = useState<string>(
     String(settings?.dailyTarget ?? DEFAULT_DAILY_TARGET)
   );
   const [mood, setMood] = useState<Mood>(settings?.mood ?? null);
-  const [listDensity, setListDensity] = useState<'compact' | 'comfortable'>(
-    settings?.listDensity ?? 'compact'
-  );
   const [reduceAnimations, setReduceAnimations] = useState<boolean>(
     settings?.reduceAnimations ?? false
   );
+  const [isLoadingDummyData, setIsLoadingDummyData] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasSyncedNameRef = useRef(false);
 
@@ -80,7 +82,6 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
       setName(settings.name || '');
       setDailyTarget(String(settings.dailyTarget));
       setMood(settings.mood ?? null);
-      setListDensity(settings.listDensity ?? 'compact');
       setReduceAnimations(settings.reduceAnimations ?? false);
     }
   }, [settings]);
@@ -140,7 +141,6 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
       dailyTarget: Math.round(targetValue),
       customActivities: settings?.customActivities ?? [],
       mood: mood ?? undefined,
-      listDensity: listDensity,
       reduceAnimations: reduceAnimations,
     });
     setOpen(false);
@@ -176,7 +176,6 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
           dailyTarget: Math.round(targetValue),
           customActivities: settings?.customActivities ?? [],
           mood: mood ?? undefined,
-          listDensity: listDensity,
           reduceAnimations: reduceAnimations,
         });
       }
@@ -187,7 +186,6 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
     name,
     dailyTarget,
     mood,
-    listDensity,
     reduceAnimations,
     open,
     isAuthenticated,
@@ -206,6 +204,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   };
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
+    setOpen(false); // Close settings dialog immediately
     try {
       // CRITICAL: Flush any pending debounced sync operations first
       try {
@@ -346,6 +346,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
       );
     } catch (error) {
       showToast(lang === 'tr' ? 'Çıkış hatası' : 'Logout error', 'error');
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -437,7 +439,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <span
                   className={`${isMobile ? 'text-xs' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
                 >
-                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.21.9
+                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.22.2
                 </span>
               </div>
               <button
@@ -560,23 +562,25 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   </label>
                 </div>
 
-                {/* Export/Import */}
-                <div
-                  className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700`}
-                >
-                  <span
-                    className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
+                {/* Export/Import - Only show if authenticated */}
+                {isAuthenticated && (
+                  <div
+                    className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700`}
                   >
-                    {t('data.export')} / {t('data.import')}
-                  </span>
-                  <Suspense
-                    fallback={
-                      <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                    }
-                  >
-                    <DataExportImport />
-                  </Suspense>
-                </div>
+                    <span
+                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
+                    >
+                      {t('data.export')} / {t('data.import')}
+                    </span>
+                    <Suspense
+                      fallback={
+                        <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                      }
+                    >
+                      <DataExportImport />
+                    </Suspense>
+                  </div>
+                )}
 
                 {/* Language & Theme & Reduce Animations */}
                 <div
@@ -599,7 +603,335 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       aria-pressed={reduceAnimations}
                       title={lang === 'tr' ? 'Animasyonları Azalt' : 'Reduce Animations'}
                     >
-                      {lang === 'tr' ? '⚡' : '⚡'}
+                      ⚡
+                    </Button>
+                    {/* Admin Mod Button */}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                      onClick={async () => {
+                        setIsLoadingDummyData(true);
+                        try {
+                          // Clear existing data first
+                          clearAllActivities();
+                          clearAllBadges();
+                          clearAllChallenges();
+
+                          // Import BASE_ACTIVITY_DEFINITIONS
+                          const { BASE_ACTIVITY_DEFINITIONS } = await import(
+                            '@/lib/activityConfig'
+                          );
+                          const {
+                            createDailyChallenge,
+                            createWeeklyChallenge,
+                            createMonthlyChallenge,
+                          } = await import('@/lib/challenges');
+
+                          // Helper function to round numbers nicely
+                          const roundAmount = (
+                            amount: number,
+                            activity: ActivityDefinition
+                          ): number => {
+                            if (activity.unit.includes('adım') || activity.unit.includes('steps')) {
+                              return Math.round(amount / 100) * 100; // Round to nearest 100 for steps
+                            } else if (
+                              activity.unit.includes('dakika') ||
+                              activity.unit.includes('minutes')
+                            ) {
+                              return Math.round(amount / 5) * 5; // Round to nearest 5 for minutes
+                            } else if (
+                              activity.unit.includes('tekrar') ||
+                              activity.unit.includes('reps')
+                            ) {
+                              return Math.round(amount / 5) * 5; // Round to nearest 5 for reps
+                            } else if (activity.unit.includes('basamak')) {
+                              return Math.round(amount / 10) * 10; // Round to nearest 10 for stairs
+                            }
+                            return Math.round(amount);
+                          };
+
+                          // Generate dummy activities for the last 240 days (8 months)
+                          const now = new Date();
+                          const activitiesToAdd: Parameters<typeof addActivity>[0][] = [];
+                          const totalDays = 240;
+
+                          for (let dayOffset = 0; dayOffset < totalDays; dayOffset++) {
+                            const baseDate = new Date(now);
+                            baseDate.setDate(baseDate.getDate() - dayOffset);
+                            baseDate.setHours(0, 0, 0, 0);
+                            const dayOfWeek = baseDate.getDay(); // 0 = Sunday, 6 = Saturday
+
+                            // Different activity patterns for different days
+                            if (dayOfWeek === 0) {
+                              // Sunday - Rest day, 1-2 activities
+                              const numActivities = Math.random() > 0.3 ? 1 : 2;
+                              for (let i = 0; i < numActivities; i++) {
+                                const activityDate = new Date(baseDate);
+                                activityDate.setHours(
+                                  10 + Math.floor(Math.random() * 4),
+                                  Math.floor(Math.random() * 60),
+                                  0,
+                                  0
+                                );
+                                const activity = BASE_ACTIVITY_DEFINITIONS.find(
+                                  (a) => a.key === 'WALKING'
+                                )!;
+                                const amount = roundAmount(2000 + Math.random() * 2000, activity);
+                                activitiesToAdd.push({
+                                  definition: activity,
+                                  amount,
+                                  performedAt: activityDate.toISOString(),
+                                });
+                              }
+                            } else if (dayOfWeek === 6) {
+                              // Saturday - Active day, 3-4 activities
+                              const numActivities = Math.random() > 0.5 ? 3 : 4;
+                              const activityTypes = [
+                                'RUNNING',
+                                'SWIMMING',
+                                'WEIGHT_LIFTING',
+                                'PUSH_UP',
+                                'SIT_UP',
+                              ];
+                              for (let i = 0; i < numActivities; i++) {
+                                const activityKey =
+                                  activityTypes[Math.floor(Math.random() * activityTypes.length)];
+                                const activity = BASE_ACTIVITY_DEFINITIONS.find(
+                                  (a) => a.key === activityKey
+                                )!;
+                                const activityDate = new Date(baseDate);
+                                const hour =
+                                  i === 0
+                                    ? 7 + Math.floor(Math.random() * 2)
+                                    : i === 1
+                                      ? 10 + Math.floor(Math.random() * 2)
+                                      : i === 2
+                                        ? 15 + Math.floor(Math.random() * 2)
+                                        : 18 + Math.floor(Math.random() * 2);
+                                activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
+
+                                let amount: number;
+                                if (activity.key === 'RUNNING') {
+                                  amount = roundAmount(3000 + Math.random() * 3000, activity);
+                                } else if (activity.key === 'SWIMMING') {
+                                  amount = roundAmount(20 + Math.random() * 40, activity);
+                                } else if (activity.key === 'WEIGHT_LIFTING') {
+                                  amount = roundAmount(30 + Math.random() * 60, activity);
+                                } else {
+                                  amount = roundAmount(
+                                    activity.defaultAmount * (0.5 + Math.random() * 0.8),
+                                    activity
+                                  );
+                                }
+
+                                activitiesToAdd.push({
+                                  definition: activity,
+                                  amount,
+                                  performedAt: activityDate.toISOString(),
+                                });
+                              }
+                            } else {
+                              // Weekdays - Regular activity, 2-4 activities
+                              const numActivities =
+                                Math.random() > 0.4 ? (Math.random() > 0.5 ? 2 : 3) : 4;
+
+                              // Use different activities each day
+                              const availableActivities = BASE_ACTIVITY_DEFINITIONS.filter(
+                                (a) => a.key !== 'WALKING' || Math.random() > 0.7 // Less walking on weekdays
+                              );
+
+                              for (let i = 0; i < numActivities; i++) {
+                                const activity =
+                                  availableActivities[
+                                    Math.floor(Math.random() * availableActivities.length)
+                                  ];
+                                const activityDate = new Date(baseDate);
+                                const hour =
+                                  i === 0
+                                    ? 6 + Math.floor(Math.random() * 2)
+                                    : i === 1
+                                      ? 12 + Math.floor(Math.random() * 2)
+                                      : i === 2
+                                        ? 17 + Math.floor(Math.random() * 2)
+                                        : 20 + Math.floor(Math.random() * 2);
+                                activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
+
+                                let amount: number;
+                                if (activity.key === 'WALKING') {
+                                  amount = roundAmount(5000 + Math.random() * 5000, activity);
+                                } else if (activity.key === 'RUNNING') {
+                                  amount = roundAmount(2000 + Math.random() * 3000, activity);
+                                } else if (activity.key === 'SWIMMING') {
+                                  amount = roundAmount(15 + Math.random() * 30, activity);
+                                } else if (activity.key === 'WEIGHT_LIFTING') {
+                                  amount = roundAmount(20 + Math.random() * 50, activity);
+                                } else if (activity.key === 'STAIRS') {
+                                  amount = roundAmount(20 + Math.random() * 30, activity);
+                                } else {
+                                  amount = roundAmount(
+                                    activity.defaultAmount * (0.6 + Math.random() * 0.6),
+                                    activity
+                                  );
+                                }
+
+                                activitiesToAdd.push({
+                                  definition: activity,
+                                  amount,
+                                  performedAt: activityDate.toISOString(),
+                                });
+                              }
+                            }
+                          }
+
+                          // Add all activities
+                          activitiesToAdd.forEach((activity) => {
+                            addActivity(activity);
+                          });
+
+                          // Wait a bit for activities to be processed
+                          await new Promise((resolve) => setTimeout(resolve, 1500));
+
+                          // Check and unlock badges - badgeStore will handle this automatically
+                          checkNewBadges();
+
+                          // Create some challenges
+                          const currentSettings = settings || { dailyTarget: DEFAULT_DAILY_TARGET };
+                          const dailyChallenge = createDailyChallenge(
+                            { tr: 'Günlük Hedef', en: 'Daily Goal' },
+                            currentSettings.dailyTarget,
+                            new Date()
+                          );
+                          const weeklyChallenge = createWeeklyChallenge(
+                            { tr: 'Haftalık Hedef', en: 'Weekly Goal' },
+                            50000,
+                            new Date()
+                          );
+                          const monthlyChallenge = createMonthlyChallenge(
+                            { tr: 'Aylık Hedef', en: 'Monthly Goal' },
+                            200000,
+                            new Date()
+                          );
+
+                          // Add challenges
+                          addChallenge(dailyChallenge);
+                          addChallenge(weeklyChallenge);
+                          addChallenge(monthlyChallenge);
+
+                          showToast(
+                            lang === 'tr'
+                              ? `✅ ${activitiesToAdd.length} aktivite, rozetler ve challenge'lar yüklendi!`
+                              : `✅ ${activitiesToAdd.length} activities, badges, and challenges loaded!`,
+                            'success'
+                          );
+
+                          // Close settings dialog
+                          setOpen(false);
+                        } catch (error) {
+                          console.error('Failed to load dummy data:', error);
+                          showToast(
+                            lang === 'tr'
+                              ? 'Dummy veri yükleme hatası'
+                              : 'Failed to load dummy data',
+                            'error'
+                          );
+                        } finally {
+                          setIsLoadingDummyData(false);
+                        }
+                      }}
+                      disabled={isLoadingDummyData}
+                      title={lang === 'tr' ? 'Admin Mod' : 'Admin Mode'}
+                    >
+                      {isLoadingDummyData ? <span className="animate-spin">⏳</span> : '🧪'}
+                    </Button>
+                    {/* Clear Cache & Data Button */}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                      onClick={async () => {
+                        if (
+                          !confirm(
+                            lang === 'tr'
+                              ? 'Tüm cache ve verileri temizlemek istediğinize emin misiniz? Bu işlem geri alınamaz ve sayfa yenilenecektir.'
+                              : 'Are you sure you want to clear all cache and data? This action cannot be undone and the page will reload.'
+                          )
+                        ) {
+                          return;
+                        }
+
+                        try {
+                          // Clear all localStorage data
+                          if (typeof window !== 'undefined') {
+                            // Clear all SportTrack related keys
+                            Object.values(STORAGE_KEYS).forEach((key) => {
+                              localStorage.removeItem(key);
+                            });
+
+                            // Clear other SportTrack related keys
+                            const allKeys = Object.keys(localStorage);
+                            allKeys.forEach((key) => {
+                              if (key.startsWith('sporttrack') || key.startsWith('sportTrack')) {
+                                localStorage.removeItem(key);
+                              }
+                            });
+
+                            // Clear Service Worker cache if available
+                            if ('serviceWorker' in navigator && 'caches' in window) {
+                              try {
+                                const cacheNames = await caches.keys();
+                                await Promise.all(
+                                  cacheNames.map((cacheName) => caches.delete(cacheName))
+                                );
+                              } catch (error) {
+                                console.warn('Failed to clear cache:', error);
+                              }
+                            }
+
+                            // Clear IndexedDB if available
+                            if ('indexedDB' in window) {
+                              try {
+                                // Try to delete IndexedDB databases
+                                const databases = await indexedDB.databases();
+                                await Promise.all(
+                                  databases.map((db) => {
+                                    if (db.name) {
+                                      return new Promise<void>((resolve, reject) => {
+                                        const deleteReq = indexedDB.deleteDatabase(db.name!);
+                                        deleteReq.onsuccess = () => resolve();
+                                        deleteReq.onerror = () => reject(deleteReq.error);
+                                        deleteReq.onblocked = () => resolve(); // Still resolve if blocked
+                                      });
+                                    }
+                                  })
+                                );
+                              } catch (error) {
+                                console.warn('Failed to clear IndexedDB:', error);
+                              }
+                            }
+
+                            showToast(
+                              lang === 'tr'
+                                ? 'Cache ve veriler temizlendi. Sayfa yenileniyor...'
+                                : 'Cache and data cleared. Reloading page...',
+                              'success'
+                            );
+
+                            // Reload page after a short delay
+                            setTimeout(() => {
+                              window.location.reload();
+                            }, 1000);
+                          }
+                        } catch (error) {
+                          console.error('Failed to clear cache and data:', error);
+                          showToast(lang === 'tr' ? 'Temizleme hatası' : 'Clear error', 'error');
+                        }
+                      }}
+                      title={lang === 'tr' ? 'Cache ve Verileri Temizle' : 'Clear Cache & Data'}
+                    >
+                      🗑️
                     </Button>
                   </div>
                 </div>
@@ -688,13 +1020,15 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       {lang === 'tr' ? 'Veri İşlemleri' : 'Data Operations'}
                     </span>
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <Suspense
-                        fallback={
-                          <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                        }
-                      >
-                        <DataExportImport />
-                      </Suspense>
+                      {isAuthenticated && (
+                        <Suspense
+                          fallback={
+                            <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                          }
+                        >
+                          <DataExportImport />
+                        </Suspense>
+                      )}
                       {isAuthenticated && (
                         <>
                           <Button
@@ -753,37 +1087,342 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                         aria-pressed={reduceAnimations}
                         title={lang === 'tr' ? 'Animasyonları Azalt' : 'Reduce Animations'}
                       >
-                        {lang === 'tr' ? '⚡' : '⚡'}
+                        ⚡
                       </Button>
-                      {/* List View - Compact/Comfortable Switch */}
-                      <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5">
-                        <button
-                          type="button"
-                          onClick={() => setListDensity('compact')}
-                          className={`px-1.5 py-0.5 ${isMobile ? 'text-sm min-h-[20px]' : 'text-base min-h-[22px]'} rounded transition-all ${
-                            listDensity === 'compact'
-                              ? 'bg-brand text-white'
-                              : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                          }`}
-                          title={t('settings.listDensityCompact')}
-                          aria-pressed={listDensity === 'compact'}
-                        >
-                          📋
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setListDensity('comfortable')}
-                          className={`px-1.5 py-0.5 ${isMobile ? 'text-sm min-h-[20px]' : 'text-base min-h-[22px]'} rounded transition-all ${
-                            listDensity === 'comfortable'
-                              ? 'bg-brand text-white'
-                              : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                          }`}
-                          title={t('settings.listDensityComfortable')}
-                          aria-pressed={listDensity === 'comfortable'}
-                        >
-                          📄
-                        </button>
-                      </div>
+                      {/* Admin Mod Button */}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                        onClick={async () => {
+                          setIsLoadingDummyData(true);
+                          try {
+                            // Clear existing data first
+                            clearAllActivities();
+                            clearAllBadges();
+                            clearAllChallenges();
+
+                            // Import BASE_ACTIVITY_DEFINITIONS
+                            const { BASE_ACTIVITY_DEFINITIONS } = await import(
+                              '@/lib/activityConfig'
+                            );
+                            const { checkBadges } = await import('@/lib/badges');
+                            const {
+                              createDailyChallenge,
+                              createWeeklyChallenge,
+                              createMonthlyChallenge,
+                            } = await import('@/lib/challenges');
+
+                            // Helper function to round numbers nicely
+                            const roundAmount = (
+                              amount: number,
+                              activity: ActivityDefinition
+                            ): number => {
+                              if (
+                                activity.unit.includes('adım') ||
+                                activity.unit.includes('steps')
+                              ) {
+                                return Math.round(amount / 100) * 100; // Round to nearest 100 for steps
+                              } else if (
+                                activity.unit.includes('dakika') ||
+                                activity.unit.includes('minutes')
+                              ) {
+                                return Math.round(amount / 5) * 5; // Round to nearest 5 for minutes
+                              } else if (
+                                activity.unit.includes('tekrar') ||
+                                activity.unit.includes('reps')
+                              ) {
+                                return Math.round(amount / 5) * 5; // Round to nearest 5 for reps
+                              } else if (activity.unit.includes('basamak')) {
+                                return Math.round(amount / 10) * 10; // Round to nearest 10 for stairs
+                              }
+                              return Math.round(amount);
+                            };
+
+                            // Generate dummy activities for the last 240 days (8 months)
+                            const now = new Date();
+                            const activitiesToAdd: Parameters<typeof addActivity>[0][] = [];
+                            const totalDays = 240;
+
+                            for (let dayOffset = 0; dayOffset < totalDays; dayOffset++) {
+                              const baseDate = new Date(now);
+                              baseDate.setDate(baseDate.getDate() - dayOffset);
+                              baseDate.setHours(0, 0, 0, 0);
+                              const dayOfWeek = baseDate.getDay(); // 0 = Sunday, 6 = Saturday
+
+                              // Different activity patterns for different days
+                              if (dayOfWeek === 0) {
+                                // Sunday - Rest day, 1-2 activities
+                                const numActivities = Math.random() > 0.3 ? 1 : 2;
+                                for (let i = 0; i < numActivities; i++) {
+                                  const activityDate = new Date(baseDate);
+                                  activityDate.setHours(
+                                    10 + Math.floor(Math.random() * 4),
+                                    Math.floor(Math.random() * 60),
+                                    0,
+                                    0
+                                  );
+                                  const activity = BASE_ACTIVITY_DEFINITIONS.find(
+                                    (a) => a.key === 'WALKING'
+                                  )!;
+                                  const amount = roundAmount(2000 + Math.random() * 2000, activity);
+                                  activitiesToAdd.push({
+                                    definition: activity,
+                                    amount,
+                                    performedAt: activityDate.toISOString(),
+                                  });
+                                }
+                              } else if (dayOfWeek === 6) {
+                                // Saturday - Active day, 3-4 activities
+                                const numActivities = Math.random() > 0.5 ? 3 : 4;
+                                const activityTypes = [
+                                  'RUNNING',
+                                  'SWIMMING',
+                                  'WEIGHT_LIFTING',
+                                  'PUSH_UP',
+                                  'SIT_UP',
+                                ];
+                                for (let i = 0; i < numActivities; i++) {
+                                  const activityKey =
+                                    activityTypes[Math.floor(Math.random() * activityTypes.length)];
+                                  const activity = BASE_ACTIVITY_DEFINITIONS.find(
+                                    (a) => a.key === activityKey
+                                  )!;
+                                  const activityDate = new Date(baseDate);
+                                  const hour =
+                                    i === 0
+                                      ? 7 + Math.floor(Math.random() * 2)
+                                      : i === 1
+                                        ? 10 + Math.floor(Math.random() * 2)
+                                        : i === 2
+                                          ? 15 + Math.floor(Math.random() * 2)
+                                          : 18 + Math.floor(Math.random() * 2);
+                                  activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
+
+                                  let amount: number;
+                                  if (activity.key === 'RUNNING') {
+                                    amount = roundAmount(3000 + Math.random() * 3000, activity);
+                                  } else if (activity.key === 'SWIMMING') {
+                                    amount = roundAmount(20 + Math.random() * 40, activity);
+                                  } else if (activity.key === 'WEIGHT_LIFTING') {
+                                    amount = roundAmount(30 + Math.random() * 60, activity);
+                                  } else {
+                                    amount = roundAmount(
+                                      activity.defaultAmount * (0.5 + Math.random() * 0.8),
+                                      activity
+                                    );
+                                  }
+
+                                  activitiesToAdd.push({
+                                    definition: activity,
+                                    amount,
+                                    performedAt: activityDate.toISOString(),
+                                  });
+                                }
+                              } else {
+                                // Weekdays - Regular activity, 2-4 activities
+                                const numActivities =
+                                  Math.random() > 0.4 ? (Math.random() > 0.5 ? 2 : 3) : 4;
+
+                                // Use different activities each day
+                                const availableActivities = BASE_ACTIVITY_DEFINITIONS.filter(
+                                  (a) => a.key !== 'WALKING' || Math.random() > 0.7 // Less walking on weekdays
+                                );
+
+                                for (let i = 0; i < numActivities; i++) {
+                                  const activity =
+                                    availableActivities[
+                                      Math.floor(Math.random() * availableActivities.length)
+                                    ];
+                                  const activityDate = new Date(baseDate);
+                                  const hour =
+                                    i === 0
+                                      ? 6 + Math.floor(Math.random() * 2)
+                                      : i === 1
+                                        ? 12 + Math.floor(Math.random() * 2)
+                                        : i === 2
+                                          ? 17 + Math.floor(Math.random() * 2)
+                                          : 20 + Math.floor(Math.random() * 2);
+                                  activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
+
+                                  let amount: number;
+                                  if (activity.key === 'WALKING') {
+                                    amount = roundAmount(5000 + Math.random() * 5000, activity);
+                                  } else if (activity.key === 'RUNNING') {
+                                    amount = roundAmount(2000 + Math.random() * 3000, activity);
+                                  } else if (activity.key === 'SWIMMING') {
+                                    amount = roundAmount(15 + Math.random() * 30, activity);
+                                  } else if (activity.key === 'WEIGHT_LIFTING') {
+                                    amount = roundAmount(20 + Math.random() * 50, activity);
+                                  } else if (activity.key === 'STAIRS') {
+                                    amount = roundAmount(20 + Math.random() * 30, activity);
+                                  } else {
+                                    amount = roundAmount(
+                                      activity.defaultAmount * (0.6 + Math.random() * 0.6),
+                                      activity
+                                    );
+                                  }
+
+                                  activitiesToAdd.push({
+                                    definition: activity,
+                                    amount,
+                                    performedAt: activityDate.toISOString(),
+                                  });
+                                }
+                              }
+                            }
+
+                            // Add all activities
+                            activitiesToAdd.forEach((activity) => {
+                              addActivity(activity);
+                            });
+
+                            // Wait a bit for activities to be processed
+                            await new Promise((resolve) => setTimeout(resolve, 1500));
+
+                            // Check and unlock badges - badgeStore will handle this automatically
+                            checkNewBadges();
+
+                            // Create some challenges
+                            const currentSettings = settings || {
+                              dailyTarget: DEFAULT_DAILY_TARGET,
+                            };
+                            const dailyChallenge = createDailyChallenge(
+                              { tr: 'Günlük Hedef', en: 'Daily Goal' },
+                              currentSettings.dailyTarget,
+                              new Date()
+                            );
+                            const weeklyChallenge = createWeeklyChallenge(
+                              { tr: 'Haftalık Hedef', en: 'Weekly Goal' },
+                              50000,
+                              new Date()
+                            );
+                            const monthlyChallenge = createMonthlyChallenge(
+                              { tr: 'Aylık Hedef', en: 'Monthly Goal' },
+                              200000,
+                              new Date()
+                            );
+
+                            // Add challenges
+                            addChallenge(dailyChallenge);
+                            addChallenge(weeklyChallenge);
+                            addChallenge(monthlyChallenge);
+
+                            showToast(
+                              lang === 'tr'
+                                ? `✅ ${activitiesToAdd.length} aktivite, rozetler ve challenge'lar yüklendi!`
+                                : `✅ ${activitiesToAdd.length} activities, badges, and challenges loaded!`,
+                              'success'
+                            );
+
+                            // Close settings dialog
+                            setOpen(false);
+                          } catch (error) {
+                            console.error('Failed to load dummy data:', error);
+                            showToast(
+                              lang === 'tr'
+                                ? 'Dummy veri yükleme hatası'
+                                : 'Failed to load dummy data',
+                              'error'
+                            );
+                          } finally {
+                            setIsLoadingDummyData(false);
+                          }
+                        }}
+                        disabled={isLoadingDummyData}
+                        title={lang === 'tr' ? 'Admin Mod' : 'Admin Mode'}
+                      >
+                        {isLoadingDummyData ? <span className="animate-spin">⏳</span> : '🧪'}
+                      </Button>
+                      {/* Clear Cache & Data Button */}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                        onClick={async () => {
+                          if (
+                            !confirm(
+                              lang === 'tr'
+                                ? 'Tüm cache ve verileri temizlemek istediğinize emin misiniz? Bu işlem geri alınamaz ve sayfa yenilenecektir.'
+                                : 'Are you sure you want to clear all cache and data? This action cannot be undone and the page will reload.'
+                            )
+                          ) {
+                            return;
+                          }
+
+                          try {
+                            // Clear all localStorage data
+                            if (typeof window !== 'undefined') {
+                              // Clear all SportTrack related keys
+                              Object.values(STORAGE_KEYS).forEach((key) => {
+                                localStorage.removeItem(key);
+                              });
+
+                              // Clear other SportTrack related keys
+                              const allKeys = Object.keys(localStorage);
+                              allKeys.forEach((key) => {
+                                if (key.startsWith('sporttrack') || key.startsWith('sportTrack')) {
+                                  localStorage.removeItem(key);
+                                }
+                              });
+
+                              // Clear Service Worker cache if available
+                              if ('serviceWorker' in navigator && 'caches' in window) {
+                                try {
+                                  const cacheNames = await caches.keys();
+                                  await Promise.all(
+                                    cacheNames.map((cacheName) => caches.delete(cacheName))
+                                  );
+                                } catch (error) {
+                                  console.warn('Failed to clear cache:', error);
+                                }
+                              }
+
+                              // Clear IndexedDB if available
+                              if ('indexedDB' in window) {
+                                try {
+                                  // Try to delete IndexedDB databases
+                                  const databases = await indexedDB.databases();
+                                  await Promise.all(
+                                    databases.map((db) => {
+                                      if (db.name) {
+                                        return new Promise<void>((resolve, reject) => {
+                                          const deleteReq = indexedDB.deleteDatabase(db.name!);
+                                          deleteReq.onsuccess = () => resolve();
+                                          deleteReq.onerror = () => reject(deleteReq.error);
+                                          deleteReq.onblocked = () => resolve(); // Still resolve if blocked
+                                        });
+                                      }
+                                    })
+                                  );
+                                } catch (error) {
+                                  console.warn('Failed to clear IndexedDB:', error);
+                                }
+                              }
+
+                              showToast(
+                                lang === 'tr'
+                                  ? 'Cache ve veriler temizlendi. Sayfa yenileniyor...'
+                                  : 'Cache and data cleared. Reloading page...',
+                                'success'
+                              );
+
+                              // Reload page after a short delay
+                              setTimeout(() => {
+                                window.location.reload();
+                              }, 1000);
+                            }
+                          } catch (error) {
+                            console.error('Failed to clear cache and data:', error);
+                            showToast(lang === 'tr' ? 'Temizleme hatası' : 'Clear error', 'error');
+                          }
+                        }}
+                        title={lang === 'tr' ? 'Cache ve Verileri Temizle' : 'Clear Cache & Data'}
+                      >
+                        🗑️
+                      </Button>
                     </div>
                   </div>
 
@@ -797,7 +1436,19 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                         <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                       }
                     >
-                      <CloudSyncSettings />
+                      <CloudSyncSettings
+                        onSyncComplete={() => setOpen(false)}
+                        onSyncingChange={(syncing) => {
+                          setIsSyncing(syncing);
+                          if (!syncing && isSyncing) {
+                            // Syncing just finished, show success
+                            setShowSyncSuccess(true);
+                            setTimeout(() => {
+                              setShowSyncSuccess(false);
+                            }, 2000);
+                          }
+                        }}
+                      />
                     </Suspense>
                   </div>
 
@@ -831,9 +1482,19 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                         variant="danger"
                         size="sm"
                         onClick={handleLogout}
-                        className="flex-1 min-w-[80px]"
+                        disabled={isLoggingOut}
+                        className="flex-1 min-w-[80px] relative"
                       >
-                        {lang === 'tr' ? 'Çıkış Yap' : 'Sign Out'}
+                        {isLoggingOut ? (
+                          <span className="flex items-center gap-2">
+                            <span className="animate-spin">⏳</span>
+                            {lang === 'tr' ? 'Çıkış yapılıyor...' : 'Logging out...'}
+                          </span>
+                        ) : lang === 'tr' ? (
+                          'Çıkış Yap'
+                        ) : (
+                          'Sign Out'
+                        )}
                       </Button>
                     </div>
                   )}
@@ -912,6 +1573,115 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         onCancel={() => setShowClearDataDialog(false)}
         variant="danger"
       />
+
+      {/* Syncing Overlay - Shows while syncing */}
+      {isSyncing && !showSyncSuccess && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-6 rounded-3xl bg-white p-10 shadow-2xl dark:bg-gray-800 animate-in fade-in zoom-in duration-300">
+            {/* Loading Spinner */}
+            <div className="relative h-20 w-20">
+              <div className="absolute inset-0 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700"></div>
+              <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-blue-600 dark:border-t-blue-400"></div>
+            </div>
+
+            {/* Syncing Message */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {lang === 'tr' ? 'Veriler Senkronize Ediliyor...' : 'Synchronizing Data...'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {lang === 'tr'
+                  ? 'Lütfen bekleyin, verileriniz senkronize ediliyor.'
+                  : 'Please wait, your data is being synchronized.'}
+              </p>
+            </div>
+
+            {/* Loading dots */}
+            <div className="flex gap-2">
+              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400 [animation-delay:-0.3s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400 [animation-delay:-0.15s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sync Success Overlay */}
+      {showSyncSuccess && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-6 rounded-3xl bg-white p-10 shadow-2xl dark:bg-gray-800 animate-in fade-in zoom-in duration-300">
+            {/* Success Checkmark Animation */}
+            <div className="relative h-20 w-20">
+              <div className="absolute inset-0 rounded-full bg-green-500/20 animate-ping"></div>
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-green-500 dark:bg-green-600">
+                <svg
+                  className="h-12 w-12 text-white animate-in zoom-in duration-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Success Message */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {lang === 'tr' ? 'Senkronizasyon Tamamlandı!' : 'Synchronization Complete!'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {lang === 'tr'
+                  ? 'Verileriniz başarıyla senkronize edildi.'
+                  : 'Your data has been successfully synchronized.'}
+              </p>
+            </div>
+
+            {/* Loading dots */}
+            <div className="flex gap-2">
+              <div className="h-2 w-2 animate-bounce rounded-full bg-green-500 dark:bg-green-400 [animation-delay:-0.3s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-green-500 dark:bg-green-400 [animation-delay:-0.15s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-green-500 dark:bg-green-400"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Logout Loading Overlay */}
+      {isLoggingOut && (
+        <div className="fixed inset-0 z-[9999] bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-900 rounded-xl border-2 border-brand/50 dark:border-brand/50 p-6 sm:p-8 shadow-2xl max-w-sm mx-4 animate-scale-in">
+            <div className="flex flex-col items-center gap-4">
+              <div className="text-5xl sm:text-6xl animate-spin">⏳</div>
+              <div className="text-center">
+                <h3
+                  className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-950 dark:text-white mb-2`}
+                >
+                  {lang === 'tr' ? 'Çıkış yapılıyor...' : 'Logging out...'}
+                </h3>
+                <p
+                  className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-600 dark:text-gray-400`}
+                >
+                  {lang === 'tr'
+                    ? 'Verileriniz buluta senkronize ediliyor, lütfen bekleyin.'
+                    : 'Syncing your data to cloud, please wait...'}
+                </p>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-brand via-brand-light to-brand-dark animate-shimmer rounded-full"
+                  style={{ width: '60%' }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

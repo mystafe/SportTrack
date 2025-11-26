@@ -16,6 +16,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AutoSyncProvider } from '@/components/AutoSyncProvider';
 import { NameDialog } from '@/components/NameDialog';
 import { CloudSyncLoading } from '@/components/CloudSyncLoading';
+import { UIStateProvider } from '@/lib/uiState';
 
 // Lazy load components that are not immediately needed
 const InstallPrompt = lazy(() =>
@@ -64,42 +65,44 @@ export function Providers({ children }: { children: ReactNode }) {
     <ErrorBoundary>
       <I18nProvider>
         <SettingsProvider>
-          <AnimationReducer>
-            <ActivitiesProvider>
-              <LevelProvider>
-                <ChallengeProvider>
-                  <BadgeProvider>
-                    <ToasterProvider>
-                      <AutoSyncProvider>
-                        <StorageErrorHandler />
-                        <Suspense fallback={null}>
-                          <InstallPrompt />
-                        </Suspense>
-                        <NotificationManager />
-                        <CloudSyncLoading />
-                        <Suspense fallback={null}>
-                          <KeyboardShortcuts />
-                        </Suspense>
-                        <Suspense fallback={null}>
-                          <CommandPalette />
-                        </Suspense>
-                        <BadgeUnlockNotification />
-                        <OnlineStatusIndicator />
-                        <NameDialog />
-                        <Suspense fallback={null}>
-                          <ConflictResolutionManager />
-                        </Suspense>
-                        <Suspense fallback={null}>
-                          <WelcomeToast />
-                        </Suspense>
-                        {children}
-                      </AutoSyncProvider>
-                    </ToasterProvider>
-                  </BadgeProvider>
-                </ChallengeProvider>
-              </LevelProvider>
-            </ActivitiesProvider>
-          </AnimationReducer>
+          <UIStateProvider>
+            <AnimationReducer>
+              <ActivitiesProvider>
+                <LevelProvider>
+                  <ChallengeProvider>
+                    <BadgeProvider>
+                      <ToasterProvider>
+                        <AutoSyncProvider>
+                          <StorageErrorHandler />
+                          <Suspense fallback={null}>
+                            <InstallPrompt />
+                          </Suspense>
+                          <NotificationManager />
+                          <CloudSyncLoading />
+                          <Suspense fallback={null}>
+                            <KeyboardShortcuts />
+                          </Suspense>
+                          <Suspense fallback={null}>
+                            <CommandPalette />
+                          </Suspense>
+                          <BadgeUnlockNotification />
+                          <OnlineStatusIndicator />
+                          <NameDialog />
+                          <Suspense fallback={null}>
+                            <ConflictResolutionManager />
+                          </Suspense>
+                          <Suspense fallback={null}>
+                            <WelcomeToast />
+                          </Suspense>
+                          {children}
+                        </AutoSyncProvider>
+                      </ToasterProvider>
+                    </BadgeProvider>
+                  </ChallengeProvider>
+                </LevelProvider>
+              </ActivitiesProvider>
+            </AnimationReducer>
+          </UIStateProvider>
         </SettingsProvider>
       </I18nProvider>
     </ErrorBoundary>

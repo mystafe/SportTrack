@@ -912,7 +912,11 @@ export function ConflictResolutionDialog({
           <Button
             variant="outline"
             size={isMobile ? 'sm' : 'md'}
-            onClick={onCancel}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onCancel();
+            }}
             className="flex-1"
           >
             {lang === 'tr' ? 'İptal' : 'Cancel'}

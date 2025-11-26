@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useCloudSync } from '@/hooks/useCloudSync';
 import { useSyncQueue } from '@/hooks/useSyncQueue';
@@ -35,7 +36,16 @@ function formatRelativeTime(date: Date, lang: 'tr' | 'en'): string {
   return formatDistanceToNow(date, { addSuffix: true, locale });
 }
 
-export function CloudSyncSettings() {
+interface CloudSyncSettingsProps {
+  onSyncComplete?: () => void;
+  onSyncingChange?: (syncing: boolean) => void;
+}
+
+export function CloudSyncSettings({
+  onSyncComplete,
+  onSyncingChange,
+}: CloudSyncSettingsProps = {}) {
+  const router = useRouter();
   const { user, isAuthenticated, logout, isConfigured } = useAuth();
   const { syncState, syncToCloud, syncFromCloud } = useCloudSync();
   const { pendingCount, failedCount, isProcessing, processQueue, retryFailed, getWaitingForRetry } =
@@ -49,7 +59,9 @@ export function CloudSyncSettings() {
   const { showToast } = useToaster();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
+  const [showSyncSuccess, setShowSyncSuccess] = useState(false);
   const [conflictData, setConflictData] = useState<{
     local: {
       activities: unknown[];
@@ -176,8 +188,7 @@ export function CloudSyncSettings() {
       return;
     }
 
-    // Instead of syncing directly, open conflict dialog
-    setSyncing(true);
+    // Don't show syncing overlay here, just open conflict dialog
     try {
       const cloudData = await syncFromCloud();
       const localData = { activities, settings, badges, challenges };
@@ -218,8 +229,6 @@ export function CloudSyncSettings() {
     } catch (error) {
       console.error('Failed to fetch cloud data:', error);
       showToast(lang === 'tr' ? 'Bulut verileri alınamadı' : 'Failed to fetch cloud data', 'error');
-    } finally {
-      setSyncing(false);
     }
   };
 
@@ -287,14 +296,6 @@ export function CloudSyncSettings() {
 
     saveLocalLastModified();
 
-    // Reload page to apply changes (wait longer to ensure cloud upload is complete)
-    setTimeout(
-      () => {
-        window.location.reload();
-      },
-      strategy !== 'cloud' ? 1500 : 500
-    );
-
     const message =
       strategy === 'cloud'
         ? lang === 'tr'
@@ -304,13 +305,40 @@ export function CloudSyncSettings() {
           ? 'Veriler uygulandı ve senkronize edildi!'
           : 'Data applied and synced!';
     showToast(message, 'success');
+
+    // Hide syncing overlay and notify parent
+    setSyncing(false);
+    if (onSyncingChange) {
+      onSyncingChange(false); // This will trigger success overlay in SettingsDialog
+    }
+
+    // Close settings dialog after sync completes
+    if (onSyncComplete) {
+      setTimeout(() => {
+        onSyncComplete();
+      }, 500);
+    }
+
+    // Navigate to homepage after a delay
+    setTimeout(() => {
+      router.push('/');
+    }, 2500);
   };
 
   const handleConflictResolve = async (strategy: ConflictStrategy) => {
     if (!conflictData) return;
 
+    // Close conflict dialog immediately
     setShowConflictDialog(false);
+
+    // Show syncing overlay first (before closing settings dialog)
     setSyncing(true);
+    if (onSyncingChange) {
+      onSyncingChange(true);
+    }
+
+    // Don't close settings dialog immediately - let overlay show
+    // It will be closed after sync completes
 
     try {
       // Clear conflict storage
@@ -344,9 +372,17 @@ export function CloudSyncSettings() {
           : `Conflict resolution error: ${errorMessage}`,
         'error'
       );
-    } finally {
       setSyncing(false);
+      if (onSyncingChange) {
+        onSyncingChange(false);
+      }
       setConflictData(null);
+      // Close settings dialog on error too
+      if (onSyncComplete) {
+        setTimeout(() => {
+          onSyncComplete();
+        }, 500);
+      }
     }
   };
 
@@ -356,7 +392,7 @@ export function CloudSyncSettings() {
       return;
     }
 
-    setSyncing(true);
+    // Don't show syncing overlay here, just check for conflicts
     try {
       const cloudData = await syncFromCloud();
       if (cloudData) {
@@ -379,21 +415,32 @@ export function CloudSyncSettings() {
           setShowConflictDialog(true);
         } else {
           // No conflicts, apply cloud data directly
-          await applyCloudData(cloudData, 'cloud');
-          showToast(
-            lang === 'tr' ? 'Buluttan senkronize edildi!' : 'Synced from cloud!',
-            'success'
-          );
+          // Show syncing overlay only when actually syncing
+          setSyncing(true);
+          try {
+            await applyCloudData(cloudData, 'cloud');
+            showToast(
+              lang === 'tr' ? 'Buluttan senkronize edildi!' : 'Synced from cloud!',
+              'success'
+            );
+            // Close settings dialog if callback provided
+            if (onSyncComplete) {
+              setTimeout(() => {
+                onSyncComplete();
+              }, 500);
+            }
+          } finally {
+            setSyncing(false);
+          }
         }
       }
     } catch (error) {
       showToast(lang === 'tr' ? 'Senkronizasyon hatası' : 'Sync error', 'error');
-    } finally {
-      setSyncing(false);
     }
   };
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
       // Before logout, upload local data to cloud if there's any data
       // Never upload empty/zeroed data to cloud
@@ -452,11 +499,91 @@ export function CloudSyncSettings() {
       );
     } catch (error) {
       showToast(lang === 'tr' ? 'Çıkış hatası' : 'Logout error', 'error');
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
   return (
     <>
+      {/* Syncing Overlay - Shows while syncing */}
+      {syncing && !showSyncSuccess && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-6 rounded-3xl bg-white p-10 shadow-2xl dark:bg-gray-800 animate-in fade-in zoom-in duration-300">
+            {/* Loading Spinner */}
+            <div className="relative h-20 w-20">
+              <div className="absolute inset-0 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700"></div>
+              <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-blue-600 dark:border-t-blue-400"></div>
+            </div>
+
+            {/* Syncing Message */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {lang === 'tr' ? 'Veriler Senkronize Ediliyor...' : 'Synchronizing Data...'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {lang === 'tr'
+                  ? 'Lütfen bekleyin, verileriniz senkronize ediliyor.'
+                  : 'Please wait, your data is being synchronized.'}
+              </p>
+            </div>
+
+            {/* Loading dots */}
+            <div className="flex gap-2">
+              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400 [animation-delay:-0.3s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400 [animation-delay:-0.15s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sync Success Overlay */}
+      {showSyncSuccess && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-6 rounded-3xl bg-white p-10 shadow-2xl dark:bg-gray-800 animate-in fade-in zoom-in duration-300">
+            {/* Success Checkmark Animation */}
+            <div className="relative h-20 w-20">
+              <div className="absolute inset-0 rounded-full bg-green-500/20 animate-ping"></div>
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-green-500 dark:bg-green-600">
+                <svg
+                  className="h-12 w-12 text-white animate-in zoom-in duration-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Success Message */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {lang === 'tr' ? 'Senkronizasyon Tamamlandı!' : 'Synchronization Complete!'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {lang === 'tr'
+                  ? 'Verileriniz başarıyla senkronize edildi.'
+                  : 'Your data has been successfully synchronized.'}
+              </p>
+            </div>
+
+            {/* Loading dots */}
+            <div className="flex gap-2">
+              <div className="h-2 w-2 animate-bounce rounded-full bg-green-500 dark:bg-green-400 [animation-delay:-0.3s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-green-500 dark:bg-green-400 [animation-delay:-0.15s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-green-500 dark:bg-green-400"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={`${isMobile ? 'space-y-2' : 'space-y-2.5'}`}>
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
@@ -499,7 +626,7 @@ export function CloudSyncSettings() {
                     return;
                   }
 
-                  setSyncing(true);
+                  // Don't show syncing overlay here, just open conflict dialog
                   try {
                     const cloudData = await syncFromCloud();
                     const localData = { activities, settings, badges, challenges };
@@ -546,8 +673,6 @@ export function CloudSyncSettings() {
                       lang === 'tr' ? 'Bulut verileri alınamadı' : 'Failed to fetch cloud data',
                       'error'
                     );
-                  } finally {
-                    setSyncing(false);
                   }
                 }}
                 disabled={syncing || syncState.status === 'syncing'}

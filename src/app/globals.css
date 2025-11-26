@@ -2855,7 +2855,7 @@ html {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-33.333%);
   }
 }
 
@@ -2874,24 +2874,31 @@ html {
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
-  animation: quoteMarquee 20s linear infinite;
+  animation: quoteMarquee 120s linear infinite;
   will-change: transform;
   gap: 0;
   vertical-align: middle;
   line-height: 1;
   height: 100%;
-}
-
-.quote-ticker-content:hover {
-  animation-play-state: paused;
-}
-
-/* Smooth scrolling for quote ticker */
-.quote-ticker-content {
+  animation-play-state: running !important;
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
   transform: translateZ(0);
   text-rendering: optimizeLegibility;
+  animation-fill-mode: both;
+  /* Force hardware acceleration */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  /* Prevent animation interruption */
+  animation-timing-function: linear;
+  /* Ensure continuous animation */
+  animation-iteration-count: infinite;
+}
+
+.quote-ticker-content:hover {
+  animation-play-state: paused;
 }
 
 .quote-ticker-glow {

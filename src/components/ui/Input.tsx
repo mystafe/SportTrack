@@ -192,7 +192,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       ease-out
       ${fullWidth ? 'w-full' : ''}
       ${icon ? 'pl-10' : ''}
-      ${iconRight ? 'pr-10' : ''}
+      ${iconRight ? 'pr-12' : ''}
       ${hasError ? 'border-error focus:border-error focus:ring-error/20 animate-shake' : ''}
       ${className}
     `
@@ -231,12 +231,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {iconRight && (
-            <div
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
-              aria-hidden="true"
-            >
-              {iconRight}
-            </div>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">{iconRight}</div>
           )}
         </div>
         {error && (

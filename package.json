@@ -1,6 +1,6 @@
 {
   "name": "sporttrack",
-  "version": "0.21.9",
+  "version": "0.22.2",
   "private": true,
   "scripts": {
     "dev": "next dev",

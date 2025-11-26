@@ -11,12 +11,41 @@ import {
   endOfWeek,
   startOfMonth,
   endOfMonth,
+  startOfYear,
+  endOfYear,
   parseISO,
   isWithinInterval,
   format,
+  subDays,
 } from 'date-fns';
 
-export type ChallengeType = 'daily' | 'weekly' | 'monthly' | 'custom';
+/**
+ * Get season number from date (0=Spring, 1=Summer, 2=Fall, 3=Winter)
+ * date-fns doesn't have getSeason, so we implement it manually
+ */
+function getSeason(date: Date): 0 | 1 | 2 | 3 {
+  const month = date.getMonth(); // 0-11
+  // Northern hemisphere seasons:
+  // Spring: March (2), April (3), May (4)
+  // Summer: June (5), July (6), August (7)
+  // Fall: September (8), October (9), November (10)
+  // Winter: December (11), January (0), February (1)
+  if (month >= 2 && month <= 4) return 0; // Spring
+  if (month >= 5 && month <= 7) return 1; // Summer
+  if (month >= 8 && month <= 10) return 2; // Fall
+  return 3; // Winter
+}
+
+export type ChallengeType =
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'yearly'
+  | 'seasonal'
+  | 'activity_specific'
+  | 'time_based'
+  | 'streak_based'
+  | 'custom';
 export type ChallengeStatus = 'active' | 'completed' | 'failed' | 'expired';
 
 export interface Challenge {
@@ -269,5 +298,213 @@ export function getDefaultWeeklyChallenge(): Challenge {
     50000,
     new Date(),
     '🔥'
+  );
+}
+
+/**
+ * Create a yearly challenge
+ */
+export function createYearlyChallenge(
+  name: { tr: string; en: string },
+  target: number,
+  yearStart: Date = new Date(),
+  icon?: string
+): Challenge {
+  const start = startOfYear(yearStart);
+  const end = endOfYear(start);
+
+  return {
+    id: `yearly-${format(start, 'yyyy')}-${Date.now()}`,
+    type: 'yearly',
+    name,
+    description: {
+      tr: `Bu yıl ${target.toLocaleString('tr-TR')} puan hedefi`,
+      en: `This year's ${target.toLocaleString('en-US')} points goal`,
+    },
+    target,
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+    status: 'active',
+    progress: 0,
+    createdAt: new Date().toISOString(),
+    icon: icon || '📅',
+  };
+}
+
+/**
+ * Create a seasonal challenge
+ */
+export function createSeasonalChallenge(
+  name: { tr: string; en: string },
+  target: number,
+  seasonStart: Date = new Date(),
+  icon?: string
+): Challenge {
+  const season = getSeason(seasonStart);
+  let start: Date;
+  let end: Date;
+
+  // Determine season dates (approximate)
+  const year = seasonStart.getFullYear();
+  switch (season) {
+    case 0: // Spring (March 1 - May 31)
+      start = new Date(year, 2, 1);
+      end = new Date(year, 4, 31);
+      break;
+    case 1: // Summer (June 1 - August 31)
+      start = new Date(year, 5, 1);
+      end = new Date(year, 7, 31);
+      break;
+    case 2: // Fall (September 1 - November 30)
+      start = new Date(year, 8, 1);
+      end = new Date(year, 10, 30);
+      break;
+    case 3: // Winter (December 1 - February 28/29)
+      start = new Date(year - 1, 11, 1);
+      end = new Date(year, 1, 28);
+      break;
+    default:
+      start = startOfMonth(seasonStart);
+      end = endOfMonth(start);
+  }
+
+  return {
+    id: `seasonal-${format(start, 'yyyy-MM')}-${Date.now()}`,
+    type: 'seasonal',
+    name,
+    description: {
+      tr: `Bu mevsim ${target.toLocaleString('tr-TR')} puan hedefi`,
+      en: `This season's ${target.toLocaleString('en-US')} points goal`,
+    },
+    target,
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+    status: 'active',
+    progress: 0,
+    createdAt: new Date().toISOString(),
+    icon: icon || '🍂',
+  };
+}
+
+/**
+ * Create an activity-specific challenge
+ */
+export function createActivitySpecificChallenge(
+  name: { tr: string; en: string },
+  description: { tr: string; en: string },
+  target: number,
+  activityKey: string,
+  startDate: Date,
+  endDate: Date,
+  icon?: string
+): Challenge {
+  return {
+    id: `activity-${activityKey}-${Date.now()}`,
+    type: 'activity_specific',
+    name,
+    description,
+    target,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+    status: 'active',
+    progress: 0,
+    createdAt: new Date().toISOString(),
+    icon: icon || '🎯',
+  };
+}
+
+/**
+ * Create a time-based challenge (e.g., morning challenge)
+ */
+export function createTimeBasedChallenge(
+  name: { tr: string; en: string },
+  description: { tr: string; en: string },
+  target: number,
+  startHour: number,
+  endHour: number,
+  startDate: Date,
+  endDate: Date,
+  icon?: string
+): Challenge {
+  return {
+    id: `time-${startHour}-${endHour}-${Date.now()}`,
+    type: 'time_based',
+    name,
+    description,
+    target,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+    status: 'active',
+    progress: 0,
+    createdAt: new Date().toISOString(),
+    icon: icon || '⏰',
+  };
+}
+
+/**
+ * Create a streak-based challenge
+ */
+export function createStreakBasedChallenge(
+  name: { tr: string; en: string },
+  description: { tr: string; en: string },
+  targetDays: number,
+  startDate: Date = new Date(),
+  icon?: string
+): Challenge {
+  const end = new Date(startDate);
+  end.setDate(end.getDate() + targetDays - 1);
+
+  return {
+    id: `streak-${targetDays}-${Date.now()}`,
+    type: 'streak_based',
+    name,
+    description,
+    target: targetDays, // For streak challenges, target is number of days
+    startDate: startDate.toISOString(),
+    endDate: endOfDay(end).toISOString(),
+    status: 'active',
+    progress: 0,
+    createdAt: new Date().toISOString(),
+    icon: icon || '🔥',
+  };
+}
+
+/**
+ * Get default seasonal challenge based on current season
+ */
+export function getDefaultSeasonalChallenge(): Challenge {
+  const now = new Date();
+  const season = getSeason(now);
+  const seasonNames = {
+    0: { tr: 'İlkbahar', en: 'Spring' },
+    1: { tr: 'Yaz', en: 'Summer' },
+    2: { tr: 'Sonbahar', en: 'Fall' },
+    3: { tr: 'Kış', en: 'Winter' },
+  };
+  const seasonName = seasonNames[season as keyof typeof seasonNames];
+
+  return createSeasonalChallenge(
+    {
+      tr: `${seasonName.tr} Hedefi`,
+      en: `${seasonName.en} Goal`,
+    },
+    200000, // 200K points for the season
+    now,
+    season === 0 ? '🌸' : season === 1 ? '☀️' : season === 2 ? '🍂' : '❄️'
+  );
+}
+
+/**
+ * Get default yearly challenge
+ */
+export function getDefaultYearlyChallenge(): Challenge {
+  return createYearlyChallenge(
+    {
+      tr: 'Yıllık Hedef',
+      en: 'Yearly Goal',
+    },
+    1000000, // 1M points for the year
+    new Date(),
+    '🗓️'
   );
 }

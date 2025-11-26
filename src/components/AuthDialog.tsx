@@ -21,6 +21,7 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { login, register, loginWithGoogle, resetPasswordEmail } = useAuth();
@@ -233,19 +234,45 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
             required
             placeholder={lang === 'tr' ? 'ornek@email.com' : 'example@email.com'}
             size={isMobile ? 'sm' : 'md'}
+            fullWidth
           />
 
           {mode !== 'reset' && (
-            <Input
-              type="password"
-              label={lang === 'tr' ? 'Şifre' : 'Password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              placeholder={lang === 'tr' ? 'Şifre (min. 6 karakter)' : 'Password (min. 6 chars)'}
-              size={isMobile ? 'sm' : 'md'}
-            />
+            <div className="relative">
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                label={lang === 'tr' ? 'Şifre' : 'Password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                placeholder={lang === 'tr' ? 'Şifre (min. 6 karakter)' : 'Password (min. 6 chars)'}
+                size={isMobile ? 'sm' : 'md'}
+                fullWidth
+                iconRight={
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowPassword(!showPassword);
+                    }}
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand/20 rounded p-1"
+                    aria-label={
+                      showPassword
+                        ? lang === 'tr'
+                          ? 'Şifreyi gizle'
+                          : 'Hide password'
+                        : lang === 'tr'
+                          ? 'Şifreyi göster'
+                          : 'Show password'
+                    }
+                  >
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
+                }
+              />
+            </div>
           )}
 
           <Button

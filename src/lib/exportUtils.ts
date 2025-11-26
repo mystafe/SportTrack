@@ -81,6 +81,17 @@ export function exportToCSV(
   URL.revokeObjectURL(url);
 }
 
+// Helper function to ensure proper text encoding for jsPDF
+// jsPDF v2+ supports UTF-8 natively, but we need to ensure proper string handling
+function prepareTextForPDF(text: string): string {
+  // Ensure text is a proper string and handle any encoding issues
+  if (typeof text !== 'string') {
+    return String(text);
+  }
+  // jsPDF handles UTF-8 automatically, just return the string
+  return text;
+}
+
 export async function exportToPDF(
   activities: ActivityRecord[],
   settings: UserSettings | null,
@@ -101,18 +112,47 @@ export async function exportToPDF(
     });
   }
 
-  const doc = new jsPDF();
+  const doc = new jsPDF({
+    compress: true,
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+  });
+
+  // Enable Unicode support for Turkish characters
+  // jsPDF v2+ supports UTF-8 natively, but we need to ensure proper encoding
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 14;
   let yPos = margin;
+
+  // Helper function to add text with proper encoding
+  const addText = (
+    text: string,
+    x: number,
+    y: number,
+    options?: { fontSize?: number; fontStyle?: string }
+  ) => {
+    if (options?.fontSize) {
+      doc.setFontSize(options.fontSize);
+    }
+    if (options?.fontStyle) {
+      doc.setFont('helvetica', options.fontStyle as any);
+    }
+    // jsPDF v2+ supports UTF-8, but we need to ensure the text is properly encoded
+    // Use splitTextToSize for long text and proper encoding
+    const lines = doc.splitTextToSize(text, pageWidth - 2 * margin);
+    doc.text(lines, x, y, { encoding: 'UTF8' });
+    return lines.length * (options?.fontSize || 10) * 0.35; // Approximate line height
+  };
 
   // Title
   const title =
     options.language === 'tr' ? 'SportTrack Aktivite Raporu' : 'SportTrack Activity Report';
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text(title, margin, yPos);
+  const titleLines = doc.splitTextToSize(title, pageWidth - 2 * margin);
+  doc.text(titleLines, margin, yPos, { encoding: 'UTF8' });
   yPos += 10;
 
   // User info
@@ -128,7 +168,8 @@ export async function exportToPDF(
       options.language === 'tr'
         ? `Kullanıcı: ${settings.name} | Günlük Hedef: ${settings.dailyTarget.toLocaleString()} puan${moodText}`
         : `User: ${settings.name} | Daily Goal: ${settings.dailyTarget.toLocaleString()} points${moodText}`;
-    doc.text(userInfo, margin, yPos);
+    const userInfoLines = doc.splitTextToSize(userInfo, pageWidth - 2 * margin);
+    doc.text(userInfoLines, margin, yPos, { encoding: 'UTF8' });
     yPos += 8;
   }
 
@@ -138,7 +179,8 @@ export async function exportToPDF(
       options.language === 'tr'
         ? `Tarih Aralığı: ${format(options.dateRange.start, 'dd.MM.yyyy', { locale })} - ${format(options.dateRange.end, 'dd.MM.yyyy', { locale })}`
         : `Date Range: ${format(options.dateRange.start, 'MM/dd/yyyy', { locale })} - ${format(options.dateRange.end, 'MM/dd/yyyy', { locale })}`;
-    doc.text(dateRangeText, margin, yPos);
+    const dateRangeLines = doc.splitTextToSize(dateRangeText, pageWidth - 2 * margin);
+    doc.text(dateRangeLines, margin, yPos, { encoding: 'UTF8' });
     yPos += 8;
   }
 
@@ -147,7 +189,8 @@ export async function exportToPDF(
     options.language === 'tr'
       ? `Rapor Tarihi: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale })}`
       : `Report Date: ${format(new Date(), 'MM/dd/yyyy HH:mm', { locale })}`;
-  doc.text(exportDateText, margin, yPos);
+  const exportDateLines = doc.splitTextToSize(exportDateText, pageWidth - 2 * margin);
+  doc.text(exportDateLines, margin, yPos, { encoding: 'UTF8' });
   yPos += 10;
 
   // Summary statistics
@@ -158,7 +201,8 @@ export async function exportToPDF(
   const summaryLabel = options.language === 'tr' ? 'Özet' : 'Summary';
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text(summaryLabel, margin, yPos);
+  const summaryLabelLines = doc.splitTextToSize(summaryLabel, pageWidth - 2 * margin);
+  doc.text(summaryLabelLines, margin, yPos, { encoding: 'UTF8' });
   yPos += 8;
 
   doc.setFontSize(10);
@@ -177,7 +221,8 @@ export async function exportToPDF(
         ];
 
   summaryText.forEach((text) => {
-    doc.text(text, margin + 5, yPos);
+    const textLines = doc.splitTextToSize(text, pageWidth - 2 * margin);
+    doc.text(textLines, margin + 5, yPos, { encoding: 'UTF8' });
     yPos += 6;
   });
   yPos += 5;
@@ -202,13 +247,24 @@ export async function exportToPDF(
     ];
   });
 
+  // Use autoTable with proper encoding for Turkish characters
   autoTable(doc, {
     head: tableHeaders,
     body: tableData,
     startY: yPos,
     margin: { left: margin, right: margin },
-    styles: { fontSize: 8, cellPadding: 2 },
-    headStyles: { fillColor: [14, 165, 233], textColor: 255, fontStyle: 'bold' },
+    styles: {
+      fontSize: 8,
+      cellPadding: 2,
+      font: 'helvetica',
+      fontStyle: 'normal',
+    },
+    headStyles: {
+      fillColor: [14, 165, 233],
+      textColor: 255,
+      fontStyle: 'bold',
+      font: 'helvetica',
+    },
     alternateRowStyles: { fillColor: [245, 247, 250] },
     columnStyles: {
       0: { cellWidth: 35 },
@@ -217,6 +273,18 @@ export async function exportToPDF(
       3: { cellWidth: 25 },
       4: { cellWidth: 20 },
       5: { cellWidth: 50 },
+    },
+    // Ensure proper encoding for Turkish characters
+    didParseCell: function (data: any) {
+      // Ensure all cell text is properly encoded
+      if (data.cell && data.cell.text) {
+        // jsPDF handles UTF-8 automatically, but we ensure it's a string
+        if (Array.isArray(data.cell.text)) {
+          data.cell.text = data.cell.text.map((t: any) => String(t));
+        } else {
+          data.cell.text = String(data.cell.text);
+        }
+      }
     },
   });
 

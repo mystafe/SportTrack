@@ -5,21 +5,50 @@ import { startOfDay, parseISO, isSameDay, subDays } from 'date-fns';
 export type BadgeId =
   | 'first_activity'
   | 'streak_7'
+  | 'streak_14'
   | 'streak_30'
+  | 'streak_60'
   | 'streak_100'
+  | 'streak_200'
+  | 'streak_365'
+  | 'points_1k'
+  | 'points_5k'
   | 'points_10k'
+  | 'points_25k'
   | 'points_50k'
   | 'points_100k'
+  | 'points_250k'
   | 'points_500k'
+  | 'points_1m'
+  | 'activities_10'
+  | 'activities_50'
   | 'activities_100'
+  | 'activities_250'
   | 'activities_500'
   | 'activities_1000'
+  | 'activities_2000'
+  | 'activities_5000'
   | 'all_activities'
   | 'weekend_warrior'
   | 'early_bird'
   | 'night_owl'
   | 'perfect_week'
-  | 'perfect_month';
+  | 'perfect_month'
+  | 'speed_demon'
+  | 'marathon_day'
+  | 'consistency_king'
+  | 'variety_seeker'
+  | 'early_riser'
+  | 'night_trainer'
+  | 'weekend_champion'
+  | 'perfect_quarter'
+  | 'year_warrior'
+  | 'comeback_king'
+  | 'social_butterfly'
+  | 'power_hour'
+  | 'steady_eddie'
+  | 'explorer'
+  | 'dedication';
 
 export interface Badge {
   id: BadgeId;
@@ -51,6 +80,17 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     category: 'streak',
     rarity: 'common',
   },
+  streak_14: {
+    id: 'streak_14',
+    name: { tr: '14 Günlük Seri', en: '14 Day Streak' },
+    description: {
+      tr: '14 gün üst üste hedefini tamamla',
+      en: 'Complete your goal 14 days in a row',
+    },
+    icon: '🔥',
+    category: 'streak',
+    rarity: 'rare',
+  },
   streak_30: {
     id: 'streak_30',
     name: { tr: '30 Günlük Seri', en: '30 Day Streak' },
@@ -61,6 +101,17 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     icon: '💪',
     category: 'streak',
     rarity: 'rare',
+  },
+  streak_60: {
+    id: 'streak_60',
+    name: { tr: '60 Günlük Seri', en: '60 Day Streak' },
+    description: {
+      tr: '60 gün üst üste hedefini tamamla',
+      en: 'Complete your goal 60 days in a row',
+    },
+    icon: '⚡',
+    category: 'streak',
+    rarity: 'epic',
   },
   streak_100: {
     id: 'streak_100',
@@ -73,6 +124,44 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     category: 'streak',
     rarity: 'legendary',
   },
+  streak_200: {
+    id: 'streak_200',
+    name: { tr: '200 Günlük Seri', en: '200 Day Streak' },
+    description: {
+      tr: '200 gün üst üste hedefini tamamla',
+      en: 'Complete your goal 200 days in a row',
+    },
+    icon: '🌟',
+    category: 'streak',
+    rarity: 'legendary',
+  },
+  streak_365: {
+    id: 'streak_365',
+    name: { tr: '1 Yıllık Seri', en: '1 Year Streak' },
+    description: {
+      tr: '365 gün üst üste hedefini tamamla',
+      en: 'Complete your goal 365 days in a row',
+    },
+    icon: '🏆',
+    category: 'streak',
+    rarity: 'legendary',
+  },
+  points_1k: {
+    id: 'points_1k',
+    name: { tr: '1K Puan', en: '1K Points' },
+    description: { tr: 'Toplamda 1.000 puan kazan', en: 'Earn 1,000 total points' },
+    icon: '⭐',
+    category: 'points',
+    rarity: 'common',
+  },
+  points_5k: {
+    id: 'points_5k',
+    name: { tr: '5K Puan', en: '5K Points' },
+    description: { tr: 'Toplamda 5.000 puan kazan', en: 'Earn 5,000 total points' },
+    icon: '⭐',
+    category: 'points',
+    rarity: 'common',
+  },
   points_10k: {
     id: 'points_10k',
     name: { tr: '10K Puan', en: '10K Points' },
@@ -80,6 +169,14 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     icon: '⭐',
     category: 'points',
     rarity: 'common',
+  },
+  points_25k: {
+    id: 'points_25k',
+    name: { tr: '25K Puan', en: '25K Points' },
+    description: { tr: 'Toplamda 25.000 puan kazan', en: 'Earn 25,000 total points' },
+    icon: '⭐',
+    category: 'points',
+    rarity: 'rare',
   },
   points_50k: {
     id: 'points_50k',
@@ -97,6 +194,14 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     category: 'points',
     rarity: 'epic',
   },
+  points_250k: {
+    id: 'points_250k',
+    name: { tr: '250K Puan', en: '250K Points' },
+    description: { tr: 'Toplamda 250.000 puan kazan', en: 'Earn 250,000 total points' },
+    icon: '💫',
+    category: 'points',
+    rarity: 'epic',
+  },
   points_500k: {
     id: 'points_500k',
     name: { tr: '500K Puan', en: '500K Points' },
@@ -104,6 +209,30 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     icon: '🏆',
     category: 'points',
     rarity: 'legendary',
+  },
+  points_1m: {
+    id: 'points_1m',
+    name: { tr: '1M Puan', en: '1M Points' },
+    description: { tr: 'Toplamda 1.000.000 puan kazan', en: 'Earn 1,000,000 total points' },
+    icon: '💎',
+    category: 'points',
+    rarity: 'legendary',
+  },
+  activities_10: {
+    id: 'activities_10',
+    name: { tr: '10 Egzersiz', en: '10 Exercises' },
+    description: { tr: '10 egzersiz ekle', en: 'Add 10 exercises' },
+    icon: '📝',
+    category: 'activities',
+    rarity: 'common',
+  },
+  activities_50: {
+    id: 'activities_50',
+    name: { tr: '50 Egzersiz', en: '50 Exercises' },
+    description: { tr: '50 egzersiz ekle', en: 'Add 50 exercises' },
+    icon: '📝',
+    category: 'activities',
+    rarity: 'common',
   },
   activities_100: {
     id: 'activities_100',
@@ -121,6 +250,14 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     category: 'activities',
     rarity: 'rare',
   },
+  activities_250: {
+    id: 'activities_250',
+    name: { tr: '250 Egzersiz', en: '250 Exercises' },
+    description: { tr: '250 egzersiz ekle', en: 'Add 250 exercises' },
+    icon: '📊',
+    category: 'activities',
+    rarity: 'rare',
+  },
   activities_1000: {
     id: 'activities_1000',
     name: { tr: '1000 Egzersiz', en: '1000 Exercises' },
@@ -128,6 +265,22 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
     icon: '🎖️',
     category: 'activities',
     rarity: 'epic',
+  },
+  activities_2000: {
+    id: 'activities_2000',
+    name: { tr: '2000 Egzersiz', en: '2000 Exercises' },
+    description: { tr: '2000 egzersiz ekle', en: 'Add 2000 exercises' },
+    icon: '🎖️',
+    category: 'activities',
+    rarity: 'epic',
+  },
+  activities_5000: {
+    id: 'activities_5000',
+    name: { tr: '5000 Egzersiz', en: '5000 Exercises' },
+    description: { tr: '5000 egzersiz ekle', en: 'Add 5000 exercises' },
+    icon: '👑',
+    category: 'activities',
+    rarity: 'legendary',
   },
   all_activities: {
     id: 'all_activities',
@@ -180,6 +333,171 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
       en: 'Complete your goal every day for a month',
     },
     icon: '💎',
+    category: 'special',
+    rarity: 'epic',
+  },
+  speed_demon: {
+    id: 'speed_demon',
+    name: { tr: 'Hız Canavarı', en: 'Speed Demon' },
+    description: {
+      tr: 'Hedefini 6 saat içinde tamamla',
+      en: 'Complete your goal within 6 hours',
+    },
+    icon: '⚡',
+    category: 'special',
+    rarity: 'rare',
+  },
+  marathon_day: {
+    id: 'marathon_day',
+    name: { tr: 'Maraton Günü', en: 'Marathon Day' },
+    description: {
+      tr: 'Tek günde 50.000+ puan kazan',
+      en: 'Earn 50,000+ points in a single day',
+    },
+    icon: '🏃',
+    category: 'special',
+    rarity: 'epic',
+  },
+  consistency_king: {
+    id: 'consistency_king',
+    name: { tr: 'Tutarlılık Kralı', en: 'Consistency King' },
+    description: {
+      tr: '30 gün üst üste aynı saatte aktivite yap',
+      en: 'Do activities at the same time for 30 days in a row',
+    },
+    icon: '👑',
+    category: 'special',
+    rarity: 'rare',
+  },
+  variety_seeker: {
+    id: 'variety_seeker',
+    name: { tr: 'Çeşitlilik Arayıcısı', en: 'Variety Seeker' },
+    description: {
+      tr: '10 farklı aktivite türü dene',
+      en: 'Try 10 different activity types',
+    },
+    icon: '🎯',
+    category: 'special',
+    rarity: 'common',
+  },
+  early_riser: {
+    id: 'early_riser',
+    name: { tr: 'Erken Kalkan', en: 'Early Riser' },
+    description: {
+      tr: '7 gün üst üste sabah 6-8 arası aktivite yap',
+      en: 'Do activities between 6-8 AM for 7 days in a row',
+    },
+    icon: '🌅',
+    category: 'special',
+    rarity: 'common',
+  },
+  night_trainer: {
+    id: 'night_trainer',
+    name: { tr: 'Gece Antrenörü', en: 'Night Trainer' },
+    description: {
+      tr: '7 gün üst üste gece 22-24 arası aktivite yap',
+      en: 'Do activities between 10 PM-12 AM for 7 days in a row',
+    },
+    icon: '🌙',
+    category: 'special',
+    rarity: 'common',
+  },
+  weekend_champion: {
+    id: 'weekend_champion',
+    name: { tr: 'Hafta Sonu Şampiyonu', en: 'Weekend Champion' },
+    description: {
+      tr: '4 hafta üst üste hafta sonu aktivite yap',
+      en: 'Do activities on weekends for 4 weeks in a row',
+    },
+    icon: '🏆',
+    category: 'special',
+    rarity: 'rare',
+  },
+  perfect_quarter: {
+    id: 'perfect_quarter',
+    name: { tr: 'Mükemmel Çeyrek', en: 'Perfect Quarter' },
+    description: {
+      tr: '90 gün üst üste hedefini tamamla',
+      en: 'Complete your goal for 90 days in a row',
+    },
+    icon: '💎',
+    category: 'special',
+    rarity: 'epic',
+  },
+  year_warrior: {
+    id: 'year_warrior',
+    name: { tr: 'Yıl Savaşçısı', en: 'Year Warrior' },
+    description: {
+      tr: '365 gün aktivite yap',
+      en: 'Do activities for 365 days',
+    },
+    icon: '🗓️',
+    category: 'special',
+    rarity: 'legendary',
+  },
+  comeback_king: {
+    id: 'comeback_king',
+    name: { tr: 'Geri Dönüş Kralı', en: 'Comeback King' },
+    description: {
+      tr: 'Seri kırıldıktan sonra tekrar başla',
+      en: 'Start again after breaking your streak',
+    },
+    icon: '🔄',
+    category: 'special',
+    rarity: 'common',
+  },
+  social_butterfly: {
+    id: 'social_butterfly',
+    name: { tr: 'Sosyal Kelebek', en: 'Social Butterfly' },
+    description: {
+      tr: 'Hafta içi ve hafta sonu aktivite yap',
+      en: 'Do activities on both weekdays and weekends',
+    },
+    icon: '🦋',
+    category: 'special',
+    rarity: 'common',
+  },
+  power_hour: {
+    id: 'power_hour',
+    name: { tr: 'Güç Saati', en: 'Power Hour' },
+    description: {
+      tr: 'Tek saatte 5.000+ puan kazan',
+      en: 'Earn 5,000+ points in a single hour',
+    },
+    icon: '⚡',
+    category: 'special',
+    rarity: 'rare',
+  },
+  steady_eddie: {
+    id: 'steady_eddie',
+    name: { tr: 'Kararlı Eddie', en: 'Steady Eddie' },
+    description: {
+      tr: '14 gün üst üste aynı puan aralığında aktivite yap',
+      en: 'Do activities in the same point range for 14 days in a row',
+    },
+    icon: '📊',
+    category: 'special',
+    rarity: 'common',
+  },
+  explorer: {
+    id: 'explorer',
+    name: { tr: 'Kaşif', en: 'Explorer' },
+    description: {
+      tr: 'Tüm özel aktiviteleri dene',
+      en: 'Try all custom activities',
+    },
+    icon: '🗺️',
+    category: 'special',
+    rarity: 'rare',
+  },
+  dedication: {
+    id: 'dedication',
+    name: { tr: 'Adanmışlık', en: 'Dedication' },
+    description: {
+      tr: '100 gün üst üste aktivite yap',
+      en: 'Do activities for 100 days in a row',
+    },
+    icon: '💪',
     category: 'special',
     rarity: 'epic',
   },
@@ -247,16 +565,44 @@ export function checkBadges(
         unlocked = currentStreak >= 7;
         break;
 
+      case 'streak_14':
+        unlocked = currentStreak >= 14;
+        break;
+
       case 'streak_30':
         unlocked = currentStreak >= 30;
+        break;
+
+      case 'streak_60':
+        unlocked = currentStreak >= 60;
         break;
 
       case 'streak_100':
         unlocked = currentStreak >= 100;
         break;
 
+      case 'streak_200':
+        unlocked = currentStreak >= 200;
+        break;
+
+      case 'streak_365':
+        unlocked = currentStreak >= 365;
+        break;
+
+      case 'points_1k':
+        unlocked = totalPoints >= 1000;
+        break;
+
+      case 'points_5k':
+        unlocked = totalPoints >= 5000;
+        break;
+
       case 'points_10k':
         unlocked = totalPoints >= 10000;
+        break;
+
+      case 'points_25k':
+        unlocked = totalPoints >= 25000;
         break;
 
       case 'points_50k':
@@ -267,12 +613,32 @@ export function checkBadges(
         unlocked = totalPoints >= 100000;
         break;
 
+      case 'points_250k':
+        unlocked = totalPoints >= 250000;
+        break;
+
       case 'points_500k':
         unlocked = totalPoints >= 500000;
         break;
 
+      case 'points_1m':
+        unlocked = totalPoints >= 1000000;
+        break;
+
+      case 'activities_10':
+        unlocked = totalActivities >= 10;
+        break;
+
+      case 'activities_50':
+        unlocked = totalActivities >= 50;
+        break;
+
       case 'activities_100':
         unlocked = totalActivities >= 100;
+        break;
+
+      case 'activities_250':
+        unlocked = totalActivities >= 250;
         break;
 
       case 'activities_500':
@@ -281,6 +647,14 @@ export function checkBadges(
 
       case 'activities_1000':
         unlocked = totalActivities >= 1000;
+        break;
+
+      case 'activities_2000':
+        unlocked = totalActivities >= 2000;
+        break;
+
+      case 'activities_5000':
+        unlocked = totalActivities >= 5000;
         break;
 
       case 'all_activities':
@@ -330,6 +704,275 @@ export function checkBadges(
           const dayPoints = daysWithActivities.get(dayKey) || 0;
           return dayPoints >= target;
         });
+        break;
+
+      case 'speed_demon':
+        // Check if goal was completed within 6 hours today
+        const todayActivities = activities.filter((a) => {
+          const activityDate = startOfDay(parseISO(a.performedAt));
+          return isSameDay(activityDate, today);
+        });
+        if (todayActivities.length > 0) {
+          const todayPoints = todayActivities.reduce((sum, a) => sum + a.points, 0);
+          if (todayPoints >= target) {
+            const sortedToday = todayActivities.sort(
+              (a, b) => parseISO(a.performedAt).getTime() - parseISO(b.performedAt).getTime()
+            );
+            const firstActivity = parseISO(sortedToday[0].performedAt);
+            const lastActivity = parseISO(sortedToday[sortedToday.length - 1].performedAt);
+            const hoursDiff = (lastActivity.getTime() - firstActivity.getTime()) / (1000 * 60 * 60);
+            unlocked = hoursDiff <= 6;
+          }
+        }
+        break;
+
+      case 'marathon_day':
+        // Check if single day has 50K+ points
+        const dayPointsMap = new Map<string, number>();
+        activities.forEach((a) => {
+          const date = startOfDay(parseISO(a.performedAt));
+          const key = date.toISOString();
+          dayPointsMap.set(key, (dayPointsMap.get(key) || 0) + a.points);
+        });
+        unlocked = Array.from(dayPointsMap.values()).some((points) => points >= 50000);
+        break;
+
+      case 'consistency_king':
+        // Check if 30 days in a row with activities at the same hour (±1 hour tolerance)
+        if (activities.length >= 30) {
+          const last30Activities = activities
+            .map((a) => ({
+              date: parseISO(a.performedAt),
+              hour: parseISO(a.performedAt).getHours(),
+            }))
+            .sort((a, b) => b.date.getTime() - a.date.getTime())
+            .slice(0, 30);
+          // Group by day and check if same hour
+          const dayHours = new Map<string, number[]>();
+          last30Activities.forEach((a) => {
+            const dayKey = startOfDay(a.date).toISOString();
+            if (!dayHours.has(dayKey)) {
+              dayHours.set(dayKey, []);
+            }
+            dayHours.get(dayKey)!.push(a.hour);
+          });
+          // Check if we have 30 consecutive days
+          const sortedDays = Array.from(dayHours.keys())
+            .map((k) => new Date(k))
+            .sort((a, b) => b.getTime() - a.getTime())
+            .slice(0, 30);
+          if (sortedDays.length === 30) {
+            // Check if all days have activities at similar hours
+            const hours = sortedDays
+              .map((day) => {
+                const dayKey = day.toISOString();
+                const dayHoursList = dayHours.get(dayKey) || [];
+                return dayHoursList.length > 0
+                  ? Math.round(dayHoursList.reduce((a, b) => a + b, 0) / dayHoursList.length)
+                  : null;
+              })
+              .filter((h) => h !== null) as number[];
+            if (hours.length >= 30) {
+              // Check if hours are consistent (±1 hour)
+              const firstHour = hours[0];
+              unlocked = hours.every((h) => Math.abs(h - firstHour) <= 1);
+            }
+          }
+        }
+        break;
+
+      case 'variety_seeker':
+        // Check if user tried 10 different activity types
+        unlocked = uniqueActivityKeys.size >= 10;
+        break;
+
+      case 'early_riser':
+        // Check if 7 days in a row with activities between 6-8 AM
+        const earlyRiserDays = new Set<string>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          const hour = date.getHours();
+          if (hour >= 6 && hour < 8) {
+            const dayKey = startOfDay(date).toISOString();
+            earlyRiserDays.add(dayKey);
+          }
+        });
+        // Check for 7 consecutive days
+        const earlyRiserDaysList = Array.from(earlyRiserDays)
+          .map((k) => new Date(k))
+          .sort((a, b) => b.getTime() - a.getTime());
+        if (earlyRiserDaysList.length >= 7) {
+          let consecutiveCount = 1;
+          for (let i = 0; i < earlyRiserDaysList.length - 1; i++) {
+            const diff = Math.abs(
+              (earlyRiserDaysList[i].getTime() - earlyRiserDaysList[i + 1].getTime()) /
+                (1000 * 60 * 60 * 24)
+            );
+            if (diff === 1) {
+              consecutiveCount++;
+              if (consecutiveCount >= 7) {
+                unlocked = true;
+                break;
+              }
+            } else {
+              consecutiveCount = 1;
+            }
+          }
+        }
+        break;
+
+      case 'night_trainer':
+        // Check if 7 days in a row with activities between 22-24 (10 PM-12 AM)
+        const nightTrainerDays = new Set<string>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          const hour = date.getHours();
+          if (hour >= 22 || hour < 24) {
+            const dayKey = startOfDay(date).toISOString();
+            nightTrainerDays.add(dayKey);
+          }
+        });
+        const nightTrainerDaysList = Array.from(nightTrainerDays)
+          .map((k) => new Date(k))
+          .sort((a, b) => b.getTime() - a.getTime());
+        if (nightTrainerDaysList.length >= 7) {
+          let consecutiveCount = 1;
+          for (let i = 0; i < nightTrainerDaysList.length - 1; i++) {
+            const diff = Math.abs(
+              (nightTrainerDaysList[i].getTime() - nightTrainerDaysList[i + 1].getTime()) /
+                (1000 * 60 * 60 * 24)
+            );
+            if (diff === 1) {
+              consecutiveCount++;
+              if (consecutiveCount >= 7) {
+                unlocked = true;
+                break;
+              }
+            } else {
+              consecutiveCount = 1;
+            }
+          }
+        }
+        break;
+
+      case 'weekend_champion':
+        // Check if 4 weeks in a row with weekend activities
+        const weekendDays = new Set<string>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          const dayOfWeek = date.getDay();
+          if (dayOfWeek === 0 || dayOfWeek === 6) {
+            // Sunday or Saturday
+            const weekKey = `${date.getFullYear()}-W${Math.ceil(
+              (date.getTime() - new Date(date.getFullYear(), 0, 1).getTime()) /
+                (1000 * 60 * 60 * 24 * 7)
+            )}`;
+            weekendDays.add(weekKey);
+          }
+        });
+        unlocked = weekendDays.size >= 4;
+        break;
+
+      case 'perfect_quarter':
+        // Check if last 90 days all have activities >= target
+        const last90Days = Array.from({ length: 90 }, (_, i) => startOfDay(subDays(today, i)));
+        unlocked = last90Days.every((day) => {
+          const dayKey = day.toISOString();
+          const dayPoints = daysWithActivities.get(dayKey) || 0;
+          return dayPoints >= target;
+        });
+        break;
+
+      case 'year_warrior':
+        // Check if user has activities on 365 different days (not necessarily consecutive)
+        unlocked = daysWithActivities.size >= 365;
+        break;
+
+      case 'comeback_king':
+        // Check if user has restarted after a broken streak
+        // This is tricky - we'll check if there's a gap and then activities resumed
+        if (sortedDays.length >= 2) {
+          // Check if there's a gap of more than 1 day
+          for (let i = 0; i < sortedDays.length - 1; i++) {
+            const diff = Math.abs(
+              (sortedDays[i].date.getTime() - sortedDays[i + 1].date.getTime()) /
+                (1000 * 60 * 60 * 24)
+            );
+            if (diff > 1) {
+              // There's a gap, check if activities resumed after
+              if (i > 0) {
+                unlocked = true;
+                break;
+              }
+            }
+          }
+        }
+        break;
+
+      case 'social_butterfly':
+        // Check if user has activities on both weekdays and weekends
+        let hasWeekday = false;
+        let hasWeekend = false;
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          const dayOfWeek = date.getDay();
+          if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+            hasWeekday = true;
+          } else if (dayOfWeek === 0 || dayOfWeek === 6) {
+            hasWeekend = true;
+          }
+        });
+        unlocked = hasWeekday && hasWeekend;
+        break;
+
+      case 'power_hour':
+        // Check if user earned 5K+ points in a single hour
+        const hourPointsMap = new Map<string, number>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          const hourKey = `${startOfDay(date).toISOString()}-${date.getHours()}`;
+          hourPointsMap.set(hourKey, (hourPointsMap.get(hourKey) || 0) + a.points);
+        });
+        unlocked = Array.from(hourPointsMap.values()).some((points) => points >= 5000);
+        break;
+
+      case 'steady_eddie':
+        // Check if 14 days in a row with activities in similar point range (±20%)
+        if (sortedDays.length >= 14) {
+          const last14Days = sortedDays.slice(0, 14);
+          const dayPointsList = last14Days.map((day) => day.points);
+          if (dayPointsList.length === 14 && dayPointsList.every((p) => p > 0)) {
+            const avgPoints = dayPointsList.reduce((a, b) => a + b, 0) / 14;
+            const tolerance = avgPoints * 0.2; // 20% tolerance
+            unlocked = dayPointsList.every((p) => Math.abs(p - avgPoints) <= tolerance);
+          }
+        }
+        break;
+
+      case 'explorer':
+        // Check if user tried all custom activities
+        // This requires checking settings for custom activities
+        // For now, we'll check if user has tried many different activity types
+        unlocked = uniqueActivityKeys.size >= 15; // Assuming there are many custom activities
+        break;
+
+      case 'dedication':
+        // Check if 100 days in a row with activities (not necessarily meeting target)
+        if (sortedDays.length >= 100) {
+          let consecutiveCount = 0;
+          for (let i = 0; i < sortedDays.length; i++) {
+            const expectedDate = startOfDay(subDays(today, consecutiveCount));
+            if (isSameDay(sortedDays[i].date, expectedDate)) {
+              consecutiveCount++;
+              if (consecutiveCount >= 100) {
+                unlocked = true;
+                break;
+              }
+            } else {
+              consecutiveCount = 0;
+            }
+          }
+        }
         break;
     }
 

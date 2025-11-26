@@ -1,19 +1,28 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useI18n } from '@/lib/i18n';
+import { useUIState } from '@/lib/uiState';
 
 export function FloatingAddButton() {
   const isMobile = useIsMobile();
   const { t } = useI18n();
+  const pathname = usePathname();
+  const { hideFloatingAddButton } = useUIState();
+
+  // Hide button on /add page or when editing/deleting
+  if (pathname === '/add' || hideFloatingAddButton) {
+    return null;
+  }
 
   // Calculate position above QuoteTicker - just above scrolling text
-  // QuoteTicker height: ~32px + BottomNavigation: 64px + safe-bottom
-  // Position button just above QuoteTicker with small gap
+  // QuoteTicker height: ~28px + BottomNavigation: 64px + safe-bottom
+  // Position button slightly lower
   const bottomOffset = isMobile
-    ? `calc(112px + max(0px, env(safe-area-inset-bottom, 0px)))`
-    : '104px';
+    ? `calc(130px + max(0px, env(safe-area-inset-bottom, 0px)))`
+    : '122px';
 
   return (
     <div
