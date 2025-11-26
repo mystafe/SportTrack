@@ -11,6 +11,8 @@
     "copy-build-to-public": "mkdir -p public && cp -r out/* public/ 2>/dev/null || true",
     "deploy": "npm run build:firebase && firebase deploy --only hosting:sporttrack",
     "deploy:hosting": "firebase deploy --only hosting:sporttrack",
+    "firebase:refresh": "bash scripts/firebase-token-refresh.sh",
+    "firebase:setup": "bash scripts/firebase-setup.sh",
     "deploy:vercel": "vercel --prod",
     "deploy:vercel:preview": "vercel",
     "test": "jest",
