@@ -449,10 +449,16 @@ export function createStreakBasedChallenge(
   description: { tr: string; en: string },
   targetDays: number,
   startDate: Date = new Date(),
+  endDate?: Date,
   icon?: string
 ): Challenge {
-  const end = new Date(startDate);
-  end.setDate(end.getDate() + targetDays - 1);
+  const end =
+    endDate ||
+    (() => {
+      const calculatedEnd = new Date(startDate);
+      calculatedEnd.setDate(calculatedEnd.getDate() + targetDays - 1);
+      return calculatedEnd;
+    })();
 
   return {
     id: `streak-${targetDays}-${Date.now()}`,

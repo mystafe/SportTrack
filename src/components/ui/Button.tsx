@@ -3,6 +3,7 @@
 import React from 'react';
 import { designTokens } from '@/lib/design-tokens';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 import { LoadingSpinner } from './LoadingSpinner';
 
 export type ButtonVariant =
@@ -194,11 +195,25 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       children,
       className = '',
       disabled,
+      onClick,
       ...props
     },
     ref
   ) => {
     const isMobile = useIsMobile();
+    const { triggerHaptic } = useHapticFeedback();
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (disabled || loading) return;
+
+      // Haptic feedback on mobile
+      if (isMobile && onClick) {
+        triggerHaptic('light');
+      }
+
+      onClick?.(e);
+    };
+
     const isDisabled = disabled || loading;
 
     const sizeConfig = sizeStyles[size] || sizeStyles.md;
@@ -243,6 +258,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         aria-disabled={isDisabled}
         aria-busy={loading}
+        onClick={handleClick}
         {...props}
       >
         {loading && (

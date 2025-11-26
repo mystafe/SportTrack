@@ -13,6 +13,16 @@ import { PageSkeleton } from '@/components/LoadingSkeleton';
 import { ChartSkeleton } from '@/components/ChartSkeleton';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import {
+  calculateWeeklyStats,
+  calculateMonthlyStats,
+  calculateConsistencyScore,
+  calculateActivityDiversity,
+  calculateProgressVelocity,
+  getMostActiveDayType,
+  getMostActiveHourRange,
+  calculateStreakStats,
+} from '@/lib/statisticsUtils';
 
 // Lazy load chart components for better performance
 const TrendChart = lazy(() =>
@@ -113,6 +123,25 @@ export default function StatsPage() {
     const completedDays = allDays.filter((day) => day.points >= target).length;
     return Math.round((completedDays / allDays.length) * 100);
   }, [allDays, target]);
+
+  // Calculate advanced statistics
+  const weeklyStats = useMemo(
+    () => calculateWeeklyStats(activities, target, 4),
+    [activities, target]
+  );
+  const monthlyStats = useMemo(
+    () => calculateMonthlyStats(activities, target, 6),
+    [activities, target]
+  );
+  const consistencyScore = useMemo(
+    () => calculateConsistencyScore(activities, target),
+    [activities, target]
+  );
+  const activityDiversity = useMemo(() => calculateActivityDiversity(activities), [activities]);
+  const progressVelocity = useMemo(() => calculateProgressVelocity(activities, 30), [activities]);
+  const mostActiveDayType = useMemo(() => getMostActiveDayType(activities), [activities]);
+  const mostActiveHour = useMemo(() => getMostActiveHourRange(activities), [activities]);
+  const streakStats = useMemo(() => calculateStreakStats(activities, target), [activities, target]);
 
   // Activity breakdown by type
   const activityBreakdown = useMemo(() => {
@@ -283,6 +312,97 @@ export default function StatsPage() {
           >
             {bestStreak}{' '}
             {bestStreak === 1 ? t('stats.highlight.sessions') : t('stats.highlight.sessions')}
+          </div>
+        </Card>
+      </div>
+
+      {/* Advanced Statistics Row */}
+      <div
+        className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'} ${isMobile ? 'gap-2' : 'gap-4'}`}
+      >
+        {/* Weekly Average */}
+        <Card
+          variant="default"
+          size="sm"
+          hoverable
+          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card gpu-accelerated`}
+        >
+          <div
+            className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300 mb-1`}
+          >
+            {t('stats.detailed.weeklyAverage')}
+          </div>
+          <div
+            className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}
+          >
+            {weeklyStats.length > 0
+              ? numberFormatter.format(
+                  Math.round(weeklyStats[weeklyStats.length - 1].averagePerDay)
+                )
+              : '0'}{' '}
+            {t('list.pointsUnit')}
+          </div>
+        </Card>
+
+        {/* Monthly Average */}
+        <Card
+          variant="default"
+          size="sm"
+          hoverable
+          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card gpu-accelerated`}
+        >
+          <div
+            className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300 mb-1`}
+          >
+            {t('stats.detailed.monthlyAverage')}
+          </div>
+          <div
+            className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}
+          >
+            {monthlyStats.length > 0
+              ? numberFormatter.format(
+                  Math.round(monthlyStats[monthlyStats.length - 1].averagePerDay)
+                )
+              : '0'}{' '}
+            {t('list.pointsUnit')}
+          </div>
+        </Card>
+
+        {/* Consistency Score */}
+        <Card
+          variant="default"
+          size="sm"
+          hoverable
+          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card gpu-accelerated`}
+        >
+          <div
+            className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300 mb-1`}
+          >
+            {t('stats.detailed.consistencyScore')}
+          </div>
+          <div
+            className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}
+          >
+            {consistencyScore.score}/100
+          </div>
+        </Card>
+
+        {/* Activity Diversity */}
+        <Card
+          variant="default"
+          size="sm"
+          hoverable
+          className={`stagger-item card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} stats-highlight-card gpu-accelerated`}
+        >
+          <div
+            className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-gray-700 dark:text-gray-300 mb-1`}
+          >
+            {t('stats.detailed.activityDiversity')}
+          </div>
+          <div
+            className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}
+          >
+            {activityDiversity.score}/100
           </div>
         </Card>
       </div>
@@ -533,7 +653,7 @@ export default function StatsPage() {
           <div className="flex-1">
             <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-brand transition-all duration-500"
+                className="h-full bg-brand transition-all duration-500 progress-bar-fill"
                 style={{ width: `${completionRate}%` }}
               />
             </div>
@@ -544,6 +664,323 @@ export default function StatsPage() {
           {allDays.filter((day) => day.points >= target).length} / {allDays.length}{' '}
           {t('stats.detailed.totalSessions')}
         </div>
+      </div>
+
+      {/* Advanced Metrics Section */}
+      <div
+        className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-4 sm:gap-6`}
+      >
+        {/* Consistency Score Details */}
+        <Card
+          variant="default"
+          size="md"
+          hoverable
+          className="chart-container card-entrance slide-in-left gpu-accelerated"
+          header={
+            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+              {t('stats.detailed.consistencyScore')}
+            </h2>
+          }
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t('stats.detailed.regularity')}
+              </span>
+              <div className="flex items-center gap-2">
+                <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-500 transition-all duration-500 progress-bar-fill"
+                    style={{ width: `${consistencyScore.factors.regularity}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold w-12 text-right">
+                  {consistencyScore.factors.regularity}%
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t('stats.detailed.frequency')}
+              </span>
+              <div className="flex items-center gap-2">
+                <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-green-500 transition-all duration-500 progress-bar-fill"
+                    style={{ width: `${consistencyScore.factors.frequency}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold w-12 text-right">
+                  {consistencyScore.factors.frequency}%
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t('stats.detailed.progression')}
+              </span>
+              <div className="flex items-center gap-2">
+                <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-purple-500 transition-all duration-500 progress-bar-fill"
+                    style={{ width: `${consistencyScore.factors.progression}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold w-12 text-right">
+                  {consistencyScore.factors.progression}%
+                </span>
+              </div>
+            </div>
+            <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <span className="text-base font-semibold text-gray-900 dark:text-white">
+                  {t('stats.detailed.consistencyScore')}
+                </span>
+                <span className="text-2xl font-bold text-brand">{consistencyScore.score}/100</span>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Activity Diversity Details */}
+        <Card
+          variant="default"
+          size="md"
+          hoverable
+          className="chart-container card-entrance slide-in-right gpu-accelerated"
+          header={
+            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+              {t('stats.detailed.activityDiversity')}
+            </h2>
+          }
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t('stats.detailed.uniqueActivities')}
+              </span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">
+                {activityDiversity.uniqueActivities}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t('stats.detailed.totalActivities')}
+              </span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">
+                {activityDiversity.totalActivities}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t('stats.detailed.diversityRatio')}
+              </span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">
+                {(activityDiversity.diversityRatio * 100).toFixed(1)}%
+              </span>
+            </div>
+            <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <span className="text-base font-semibold text-gray-900 dark:text-white">
+                  {t('stats.detailed.activityDiversity')}
+                </span>
+                <span className="text-2xl font-bold text-brand">{activityDiversity.score}/100</span>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Progress Velocity */}
+        <Card
+          variant="default"
+          size="md"
+          hoverable
+          className="chart-container card-entrance slide-in-left gpu-accelerated"
+          header={
+            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+              {t('stats.detailed.progressVelocity')}
+            </h2>
+          }
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {lang === 'tr' ? 'Son 30 Gün Ortalama' : 'Last 30 Days Average'}
+              </span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">
+                {numberFormatter.format(Math.round(progressVelocity.currentAverage))}{' '}
+                {t('list.pointsUnit')}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {lang === 'tr' ? 'Önceki 30 Gün Ortalama' : 'Previous 30 Days Average'}
+              </span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">
+                {numberFormatter.format(Math.round(progressVelocity.previousAverage))}{' '}
+                {t('list.pointsUnit')}
+              </span>
+            </div>
+            <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <span className="text-base font-semibold text-gray-900 dark:text-white">
+                  {progressVelocity.trend === 'up'
+                    ? t('stats.detailed.trendUp')
+                    : progressVelocity.trend === 'down'
+                      ? t('stats.detailed.trendDown')
+                      : t('stats.detailed.trendStable')}
+                </span>
+                <span
+                  className={`text-2xl font-bold ${
+                    progressVelocity.velocity > 0
+                      ? 'text-green-600 dark:text-green-400'
+                      : progressVelocity.velocity < 0
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-gray-600 dark:text-gray-400'
+                  }`}
+                >
+                  {progressVelocity.velocity > 0 ? '+' : ''}
+                  {progressVelocity.velocity.toFixed(1)}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Most Active Day Type */}
+        <Card
+          variant="default"
+          size="md"
+          hoverable
+          className="chart-container card-entrance slide-in-right gpu-accelerated"
+          header={
+            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+              {t('stats.detailed.mostActiveDayType')}
+            </h2>
+          }
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-2 border-blue-200 dark:border-blue-700">
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                {t('stats.detailed.weekday')}
+              </span>
+              <div className="text-right">
+                <div className="text-lg font-bold text-gray-900 dark:text-white">
+                  {numberFormatter.format(mostActiveDayType.weekday.average)} {t('list.pointsUnit')}
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">
+                  {mostActiveDayType.weekday.count} {t('stats.highlight.sessions')}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-2 border-green-200 dark:border-green-700">
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                {t('stats.detailed.weekend')}
+              </span>
+              <div className="text-right">
+                <div className="text-lg font-bold text-gray-900 dark:text-white">
+                  {numberFormatter.format(mostActiveDayType.weekend.average)} {t('list.pointsUnit')}
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">
+                  {mostActiveDayType.weekend.count} {t('stats.highlight.sessions')}
+                </div>
+              </div>
+            </div>
+            {mostActiveDayType.mostActive !== 'equal' && (
+              <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+                <div className="text-center">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {lang === 'tr' ? 'En Aktif:' : 'Most Active:'}{' '}
+                  </span>
+                  <span className="text-base font-bold text-brand">
+                    {mostActiveDayType.mostActive === 'weekday'
+                      ? t('stats.detailed.weekday')
+                      : t('stats.detailed.weekend')}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* Streak Statistics */}
+        <Card
+          variant="default"
+          size="md"
+          hoverable
+          className="chart-container card-entrance slide-in-left gpu-accelerated"
+          header={
+            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+              {t('stats.detailed.streakStats')}
+            </h2>
+          }
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t('stats.detailed.currentStreak')}
+              </span>
+              <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                {streakStats.currentStreak} {t('stats.highlight.sessions')}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t('stats.detailed.longestStreak')}
+              </span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">
+                {streakStats.longestStreak} {t('stats.highlight.sessions')}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t('stats.detailed.averageStreak')}
+              </span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">
+                {streakStats.averageStreak} {t('stats.highlight.sessions')}
+              </span>
+            </div>
+            <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+              <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                {lang === 'tr'
+                  ? `${streakStats.streakHistory.length} seri kaydedildi`
+                  : `${streakStats.streakHistory.length} streaks recorded`}
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Most Active Hour */}
+        <Card
+          variant="default"
+          size="md"
+          hoverable
+          className="chart-container card-entrance slide-in-right gpu-accelerated"
+          header={
+            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+              {t('stats.detailed.mostActiveHour')}
+            </h2>
+          }
+        >
+          <div className="space-y-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-brand mb-2">
+                {mostActiveHour.hour}:00 - {mostActiveHour.hour + 1}:00
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {mostActiveHour.count} {lang === 'tr' ? 'aktivite' : 'activities'} (
+                {mostActiveHour.percentage}%)
+              </div>
+            </div>
+            <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+              <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                {lang === 'tr'
+                  ? '24 saatlik dağılım grafiği aşağıda gösterilmiştir'
+                  : '24-hour distribution chart shown below'}
+              </div>
+            </div>
+          </div>
+        </Card>
       </div>
 
       {/* Personal Records */}

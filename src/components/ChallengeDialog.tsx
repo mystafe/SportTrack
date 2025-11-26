@@ -163,6 +163,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
           { tr: descriptionTr || '', en: descriptionEn || '' },
           targetValue, // For streak challenges, target is number of days
           start,
+          undefined, // endDate - will be calculated automatically
           icon
         );
         break;

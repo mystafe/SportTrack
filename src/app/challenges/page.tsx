@@ -17,6 +17,9 @@ const ChallengeCard = lazy(() =>
 const ChallengeDialog = lazy(() =>
   import('@/components/ChallengeDialog').then((m) => ({ default: m.ChallengeDialog }))
 );
+const PresetChallenges = lazy(() =>
+  import('@/components/PresetChallenges').then((m) => ({ default: m.PresetChallenges }))
+);
 
 export default function ChallengesPage() {
   const { challenges, hydrated, addChallenge, updateChallenge, deleteChallenge } = useChallenges();
@@ -107,6 +110,11 @@ export default function ChallengesPage() {
           + {t('challenges.addChallenge')}
         </Button>
       </div>
+
+      {/* Preset Challenges */}
+      <Suspense fallback={<div className="h-32 skeleton rounded-lg mb-8" />}>
+        <PresetChallenges />
+      </Suspense>
 
       {challenges.length === 0 ? (
         <EmptyState
