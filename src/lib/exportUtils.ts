@@ -142,7 +142,7 @@ export async function exportToPDF(
     // jsPDF v2+ supports UTF-8, but we need to ensure the text is properly encoded
     // Use splitTextToSize for long text and proper encoding
     const lines = doc.splitTextToSize(text, pageWidth - 2 * margin);
-    doc.text(lines, x, y, { encoding: 'UTF8' });
+    doc.text(lines, x, y);
     return lines.length * (options?.fontSize || 10) * 0.35; // Approximate line height
   };
 
