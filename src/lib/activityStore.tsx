@@ -11,6 +11,7 @@ import { startOfDay, subDays } from 'date-fns';
 import { STORAGE_KEYS, TIMEOUTS } from '@/lib/constants';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { isQuotaError } from '@/lib/errorHandler';
+import { useSettings, type BaseActivityOverride } from '@/lib/settingsStore';
 
 const STORAGE_KEY = STORAGE_KEYS.ACTIVITIES;
 
@@ -463,4 +464,65 @@ export function useActivitiesSummary(targetPoints: number) {
 
 export function getBaseActivityDefinitions(): ActivityDefinition[] {
   return BASE_ACTIVITY_DEFINITIONS;
+}
+
+/**
+ * Hook to get all activity definitions (base + custom + overrides)
+ */
+export function useActivityDefinitions(): ActivityDefinition[] {
+  const { settings } = useSettings();
+
+  return useMemo(() => {
+    const definitions: ActivityDefinition[] = [];
+
+    // Start with base definitions
+    const baseDefinitions = [...BASE_ACTIVITY_DEFINITIONS];
+
+    // Apply base activity overrides
+    const overridesMap = new Map<ActivityKey, BaseActivityOverride>();
+    if (settings?.baseActivityOverrides) {
+      settings.baseActivityOverrides.forEach((override) => {
+        overridesMap.set(override.key, override);
+      });
+    }
+
+    // Apply overrides to base definitions
+    baseDefinitions.forEach((def) => {
+      const override = overridesMap.get(def.key);
+      if (override) {
+        definitions.push({
+          ...def,
+          ...(override.label && { label: override.label }),
+          ...(override.labelEn !== undefined && { labelEn: override.labelEn }),
+          ...(override.icon && { icon: override.icon }),
+          ...(override.multiplier !== undefined && { multiplier: override.multiplier }),
+          ...(override.unit && { unit: override.unit }),
+          ...(override.unitEn !== undefined && { unitEn: override.unitEn }),
+        });
+      } else {
+        definitions.push(def);
+      }
+    });
+
+    // Add custom activities
+    if (settings?.customActivities) {
+      settings.customActivities.forEach((custom) => {
+        definitions.push({
+          key: custom.id,
+          label: custom.label,
+          labelEn: custom.labelEn,
+          icon: custom.icon,
+          multiplier: custom.multiplier,
+          unit: custom.unit,
+          unitEn: custom.unitEn,
+          defaultAmount: custom.defaultAmount,
+          description: custom.description,
+          descriptionEn: custom.descriptionEn,
+          isCustom: true,
+        });
+      });
+    }
+
+    return definitions;
+  }, [settings]);
 }

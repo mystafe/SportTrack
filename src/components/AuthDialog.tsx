@@ -49,12 +49,32 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
     try {
       if (mode === 'login') {
         await login(email, password);
+
+        // Set flag to suppress badge notifications after new login
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('sporttrack.is_new_login', 'true');
+          // Clear flag after 5 seconds (enough time for initial data load)
+          setTimeout(() => {
+            localStorage.removeItem('sporttrack.is_new_login');
+          }, 5000);
+        }
+
         showToast(lang === 'tr' ? 'Giriş başarılı!' : 'Login successful!', 'success');
         onClose();
         // Redirect to home page after login
         router.push('/');
       } else if (mode === 'signup') {
         await register(email, password, displayName || undefined);
+
+        // Set flag to suppress badge notifications after new signup
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('sporttrack.is_new_login', 'true');
+          // Clear flag after 5 seconds (enough time for initial data load)
+          setTimeout(() => {
+            localStorage.removeItem('sporttrack.is_new_login');
+          }, 5000);
+        }
+
         showToast(lang === 'tr' ? 'Kayıt başarılı!' : 'Registration successful!', 'success');
         onClose();
         // Redirect to home page after signup
@@ -145,6 +165,16 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
     setLoading(true);
     try {
       await loginWithGoogle();
+
+      // Set flag to suppress badge notifications after new login
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('sporttrack.is_new_login', 'true');
+        // Clear flag after 5 seconds (enough time for initial data load)
+        setTimeout(() => {
+          localStorage.removeItem('sporttrack.is_new_login');
+        }, 5000);
+      }
+
       showToast(lang === 'tr' ? 'Giriş başarılı!' : 'Login successful!', 'success');
       onClose();
       // Redirect to home page after Google login
@@ -223,6 +253,7 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder={lang === 'tr' ? 'İsim (opsiyonel)' : 'Name (optional)'}
               size={isMobile ? 'sm' : 'md'}
+              fullWidth
             />
           )}
 

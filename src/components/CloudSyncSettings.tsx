@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useCloudSync } from '@/hooks/useCloudSync';
@@ -18,13 +18,12 @@ import { useChallenges } from '@/lib/challengeStore';
 import type { Challenge } from '@/lib/challenges';
 import { resolveConflicts, saveLocalLastModified } from '@/lib/cloudSync/conflictResolver';
 import { STORAGE_KEYS } from '@/lib/constants';
-import { ConflictResolutionDialog } from './ConflictResolutionDialog';
-import { SyncHistoryDialog } from './SyncHistoryDialog';
 import { syncHistoryService } from '@/lib/cloudSync/syncHistory';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
 import { formatDistanceToNow } from 'date-fns';
 import { tr, enUS } from 'date-fns/locale';
 import { Button } from '@/components/ui/Button';
+import { useGlobalDialogState } from '@/lib/globalDialogState';
 
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 
@@ -39,11 +38,13 @@ function formatRelativeTime(date: Date, lang: 'tr' | 'en'): string {
 interface CloudSyncSettingsProps {
   onSyncComplete?: () => void;
   onSyncingChange?: (syncing: boolean) => void;
+  onSettingsClose?: () => void;
 }
 
 export function CloudSyncSettings({
   onSyncComplete,
   onSyncingChange,
+  onSettingsClose,
 }: CloudSyncSettingsProps = {}) {
   const router = useRouter();
   const { user, isAuthenticated, logout, isConfigured } = useAuth();
@@ -60,29 +61,15 @@ export function CloudSyncSettings({
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [showConflictDialog, setShowConflictDialog] = useState(false);
+  const {
+    showConflictDialog,
+    setShowConflictDialog,
+    conflictData,
+    setConflictData,
+    showSyncHistoryDialog,
+    setShowSyncHistoryDialog,
+  } = useGlobalDialogState();
   const [showSyncSuccess, setShowSyncSuccess] = useState(false);
-  const [conflictData, setConflictData] = useState<{
-    local: {
-      activities: unknown[];
-      settings: unknown | null;
-      badges: unknown[];
-      challenges: unknown[];
-    };
-    cloud: {
-      activities: unknown[];
-      settings: unknown | null;
-      badges: unknown[];
-      challenges: unknown[];
-      points?: number;
-      metadata?: {
-        lastModified: Date;
-        version: number;
-        userId: string;
-      };
-    };
-  } | null>(null);
-  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [syncStatistics, setSyncStatistics] = useState(syncHistoryService.getStatistics());
   const [hasConflicts, setHasConflicts] = useState<boolean | null>(null);
 
@@ -188,209 +175,244 @@ export function CloudSyncSettings({
       return;
     }
 
-    // Don't show syncing overlay here, just open conflict dialog
-    try {
-      const cloudData = await syncFromCloud();
-      const localData = { activities, settings, badges, challenges };
+    // Close settings dialog first
+    onSettingsClose?.();
 
-      if (cloudData) {
-        // Convert CloudData to conflict format
-        setConflictData({
-          local: localData,
-          cloud: {
-            activities: (cloudData.exercises || cloudData.activities || []) as unknown[],
-            settings: cloudData.settings,
-            badges: (cloudData.badges || []) as unknown[],
-            challenges: (cloudData.challenges || []) as unknown[],
-            metadata: cloudData.metadata,
-            points: cloudData.points,
-          },
-        });
-        setShowConflictDialog(true);
-      } else {
-        // No cloud data, show local data only
-        setConflictData({
-          local: localData,
-          cloud: {
-            activities: [],
-            settings: null,
-            badges: [],
-            challenges: [],
-            points: 0,
-            metadata: {
-              lastModified: new Date(),
-              version: Date.now(),
-              userId: user?.uid || 'unknown',
-            },
-          },
-        });
-        setShowConflictDialog(true);
-      }
-    } catch (error) {
-      console.error('Failed to fetch cloud data:', error);
-      showToast(lang === 'tr' ? 'Bulut verileri alınamadı' : 'Failed to fetch cloud data', 'error');
-    }
-  };
-
-  const applyCloudData = async (
-    cloudData: import('@/lib/cloudSync/types').CloudData,
-    strategy: ConflictStrategy
-  ) => {
-    const localData = { activities, settings, badges, challenges };
-    const resolution = resolveConflicts(localData, cloudData, strategy);
-
-    // Apply resolved data to localStorage
-    if (typeof window !== 'undefined') {
-      // Write activities
-      if (resolution.resolvedData.activities.length > 0) {
-        localStorage.setItem(
-          STORAGE_KEYS.ACTIVITIES,
-          JSON.stringify(resolution.resolvedData.activities)
-        );
-      } else {
-        localStorage.removeItem(STORAGE_KEYS.ACTIVITIES);
-      }
-
-      // Write badges
-      if (resolution.resolvedData.badges.length > 0) {
-        localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(resolution.resolvedData.badges));
-      } else {
-        localStorage.removeItem(STORAGE_KEYS.BADGES);
-      }
-
-      // Write challenges
-      if (resolution.resolvedData.challenges.length > 0) {
-        localStorage.setItem(
-          STORAGE_KEYS.CHALLENGES,
-          JSON.stringify(resolution.resolvedData.challenges)
-        );
-      } else {
-        localStorage.removeItem(STORAGE_KEYS.CHALLENGES);
-      }
-
-      // Apply settings
-      if (resolution.resolvedData.settings) {
-        saveSettings(resolution.resolvedData.settings);
-      }
-    }
-
-    // Only sync to cloud if strategy is NOT "cloud" (cloud strategy means use cloud data, don't overwrite it)
-    // For "local" strategy: upload local data to cloud
-    // For "merge" or "newest": upload merged/resolved data to cloud
-    // For "cloud" strategy: just apply cloud data locally, don't upload anything
-    if (strategy !== 'cloud') {
-      try {
-        await syncToCloud({
-          activities: resolution.resolvedData.activities,
-          settings: resolution.resolvedData.settings,
-          badges: resolution.resolvedData.badges,
-          challenges: resolution.resolvedData.challenges,
-        });
-        // Wait a bit more to ensure upload is fully processed
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      } catch (error) {
-        console.error('Failed to sync to cloud after conflict resolution:', error);
-        showToast(lang === 'tr' ? "Cloud'a yükleme hatası" : 'Failed to upload to cloud', 'error');
-      }
-    }
-
-    saveLocalLastModified();
-
-    const message =
-      strategy === 'cloud'
-        ? lang === 'tr'
-          ? 'Bulut verileri uygulandı'
-          : 'Cloud data applied'
-        : lang === 'tr'
-          ? 'Veriler uygulandı ve senkronize edildi!'
-          : 'Data applied and synced!';
-    showToast(message, 'success');
-
-    // Hide syncing overlay and notify parent
-    setSyncing(false);
-    if (onSyncingChange) {
-      onSyncingChange(false); // This will trigger success overlay in SettingsDialog
-    }
-
-    // Close settings dialog after sync completes
-    if (onSyncComplete) {
-      setTimeout(() => {
-        onSyncComplete();
-      }, 500);
-    }
-
-    // Navigate to homepage after a delay
-    setTimeout(() => {
-      router.push('/');
-    }, 2500);
-  };
-
-  const handleConflictResolve = async (strategy: ConflictStrategy) => {
-    if (!conflictData) return;
-
-    // Close conflict dialog immediately
-    setShowConflictDialog(false);
-
-    // Show syncing overlay first (before closing settings dialog)
+    // Show syncing overlay
     setSyncing(true);
     if (onSyncingChange) {
       onSyncingChange(true);
     }
 
-    // Don't close settings dialog immediately - let overlay show
-    // It will be closed after sync completes
-
     try {
-      // Clear conflict storage
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem(CONFLICT_STORAGE_KEY);
+      // Sync local data to cloud
+      await syncToCloud({
+        activities,
+        settings,
+        badges,
+        challenges,
+      });
+
+      // Show success message
+      showToast(lang === 'tr' ? 'Veriler buluta yüklendi!' : 'Data uploaded to cloud!', 'success');
+
+      // Show success overlay
+      setSyncing(false);
+      setShowSyncSuccess(true);
+      if (onSyncingChange) {
+        onSyncingChange(false);
       }
 
-      // Add metadata to cloudData if missing (required by CloudData type)
-      const cloudDataWithMetadata: import('@/lib/cloudSync/types').CloudData = {
-        exercises: (conflictData.cloud.activities as ActivityRecord[]) || [],
-        activities: [],
-        statistics: [],
-        badges: (conflictData.cloud.badges as Badge[]) || [],
-        challenges: (conflictData.cloud.challenges as Challenge[]) || [],
-        settings: (conflictData.cloud.settings as UserSettings | null) || null,
-        points: conflictData.cloud.points || 0,
-        lastModified: new Date(),
-        metadata: {
-          lastModified: new Date(),
-          version: Date.now(),
-          userId: user?.uid || '',
-        },
-      };
-      await applyCloudData(cloudDataWithMetadata, strategy);
+      // Hide success overlay after 2 seconds
+      setTimeout(() => {
+        setShowSyncSuccess(false);
+      }, 2000);
     } catch (error) {
-      console.error('Conflict resolution error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      showToast(
-        lang === 'tr'
-          ? `Çakışma çözümü hatası: ${errorMessage}`
-          : `Conflict resolution error: ${errorMessage}`,
-        'error'
-      );
+      console.error('Failed to sync to cloud:', error);
+      showToast(lang === 'tr' ? 'Buluta yükleme hatası' : 'Failed to upload to cloud', 'error');
       setSyncing(false);
       if (onSyncingChange) {
         onSyncingChange(false);
       }
-      setConflictData(null);
-      // Close settings dialog on error too
+    }
+  };
+
+  const applyCloudData = useCallback(
+    async (cloudData: import('@/lib/cloudSync/types').CloudData, strategy: ConflictStrategy) => {
+      const localData = { activities, settings, badges, challenges };
+      const resolution = resolveConflicts(localData, cloudData, strategy);
+
+      // Apply resolved data to localStorage
+      if (typeof window !== 'undefined') {
+        // Write activities
+        if (resolution.resolvedData.activities.length > 0) {
+          localStorage.setItem(
+            STORAGE_KEYS.ACTIVITIES,
+            JSON.stringify(resolution.resolvedData.activities)
+          );
+        } else {
+          localStorage.removeItem(STORAGE_KEYS.ACTIVITIES);
+        }
+
+        // Write badges
+        if (resolution.resolvedData.badges.length > 0) {
+          localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(resolution.resolvedData.badges));
+        } else {
+          localStorage.removeItem(STORAGE_KEYS.BADGES);
+        }
+
+        // Write challenges
+        if (resolution.resolvedData.challenges.length > 0) {
+          localStorage.setItem(
+            STORAGE_KEYS.CHALLENGES,
+            JSON.stringify(resolution.resolvedData.challenges)
+          );
+        } else {
+          localStorage.removeItem(STORAGE_KEYS.CHALLENGES);
+        }
+
+        // Apply settings
+        if (resolution.resolvedData.settings) {
+          saveSettings(resolution.resolvedData.settings);
+        }
+      }
+
+      // Only sync to cloud if strategy is NOT "cloud" (cloud strategy means use cloud data, don't overwrite it)
+      // For "local" strategy: upload local data to cloud
+      // For "merge" or "newest": upload merged/resolved data to cloud
+      // For "cloud" strategy: just apply cloud data locally, don't upload anything
+      if (strategy !== 'cloud') {
+        try {
+          await syncToCloud({
+            activities: resolution.resolvedData.activities,
+            settings: resolution.resolvedData.settings,
+            badges: resolution.resolvedData.badges,
+            challenges: resolution.resolvedData.challenges,
+          });
+          // Wait a bit more to ensure upload is fully processed
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error('Failed to sync to cloud after conflict resolution:', error);
+          showToast(
+            lang === 'tr' ? "Cloud'a yükleme hatası" : 'Failed to upload to cloud',
+            'error'
+          );
+        }
+      }
+
+      saveLocalLastModified();
+
+      const message =
+        strategy === 'cloud'
+          ? lang === 'tr'
+            ? 'Bulut verileri uygulandı'
+            : 'Cloud data applied'
+          : lang === 'tr'
+            ? 'Veriler uygulandı ve senkronize edildi!'
+            : 'Data applied and synced!';
+      showToast(message, 'success');
+
+      // Hide syncing overlay and notify parent
+      setSyncing(false);
+      if (onSyncingChange) {
+        onSyncingChange(false); // This will trigger success overlay in SettingsDialog
+      }
+
+      // Close settings dialog after sync completes
       if (onSyncComplete) {
         setTimeout(() => {
           onSyncComplete();
         }, 500);
       }
-    }
-  };
+
+      // Navigate to homepage after a delay
+      setTimeout(() => {
+        router.push('/');
+      }, 2500);
+    },
+    [
+      activities,
+      settings,
+      badges,
+      challenges,
+      syncToCloud,
+      saveSettings,
+      router,
+      lang,
+      showToast,
+      onSyncingChange,
+      onSyncComplete,
+    ]
+  );
+
+  // Listen for conflict resolve event from GlobalDialogs
+  useEffect(() => {
+    const handleConflictResolveEvent = async (event: CustomEvent<ConflictStrategy>) => {
+      const strategy = event.detail;
+      if (!conflictData) return;
+
+      // Show syncing overlay first
+      setSyncing(true);
+      if (onSyncingChange) {
+        onSyncingChange(true);
+      }
+
+      try {
+        // Clear conflict storage
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(CONFLICT_STORAGE_KEY);
+        }
+
+        // Add metadata to cloudData if missing (required by CloudData type)
+        const cloudDataWithMetadata: import('@/lib/cloudSync/types').CloudData = {
+          exercises: (conflictData.cloud.activities as ActivityRecord[]) || [],
+          activities: [],
+          statistics: [],
+          badges: (conflictData.cloud.badges as Badge[]) || [],
+          challenges: (conflictData.cloud.challenges as Challenge[]) || [],
+          settings: (conflictData.cloud.settings as UserSettings | null) || null,
+          points: conflictData.cloud.points || 0,
+          lastModified: new Date(),
+          metadata: {
+            lastModified: new Date(),
+            version: Date.now(),
+            userId: user?.uid || '',
+          },
+        };
+        await applyCloudData(cloudDataWithMetadata, strategy);
+      } catch (error) {
+        console.error('Conflict resolution error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        showToast(
+          lang === 'tr'
+            ? `Çakışma çözümü hatası: ${errorMessage}`
+            : `Conflict resolution error: ${errorMessage}`,
+          'error'
+        );
+        setSyncing(false);
+        if (onSyncingChange) {
+          onSyncingChange(false);
+        }
+        setConflictData(null);
+        // Close settings dialog on error too
+        if (onSyncComplete) {
+          setTimeout(() => {
+            onSyncComplete();
+          }, 500);
+        }
+      }
+    };
+
+    window.addEventListener(
+      'sporttrack:conflict-resolve-handler',
+      handleConflictResolveEvent as EventListener
+    );
+    return () => {
+      window.removeEventListener(
+        'sporttrack:conflict-resolve-handler',
+        handleConflictResolveEvent as EventListener
+      );
+    };
+  }, [
+    conflictData,
+    user?.uid,
+    applyCloudData,
+    setConflictData,
+    setSyncing,
+    onSyncingChange,
+    onSyncComplete,
+    showToast,
+    lang,
+  ]);
 
   const handleSyncFromCloud = async () => {
     if (!isAuthenticated) {
       setShowAuthDialog(true);
       return;
     }
+
+    // Close settings dialog first
+    onSettingsClose?.();
 
     // Don't show syncing overlay here, just check for conflicts
     try {
@@ -412,7 +434,12 @@ export function CloudSyncSettings({
               metadata: cloudData.metadata,
             },
           });
-          setShowConflictDialog(true);
+          // Use requestAnimationFrame to ensure Settings Dialog closes first
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              setShowConflictDialog(true);
+            }, 100);
+          });
         } else {
           // No conflicts, apply cloud data directly
           // Show syncing overlay only when actually syncing
@@ -626,6 +653,9 @@ export function CloudSyncSettings({
                     return;
                   }
 
+                  // Close settings dialog first
+                  onSettingsClose?.();
+
                   // Don't show syncing overlay here, just open conflict dialog
                   try {
                     const cloudData = await syncFromCloud();
@@ -647,7 +677,12 @@ export function CloudSyncSettings({
                           points: cloudData.points, // Include points for proper display
                         },
                       });
-                      setShowConflictDialog(true);
+                      // Use requestAnimationFrame to ensure Settings Dialog closes first
+                      requestAnimationFrame(() => {
+                        setTimeout(() => {
+                          setShowConflictDialog(true);
+                        }, 100);
+                      });
                     } else {
                       // No cloud data, show local data only
                       setConflictData({
@@ -665,7 +700,12 @@ export function CloudSyncSettings({
                           },
                         },
                       });
-                      setShowConflictDialog(true);
+                      // Use requestAnimationFrame to ensure Settings Dialog closes first
+                      requestAnimationFrame(() => {
+                        setTimeout(() => {
+                          setShowConflictDialog(true);
+                        }, 100);
+                      });
                     }
                   } catch (error) {
                     console.error('Failed to fetch cloud data:', error);
@@ -735,8 +775,14 @@ export function CloudSyncSettings({
                   <button
                     type="button"
                     onClick={() => {
-                      setSyncStatistics(syncHistoryService.getStatistics());
-                      setShowHistoryDialog(true);
+                      // Close Settings Dialog first
+                      onSettingsClose?.();
+                      // Use requestAnimationFrame to ensure Settings Dialog closes first
+                      requestAnimationFrame(() => {
+                        setTimeout(() => {
+                          setShowSyncHistoryDialog(true);
+                        }, 100);
+                      });
                     }}
                     className={`text-base hover:opacity-70 transition-opacity flex items-center justify-center ${isMobile ? 'min-h-[44px] min-w-[44px]' : 'min-h-[24px] min-w-[24px]'}`}
                     title={lang === 'tr' ? 'Senkronizasyon geçmişi' : 'Sync history'}
@@ -860,95 +906,8 @@ export function CloudSyncSettings({
         <AuthDialog open={showAuthDialog} onClose={() => setShowAuthDialog(false)} />
       )}
 
-      {showConflictDialog && conflictData && (
-        <ConflictResolutionDialog
-          open={showConflictDialog}
-          onResolve={handleConflictResolve}
-          onCancel={() => {
-            setShowConflictDialog(false);
-            setConflictData(null);
-            // Clear conflict storage on cancel
-            if (typeof window !== 'undefined') {
-              localStorage.removeItem(CONFLICT_STORAGE_KEY);
-            }
-          }}
-          localData={{
-            activities: (conflictData.local.activities as ActivityRecord[]) || [],
-            badges: (conflictData.local.badges as Badge[]) || [],
-            challenges: conflictData.local.challenges || [],
-            // Always use current settings from store, as conflict data may not include updated settings
-            // This ensures that any settings changes made after conflict detection are reflected
-            settings: settings || (conflictData.local.settings as UserSettings | null) || null,
-          }}
-          cloudData={{
-            exercises: (conflictData.cloud.activities || []) as ActivityRecord[],
-            activities: [],
-            statistics: [],
-            badges: (conflictData.cloud.badges || []) as Badge[],
-            challenges: (conflictData.cloud.challenges || []) as Challenge[],
-            settings: (conflictData.cloud.settings as UserSettings | null) || null,
-            metadata: conflictData.cloud.metadata || {
-              lastModified: new Date(),
-              version: Date.now(),
-              userId: user?.uid || 'unknown',
-            },
-            points: 0,
-            lastModified: conflictData.cloud.metadata?.lastModified || null,
-          }}
-          localLastModified={(() => {
-            if (typeof window === 'undefined') return null;
-            try {
-              const stored = localStorage.getItem('sporttrack_last_sync');
-              if (stored) {
-                const date = new Date(stored);
-                if (!isNaN(date.getTime())) {
-                  return date;
-                }
-              }
-              // If no stored date, check if there are activities and use current time as fallback
-              if (activities.length > 0) {
-                return new Date();
-              }
-            } catch (error) {
-              console.error('Failed to get local last modified:', error);
-            }
-            return null;
-          })()}
-          cloudLastModified={(() => {
-            const cloudData = conflictData.cloud as any;
-            // Check if cloud has any data - if empty, don't show last modified date
-            const hasCloudData =
-              (cloudData.activities && cloudData.activities.length > 0) ||
-              (cloudData.badges && cloudData.badges.length > 0) ||
-              (cloudData.challenges && cloudData.challenges.length > 0);
-
-            if (!hasCloudData) {
-              return null; // No data in cloud, don't show date
-            }
-
-            if (cloudData.metadata?.lastModified) {
-              try {
-                return new Date(cloudData.metadata.lastModified);
-              } catch {
-                return null;
-              }
-            }
-            return null;
-          })()}
-        />
-      )}
-
-      {showHistoryDialog && (
-        <SyncHistoryDialog
-          open={showHistoryDialog}
-          statistics={syncStatistics}
-          onClose={() => {
-            setShowHistoryDialog(false);
-            // Refresh statistics when closing
-            setSyncStatistics(syncHistoryService.getStatistics());
-          }}
-        />
-      )}
+      {/* ConflictResolutionDialog is now rendered in GlobalDialogs */}
+      {/* SyncHistoryDialog is now rendered in GlobalDialogs */}
     </>
   );
 }

@@ -61,24 +61,29 @@ export function useHapticFeedback() {
 
     // Fallback: Vibration API (works on Android and other devices)
     if ('vibrate' in navigator) {
-      switch (type) {
-        case 'light':
-        case 'selection':
-          navigator.vibrate(10); // Very short vibration
-          break;
-        case 'medium':
-        case 'success':
-          navigator.vibrate(20); // Short vibration
-          break;
-        case 'heavy':
-        case 'warning':
-          navigator.vibrate([10, 50, 10]); // Pattern: vibrate, pause, vibrate
-          break;
-        case 'error':
-          navigator.vibrate([20, 50, 20, 50, 20]); // Pattern: error vibration
-          break;
-        default:
-          navigator.vibrate(10);
+      try {
+        switch (type) {
+          case 'light':
+          case 'selection':
+            navigator.vibrate(10); // Very short vibration
+            break;
+          case 'medium':
+          case 'success':
+            navigator.vibrate(20); // Short vibration
+            break;
+          case 'heavy':
+          case 'warning':
+            navigator.vibrate([10, 50, 10]); // Pattern: vibrate, pause, vibrate
+            break;
+          case 'error':
+            navigator.vibrate([20, 50, 20, 50, 20]); // Pattern: error vibration
+            break;
+          default:
+            navigator.vibrate(10);
+        }
+      } catch (error) {
+        // Silently ignore vibration errors (browser may block until user interaction)
+        // This is expected behavior and not an actual error
       }
     }
   };

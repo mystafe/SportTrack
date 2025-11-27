@@ -22,6 +22,13 @@ import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { useRouter } from 'next/navigation';
 import { useUIState } from '@/lib/uiState';
+import { Accordion } from '@/components/ui/Accordion';
+import { lazy, Suspense } from 'react';
+
+// Lazy load heavy components
+const ActivityFiltersLazy = lazy(() =>
+  import('@/components/ActivityFilters').then((m) => ({ default: m.ActivityFilters }))
+);
 
 function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
   const hours = Math.floor(seconds / 3600);
@@ -143,37 +150,53 @@ function ActivitiesClient() {
   };
 
   return (
-    <PullToRefresh onRefresh={handleRefresh} className="space-y-4 sm:space-y-5">
-      {/* Compact Filters */}
-      <ActivityFilters filters={filters} onFiltersChange={setFilters} />
+    <PullToRefresh onRefresh={handleRefresh} className="space-y-3 sm:space-y-4">
+      {/* Filters - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Filtreler ve Arama' : 'Filters & Search'}
+        icon="🔍"
+        defaultOpen={false}
+        variant="compact"
+        className="card-entrance"
+      >
+        <Suspense fallback={<div className="h-24 skeleton rounded-lg" />}>
+          <ActivityFiltersLazy filters={filters} onFiltersChange={setFilters} />
+        </Suspense>
+      </Accordion>
 
-      {/* Compact Filtered Stats Summary */}
+      {/* Filtered Stats Summary - Accordion */}
       {(filters.dateRange !== 'all' ||
         filters.activityType !== 'all' ||
         filters.category !== 'all' ||
         filters.searchQuery) && (
-        <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 px-3 py-2 shadow-md hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-gray-800 dark:text-gray-200">
-              {t('filters.results')}
-            </span>
-            <div className="text-gray-700 dark:text-gray-200 font-semibold">
-              {filteredStats.totalCount} {t('filters.activities')} ·{' '}
-              {numberFormatter.format(filteredStats.totalPoints)} {t('list.pointsUnit')}
+        <Accordion
+          title={lang === 'tr' ? 'Filtre Sonuçları' : 'Filter Results'}
+          icon="📊"
+          defaultOpen={true}
+          variant="compact"
+          className="card-entrance"
+        >
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-brand/5 to-brand/10 dark:from-brand/10 dark:to-brand/20 px-4 py-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                {t('filters.results')}
+              </span>
+              <div className="text-sm text-gray-700 dark:text-gray-200 font-bold">
+                {filteredStats.totalCount} {t('filters.activities')} ·{' '}
+                {numberFormatter.format(filteredStats.totalPoints)} {t('list.pointsUnit')}
+              </div>
             </div>
           </div>
-        </div>
+        </Accordion>
       )}
 
-      <div className="space-y-3 sm:space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-medium px-1">
-          <span>{t('list.records')}</span>
-          {filteredActivities.length !== activities.length && (
-            <span className="text-[10px] sm:text-xs text-gray-700 dark:text-gray-300 font-medium">
-              {filteredActivities.length} / {activities.length}
-            </span>
-          )}
-        </div>
+      {/* Activities List - Accordion */}
+      <Accordion
+        title={`${t('list.records')}${filteredActivities.length !== activities.length ? ` (${filteredActivities.length} / ${activities.length})` : ''}`}
+        icon="📝"
+        defaultOpen={true}
+        className="card-entrance"
+      >
         <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
           {filteredActivities.length === 0 ? (
             <div className="p-12 text-center">
@@ -310,7 +333,7 @@ function ActivitiesClient() {
                     </div>
                   </div>
                   <ul
-                    className={`${(settings?.listDensity ?? 'comfortable') === 'compact' ? (isMobile ? 'space-y-2' : 'space-y-1') : isMobile ? 'space-y-3' : 'space-y-2'} ${isMobile ? 'px-0 pb-3' : 'px-1 pb-2'}`}
+                    className={`${(settings?.listDensity ?? 'compact') === 'compact' ? (isMobile ? 'space-y-2' : 'space-y-1') : isMobile ? 'space-y-3' : 'space-y-2'} ${isMobile ? 'px-0 pb-3' : 'px-1 pb-2'}`}
                   >
                     {acts.map((activity, actIndex) => {
                       const isToday =
@@ -327,7 +350,7 @@ function ActivitiesClient() {
                           onEdit={(id) => setEditingId(id)}
                           onDelete={(id, act) => setDeleteConfirm({ id, activity: act })}
                           animationDelay={`${groupIndex * 0.1 + actIndex * 0.05}s`}
-                          density={settings?.listDensity ?? 'comfortable'}
+                          density={settings?.listDensity ?? 'compact'}
                         />
                       );
                     })}
@@ -337,7 +360,7 @@ function ActivitiesClient() {
             </div>
           )}
         </div>
-      </div>
+      </Accordion>
     </PullToRefresh>
   );
 }

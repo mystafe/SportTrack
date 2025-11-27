@@ -1,16 +1,19 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useChallenges } from '@/lib/challengeStore';
+import { useActivities } from '@/lib/activityStore';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 import { Confetti } from '@/components/Confetti';
+import { calculateChallengeProgress } from '@/lib/challenges';
 import type { Challenge } from '@/lib/challenges';
 
 export function ChallengeCompletionNotification() {
-  const { challenges, checkCompletedChallenges } = useChallenges();
+  const { challenges } = useChallenges();
+  const { activities } = useActivities();
   const { lang } = useI18n();
   const router = useRouter();
   const isMobile = useIsMobile();
@@ -19,26 +22,48 @@ export function ChallengeCompletionNotification() {
   const [currentChallenge, setCurrentChallenge] = useState<Challenge | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const [shownChallengeIds, setShownChallengeIds] = useState<Set<string>>(new Set());
+  const shownChallengeIdsRef = useRef<Set<string>>(new Set());
   const [showConfetti, setShowConfetti] = useState(false);
 
+  // Memoize completed challenges check to avoid infinite loops
+  const completedChallengesList = useMemo(() => {
+    return challenges.filter((c) => {
+      const progress = calculateChallengeProgress(c, activities);
+      return progress.isCompleted && c.status === 'active';
+    });
+  }, [challenges, activities]);
+
+  // Track previous completed challenges to detect new ones
+  const prevCompletedIdsRef = useRef<Set<string>>(new Set());
+
   useEffect(() => {
-    const newCompleted = checkCompletedChallenges();
+    // Get IDs of currently completed challenges
+    const currentCompletedIds = new Set(completedChallengesList.map((c) => c.id));
+
+    // Find newly completed challenges (in current but not in previous)
+    const newCompleted = completedChallengesList.filter(
+      (challenge) =>
+        !prevCompletedIdsRef.current.has(challenge.id) &&
+        !shownChallengeIdsRef.current.has(challenge.id)
+    );
+
+    // Update the ref with current completed IDs
+    prevCompletedIdsRef.current = currentCompletedIds;
+
+    // Add new completed challenges to the queue
     if (newCompleted.length > 0) {
-      // Only add challenges that haven't been shown yet
-      const unseenChallenges = newCompleted.filter(
-        (challenge) => !shownChallengeIds.has(challenge.id)
-      );
-      if (unseenChallenges.length > 0) {
-        setCompletedChallenges((prev) => [...prev, ...unseenChallenges]);
-        setShownChallengeIds((prev) => {
-          const newSet = new Set(prev);
-          unseenChallenges.forEach((challenge) => newSet.add(challenge.id));
-          return newSet;
-        });
-      }
+      setCompletedChallenges((prev) => {
+        // Prevent duplicate additions
+        const existingIds = new Set(prev.map((c) => c.id));
+        const trulyNew = newCompleted.filter((c) => !existingIds.has(c.id));
+        if (trulyNew.length === 0) return prev;
+        return [...prev, ...trulyNew];
+      });
+      newCompleted.forEach((challenge) => {
+        shownChallengeIdsRef.current.add(challenge.id);
+      });
     }
-  }, [challenges, checkCompletedChallenges, shownChallengeIds]);
+  }, [completedChallengesList]);
 
   const handleDismiss = useCallback(() => {
     setIsExiting(true);

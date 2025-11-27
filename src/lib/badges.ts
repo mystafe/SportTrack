@@ -1,18 +1,33 @@
 import { ActivityRecord } from '@/lib/activityStore';
 import { UserSettings } from '@/lib/settingsStore';
-import { startOfDay, parseISO, isSameDay, subDays } from 'date-fns';
+import { startOfDay, parseISO, isSameDay, subDays, startOfWeek, startOfMonth } from 'date-fns';
+import { BASE_ACTIVITY_DEFINITIONS } from '@/lib/activityConfig';
+
+// Helper function to get season
+function getSeason(date: Date): 'spring' | 'summer' | 'autumn' | 'winter' {
+  const month = date.getMonth(); // 0-11
+  if (month >= 2 && month <= 4) return 'spring'; // March, April, May
+  if (month >= 5 && month <= 7) return 'summer'; // June, July, August
+  if (month >= 8 && month <= 10) return 'autumn'; // September, October, November
+  return 'winter'; // December, January, February
+}
 
 export type BadgeId =
   | 'first_activity'
+  | 'streak_3'
   | 'streak_7'
   | 'streak_14'
+  | 'streak_21'
   | 'streak_30'
   | 'streak_60'
   | 'streak_100'
   | 'streak_200'
   | 'streak_365'
+  | 'streak_500'
   | 'points_1k'
+  | 'points_2_5k'
   | 'points_5k'
+  | 'points_7_5k'
   | 'points_10k'
   | 'points_25k'
   | 'points_50k'
@@ -20,6 +35,8 @@ export type BadgeId =
   | 'points_250k'
   | 'points_500k'
   | 'points_1m'
+  | 'points_2m'
+  | 'points_5m'
   | 'activities_10'
   | 'activities_50'
   | 'activities_100'
@@ -30,8 +47,11 @@ export type BadgeId =
   | 'activities_5000'
   | 'all_activities'
   | 'weekend_warrior'
+  | 'weekday_warrior'
   | 'early_bird'
+  | 'noon_warrior'
   | 'night_owl'
+  | 'midnight_runner'
   | 'perfect_week'
   | 'perfect_month'
   | 'speed_demon'
@@ -48,7 +68,22 @@ export type BadgeId =
   | 'power_hour'
   | 'steady_eddie'
   | 'explorer'
-  | 'dedication';
+  | 'dedication'
+  | 'running_master'
+  | 'swimming_master'
+  | 'strength_master'
+  | 'cardio_master'
+  | 'spring_warrior'
+  | 'summer_champion'
+  | 'autumn_hero'
+  | 'winter_legend'
+  | 'habit_former'
+  | 'progress_maker'
+  | 'consistency_master'
+  | 'milestone_reacher'
+  | 'weekly_champion'
+  | 'monthly_champion'
+  | 'daily_average_king';
 
 export interface Badge {
   id: BadgeId;
@@ -58,6 +93,7 @@ export interface Badge {
   category: 'streak' | 'points' | 'activities' | 'special';
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   unlockedAt?: Date;
+  shown?: boolean; // Whether the badge notification has been shown to the user
 }
 
 export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
@@ -498,6 +534,269 @@ export const BADGE_DEFINITIONS: Record<BadgeId, Omit<Badge, 'unlockedAt'>> = {
       en: 'Do activities for 100 days in a row',
     },
     icon: '💪',
+    category: 'special',
+    rarity: 'epic',
+  },
+  streak_3: {
+    id: 'streak_3',
+    name: { tr: '3 Günlük Seri', en: '3 Day Streak' },
+    description: {
+      tr: '3 gün üst üste hedefini tamamla',
+      en: 'Complete your goal 3 days in a row',
+    },
+    icon: '🔥',
+    category: 'streak',
+    rarity: 'common',
+  },
+  streak_21: {
+    id: 'streak_21',
+    name: { tr: '21 Günlük Alışkanlık', en: '21 Day Habit' },
+    description: {
+      tr: '21 gün üst üste hedefini tamamla - alışkanlık oluştur',
+      en: 'Complete your goal 21 days in a row - form a habit',
+    },
+    icon: '✨',
+    category: 'streak',
+    rarity: 'rare',
+  },
+  streak_500: {
+    id: 'streak_500',
+    name: { tr: '500 Günlük Seri', en: '500 Day Streak' },
+    description: {
+      tr: '500 gün üst üste hedefini tamamla',
+      en: 'Complete your goal 500 days in a row',
+    },
+    icon: '👑',
+    category: 'streak',
+    rarity: 'legendary',
+  },
+  points_2_5k: {
+    id: 'points_2_5k',
+    name: { tr: '2.5K Puan', en: '2.5K Points' },
+    description: { tr: 'Toplamda 2.500 puan kazan', en: 'Earn 2,500 total points' },
+    icon: '⭐',
+    category: 'points',
+    rarity: 'common',
+  },
+  points_7_5k: {
+    id: 'points_7_5k',
+    name: { tr: '7.5K Puan', en: '7.5K Points' },
+    description: { tr: 'Toplamda 7.500 puan kazan', en: 'Earn 7,500 total points' },
+    icon: '⭐',
+    category: 'points',
+    rarity: 'common',
+  },
+  points_2m: {
+    id: 'points_2m',
+    name: { tr: '2M Puan', en: '2M Points' },
+    description: { tr: 'Toplamda 2.000.000 puan kazan', en: 'Earn 2,000,000 total points' },
+    icon: '💎',
+    category: 'points',
+    rarity: 'legendary',
+  },
+  points_5m: {
+    id: 'points_5m',
+    name: { tr: '5M Puan', en: '5M Points' },
+    description: { tr: 'Toplamda 5.000.000 puan kazan', en: 'Earn 5,000,000 total points' },
+    icon: '💎',
+    category: 'points',
+    rarity: 'legendary',
+  },
+  weekday_warrior: {
+    id: 'weekday_warrior',
+    name: { tr: 'Hafta İçi Savaşçısı', en: 'Weekday Warrior' },
+    description: {
+      tr: '5 hafta üst üste hafta içi aktivite yap',
+      en: 'Do activities on weekdays for 5 weeks in a row',
+    },
+    icon: '💼',
+    category: 'special',
+    rarity: 'rare',
+  },
+  noon_warrior: {
+    id: 'noon_warrior',
+    name: { tr: 'Öğle Savaşçısı', en: 'Noon Warrior' },
+    description: {
+      tr: 'Öğle vakti (12-14) aktivite yap',
+      en: 'Do activities during noon (12-2 PM)',
+    },
+    icon: '☀️',
+    category: 'special',
+    rarity: 'common',
+  },
+  midnight_runner: {
+    id: 'midnight_runner',
+    name: { tr: 'Gece Yarısı Koşucusu', en: 'Midnight Runner' },
+    description: {
+      tr: 'Gece yarısı (00-02) aktivite yap',
+      en: 'Do activities during midnight (12-2 AM)',
+    },
+    icon: '🌙',
+    category: 'special',
+    rarity: 'rare',
+  },
+  running_master: {
+    id: 'running_master',
+    name: { tr: 'Koşu Ustası', en: 'Running Master' },
+    description: {
+      tr: '100 kez koşu aktivitesi yap',
+      en: 'Do running activities 100 times',
+    },
+    icon: '🏃',
+    category: 'special',
+    rarity: 'epic',
+  },
+  swimming_master: {
+    id: 'swimming_master',
+    name: { tr: 'Yüzme Ustası', en: 'Swimming Master' },
+    description: {
+      tr: '50 kez yüzme aktivitesi yap',
+      en: 'Do swimming activities 50 times',
+    },
+    icon: '🏊',
+    category: 'special',
+    rarity: 'epic',
+  },
+  strength_master: {
+    id: 'strength_master',
+    name: { tr: 'Güç Ustası', en: 'Strength Master' },
+    description: {
+      tr: '200 kez güç aktivitesi yap',
+      en: 'Do strength activities 200 times',
+    },
+    icon: '💪',
+    category: 'special',
+    rarity: 'epic',
+  },
+  cardio_master: {
+    id: 'cardio_master',
+    name: { tr: 'Kardiyo Ustası', en: 'Cardio Master' },
+    description: {
+      tr: '150 kez kardiyo aktivitesi yap',
+      en: 'Do cardio activities 150 times',
+    },
+    icon: '❤️',
+    category: 'special',
+    rarity: 'epic',
+  },
+  spring_warrior: {
+    id: 'spring_warrior',
+    name: { tr: 'İlkbahar Savaşçısı', en: 'Spring Warrior' },
+    description: {
+      tr: 'İlkbahar mevsiminde 30 gün aktivite yap',
+      en: 'Do activities for 30 days during spring',
+    },
+    icon: '🌸',
+    category: 'special',
+    rarity: 'rare',
+  },
+  summer_champion: {
+    id: 'summer_champion',
+    name: { tr: 'Yaz Şampiyonu', en: 'Summer Champion' },
+    description: {
+      tr: 'Yaz mevsiminde 30 gün aktivite yap',
+      en: 'Do activities for 30 days during summer',
+    },
+    icon: '☀️',
+    category: 'special',
+    rarity: 'rare',
+  },
+  autumn_hero: {
+    id: 'autumn_hero',
+    name: { tr: 'Sonbahar Kahramanı', en: 'Autumn Hero' },
+    description: {
+      tr: 'Sonbahar mevsiminde 30 gün aktivite yap',
+      en: 'Do activities for 30 days during autumn',
+    },
+    icon: '🍂',
+    category: 'special',
+    rarity: 'rare',
+  },
+  winter_legend: {
+    id: 'winter_legend',
+    name: { tr: 'Kış Efsanesi', en: 'Winter Legend' },
+    description: {
+      tr: 'Kış mevsiminde 30 gün aktivite yap',
+      en: 'Do activities for 30 days during winter',
+    },
+    icon: '❄️',
+    category: 'special',
+    rarity: 'rare',
+  },
+  habit_former: {
+    id: 'habit_former',
+    name: { tr: 'Alışkanlık Oluşturucu', en: 'Habit Former' },
+    description: {
+      tr: '21 gün üst üste aktivite yaparak alışkanlık oluştur',
+      en: 'Form a habit by doing activities for 21 days in a row',
+    },
+    icon: '🔄',
+    category: 'special',
+    rarity: 'rare',
+  },
+  progress_maker: {
+    id: 'progress_maker',
+    name: { tr: 'İlerleme Yapan', en: 'Progress Maker' },
+    description: {
+      tr: 'Son 7 günde önceki 7 güne göre %50 daha fazla puan kazan',
+      en: 'Earn 50% more points in the last 7 days compared to the previous 7 days',
+    },
+    icon: '📈',
+    category: 'special',
+    rarity: 'rare',
+  },
+  consistency_master: {
+    id: 'consistency_master',
+    name: { tr: 'Tutarlılık Ustası', en: 'Consistency Master' },
+    description: {
+      tr: '60 gün üst üste hedefini tamamla',
+      en: 'Complete your goal for 60 days in a row',
+    },
+    icon: '🎯',
+    category: 'special',
+    rarity: 'epic',
+  },
+  milestone_reacher: {
+    id: 'milestone_reacher',
+    name: { tr: 'Kilometre Taşına Ulaşan', en: 'Milestone Reacher' },
+    description: {
+      tr: 'Önemli bir kilometre taşına ulaş',
+      en: 'Reach an important milestone',
+    },
+    icon: '🏁',
+    category: 'special',
+    rarity: 'epic',
+  },
+  weekly_champion: {
+    id: 'weekly_champion',
+    name: { tr: 'Haftalık Şampiyon', en: 'Weekly Champion' },
+    description: {
+      tr: 'Tek haftada 50.000+ puan kazan',
+      en: 'Earn 50,000+ points in a single week',
+    },
+    icon: '📅',
+    category: 'special',
+    rarity: 'epic',
+  },
+  monthly_champion: {
+    id: 'monthly_champion',
+    name: { tr: 'Aylık Şampiyon', en: 'Monthly Champion' },
+    description: {
+      tr: 'Tek ayda 200.000+ puan kazan',
+      en: 'Earn 200,000+ points in a single month',
+    },
+    icon: '📆',
+    category: 'special',
+    rarity: 'legendary',
+  },
+  daily_average_king: {
+    id: 'daily_average_king',
+    name: { tr: 'Günlük Ortalama Kralı', en: 'Daily Average King' },
+    description: {
+      tr: 'Son 30 günde günlük ortalama 5.000+ puan kazan',
+      en: 'Earn an average of 5,000+ points per day over the last 30 days',
+    },
+    icon: '👑',
     category: 'special',
     rarity: 'epic',
   },
@@ -973,6 +1272,232 @@ export function checkBadges(
             }
           }
         }
+        break;
+
+      case 'streak_3':
+        unlocked = currentStreak >= 3;
+        break;
+
+      case 'streak_21':
+        unlocked = currentStreak >= 21;
+        break;
+
+      case 'streak_500':
+        unlocked = currentStreak >= 500;
+        break;
+
+      case 'points_2_5k':
+        unlocked = totalPoints >= 2500;
+        break;
+
+      case 'points_7_5k':
+        unlocked = totalPoints >= 7500;
+        break;
+
+      case 'points_2m':
+        unlocked = totalPoints >= 2000000;
+        break;
+
+      case 'points_5m':
+        unlocked = totalPoints >= 5000000;
+        break;
+
+      case 'weekday_warrior':
+        // Check if 5 weeks in a row with weekday activities
+        const weekdayWeeks = new Set<string>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          const dayOfWeek = date.getDay();
+          if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+            const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+            const weekKey = weekStart.toISOString();
+            weekdayWeeks.add(weekKey);
+          }
+        });
+        const weekdayWeeksList = Array.from(weekdayWeeks)
+          .map((k) => new Date(k))
+          .sort((a, b) => b.getTime() - a.getTime());
+        if (weekdayWeeksList.length >= 5) {
+          let consecutiveWeeks = 1;
+          for (let i = 0; i < weekdayWeeksList.length - 1; i++) {
+            const diff = Math.abs(
+              (weekdayWeeksList[i].getTime() - weekdayWeeksList[i + 1].getTime()) /
+                (1000 * 60 * 60 * 24 * 7)
+            );
+            if (diff === 1) {
+              consecutiveWeeks++;
+              if (consecutiveWeeks >= 5) {
+                unlocked = true;
+                break;
+              }
+            } else {
+              consecutiveWeeks = 1;
+            }
+          }
+        }
+        break;
+
+      case 'noon_warrior':
+        unlocked = activities.some((a) => {
+          const date = parseISO(a.performedAt);
+          const hour = date.getHours();
+          return hour >= 12 && hour < 14;
+        });
+        break;
+
+      case 'midnight_runner':
+        unlocked = activities.some((a) => {
+          const date = parseISO(a.performedAt);
+          const hour = date.getHours();
+          return hour >= 0 && hour < 2;
+        });
+        break;
+
+      case 'running_master':
+        const runningCount = activities.filter((a) => a.activityKey === 'RUNNING').length;
+        unlocked = runningCount >= 100;
+        break;
+
+      case 'swimming_master':
+        const swimmingCount = activities.filter((a) => a.activityKey === 'SWIMMING').length;
+        unlocked = swimmingCount >= 50;
+        break;
+
+      case 'strength_master':
+        const strengthActivities = ['PUSH_UP', 'SIT_UP', 'WEIGHT_LIFTING', 'CRUNCH'];
+        const strengthCount = activities.filter((a) =>
+          strengthActivities.includes(a.activityKey)
+        ).length;
+        unlocked = strengthCount >= 200;
+        break;
+
+      case 'cardio_master':
+        const cardioActivities = ['WALKING', 'RUNNING', 'SWIMMING', 'STAIRS'];
+        const cardioCount = activities.filter((a) =>
+          cardioActivities.includes(a.activityKey)
+        ).length;
+        unlocked = cardioCount >= 150;
+        break;
+
+      case 'spring_warrior':
+        const springDays = new Set<string>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          if (getSeason(date) === 'spring') {
+            const dayKey = startOfDay(date).toISOString();
+            springDays.add(dayKey);
+          }
+        });
+        unlocked = springDays.size >= 30;
+        break;
+
+      case 'summer_champion':
+        const summerDays = new Set<string>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          if (getSeason(date) === 'summer') {
+            const dayKey = startOfDay(date).toISOString();
+            summerDays.add(dayKey);
+          }
+        });
+        unlocked = summerDays.size >= 30;
+        break;
+
+      case 'autumn_hero':
+        const autumnDays = new Set<string>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          if (getSeason(date) === 'autumn') {
+            const dayKey = startOfDay(date).toISOString();
+            autumnDays.add(dayKey);
+          }
+        });
+        unlocked = autumnDays.size >= 30;
+        break;
+
+      case 'winter_legend':
+        const winterDays = new Set<string>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          if (getSeason(date) === 'winter') {
+            const dayKey = startOfDay(date).toISOString();
+            winterDays.add(dayKey);
+          }
+        });
+        unlocked = winterDays.size >= 30;
+        break;
+
+      case 'habit_former':
+        unlocked = currentStreak >= 21;
+        break;
+
+      case 'progress_maker':
+        // Compare last 7 days to previous 7 days
+        const last7DaysPoints = Array.from({ length: 7 }, (_, i) => {
+          const day = startOfDay(subDays(today, i));
+          const dayKey = day.toISOString();
+          return daysWithActivities.get(dayKey) || 0;
+        }).reduce((sum, p) => sum + p, 0);
+        const prev7DaysPoints = Array.from({ length: 7 }, (_, i) => {
+          const day = startOfDay(subDays(today, i + 7));
+          const dayKey = day.toISOString();
+          return daysWithActivities.get(dayKey) || 0;
+        }).reduce((sum, p) => sum + p, 0);
+        if (prev7DaysPoints > 0) {
+          const increase = (last7DaysPoints - prev7DaysPoints) / prev7DaysPoints;
+          unlocked = increase >= 0.5; // 50% increase
+        }
+        break;
+
+      case 'consistency_master':
+        unlocked = currentStreak >= 60;
+        break;
+
+      case 'milestone_reacher':
+        // Check if user reached any major milestone (100K, 250K, 500K, 1M points)
+        unlocked =
+          totalPoints >= 100000 ||
+          totalPoints >= 250000 ||
+          totalPoints >= 500000 ||
+          totalPoints >= 1000000 ||
+          currentStreak >= 100 ||
+          currentStreak >= 200 ||
+          currentStreak >= 365;
+        break;
+
+      case 'weekly_champion':
+        // Check if any week has 50K+ points
+        const weekPointsMap = new Map<string, number>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+          const weekKey = weekStart.toISOString();
+          weekPointsMap.set(weekKey, (weekPointsMap.get(weekKey) || 0) + a.points);
+        });
+        unlocked = Array.from(weekPointsMap.values()).some((points) => points >= 50000);
+        break;
+
+      case 'monthly_champion':
+        // Check if any month has 200K+ points
+        const monthPointsMap = new Map<string, number>();
+        activities.forEach((a) => {
+          const date = parseISO(a.performedAt);
+          const monthStart = startOfMonth(date);
+          const monthKey = monthStart.toISOString();
+          monthPointsMap.set(monthKey, (monthPointsMap.get(monthKey) || 0) + a.points);
+        });
+        unlocked = Array.from(monthPointsMap.values()).some((points) => points >= 200000);
+        break;
+
+      case 'daily_average_king':
+        // Check if last 30 days average is 5K+ points
+        const last30DaysPoints = Array.from({ length: 30 }, (_, i) => {
+          const day = startOfDay(subDays(today, i));
+          const dayKey = day.toISOString();
+          return daysWithActivities.get(dayKey) || 0;
+        });
+        const avgPoints = last30DaysPoints.reduce((sum, p) => sum + p, 0) / 30;
+        unlocked = avgPoints >= 5000;
         break;
     }
 

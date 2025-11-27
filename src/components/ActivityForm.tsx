@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { ActivityDefinition, ActivityKey } from '@/lib/activityConfig';
 import { useI18n } from '@/lib/i18n';
@@ -13,6 +13,7 @@ import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/Button';
+import { Accordion } from '@/components/ui/Accordion';
 import { useBadges } from '@/lib/badgeStore';
 import { useLevel } from '@/lib/levelStore';
 import { useChallenges } from '@/lib/challengeStore';
@@ -48,6 +49,7 @@ type ActivityFormProps = {
   onSaved?: () => void;
   onCancel?: () => void;
   initial?: ActivityFormInitial | null;
+  preselectedActivityKey?: ActivityKey;
 };
 
 function asDefinitionFromRecord(record: ActivityFormInitial): ActivityDefinition {
@@ -64,7 +66,13 @@ function asDefinitionFromRecord(record: ActivityFormInitial): ActivityDefinition
   };
 }
 
-export function ActivityForm({ onCreated, onSaved, onCancel, initial }: ActivityFormProps) {
+export const ActivityForm = memo(function ActivityForm({
+  onCreated,
+  onSaved,
+  onCancel,
+  initial,
+  preselectedActivityKey,
+}: ActivityFormProps) {
   const router = useRouter();
   const isMobile = useIsMobile();
   const { triggerHaptic } = useHapticFeedback();
@@ -108,7 +116,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   );
 
   const [activityKey, setActivityKey] = useState<ActivityKey>(
-    initial?.activityKey ?? definitions[0]?.key ?? 'WALKING'
+    initial?.activityKey ?? preselectedActivityKey ?? definitions[0]?.key ?? 'WALKING'
   );
   const [performedAt, setPerformedAt] = useState<string>(
     initial?.performedAt ? toLocalInputValue(new Date(initial.performedAt)) : ''
@@ -142,6 +150,12 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       setAmount(String(initial.amount));
       setNote(initial.note ?? '');
       setPerformedAt(toLocalInputValue(new Date(initial.performedAt)));
+    } else if (preselectedActivityKey && definitionMap[preselectedActivityKey]) {
+      const preselected = definitionMap[preselectedActivityKey];
+      setActivityKey(preselectedActivityKey);
+      setAmount(String(preselected.defaultAmount ?? 10));
+      setNote('');
+      setPerformedAt(toLocalInputValue(new Date()));
     } else {
       const first = definitions[0];
       setActivityKey(first?.key ?? 'WALKING');
@@ -149,7 +163,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       setNote('');
       setPerformedAt('');
     }
-  }, [initial, definitions]);
+  }, [initial, preselectedActivityKey, definitions, definitionMap]);
 
   useEffect(() => {
     if (!initial && !performedAt) {
@@ -263,18 +277,20 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
   return (
     <form
       onSubmit={submit}
-      className={isMobile ? 'space-y-4' : 'space-y-5'}
+      className={isMobile ? 'space-y-2' : 'space-y-3'}
       autoComplete="off"
       data-form-type="other"
       noValidate
     >
-      <div className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
-        <div
-          className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
-        >
-          {t('form.selectActivity')}
-        </div>
-        <div className={`grid grid-cols-3 sm:grid-cols-3 ${isMobile ? 'gap-2' : 'gap-2'}`}>
+      {/* Activity Selection - Accordion */}
+      <Accordion
+        title={t('form.selectActivity')}
+        icon="🏃"
+        defaultOpen={true}
+        variant="compact"
+        className="card-entrance"
+      >
+        <div className={`grid grid-cols-3 sm:grid-cols-3 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
           {definitions.map((def) => {
             const active = def.key === activityKey;
             return (
@@ -282,7 +298,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                 type="button"
                 key={def.key}
                 variant={active ? 'primary' : 'outline'}
-                size={isMobile ? 'md' : 'sm'}
+                size={isMobile ? 'sm' : 'sm'}
                 onClick={() => {
                   setActivityKey(def.key);
                   setAmount((current) => {
@@ -292,7 +308,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
                     return String(def.defaultAmount);
                   });
                 }}
-                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} ${isMobile ? 'px-2 py-1.5 min-h-[44px]' : 'px-2 py-1.5'} shadow-md hover:shadow-xl transition-all duration-300 ${
+                className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} ${isMobile ? 'px-1.5 py-1 min-h-[40px]' : 'px-2 py-1.5'} shadow-md hover:shadow-xl transition-all duration-300 ${
                   active
                     ? 'active ring-2 ring-brand/30 dark:ring-brand/20 scale-105'
                     : 'scale-on-interact'
@@ -311,23 +327,23 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
               >
                 <div className="flex items-center justify-between">
                   <div
-                    className={`${isMobile ? 'text-base' : 'text-lg'} transition-transform duration-300 ${active ? 'activity-icon-pulse' : ''}`}
+                    className={`${isMobile ? 'text-sm' : 'text-base'} transition-transform duration-300 ${active ? 'activity-icon-pulse' : ''}`}
                   >
                     {def.icon}
                   </div>
                   <div
-                    className={`${isMobile ? 'text-[7px] px-1 py-0.5' : 'text-[8px] px-1 py-0.5'} rounded-full bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 font-bold border border-gray-200 dark:border-gray-700`}
+                    className={`${isMobile ? 'text-[10px] px-1 py-0.5' : 'text-xs px-1 py-0.5'} rounded-full bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 font-bold border border-gray-200 dark:border-gray-700`}
                   >
                     {def.multiplier}x
                   </div>
                 </div>
                 <div
-                  className={`${isMobile ? 'mt-1' : 'mt-1'} ${isMobile ? 'text-xs' : 'text-[10px]'} font-bold transition-colors text-gray-950 dark:text-gray-100 leading-tight`}
+                  className={`${isMobile ? 'mt-0.5' : 'mt-1'} ${isMobile ? 'text-xs' : 'text-xs'} font-bold transition-colors text-gray-950 dark:text-gray-100 leading-tight`}
                 >
                   {getActivityLabel(def, lang)}
                 </div>
                 <div
-                  className={`${isMobile ? 'text-[10px]' : 'text-[9px]'} font-medium text-gray-600 dark:text-gray-400 leading-tight`}
+                  className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-gray-600 dark:text-gray-400 leading-tight`}
                 >
                   {def.defaultAmount} {getActivityUnit(def, lang)}
                 </div>
@@ -335,51 +351,63 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
             );
           })}
         </div>
-      </div>
-      <div
-        className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} ${isMobile ? 'gap-3' : 'gap-3'}`}
+      </Accordion>
+
+      {/* Activity Details - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Aktivite Detayları' : 'Activity Details'}
+        icon="📝"
+        defaultOpen={true}
+        variant="compact"
+        className="card-entrance"
       >
-        <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
-          <div
-            className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
-          >
-            {t('form.amount')} ({getActivityUnit(definition, lang)})
-          </div>
-          <Input
-            type="number"
-            min={1}
-            step={1}
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            size={isMobile ? 'md' : 'md'}
-            variant="default"
-            fullWidth
-            required
-            autoComplete="off"
-            data-form-type="other"
-            data-lpignore="true"
-            data-1p-ignore="true"
-            aria-autocomplete="none"
-            role="spinbutton"
-            aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
-            aria-describedby={
-              getActivityDescription(definition, lang) ? 'amount-description' : undefined
-            }
-            name=""
-            inputMode="decimal"
-            helperText={getActivityDescription(definition, lang) || undefined}
-          />
+        <div className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
+          {/* Amount Input */}
+          <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
+            <div
+              className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
+            >
+              {t('form.amount')} ({getActivityUnit(definition, lang)})
+            </div>
+            <Input
+              type="number"
+              min={1}
+              step={1}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              size={isMobile ? 'md' : 'md'}
+              variant="default"
+              fullWidth
+              required
+              autoComplete="off"
+              data-form-type="other"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              aria-autocomplete="none"
+              role="spinbutton"
+              aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
+              aria-describedby={
+                getActivityDescription(definition, lang) ? 'amount-description' : undefined
+              }
+              name=""
+              inputMode="decimal"
+            />
+          </label>
+
+          {/* Description - Full Width */}
           {getActivityDescription(definition, lang) ? (
             <div
               id="amount-description"
-              className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400 mt-0.5`}
+              className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400 w-full`}
               role="note"
             >
               {getActivityDescription(definition, lang)}
             </div>
           ) : null}
+
+          {/* Points Calculation - Full Width */}
           <div
-            className={`${isMobile ? 'text-xs' : 'text-[10px]'} text-gray-500 dark:text-gray-400 ${isMobile ? 'mt-1' : 'mt-1'} flex items-center gap-2`}
+            className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400 w-full flex items-center gap-2`}
           >
             <span>{definition.multiplier}x</span>
             <span>·</span>
@@ -387,40 +415,61 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
               {t('form.points')}: {pointsDisplay}
             </span>
           </div>
-        </label>
-        <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} min-w-0 max-w-full`}>
-          <div
-            className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
-          >
-            {t('form.datetime')}
-          </div>
-          <input
-            type="datetime-local"
-            value={performedAt}
-            onChange={(e) => setPerformedAt(e.target.value)}
-            className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-3 py-2 min-h-[44px] text-base' : 'rounded-lg px-3 py-3 min-h-[44px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 min-w-0 max-w-full transition-all duration-200`}
-            required
-            autoComplete="off"
-            data-form-type="other"
-            data-lpignore="true"
-            data-1p-ignore="true"
-            aria-autocomplete="none"
-            aria-label={t('form.datetime')}
-            aria-required="true"
-            name=""
-            inputMode="none"
-          />
-        </label>
-      </div>
-      <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
-        <div
-          className={`${isMobile ? 'text-xs' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}
-        >
-          {t('form.noteOptional')}
+
+          {/* DateTime Input */}
+          <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
+            <div
+              className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
+            >
+              {t('form.datetime')}
+            </div>
+            <input
+              type="datetime-local"
+              value={performedAt}
+              onChange={(e) => setPerformedAt(e.target.value)}
+              className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2.5 py-1.5 min-h-[40px] text-sm' : 'rounded-lg px-3 py-2 min-h-[40px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-200`}
+              required
+              autoComplete="off"
+              data-form-type="other"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              aria-autocomplete="none"
+              aria-label={t('form.datetime')}
+              aria-required="true"
+              name=""
+              inputMode="none"
+            />
+          </label>
         </div>
+      </Accordion>
+
+      {/* Optional Note - Accordion */}
+      <Accordion
+        title={t('form.noteOptional')}
+        icon="📄"
+        defaultOpen={false}
+        variant="compact"
+        className="card-entrance"
+      >
         <Textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
+          onClick={(e) => {
+            // Prevent form submission when clicking on textarea
+            e.stopPropagation();
+          }}
+          onKeyDown={(e) => {
+            // Prevent form submission when Enter is pressed in textarea
+            // Allow Shift+Enter for new line
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
+          onFocus={(e) => {
+            // Prevent form submission when focusing on textarea
+            e.stopPropagation();
+          }}
           size={isMobile ? 'md' : 'md'}
           fullWidth
           rows={isMobile ? 2 : 2}
@@ -432,19 +481,22 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           data-1p-ignore="true"
           aria-autocomplete="none"
           role="textbox"
-          name=""
+          name="note"
         />
-      </label>
+      </Accordion>
+
+      {/* Submit Button */}
       <div
-        className={`flex items-center ${isMobile ? 'gap-1.5' : 'gap-2'} ${isMobile && !isEditing ? 'flex-col' : ''}`}
+        className={`flex items-center ${isMobile ? 'gap-1.5' : 'gap-2'} ${isMobile && !isEditing ? 'flex-col' : ''} mt-1`}
       >
         <Button
           type="submit"
           variant="primary"
-          size={isMobile ? 'md' : 'md'}
+          size={isMobile ? 'sm' : 'md'}
           fullWidth={isMobile && !isEditing}
           disabled={loading}
           loading={loading}
+          className="card-entrance"
           aria-label={loading ? t('form.loading') : isEditing ? t('form.save') : t('form.add')}
         >
           {isEditing ? t('form.save') : t('form.add')}
@@ -453,7 +505,7 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
           <Button
             type="button"
             variant="secondary"
-            size={isMobile ? 'md' : 'md'}
+            size={isMobile ? 'sm' : 'md'}
             onClick={onCancel}
             aria-label={t('form.cancel')}
           >
@@ -463,4 +515,4 @@ export function ActivityForm({ onCreated, onSaved, onCancel, initial }: Activity
       </div>
     </form>
   );
-}
+});

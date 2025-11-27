@@ -5,15 +5,43 @@ import { usePathname } from 'next/navigation';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useI18n } from '@/lib/i18n';
 import { useUIState } from '@/lib/uiState';
+import { useGlobalDialogState } from '@/lib/globalDialogState';
+import { useState, useEffect } from 'react';
 
 export function FloatingAddButton() {
   const isMobile = useIsMobile();
   const { t } = useI18n();
   const pathname = usePathname();
   const { hideFloatingAddButton } = useUIState();
+  const { hasAnyDialogOpen } = useGlobalDialogState();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
-  // Hide button on /add page or when editing/deleting
-  if (pathname === '/add' || hideFloatingAddButton) {
+  // Check if Settings Dialog is open
+  useEffect(() => {
+    const checkSettingsOpen = () => {
+      const settingsDialog = document.querySelector('[class*="z-[9999]"]');
+      const isOpen = settingsDialog && window.getComputedStyle(settingsDialog).display !== 'none';
+      setSettingsOpen(!!isOpen);
+    };
+
+    const observer = new MutationObserver(checkSettingsOpen);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style'],
+    });
+    checkSettingsOpen();
+
+    const interval = setInterval(checkSettingsOpen, 100);
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Hide button on /add page, when editing/deleting, or when any dialog is open
+  if (pathname === '/add' || hideFloatingAddButton || settingsOpen || hasAnyDialogOpen) {
     return null;
   }
 
@@ -26,7 +54,7 @@ export function FloatingAddButton() {
 
   return (
     <div
-      className={`fixed right-4 sm:right-6 z-[9999] transition-all duration-500 ease-in-out flex flex-col items-center gap-2`}
+      className={`fixed right-4 sm:right-6 z-[9998] transition-all duration-500 ease-in-out flex flex-col items-center gap-2`}
       style={{
         willChange: 'opacity, transform',
         position: 'fixed',

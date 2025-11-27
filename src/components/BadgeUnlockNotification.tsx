@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBadges } from '@/lib/badgeStore';
+import { useActivities } from '@/lib/activityStore';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
@@ -10,7 +11,8 @@ import { Confetti } from '@/components/Confetti';
 import type { Badge } from '@/lib/badges';
 
 export function BadgeUnlockNotification() {
-  const { badges, checkNewBadges } = useBadges();
+  const { badges, checkNewBadges, markBadgeAsShown } = useBadges();
+  const { activities } = useActivities();
   const { lang } = useI18n();
   const router = useRouter();
   const isMobile = useIsMobile();
@@ -21,22 +23,101 @@ export function BadgeUnlockNotification() {
   const [isExiting, setIsExiting] = useState(false);
   const [shownBadgeIds, setShownBadgeIds] = useState<Set<string>>(new Set());
   const [showConfetti, setShowConfetti] = useState(false);
+  const prevActivitiesLengthRef = useRef<number>(0);
+  const isInitializedRef = useRef<boolean>(false);
+
+  // Initialize shownBadgeIds from localStorage on mount and from badges with shown: true
+  useEffect(() => {
+    if (typeof window !== 'undefined' && badges.length > 0 && !isInitializedRef.current) {
+      try {
+        const stored = localStorage.getItem('sporttrack.shown_badge_ids');
+        const storedIds = stored ? (JSON.parse(stored) as string[]) : [];
+
+        // Also add badges that are marked as shown: true
+        const shownBadgeIdsFromBadges = badges
+          .filter((badge) => badge.shown === true)
+          .map((badge) => badge.id);
+
+        // Combine both sources and remove duplicates
+        const allShownIds = Array.from(new Set([...storedIds, ...shownBadgeIdsFromBadges]));
+
+        // Only update if there are changes
+        if (allShownIds.length > 0) {
+          setShownBadgeIds(new Set(allShownIds));
+          localStorage.setItem('sporttrack.shown_badge_ids', JSON.stringify(allShownIds));
+        }
+
+        // Mark as initialized
+        isInitializedRef.current = true;
+        prevActivitiesLengthRef.current = activities.length;
+      } catch (error) {
+        console.error('Failed to load shown badge IDs:', error);
+      }
+    }
+  }, [badges, activities.length]);
 
   useEffect(() => {
+    // Skip badge notifications in these scenarios:
+    // 1. Dummy data is being loaded
+    // 2. Data is being imported
+    // 3. User just logged in (initial data sync)
+    const shouldSuppressBadges =
+      typeof window !== 'undefined' &&
+      (localStorage.getItem('sporttrack.dummy_data_loading') === 'true' ||
+        localStorage.getItem('sporttrack.data_importing') === 'true' ||
+        localStorage.getItem('sporttrack.is_new_login') === 'true');
+
+    if (shouldSuppressBadges) {
+      return;
+    }
+
+    // Don't check for badges if we haven't initialized yet
+    if (!isInitializedRef.current) {
+      return;
+    }
+
+    // Only check for badges if activities actually increased (new activity added)
+    // This prevents checking on page refresh when badges are loaded from localStorage
+    const currentActivitiesLength = activities.length;
+    const hasNewActivity = currentActivitiesLength > prevActivitiesLengthRef.current;
+
+    if (!hasNewActivity) {
+      // Update ref but don't check for badges
+      prevActivitiesLengthRef.current = currentActivitiesLength;
+      return;
+    }
+
+    // Update ref before checking
+    prevActivitiesLengthRef.current = currentActivitiesLength;
+
+    // Check for new badges - only truly new badges will be returned
     const newBadges = checkNewBadges();
     if (newBadges.length > 0) {
       // Only add badges that haven't been shown yet
-      const unseenBadges = newBadges.filter((badge) => !shownBadgeIds.has(badge.id));
+      // Check both the badge's shown flag and our local shownBadgeIds set
+      const unseenBadges = newBadges.filter(
+        (badge) => badge.shown !== true && !shownBadgeIds.has(badge.id)
+      );
       if (unseenBadges.length > 0) {
         setUnlockedBadges((prev) => [...prev, ...unseenBadges]);
-        setShownBadgeIds((prev) => {
-          const newSet = new Set(prev);
-          unseenBadges.forEach((badge) => newSet.add(badge.id));
-          return newSet;
-        });
+        const newShownIds = new Set(shownBadgeIds);
+        unseenBadges.forEach((badge) => newShownIds.add(badge.id));
+        setShownBadgeIds(newShownIds);
+
+        // Save to localStorage
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(
+              'sporttrack.shown_badge_ids',
+              JSON.stringify(Array.from(newShownIds))
+            );
+          } catch (error) {
+            console.error('Failed to save shown badge IDs:', error);
+          }
+        }
       }
     }
-  }, [badges, checkNewBadges, shownBadgeIds]);
+  }, [activities.length, checkNewBadges, shownBadgeIds]);
 
   const handleDismiss = useCallback(() => {
     setIsExiting(true);
@@ -55,6 +136,25 @@ export function BadgeUnlockNotification() {
       setIsVisible(true);
       setIsExiting(false);
       setShowConfetti(true);
+
+      // Mark badge as shown when notification appears
+      markBadgeAsShown(nextBadge.id);
+
+      // Also update local shownBadgeIds set and save to localStorage
+      setShownBadgeIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(nextBadge.id);
+        // Save to localStorage
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('sporttrack.shown_badge_ids', JSON.stringify(Array.from(newSet)));
+          } catch (error) {
+            console.error('Failed to save shown badge IDs:', error);
+          }
+        }
+        return newSet;
+      });
+
       // Trigger haptic feedback when badge appears
       triggerHaptic('success');
 
@@ -63,7 +163,7 @@ export function BadgeUnlockNotification() {
         setShowConfetti(false);
       }, 3000);
     }
-  }, [unlockedBadges, currentBadge, isVisible, triggerHaptic]);
+  }, [unlockedBadges, currentBadge, isVisible, triggerHaptic, markBadgeAsShown]);
 
   // Auto-hide timer - runs when badge is visible
   useEffect(() => {

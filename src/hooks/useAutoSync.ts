@@ -21,10 +21,10 @@ const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 const LAST_ACTIVITY_ADDED_KEY = 'sporttrack_last_activity_added';
 const LAST_SYNC_TIME_KEY = 'sporttrack_last_sync_time';
 
-// Debounce delay: wait 2 seconds after activity added before syncing (reduced from 5s for faster sync)
-const DEBOUNCE_DELAY_MS = 2000;
-// Periodic check interval: check every 60 seconds for changes (increased from 30s to reduce Firebase requests)
-const PERIODIC_CHECK_INTERVAL_MS = 60000;
+// Debounce delay: wait 3 seconds after activity added before syncing (optimized for batch operations)
+const DEBOUNCE_DELAY_MS = 3000;
+// Periodic check interval: check every 120 seconds for changes (optimized to reduce Firebase quota usage)
+const PERIODIC_CHECK_INTERVAL_MS = 120000;
 
 export function useAutoSync() {
   const { isAuthenticated, isConfigured } = useAuth();
@@ -140,6 +140,35 @@ export function useAutoSync() {
       debounceTimerRef.current = null;
     }
 
+    // Check if quota is exceeded - disable auto-sync if so
+    const quotaExceeded =
+      typeof window !== 'undefined' && localStorage.getItem('sporttrack.quota_exceeded') === 'true';
+
+    if (quotaExceeded) {
+      // Check if quota error was more than 24 hours ago - allow retry
+      const quotaExceededAt =
+        typeof window !== 'undefined' ? localStorage.getItem('sporttrack.quota_exceeded_at') : null;
+
+      if (quotaExceededAt) {
+        const quotaDate = new Date(quotaExceededAt);
+        const hoursSinceQuota = (Date.now() - quotaDate.getTime()) / (1000 * 60 * 60);
+
+        // If quota error was more than 24 hours ago, clear the flag and allow sync
+        if (hoursSinceQuota > 24) {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('sporttrack.quota_exceeded');
+            localStorage.removeItem('sporttrack.quota_exceeded_at');
+          }
+        } else {
+          // Quota exceeded recently - skip sync
+          return;
+        }
+      } else {
+        // No timestamp - skip sync
+        return;
+      }
+    }
+
     // Check if initial sync is complete and if there's a pending conflict
     const initialSyncComplete =
       typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
@@ -201,6 +230,9 @@ export function useAutoSync() {
   };
 
   // Check if activities changed (added, edited, or deleted) - trigger debounced sync
+  // Use refs to prevent unnecessary re-runs
+  const prevActivitiesHashRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!allHydrated || !isAuthenticated || !isConfigured) {
       return;
@@ -210,11 +242,14 @@ export function useAutoSync() {
     const lastCount = lastActivityCountRef.current;
     const currentHash = createDataHash();
     const lastHash = lastSyncHashRef.current;
+    const prevHash = prevActivitiesHashRef.current;
 
     // If activity count changed OR content changed (edit), trigger debounced sync
     const countChanged = currentCount !== lastCount;
-    const contentChanged = lastHash !== null && currentHash !== lastHash;
+    const contentChanged =
+      lastHash !== null && currentHash !== lastHash && currentHash !== prevHash;
 
+    // Only proceed if there's an actual change
     if ((countChanged || contentChanged) && lastCount >= 0) {
       if (typeof window !== 'undefined') {
         localStorage.setItem(LAST_ACTIVITY_ADDED_KEY, String(Date.now()));
@@ -230,6 +265,9 @@ export function useAutoSync() {
       debounceTimerRef.current = setTimeout(() => {
         performDebouncedSync();
       }, DEBOUNCE_DELAY_MS);
+
+      // Update hash ref to prevent duplicate triggers
+      prevActivitiesHashRef.current = currentHash;
     }
 
     lastActivityCountRef.current = currentCount;
@@ -286,7 +324,9 @@ export function useAutoSync() {
     };
   }, [settings, allHydrated, isAuthenticated, isConfigured]);
 
-  // Periodic check: runs every 30 seconds to check for changes
+  // Periodic check: runs every 60 seconds to check for changes
+  // NOTE: This effect should NOT depend on activities, settings, badges, challenges
+  // to prevent infinite loops. It uses refs to access current values instead.
   useEffect(() => {
     if (!isAuthenticated || !isConfigured || !allHydrated) {
       if (periodicCheckRef.current) {
@@ -294,6 +334,44 @@ export function useAutoSync() {
         periodicCheckRef.current = null;
       }
       return;
+    }
+
+    // Check if quota is exceeded - disable periodic sync if so
+    const quotaExceeded =
+      typeof window !== 'undefined' && localStorage.getItem('sporttrack.quota_exceeded') === 'true';
+
+    if (quotaExceeded) {
+      // Check if quota error was more than 24 hours ago - allow retry
+      const quotaExceededAt =
+        typeof window !== 'undefined' ? localStorage.getItem('sporttrack.quota_exceeded_at') : null;
+
+      if (quotaExceededAt) {
+        const quotaDate = new Date(quotaExceededAt);
+        const hoursSinceQuota = (Date.now() - quotaDate.getTime()) / (1000 * 60 * 60);
+
+        // If quota error was more than 24 hours ago, clear the flag and allow sync
+        if (hoursSinceQuota <= 24) {
+          // Quota exceeded recently - disable periodic sync
+          if (periodicCheckRef.current) {
+            clearInterval(periodicCheckRef.current);
+            periodicCheckRef.current = null;
+          }
+          return;
+        } else {
+          // Clear quota flag after 24 hours
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('sporttrack.quota_exceeded');
+            localStorage.removeItem('sporttrack.quota_exceeded_at');
+          }
+        }
+      } else {
+        // No timestamp - disable periodic sync
+        if (periodicCheckRef.current) {
+          clearInterval(periodicCheckRef.current);
+          periodicCheckRef.current = null;
+        }
+        return;
+      }
     }
 
     // Check if initial sync is complete and if there's a pending conflict
@@ -321,23 +399,68 @@ export function useAutoSync() {
 
     // Periodic check function
     const performPeriodicCheck = async () => {
+      // Check if quota is exceeded - disable auto-sync if so
+      const quotaExceeded =
+        typeof window !== 'undefined' &&
+        localStorage.getItem('sporttrack.quota_exceeded') === 'true';
+
+      if (quotaExceeded) {
+        // Check if quota error was more than 24 hours ago - allow retry
+        const quotaExceededAt =
+          typeof window !== 'undefined'
+            ? localStorage.getItem('sporttrack.quota_exceeded_at')
+            : null;
+
+        if (quotaExceededAt) {
+          const quotaDate = new Date(quotaExceededAt);
+          const hoursSinceQuota = (Date.now() - quotaDate.getTime()) / (1000 * 60 * 60);
+
+          // If quota error was more than 24 hours ago, clear the flag and allow sync
+          if (hoursSinceQuota > 24) {
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('sporttrack.quota_exceeded');
+              localStorage.removeItem('sporttrack.quota_exceeded_at');
+            }
+          } else {
+            // Quota exceeded recently - skip sync
+            return;
+          }
+        } else {
+          // No timestamp - skip sync
+          return;
+        }
+      }
+
       // Check if there are changes
       if (!hasChangesSinceLastSync()) {
         // Periodic check: No changes detected, skipping sync
         return;
       }
 
-      // Check if an activity was added recently (within last 30 seconds)
+      // Check if an activity was added recently (within last 5 minutes)
+      // This allows periodic sync to catch up on changes even if debounced sync was skipped
       const lastActivityAdded =
         typeof window !== 'undefined'
           ? parseInt(localStorage.getItem(LAST_ACTIVITY_ADDED_KEY) || '0', 10)
           : 0;
       const now = Date.now();
       const timeSinceActivityAdded = now - lastActivityAdded;
+      const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
-      // Only sync if activity was added recently (within last 30 seconds)
-      if (lastActivityAdded > 0 && timeSinceActivityAdded > PERIODIC_CHECK_INTERVAL_MS) {
-        // Periodic check: No recent activity, skipping sync
+      // Only sync if activity was added recently (within last 5 minutes) OR if it's been more than 10 minutes since last sync
+      const lastSyncTime =
+        typeof window !== 'undefined'
+          ? parseInt(localStorage.getItem(LAST_SYNC_TIME_KEY) || '0', 10)
+          : 0;
+      const timeSinceLastSync = now - lastSyncTime;
+      const TEN_MINUTES_MS = 10 * 60 * 1000;
+
+      if (
+        lastActivityAdded > 0 &&
+        timeSinceActivityAdded > FIVE_MINUTES_MS &&
+        timeSinceLastSync < TEN_MINUTES_MS
+      ) {
+        // Periodic check: No recent activity and recent sync, skipping
         return;
       }
 
@@ -394,16 +517,10 @@ export function useAutoSync() {
         periodicCheckRef.current = null;
       }
     };
-  }, [
-    isAuthenticated,
-    isConfigured,
-    allHydrated,
-    activities,
-    settings,
-    badges,
-    challenges,
-    syncToCloud,
-  ]);
+    // CRITICAL: Only depend on authentication and hydration state
+    // Do NOT depend on activities, settings, badges, challenges, or syncToCloud
+    // to prevent infinite loops. The periodic check uses refs to access current values.
+  }, [isAuthenticated, isConfigured, allHydrated]);
 
   // Initialize last activity count, custom activities count, and sync hash
   useEffect(() => {

@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import Link from 'next/link';
 import { SettingsDialog } from '@/components/SettingsDialog';
 import { Logo } from '@/components/Logo';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
-export function Header() {
+export const Header = memo(function Header() {
   const { t } = useI18n();
   const isMobile = useIsMobile();
   const [mounted, setMounted] = useState(false);
@@ -31,7 +31,7 @@ export function Header() {
             <div className="flex items-center gap-0.5 sm:gap-0.5 flex-shrink-0">
               <Link
                 href="/activities"
-                className={`nav-icon nav-icon-activities min-h-[40px] min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
+                className={`nav-icon nav-icon-activities min-h-[44px] min-w-[44px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
                 aria-label={t('nav.activities')}
                 data-tour-id="activities"
               >
@@ -48,7 +48,7 @@ export function Header() {
               </span>
               <Link
                 href="/stats"
-                className={`nav-icon nav-icon-stats min-h-[40px] min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
+                className={`nav-icon nav-icon-stats min-h-[44px] min-w-[44px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
                 aria-label={t('nav.stats')}
                 data-tour-id="stats"
               >
@@ -65,7 +65,7 @@ export function Header() {
               </span>
               <Link
                 href="/achievements"
-                className={`nav-icon nav-icon-achievements min-h-[40px] min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
+                className={`nav-icon nav-icon-achievements min-h-[44px] min-w-[44px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
                 aria-label={t('nav.achievements')}
                 data-tour-id="achievements"
               >
@@ -82,7 +82,7 @@ export function Header() {
               </span>
               <Link
                 href="/challenges"
-                className={`nav-icon nav-icon-challenges min-h-[40px] min-w-[40px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
+                className={`nav-icon nav-icon-challenges min-h-[44px] min-w-[44px] flex items-center justify-center text-lg sm:text-xl transition-all duration-500 rounded-full relative overflow-hidden group`}
                 aria-label={t('nav.challenges')}
                 data-tour-id="challenges"
               >
@@ -101,4 +101,4 @@ export function Header() {
       </nav>
     </header>
   );
-}
+});

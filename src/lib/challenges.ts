@@ -19,6 +19,20 @@ import {
   subDays,
 } from 'date-fns';
 
+// Counter for unique ID generation to prevent collisions
+let challengeIdCounter = 0;
+
+/**
+ * Generate a unique ID for challenges
+ */
+function generateChallengeId(prefix: string): string {
+  challengeIdCounter++;
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 11); // Longer random string
+  const counter = challengeIdCounter.toString(36); // Counter as base36
+  return `${prefix}-${timestamp}-${counter}-${random}`;
+}
+
 /**
  * Get season number from date (0=Spring, 1=Summer, 2=Fall, 3=Winter)
  * date-fns doesn't have getSeason, so we implement it manually
@@ -168,7 +182,7 @@ export function createDailyChallenge(
   const end = endOfDay(date);
 
   return {
-    id: `daily-${format(start, 'yyyy-MM-dd')}-${Date.now()}`,
+    id: generateChallengeId(`daily-${format(start, 'yyyy-MM-dd')}`),
     type: 'daily',
     name,
     description: {
@@ -198,7 +212,7 @@ export function createWeeklyChallenge(
   const end = endOfWeek(start, { weekStartsOn: 1 });
 
   return {
-    id: `weekly-${format(start, 'yyyy-MM-dd')}-${Date.now()}`,
+    id: generateChallengeId(`weekly-${format(start, 'yyyy-MM-dd')}`),
     type: 'weekly',
     name,
     description: {
@@ -228,7 +242,7 @@ export function createMonthlyChallenge(
   const end = endOfMonth(start);
 
   return {
-    id: `monthly-${format(start, 'yyyy-MM')}-${Date.now()}`,
+    id: generateChallengeId(`monthly-${format(start, 'yyyy-MM')}`),
     type: 'monthly',
     name,
     description: {
@@ -257,7 +271,7 @@ export function createCustomChallenge(
   icon?: string
 ): Challenge {
   return {
-    id: `custom-${Date.now()}`,
+    id: generateChallengeId('custom'),
     type: 'custom',
     name,
     description,
@@ -314,7 +328,7 @@ export function createYearlyChallenge(
   const end = endOfYear(start);
 
   return {
-    id: `yearly-${format(start, 'yyyy')}-${Date.now()}`,
+    id: generateChallengeId(`yearly-${format(start, 'yyyy')}`),
     type: 'yearly',
     name,
     description: {
@@ -369,7 +383,7 @@ export function createSeasonalChallenge(
   }
 
   return {
-    id: `seasonal-${format(start, 'yyyy-MM')}-${Date.now()}`,
+    id: generateChallengeId(`seasonal-${format(start, 'yyyy-MM')}`),
     type: 'seasonal',
     name,
     description: {
@@ -399,7 +413,7 @@ export function createActivitySpecificChallenge(
   icon?: string
 ): Challenge {
   return {
-    id: `activity-${activityKey}-${Date.now()}`,
+    id: generateChallengeId(`activity-${activityKey}`),
     type: 'activity_specific',
     name,
     description,
@@ -427,7 +441,7 @@ export function createTimeBasedChallenge(
   icon?: string
 ): Challenge {
   return {
-    id: `time-${startHour}-${endHour}-${Date.now()}`,
+    id: generateChallengeId(`time-${startHour}-${endHour}`),
     type: 'time_based',
     name,
     description,
@@ -461,7 +475,7 @@ export function createStreakBasedChallenge(
     })();
 
   return {
-    id: `streak-${targetDays}-${Date.now()}`,
+    id: generateChallengeId(`streak-${targetDays}`),
     type: 'streak_based',
     name,
     description,

@@ -33,6 +33,59 @@ const nextConfig = {
       exclude: ['error', 'warn'],
     } : false,
   },
+  // Optimize bundle splitting
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Optimize chunk splitting for better caching
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Vendor chunks
+            vendor: {
+              name: 'vendor',
+              chunks: 'all',
+              test: /node_modules/,
+              priority: 20,
+            },
+            // Recharts chunk (large library)
+            recharts: {
+              name: 'recharts',
+              test: /[\\/]node_modules[\\/](recharts)[\\/]/,
+              chunks: 'all',
+              priority: 30,
+            },
+            // Firebase chunk
+            firebase: {
+              name: 'firebase',
+              test: /[\\/]node_modules[\\/](@firebase|firebase)[\\/]/,
+              chunks: 'all',
+              priority: 30,
+            },
+            // Date-fns chunk
+            dateFns: {
+              name: 'date-fns',
+              test: /[\\/]node_modules[\\/](date-fns)[\\/]/,
+              chunks: 'all',
+              priority: 25,
+            },
+            // Common chunks
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'all',
+              priority: 10,
+              reuseExistingChunk: true,
+            },
+          },
+        },
+      };
+    }
+    return config;
+  },
 };
 
 // Disable PWA/Service Worker for Firebase deployments to prevent navigation issues

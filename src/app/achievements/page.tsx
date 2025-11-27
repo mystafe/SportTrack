@@ -10,6 +10,14 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { PageSkeleton, BadgeCardSkeleton } from '@/components/LoadingSkeleton';
 import { Card } from '@/components/ui/Card';
 import { Badge as BadgeComponent } from '@/components/ui/Badge';
+import { ActivityBadges } from '@/components/ActivityBadges';
+import { Accordion } from '@/components/ui/Accordion';
+import { lazy, Suspense } from 'react';
+
+// Lazy load ActivityBadges for better performance
+const ActivityBadgesLazy = lazy(() =>
+  import('@/components/ActivityBadges').then((m) => ({ default: m.ActivityBadges }))
+);
 
 export default function AchievementsPage() {
   const { badges, hydrated } = useBadges();
@@ -126,6 +134,11 @@ export default function AchievementsPage() {
             <BadgeCardSkeleton key={i} />
           ))}
         </div>
+
+        {/* Activity Badges Section */}
+        <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+          <ActivityBadgesLazy />
+        </Suspense>
       </main>
     );
   }
@@ -188,85 +201,144 @@ export default function AchievementsPage() {
         </div>
       </Card>
 
-      {/* Badges by Category */}
-      {(['streak', 'points', 'activities', 'special'] as const).map((category) => (
-        <Card
-          key={category}
-          variant="default"
-          size="md"
-          hoverable
-          className="card-entrance"
-          header={
-            <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white">
-              {categoryLabels[category]}
-            </h2>
-          }
-        >
-          <div
-            className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'} gap-3 sm:gap-4`}
+      {/* Badges by Category - Accordion */}
+      {(['streak', 'points', 'activities', 'special'] as const).map((category) => {
+        const categoryBadges = badgesByCategory[category];
+        const unlockedCount = categoryBadges.filter((b) => !!b.unlockedAt).length;
+        const totalCount = categoryBadges.length;
+        const categoryIcons = {
+          streak: '🔥',
+          points: '⭐',
+          activities: '🏃',
+          special: '✨',
+        };
+
+        return (
+          <Accordion
+            key={category}
+            title={`${categoryLabels[category]} (${unlockedCount} / ${totalCount})`}
+            icon={categoryIcons[category]}
+            defaultOpen={category === 'streak' || category === 'points'}
+            className="card-entrance"
           >
-            {badgesByCategory[category].map((badge) => {
-              const isUnlocked = !!badge.unlockedAt;
-              return (
-                <div
-                  key={badge.id}
-                  className={`stagger-item relative rounded-xl border-2 p-3 sm:p-4 transition-all duration-300 ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : 'hover:scale-105'} ${
-                    isUnlocked
-                      ? `${getRarityColor(badge.rarity)} shadow-md hover:shadow-xl`
-                      : 'border-gray-300 dark:border-gray-800 bg-gradient-to-br from-gray-100 via-gray-200/30 to-gray-100 dark:from-gray-900/80 dark:via-gray-900/50 dark:to-gray-900/80 opacity-50 blur-[0.5px]'
-                  }`}
-                >
-                  {!isUnlocked && (
-                    <div className="absolute inset-0 flex items-center justify-center z-10">
-                      <div className="text-4xl opacity-40 dark:opacity-30">🔒</div>
+            <div
+              className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'} gap-3 sm:gap-4`}
+            >
+              {categoryBadges.map((badge) => {
+                const isUnlocked = !!badge.unlockedAt;
+                return (
+                  <div
+                    key={badge.id}
+                    className={`stagger-item relative rounded-xl border-2 p-3 sm:p-4 transition-all duration-300 overflow-hidden group ${
+                      isMobile
+                        ? 'mobile-card-lift touch-feedback bounce-in-mobile'
+                        : 'hover:scale-105 hover:-translate-y-1'
+                    } ${
+                      isUnlocked
+                        ? `${getRarityColor(badge.rarity)} shadow-md hover:shadow-2xl badge-glow-${badge.rarity}`
+                        : 'border-gray-300 dark:border-gray-800 bg-gradient-to-br from-gray-100 via-gray-200/30 to-gray-100 dark:from-gray-900/80 dark:via-gray-900/50 dark:to-gray-900/80 opacity-50 blur-[0.5px]'
+                    }`}
+                  >
+                    {/* Glow effect overlay for unlocked badges */}
+                    {isUnlocked && (
+                      <div
+                        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 badge-glow-overlay-${badge.rarity} pointer-events-none rounded-xl z-0`}
+                      ></div>
+                    )}
+                    {!isUnlocked && (
+                      <div className="absolute inset-0 flex items-center justify-center z-10 bg-gray-900/20 dark:bg-gray-900/40 rounded-xl">
+                        <div className="text-5xl sm:text-6xl opacity-80 dark:opacity-70 drop-shadow-lg filter blur-[0.5px]">
+                          🔒
+                        </div>
+                      </div>
+                    )}
+                    <div className="relative z-10">
+                      <div
+                        className={`text-4xl sm:text-5xl mb-2 ${!isUnlocked ? 'opacity-20 blur-[1px]' : isMobile ? 'emoji-celebrate' : 'emoji-bounce group-hover:scale-110 group-hover:rotate-6 transition-all duration-300'}`}
+                      >
+                        {badge.icon}
+                        {/* Particle effect for legendary badges */}
+                        {isUnlocked && badge.rarity === 'legendary' && (
+                          <div className="absolute inset-0 badge-particles opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                            <span className="absolute top-0 left-1/2 text-xs animate-float">
+                              ✨
+                            </span>
+                            <span
+                              className="absolute top-1/4 right-0 text-xs animate-float"
+                              style={{ animationDelay: '0.2s' }}
+                            >
+                              ⭐
+                            </span>
+                            <span
+                              className="absolute bottom-1/4 left-0 text-xs animate-float"
+                              style={{ animationDelay: '0.4s' }}
+                            >
+                              💫
+                            </span>
+                            <span
+                              className="absolute bottom-0 right-1/4 text-xs animate-float"
+                              style={{ animationDelay: '0.6s' }}
+                            >
+                              ✨
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div
+                        className={`text-sm sm:text-base font-bold mb-1 text-gray-950 dark:text-gray-100 ${!isUnlocked ? 'opacity-20 blur-[0.5px]' : ''}`}
+                      >
+                        {badge.name[lang]}
+                      </div>
+                      <div
+                        className={`text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${!isUnlocked ? 'opacity-20 blur-[0.5px]' : ''}`}
+                      >
+                        {badge.description[lang]}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <BadgeComponent
+                          variant={
+                            isUnlocked
+                              ? badge.rarity === 'common'
+                                ? 'default'
+                                : badge.rarity === 'rare'
+                                  ? 'info'
+                                  : badge.rarity === 'epic'
+                                    ? 'primary'
+                                    : 'warning'
+                              : 'default'
+                          }
+                          size="sm"
+                          className={!isUnlocked ? 'opacity-50' : ''}
+                        >
+                          {getRarityLabel(badge.rarity)}
+                        </BadgeComponent>
+                        {(() => {
+                          const formattedDate = formatBadgeDate(badge.unlockedAt);
+                          return formattedDate ? (
+                            <span className="text-xs text-gray-500">{formattedDate}</span>
+                          ) : null;
+                        })()}
+                      </div>
                     </div>
-                  )}
-                  <div
-                    className={`text-4xl sm:text-5xl mb-2 ${!isUnlocked ? 'opacity-20 blur-[1px]' : isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}
-                  >
-                    {badge.icon}
                   </div>
-                  <div
-                    className={`text-sm sm:text-base font-bold mb-1 text-gray-950 dark:text-gray-100 ${!isUnlocked ? 'opacity-20 blur-[0.5px]' : ''}`}
-                  >
-                    {badge.name[lang]}
-                  </div>
-                  <div
-                    className={`text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${!isUnlocked ? 'opacity-20 blur-[0.5px]' : ''}`}
-                  >
-                    {badge.description[lang]}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <BadgeComponent
-                      variant={
-                        isUnlocked
-                          ? badge.rarity === 'common'
-                            ? 'default'
-                            : badge.rarity === 'rare'
-                              ? 'info'
-                              : badge.rarity === 'epic'
-                                ? 'primary'
-                                : 'warning'
-                          : 'default'
-                      }
-                      size="sm"
-                      className={!isUnlocked ? 'opacity-50' : ''}
-                    >
-                      {getRarityLabel(badge.rarity)}
-                    </BadgeComponent>
-                    {(() => {
-                      const formattedDate = formatBadgeDate(badge.unlockedAt);
-                      return formattedDate ? (
-                        <span className="text-xs text-gray-500">{formattedDate}</span>
-                      ) : null;
-                    })()}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      ))}
+                );
+              })}
+            </div>
+          </Accordion>
+        );
+      })}
+
+      {/* Activity Badges - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Aktivite Rozetleri' : 'Activity Badges'}
+        icon="🎖️"
+        defaultOpen={false}
+        className="card-entrance"
+      >
+        <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+          <ActivityBadgesLazy />
+        </Suspense>
+      </Accordion>
     </div>
   );
 }

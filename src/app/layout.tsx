@@ -67,6 +67,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body
         className="min-h-screen h-full bg-white dark:bg-black overflow-x-hidden safe-top safe-bottom"
+        style={{
+          overflowY: 'hidden',
+          height: '100vh',
+        }}
         suppressHydrationWarning
       >
         <script
@@ -195,10 +199,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Header />
           <main
             id="main-content"
-            className="container py-4 sm:py-6"
+            className="container py-4 sm:py-6 mobile-scroll-area"
             style={{
+              paddingTop: 'calc(64px + 2px + 1rem)',
               paddingBottom:
-                'max(1.5rem, calc(64px + 32px + 1.5rem + env(safe-area-inset-bottom, 0px)))',
+                'max(1.5rem, calc(56px + 32px + 1.5rem + env(safe-area-inset-bottom, 0px)))',
             }}
             role="main"
             aria-label="Main content"

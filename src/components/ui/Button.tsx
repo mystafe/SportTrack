@@ -108,10 +108,10 @@ const variantStyles: Record<ButtonVariant, string> = {
     disabled:opacity-70
   `,
   danger: `
-    bg-gradient-to-r from-error to-error-dark
+    bg-gradient-to-r from-error-500 to-error-600
     text-white
     shadow-elevation-2 shadow-colored-error
-    hover:from-error-dark hover:to-error
+    hover:from-error-600 hover:to-error-500
     hover:shadow-elevation-4
     active:scale-[0.98]
     disabled:from-gray-400 disabled:to-gray-500 disabled:shadow-none

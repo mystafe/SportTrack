@@ -6,7 +6,8 @@ export function ActivityListSkeleton() {
       {[1, 2, 3].map((i) => (
         <div
           key={i}
-          className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 skeleton"
+          className="rounded-xl border-2 border-gray-200/60 dark:border-gray-700/60 bg-gradient-to-br from-white via-gray-50/50 to-white dark:from-gray-900/95 dark:via-gray-800/50 dark:to-gray-900/95 p-4 shadow-md skeleton"
+          style={{ animationDelay: `${i * 0.1}s` }}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 flex-1">
@@ -26,7 +27,7 @@ export function ActivityListSkeleton() {
 
 export function StatsCardSkeleton() {
   return (
-    <div className="rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 skeleton">
+    <div className="rounded-xl border-2 border-gray-200/60 dark:border-gray-700/60 bg-gradient-to-br from-white via-gray-50/50 to-white dark:from-gray-900/95 dark:via-gray-800/50 dark:to-gray-900/95 p-4 shadow-md skeleton">
       <div className="space-y-3">
         <div className="h-4 w-24 rounded skeleton" />
         <div className="h-8 w-32 rounded skeleton" />
@@ -90,6 +91,48 @@ export function PageSkeleton() {
       <div className="animate-pulse space-y-4">
         <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded-lg w-1/3 skeleton" />
         <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-lg w-1/2 skeleton" />
+      </div>
+    </div>
+  );
+}
+
+export function ChartSkeleton() {
+  return (
+    <div className="w-full h-64 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 skeleton">
+      <div className="space-y-3">
+        <div className="h-4 w-32 rounded skeleton" />
+        <div className="h-48 w-full rounded skeleton" />
+        <div className="flex items-center justify-between">
+          <div className="h-3 w-20 rounded skeleton" />
+          <div className="h-3 w-20 rounded skeleton" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function WidgetSkeleton() {
+  return (
+    <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-3 sm:p-4 skeleton">
+      <div className="flex flex-col items-center text-center space-y-2">
+        <div className="h-8 w-8 rounded skeleton" />
+        <div className="h-4 w-20 rounded skeleton" />
+        <div className="h-6 w-16 rounded skeleton" />
+        <div className="h-3 w-24 rounded skeleton" />
+      </div>
+    </div>
+  );
+}
+
+export function AccordionSkeleton() {
+  return (
+    <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 overflow-hidden skeleton">
+      <div className="p-4 sm:p-5 flex items-center justify-between">
+        <div className="flex items-center gap-3 flex-1">
+          <div className="h-6 w-6 rounded skeleton" />
+          <div className="h-5 w-32 rounded skeleton" />
+        </div>
+        <div className="h-5 w-5 rounded skeleton" />
       </div>
     </div>
   );

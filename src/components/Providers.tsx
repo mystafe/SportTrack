@@ -12,12 +12,16 @@ import { StorageErrorHandler } from '@/components/StorageErrorHandler';
 import { NotificationManager } from '@/components/NotificationManager';
 import { BadgeUnlockNotification } from '@/components/BadgeUnlockNotification';
 import { ChallengeCompletionNotification } from '@/components/ChallengeCompletionNotification';
+import { ActivityGoalCompletionNotification } from '@/components/ActivityGoalCompletionNotification';
 import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AutoSyncProvider } from '@/components/AutoSyncProvider';
 import { NameDialog } from '@/components/NameDialog';
 import { CloudSyncLoading } from '@/components/CloudSyncLoading';
 import { UIStateProvider } from '@/lib/uiState';
+import { DialogManagerProvider } from '@/lib/dialogManager';
+import { GlobalDialogProvider } from '@/lib/globalDialogState';
+import { GlobalDialogs } from '@/components/GlobalDialogs';
 
 // Lazy load components that are not immediately needed
 const InstallPrompt = lazy(() =>
@@ -64,49 +68,55 @@ export function Providers({ children }: { children: ReactNode }) {
   }, []);
   return (
     <ErrorBoundary>
-      <I18nProvider>
-        <SettingsProvider>
-          <UIStateProvider>
-            <AnimationReducer>
-              <ActivitiesProvider>
-                <LevelProvider>
-                  <ChallengeProvider>
-                    <BadgeProvider>
-                      <ToasterProvider>
-                        <AutoSyncProvider>
-                          <StorageErrorHandler />
-                          <Suspense fallback={null}>
-                            <InstallPrompt />
-                          </Suspense>
-                          <NotificationManager />
-                          <CloudSyncLoading />
-                          <Suspense fallback={null}>
-                            <KeyboardShortcuts />
-                          </Suspense>
-                          <Suspense fallback={null}>
-                            <CommandPalette />
-                          </Suspense>
-                          <BadgeUnlockNotification />
-                          <ChallengeCompletionNotification />
-                          <OnlineStatusIndicator />
-                          <NameDialog />
-                          <Suspense fallback={null}>
-                            <ConflictResolutionManager />
-                          </Suspense>
-                          <Suspense fallback={null}>
-                            <WelcomeToast />
-                          </Suspense>
-                          {children}
-                        </AutoSyncProvider>
-                      </ToasterProvider>
-                    </BadgeProvider>
-                  </ChallengeProvider>
-                </LevelProvider>
-              </ActivitiesProvider>
-            </AnimationReducer>
-          </UIStateProvider>
-        </SettingsProvider>
-      </I18nProvider>
+      <DialogManagerProvider>
+        <GlobalDialogProvider>
+          <I18nProvider>
+            <SettingsProvider>
+              <UIStateProvider>
+                <AnimationReducer>
+                  <ActivitiesProvider>
+                    <LevelProvider>
+                      <ChallengeProvider>
+                        <BadgeProvider>
+                          <ToasterProvider>
+                            <AutoSyncProvider>
+                              <StorageErrorHandler />
+                              <Suspense fallback={null}>
+                                <InstallPrompt />
+                              </Suspense>
+                              <NotificationManager />
+                              <CloudSyncLoading />
+                              <Suspense fallback={null}>
+                                <KeyboardShortcuts />
+                              </Suspense>
+                              <Suspense fallback={null}>
+                                <CommandPalette />
+                              </Suspense>
+                              <BadgeUnlockNotification />
+                              <ChallengeCompletionNotification />
+                              <ActivityGoalCompletionNotification />
+                              <OnlineStatusIndicator />
+                              <NameDialog />
+                              <Suspense fallback={null}>
+                                <ConflictResolutionManager />
+                              </Suspense>
+                              <Suspense fallback={null}>
+                                <WelcomeToast />
+                              </Suspense>
+                              <GlobalDialogs />
+                              {children}
+                            </AutoSyncProvider>
+                          </ToasterProvider>
+                        </BadgeProvider>
+                      </ChallengeProvider>
+                    </LevelProvider>
+                  </ActivitiesProvider>
+                </AnimationReducer>
+              </UIStateProvider>
+            </SettingsProvider>
+          </I18nProvider>
+        </GlobalDialogProvider>
+      </DialogManagerProvider>
     </ErrorBoundary>
   );
 }

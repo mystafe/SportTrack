@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
@@ -92,7 +92,9 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
     return filtered;
   }, [activities, dateRange, customStart, customEnd, activityFilter, minPoints, maxPoints]);
 
-  if (!open) return null;
+  if (!open) {
+    return null;
+  }
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -171,29 +173,34 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10001] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
+      className={`fixed inset-0 z-[10020] flex ${isMobile ? 'items-start pt-8' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-top`}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="export-dialog-title"
     >
       <div
-        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4'} border-2 border-gray-200 dark:border-gray-700 animate-scale-in`}
+        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-xl w-full max-h-[85vh] overflow-y-auto' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4'} border-2 border-gray-200 dark:border-gray-700 animate-scale-in`}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className={`${isMobile ? 'p-6' : 'p-6'}`}>
+        <div className={`${isMobile ? 'p-4' : 'p-5'}`}>
           <h2
             id="export-dialog-title"
-            className={`${isMobile ? 'text-xl' : 'text-lg'} font-bold text-gray-950 dark:text-white mb-4`}
+            className={`${isMobile ? 'text-lg' : 'text-lg'} font-bold text-gray-950 dark:text-white mb-3`}
           >
             {t('export.title')}
           </h2>
 
           {/* Format Selection */}
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
+          <div className="mb-3">
+            <label className="block text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1.5">
               {t('export.format')}
             </label>
-            <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-2`}>
+            <div className={`flex ${isMobile ? 'flex-row' : 'flex-row'} gap-1.5`}>
               <Button
                 type="button"
                 variant={exportFormat === 'csv' ? 'primary' : 'outline'}
@@ -225,22 +232,24 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
           </div>
 
           {/* Date Range Selection */}
-          <Select
-            label={t('export.dateRange')}
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value as typeof dateRange)}
-            size={isMobile ? 'sm' : 'md'}
-            options={[
-              { value: 'all', label: t('export.allTime') },
-              { value: '7days', label: t('export.last7Days') },
-              { value: '30days', label: t('export.last30Days') },
-              { value: 'custom', label: t('export.customRange') },
-            ]}
-          />
+          <div className="mb-3">
+            <Select
+              label={t('export.dateRange')}
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value as typeof dateRange)}
+              size={isMobile ? 'sm' : 'sm'}
+              options={[
+                { value: 'all', label: t('export.allTime') },
+                { value: '7days', label: t('export.last7Days') },
+                { value: '30days', label: t('export.last30Days') },
+                { value: 'custom', label: t('export.customRange') },
+              ]}
+            />
+          </div>
 
           {/* Custom Date Range */}
           {dateRange === 'custom' && (
-            <div className="mb-4 grid grid-cols-2 gap-2">
+            <div className="mb-3 grid grid-cols-2 gap-2">
               <Input
                 type="date"
                 label={t('export.startDate')}
@@ -260,25 +269,27 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
           )}
 
           {/* Activity Filter */}
-          <Select
-            label={lang === 'tr' ? 'Aktivite Filtresi' : 'Activity Filter'}
-            value={activityFilter}
-            onChange={(e) => setActivityFilter(e.target.value)}
-            size={isMobile ? 'sm' : 'md'}
-            options={[
-              { value: 'all', label: lang === 'tr' ? 'Tüm Aktiviteler' : 'All Activities' },
-              ...activityKeys.map((key) => {
-                const activity = activities.find((a) => a.activityKey === key);
-                return {
-                  value: key,
-                  label: activity ? getActivityLabel(activity, lang) : key,
-                };
-              }),
-            ]}
-          />
+          <div className="mb-3">
+            <Select
+              label={lang === 'tr' ? 'Aktivite Filtresi' : 'Activity Filter'}
+              value={activityFilter}
+              onChange={(e) => setActivityFilter(e.target.value)}
+              size={isMobile ? 'sm' : 'sm'}
+              options={[
+                { value: 'all', label: lang === 'tr' ? 'Tüm Aktiviteler' : 'All Activities' },
+                ...activityKeys.map((key) => {
+                  const activity = activities.find((a) => a.activityKey === key);
+                  return {
+                    value: key,
+                    label: activity ? getActivityLabel(activity, lang) : key,
+                  };
+                }),
+              ]}
+            />
+          </div>
 
           {/* Points Filter */}
-          <div className="mb-4 grid grid-cols-2 gap-2">
+          <div className="mb-3 grid grid-cols-2 gap-2">
             <Input
               type="number"
               label={lang === 'tr' ? 'Min Puan' : 'Min Points'}
@@ -300,7 +311,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
           </div>
 
           {/* Preview */}
-          <div className="mb-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700">
+          <div className="mb-3 p-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700">
             <div className="flex items-center justify-between mb-2">
               <span
                 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-blue-900 dark:text-blue-100`}

@@ -85,10 +85,10 @@ export function QuoteTicker() {
 
   if (!mounted || quotes.length === 0) return null;
 
-  // Calculate bottom position: above BottomNavigation (64px) + safe area
+  // Calculate bottom position: above BottomNavigation (56px after resize) + safe area + extra spacing
   const bottomPosition = isMobile
-    ? 'calc(64px + max(12px, env(safe-area-inset-bottom, 0px)))'
-    : 'max(12px, env(safe-area-inset-bottom, 0px))';
+    ? 'calc(56px + max(32px, env(safe-area-inset-bottom, 0px)))'
+    : 'max(28px, env(safe-area-inset-bottom, 0px))';
 
   return (
     <div
@@ -103,13 +103,6 @@ export function QuoteTicker() {
         {/* Subtle gradient fade edges */}
         <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-20 bg-gradient-to-r from-brand/20 via-brand/10 to-transparent dark:from-brand/30 dark:via-brand/15 z-10 pointer-events-none"></div>
         <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-20 bg-gradient-to-l from-brand/20 via-brand/10 to-transparent dark:from-brand/30 dark:via-brand/15 z-10 pointer-events-none"></div>
-
-        {/* Minimal decorative dots */}
-        <div className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand/60 dark:bg-brand/70 z-10 animate-pulse"></div>
-        <div
-          className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand/60 dark:bg-brand/70 z-10 animate-pulse"
-          style={{ animationDelay: '0.5s' }}
-        ></div>
 
         {/* Scrolling content - optimized for continuous animation */}
         <div

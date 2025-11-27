@@ -458,9 +458,7 @@ export class CloudSyncService {
       (data.settings && data.settings.name && data.settings.name.trim() !== '');
 
     if (!hasData && !isReset) {
-      console.log(
-        '⏭️ Skipping upload: No data to upload (all empty/zeroed). Only reset operations can upload empty data.'
-      );
+      // Skipping upload: No data to upload (all empty/zeroed). Only reset operations can upload empty data.
       return; // Don't upload empty data unless it's a reset
     }
 

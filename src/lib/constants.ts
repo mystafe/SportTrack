@@ -10,6 +10,10 @@ export const STORAGE_KEYS = {
   CHALLENGES: 'sporttrack.challenges.v1',
   ONBOARDING_COMPLETED: 'sporttrack.onboarding.completed',
   APPLE_HEALTH_LAST_IMPORT: 'sporttrack.appleHealth.lastImport',
+  ACTIVITY_REMINDERS: 'sporttrack.activityReminders.v1',
+  ACTIVITY_GOALS: 'sporttrack.activityGoals.v1',
+  QUOTA_EXCEEDED: 'sporttrack.quota_exceeded',
+  QUOTA_EXCEEDED_AT: 'sporttrack.quota_exceeded_at',
 } as const;
 
 export const TIMEOUTS = {

@@ -4,47 +4,52 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { memo, useMemo } from 'react';
 
-export function BottomNavigation() {
+export const BottomNavigation = memo(function BottomNavigation() {
   const pathname = usePathname();
   const { t } = useI18n();
   const isMobile = useIsMobile();
 
-  // Only show on mobile
-  if (!isMobile) return null;
+  // Memoize navItems BEFORE any conditional returns (Rules of Hooks)
+  const navItems = useMemo(
+    () => [
+      {
+        href: '/',
+        label: t('nav.home'),
+        icon: '🏠',
+        ariaLabel: t('nav.home'),
+      },
+      {
+        href: '/activities',
+        label: t('nav.activities'),
+        icon: '🏃',
+        ariaLabel: t('nav.activities'),
+      },
+      {
+        href: '/stats',
+        label: t('nav.stats'),
+        icon: '📊',
+        ariaLabel: t('nav.stats'),
+      },
+      {
+        href: '/achievements',
+        label: t('nav.achievements'),
+        icon: '🏆',
+        ariaLabel: t('nav.achievements'),
+      },
+      {
+        href: '/challenges',
+        label: t('nav.challenges'),
+        icon: '🎯',
+        ariaLabel: t('nav.challenges'),
+      },
+    ],
+    [t]
+  );
 
-  const navItems = [
-    {
-      href: '/',
-      label: t('nav.home'),
-      icon: '🏠',
-      ariaLabel: t('nav.home'),
-    },
-    {
-      href: '/activities',
-      label: t('nav.activities'),
-      icon: '🏃',
-      ariaLabel: t('nav.activities'),
-    },
-    {
-      href: '/stats',
-      label: t('nav.stats'),
-      icon: '📊',
-      ariaLabel: t('nav.stats'),
-    },
-    {
-      href: '/achievements',
-      label: t('nav.achievements'),
-      icon: '🏆',
-      ariaLabel: t('nav.achievements'),
-    },
-    {
-      href: '/challenges',
-      label: t('nav.challenges'),
-      icon: '🎯',
-      ariaLabel: t('nav.challenges'),
-    },
-  ];
+  // Only show on mobile - AFTER all hooks
+  if (!isMobile) return null;
 
   return (
     <nav
@@ -61,7 +66,7 @@ export function BottomNavigation() {
       aria-label={t('nav.main')}
     >
       <div className="container mx-auto px-2 safe-left safe-right">
-        <div className="flex items-center justify-around h-16 safe-bottom">
+        <div className="flex items-center justify-around h-14 safe-bottom">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -69,9 +74,9 @@ export function BottomNavigation() {
                 key={item.href}
                 href={item.href}
                 className={`
-                  flex flex-col items-center justify-center gap-1
-                  min-w-[56px] min-h-[56px] px-3 py-2
-                  rounded-2xl transition-all duration-300 ease-out
+                  flex flex-col items-center justify-center gap-0.5
+                  min-w-[48px] min-h-[48px] px-2 py-1.5
+                  rounded-xl transition-all duration-300 ease-out
                   ${
                     isActive
                       ? 'bg-gradient-to-br from-brand/15 via-brand/10 to-brand/5 dark:from-brand/25 dark:via-brand/20 dark:to-brand/15 text-brand dark:text-brand-light shadow-lg shadow-brand/20 dark:shadow-brand/30'
@@ -92,7 +97,7 @@ export function BottomNavigation() {
                   <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand dark:bg-brand-light rounded-full animate-pulse" />
                 )}
                 <span
-                  className={`text-2xl ${isActive ? 'scale-110 drop-shadow-lg' : 'scale-100'} transition-all duration-300 ease-out`}
+                  className={`text-xl ${isActive ? 'scale-110 drop-shadow-lg' : 'scale-100'} transition-all duration-300 ease-out`}
                   aria-hidden="true"
                   style={{
                     filter: isActive ? 'drop-shadow(0 2px 4px rgba(14, 165, 233, 0.3))' : 'none',
@@ -101,7 +106,7 @@ export function BottomNavigation() {
                   {item.icon}
                 </span>
                 <span
-                  className={`text-[10px] font-bold leading-tight tracking-tight ${isActive ? 'opacity-100' : 'opacity-70'} transition-opacity duration-300`}
+                  className={`text-[9px] font-bold leading-tight tracking-tight ${isActive ? 'opacity-100' : 'opacity-70'} transition-opacity duration-300`}
                 >
                   {item.label}
                 </span>
@@ -112,4 +117,4 @@ export function BottomNavigation() {
       </div>
     </nav>
   );
-}
+});

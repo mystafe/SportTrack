@@ -59,7 +59,7 @@ export const ChallengeCard = memo(function ChallengeCard({
 
   return (
     <div
-      className={`card-entrance rounded-xl border-2 ${isMobile ? 'p-3' : 'p-4'} ${getStatusColor()} transition-all duration-300 hover:shadow-xl shadow-md bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95`}
+      className={`card-entrance stagger-item rounded-xl border-2 ${isMobile ? 'p-3' : 'p-4'} ${getStatusColor()} transition-all duration-300 hover:shadow-xl hover:scale-[1.02] shadow-md bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'mobile-card-lift touch-feedback' : 'magnetic-hover'} gpu-accelerated`}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -118,18 +118,31 @@ export const ChallengeCard = memo(function ChallengeCard({
         </div>
 
         <div
-          className={`w-full ${isMobile ? 'h-2.5' : 'h-3'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner`}
+          className={`w-full ${isMobile ? 'h-2.5' : 'h-3'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner relative group/progress`}
         >
           <div
-            className={`h-full transition-all duration-500 shadow-sm ${
+            className={`h-full transition-all duration-1000 ease-out shadow-sm progress-bar-fill relative ${
               challenge.status === 'completed'
-                ? 'bg-gradient-to-r from-green-500 to-emerald-500'
+                ? 'bg-gradient-to-r from-green-500 via-emerald-500 to-green-600'
                 : challenge.status === 'expired' || challenge.status === 'failed'
-                  ? 'bg-gradient-to-r from-red-500 to-rose-500'
-                  : 'bg-gradient-to-r from-brand to-brand-dark'
+                  ? 'bg-gradient-to-r from-red-500 via-rose-500 to-red-600'
+                  : 'bg-gradient-to-r from-brand via-brand-light to-brand-dark'
             }`}
             style={{ width: `${Math.min(100, progress.percentage)}%` }}
-          />
+          >
+            {/* Shimmer effect */}
+            {progress.percentage > 0 && (
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer rounded-full" />
+            )}
+            {/* Pulse effect when near completion */}
+            {progress.percentage >= 90 && progress.percentage < 100 && (
+              <div className="absolute inset-0 bg-white/20 animate-pulse rounded-full" />
+            )}
+          </div>
+          {/* Completion glow effect */}
+          {progress.percentage === 100 && (
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer rounded-full" />
+          )}
         </div>
 
         <div

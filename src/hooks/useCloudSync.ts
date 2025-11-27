@@ -17,11 +17,21 @@ import type { SyncStatus, SyncState } from '@/lib/cloudSync/types';
  */
 function classifyError(
   error: unknown
-): 'network' | 'permission' | 'validation' | 'timeout' | 'unknown' {
+): 'network' | 'permission' | 'validation' | 'timeout' | 'quota' | 'unknown' {
   if (!error) return 'unknown';
 
   const errorMessage = error instanceof Error ? error.message : String(error);
   const errorCode = error instanceof Error && 'code' in error ? String(error.code) : '';
+
+  // Quota errors (don't retry - Firebase quota exceeded)
+  if (
+    errorCode === 'resource-exhausted' ||
+    errorMessage.includes('quota') ||
+    errorMessage.includes('Quota exceeded') ||
+    errorMessage.includes('resource-exhausted')
+  ) {
+    return 'quota';
+  }
 
   // Network errors (retry)
   if (
@@ -194,6 +204,12 @@ export function useCloudSync() {
             data.badges.length +
             data.challenges.length;
 
+          // Clear quota flag on successful sync
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('sporttrack.quota_exceeded');
+            localStorage.removeItem('sporttrack.quota_exceeded_at');
+          }
+
           // Cloud sync completed successfully
           updateStatus('synced');
           setSyncState((prev) => ({
@@ -219,10 +235,15 @@ export function useCloudSync() {
           const errorType = classifyError(error);
 
           // Don't retry for certain error types
-          if (errorType === 'permission' || errorType === 'validation') {
+          if (errorType === 'permission' || errorType === 'validation' || errorType === 'quota') {
             // Log only in development
             if (process.env.NODE_ENV === 'development') {
               console.error(`Non-retryable error (${errorType}):`, errorMessage);
+            }
+            // Store quota error flag to disable auto-sync
+            if (errorType === 'quota' && typeof window !== 'undefined') {
+              localStorage.setItem('sporttrack.quota_exceeded', 'true');
+              localStorage.setItem('sporttrack.quota_exceeded_at', new Date().toISOString());
             }
             break; // Exit retry loop
           }
@@ -320,6 +341,12 @@ export function useCloudSync() {
           });
         }
 
+        // Clear quota flag on successful sync
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('sporttrack.quota_exceeded');
+          localStorage.removeItem('sporttrack.quota_exceeded_at');
+        }
+
         updateStatus('synced');
         setSyncState((prev) => ({
           ...prev,
@@ -334,10 +361,15 @@ export function useCloudSync() {
         const errorType = classifyError(error);
 
         // Don't retry for certain error types
-        if (errorType === 'permission' || errorType === 'validation') {
+        if (errorType === 'permission' || errorType === 'validation' || errorType === 'quota') {
           // Log only in development
           if (process.env.NODE_ENV === 'development') {
             console.error(`Non-retryable download error (${errorType}):`, errorMessage);
+          }
+          // Store quota error flag to disable auto-sync
+          if (errorType === 'quota' && typeof window !== 'undefined') {
+            localStorage.setItem('sporttrack.quota_exceeded', 'true');
+            localStorage.setItem('sporttrack.quota_exceeded_at', new Date().toISOString());
           }
           break; // Exit retry loop
         }

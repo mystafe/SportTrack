@@ -139,7 +139,7 @@ export function ImportPreviewDialog({
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10000] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
+      className={`fixed inset-0 z-[10021] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onCancel();

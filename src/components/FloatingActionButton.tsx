@@ -1,38 +1,50 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { useGlobalDialogState } from '@/lib/globalDialogState';
 import { Button } from '@/components/ui/Button';
+import { useState, useEffect } from 'react';
 
 export function FloatingActionButton() {
   const router = useRouter();
   const { t } = useI18n();
   const isMobile = useIsMobile();
   const { triggerHaptic } = useHapticFeedback();
+  const { hasAnyDialogOpen } = useGlobalDialogState();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Only show on mobile
   if (!isMobile) return null;
 
-  // Check if settings dialog is open
+  // Check if Settings Dialog is open
   useEffect(() => {
     const checkSettingsOpen = () => {
-      const settingsDialog = document.querySelector('[class*="z-[10000]"]');
-      setSettingsOpen(!!settingsDialog);
+      const settingsDialog = document.querySelector('[class*="z-[9999]"]');
+      const isOpen = settingsDialog && window.getComputedStyle(settingsDialog).display !== 'none';
+      setSettingsOpen(!!isOpen);
     };
 
     const observer = new MutationObserver(checkSettingsOpen);
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style'],
+    });
     checkSettingsOpen();
 
-    return () => observer.disconnect();
+    const interval = setInterval(checkSettingsOpen, 100);
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+    };
   }, []);
 
-  // Don't show if settings is open
-  if (settingsOpen) return null;
+  // Don't show if any dialog is open (including Settings)
+  if (settingsOpen || hasAnyDialogOpen) return null;
 
   const handleClick = () => {
     triggerHaptic('medium');

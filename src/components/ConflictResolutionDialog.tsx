@@ -46,10 +46,10 @@ export function ConflictResolutionDialog({
   const { lang } = useI18n();
   const isMobile = useIsMobile();
   const { settings: currentSettings } = useSettings(); // Get current settings from store
-  const [selectedLocal, setSelectedLocal] = useState(true); // Default to true for merge
-  const [selectedCloud, setSelectedCloud] = useState(true); // Default to true for merge
+  const [selectedLocal, setSelectedLocal] = useState(false); // Default to false - user must choose
+  const [selectedCloud, setSelectedCloud] = useState(false); // Default to false - user must choose
   const [showDetails, setShowDetails] = useState(false);
-  const [showMergePreview, setShowMergePreview] = useState(true); // Default to true since both are selected
+  const [showMergePreview, setShowMergePreview] = useState(false); // Default to false - user must select both
 
   // Track localStorage changes for theme and language to force re-computation
   const [localStorageVersion, setLocalStorageVersion] = useState(0);
@@ -76,13 +76,13 @@ export function ConflictResolutionDialog({
     };
   }, []);
 
-  // Reset selections when dialog opens (default to merge - both selected)
+  // Reset selections when dialog opens (user must make a choice)
   useEffect(() => {
     if (open) {
-      setSelectedLocal(true); // Default to merge
-      setSelectedCloud(true); // Default to merge
+      setSelectedLocal(false); // User must choose
+      setSelectedCloud(false); // User must choose
       setShowDetails(false);
-      setShowMergePreview(true); // Show merge preview by default
+      setShowMergePreview(false); // User must select both to see merge preview
     }
   }, [open]);
 
@@ -400,7 +400,7 @@ export function ConflictResolutionDialog({
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10001] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
+      className={`fixed inset-0 z-[10025] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
       onClick={(e) => {
         // Only close if clicking the backdrop, not the card content
         if (e.target === e.currentTarget) {

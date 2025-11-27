@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense, useMemo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useChallenges } from '@/lib/challengeStore';
 import { Challenge, ChallengeType } from '@/lib/challenges';
@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { PageSkeleton, ChallengeCardSkeleton } from '@/components/LoadingSkeleton';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/EmptyState';
+import { Accordion } from '@/components/ui/Accordion';
 
 // Lazy load challenge components
 const ChallengeCard = lazy(() =>
@@ -29,6 +30,21 @@ export default function ChallengesPage() {
   const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null);
   const [deletingChallenge, setDeletingChallenge] = useState<Challenge | null>(null);
 
+  // Memoize filtered challenges to prevent unnecessary re-renders
+  // IMPORTANT: These hooks must be called before any conditional returns
+  const activeChallenges = useMemo(
+    () => challenges.filter((c) => c.status === 'active'),
+    [challenges]
+  );
+  const completedChallenges = useMemo(
+    () => challenges.filter((c) => c.status === 'completed'),
+    [challenges]
+  );
+  const expiredChallenges = useMemo(
+    () => challenges.filter((c) => c.status === 'expired' || c.status === 'failed'),
+    [challenges]
+  );
+
   if (!hydrated) {
     return (
       <main className="container py-6 sm:py-8" role="main" aria-label={t('nav.challenges')}>
@@ -41,12 +57,6 @@ export default function ChallengesPage() {
       </main>
     );
   }
-
-  const activeChallenges = challenges.filter((c) => c.status === 'active');
-  const completedChallenges = challenges.filter((c) => c.status === 'completed');
-  const expiredChallenges = challenges.filter(
-    (c) => c.status === 'expired' || c.status === 'failed'
-  );
 
   const handleAddChallenge = () => {
     setEditingChallenge(null);
@@ -99,22 +109,39 @@ export default function ChallengesPage() {
         </p>
       </div>
 
-      <div className="mb-6">
-        <Button
-          type="button"
-          variant="primary"
-          size={isMobile ? 'sm' : 'md'}
-          onClick={handleAddChallenge}
-          className={`${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'}`}
-        >
-          + {t('challenges.addChallenge')}
-        </Button>
-      </div>
+      <Accordion
+        title={lang === 'tr' ? 'Yeni Hedef Oluştur' : 'Create New Challenge'}
+        icon="➕"
+        defaultOpen={false}
+        variant="compact"
+        className="card-entrance mb-6"
+      >
+        <div className="flex flex-col gap-3">
+          <Button
+            type="button"
+            variant="primary"
+            size={isMobile ? 'sm' : 'md'}
+            onClick={handleAddChallenge}
+            className={`card-entrance ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'}`}
+            fullWidth
+          >
+            + {t('challenges.addChallenge')}
+          </Button>
+        </div>
+      </Accordion>
 
-      {/* Preset Challenges */}
-      <Suspense fallback={<div className="h-32 skeleton rounded-lg mb-8" />}>
-        <PresetChallenges />
-      </Suspense>
+      {/* Preset Challenges - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Önceden Tanımlı Hedefler' : 'Preset Challenges'}
+        icon="📋"
+        defaultOpen={false}
+        variant="compact"
+        className="card-entrance mb-6"
+      >
+        <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+          <PresetChallenges />
+        </Suspense>
+      </Accordion>
 
       {challenges.length === 0 ? (
         <EmptyState
@@ -132,17 +159,20 @@ export default function ChallengesPage() {
           }}
         />
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-4">
+          {/* Active Challenges - Accordion */}
           {activeChallenges.length > 0 && (
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white mb-4">
-                {t('challenges.active')}
-              </h2>
+            <Accordion
+              title={`${t('challenges.active')} (${activeChallenges.length})`}
+              icon="🔥"
+              defaultOpen={true}
+              className="card-entrance"
+            >
               <div
                 className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}
               >
-                {activeChallenges.map((challenge) => (
-                  <Suspense key={challenge.id} fallback={<ChallengeCardSkeleton />}>
+                {activeChallenges.map((challenge, index) => (
+                  <Suspense key={`${challenge.id}-${index}`} fallback={<ChallengeCardSkeleton />}>
                     <ChallengeCard
                       challenge={challenge}
                       onEdit={() => handleEditChallenge(challenge)}
@@ -151,19 +181,22 @@ export default function ChallengesPage() {
                   </Suspense>
                 ))}
               </div>
-            </div>
+            </Accordion>
           )}
 
+          {/* Completed Challenges - Accordion */}
           {completedChallenges.length > 0 && (
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white mb-4">
-                {t('challenges.completed')}
-              </h2>
+            <Accordion
+              title={`${t('challenges.completed')} (${completedChallenges.length})`}
+              icon="✅"
+              defaultOpen={false}
+              className="card-entrance"
+            >
               <div
                 className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}
               >
-                {completedChallenges.map((challenge) => (
-                  <Suspense key={challenge.id} fallback={<ChallengeCardSkeleton />}>
+                {completedChallenges.map((challenge, index) => (
+                  <Suspense key={`${challenge.id}-${index}`} fallback={<ChallengeCardSkeleton />}>
                     <ChallengeCard
                       challenge={challenge}
                       onEdit={() => handleEditChallenge(challenge)}
@@ -172,19 +205,22 @@ export default function ChallengesPage() {
                   </Suspense>
                 ))}
               </div>
-            </div>
+            </Accordion>
           )}
 
+          {/* Expired Challenges - Accordion */}
           {expiredChallenges.length > 0 && (
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white mb-4">
-                {t('challenges.expired')}
-              </h2>
+            <Accordion
+              title={`${t('challenges.expired')} (${expiredChallenges.length})`}
+              icon="⏰"
+              defaultOpen={false}
+              className="card-entrance"
+            >
               <div
                 className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}
               >
-                {expiredChallenges.map((challenge) => (
-                  <Suspense key={challenge.id} fallback={<ChallengeCardSkeleton />}>
+                {expiredChallenges.map((challenge, index) => (
+                  <Suspense key={`${challenge.id}-${index}`} fallback={<ChallengeCardSkeleton />}>
                     <ChallengeCard
                       challenge={challenge}
                       onEdit={() => handleEditChallenge(challenge)}
@@ -193,7 +229,7 @@ export default function ChallengesPage() {
                   </Suspense>
                 ))}
               </div>
-            </div>
+            </Accordion>
           )}
         </div>
       )}

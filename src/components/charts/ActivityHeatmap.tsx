@@ -19,7 +19,7 @@ type ActivityHeatmapProps = {
   target: number;
 };
 
-export function ActivityHeatmap({ activities, target }: ActivityHeatmapProps) {
+export default function ActivityHeatmap({ activities, target }: ActivityHeatmapProps) {
   const { lang } = useI18n();
   const isMobile = useIsMobile();
 

@@ -1,8 +1,9 @@
 'use client';
 
+import { memo } from 'react';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
-export function Logo() {
+export const Logo = memo(function Logo() {
   const isMobile = useIsMobile();
 
   if (isMobile) {
@@ -12,105 +13,206 @@ export function Logo() {
           <svg
             width="32"
             height="32"
-            viewBox="0 0 40 40"
+            viewBox="0 0 48 48"
             className="drop-shadow-md"
             aria-hidden="true"
           >
             <defs>
               <linearGradient id="logoGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#0ea5e9" />
+                <stop offset="50%" stopColor="#3b82f6" />
                 <stop offset="100%" stopColor="#0284c7" />
               </linearGradient>
+              <filter id="glowMobile">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
             </defs>
-            {/* Simple circle background */}
-            <circle
-              cx="20"
-              cy="20"
-              r="18"
+            {/* Modern rounded square background */}
+            <rect
+              x="4"
+              y="4"
+              width="40"
+              height="40"
+              rx="10"
+              ry="10"
               fill="url(#logoGradientMobile)"
               className="dark:opacity-95"
+              filter="url(#glowMobile)"
             />
-            {/* Very simple running person icon */}
-            <g fill="white">
-              {/* Head */}
-              <circle cx="20" cy="18" r="3" />
-              {/* Body */}
-              <rect x="18.5" y="21" width="3" height="8" rx="1.5" />
-              {/* Arms - simple V shape */}
-              <path
-                d="M 20 22 L 15 26 M 20 22 L 25 26"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-              {/* Legs - simple running position */}
-              <path
-                d="M 20 29 L 17 36 M 20 29 L 23 36"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
+            {/* Activity tracking icon - stylized checkmark with pulse */}
+            <g
+              fill="none"
+              stroke="white"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              {/* Checkmark representing completed activity */}
+              <path d="M 16 24 L 20 28 L 32 16" strokeWidth="3" />
+              {/* Pulse rings */}
+              <circle cx="24" cy="24" r="8" opacity="0.3" strokeWidth="1.5" />
+              <circle cx="24" cy="24" r="12" opacity="0.2" strokeWidth="1" />
             </g>
           </svg>
         </div>
-        <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-brand via-sky-400 to-brand-dark bg-clip-text text-transparent uppercase tracking-tight whitespace-nowrap flex items-center">
-          SPORT TRACK
-        </span>
+        <div className="flex flex-col items-start">
+          {/* Gradient top line - smooth gradient from light to dark blue */}
+          <svg width="120" height="3" viewBox="0 0 120 3" className="mb-0.5" aria-hidden="true">
+            <defs>
+              <linearGradient id="topLineGradientMobile" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#87ceeb" />
+                <stop offset="25%" stopColor="#5dade2" />
+                <stop offset="50%" stopColor="#3498db" />
+                <stop offset="75%" stopColor="#2980b9" />
+                <stop offset="100%" stopColor="#1e6fa8" />
+              </linearGradient>
+            </defs>
+            {/* Smooth gradient line */}
+            <line
+              x1="0"
+              y1="1.5"
+              x2="120"
+              y2="1.5"
+              stroke="url(#topLineGradientMobile)"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+          </svg>
+          <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-brand via-blue-500 to-brand-dark bg-clip-text text-transparent tracking-tight whitespace-nowrap">
+            SPORT TRACK
+          </span>
+          {/* Gradient finish line - smooth gradient from light to dark blue */}
+          <svg width="120" height="3" viewBox="0 0 120 3" className="mt-0.5" aria-hidden="true">
+            <defs>
+              <linearGradient id="lineGradientMobile" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#87ceeb" />
+                <stop offset="25%" stopColor="#5dade2" />
+                <stop offset="50%" stopColor="#3498db" />
+                <stop offset="75%" stopColor="#2980b9" />
+                <stop offset="100%" stopColor="#1e6fa8" />
+              </linearGradient>
+            </defs>
+            {/* Smooth gradient line */}
+            <line
+              x1="0"
+              y1="1.5"
+              x2="120"
+              y2="1.5"
+              stroke="url(#lineGradientMobile)"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-2.5">
+    <div className="flex items-center gap-3">
       <div className="relative group">
         <svg
-          width="40"
-          height="40"
-          viewBox="0 0 40 40"
-          className="drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
+          width="44"
+          height="44"
+          viewBox="0 0 48 48"
+          className="drop-shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2"
           aria-hidden="true"
         >
           <defs>
             <linearGradient id="logoGradientDesktop" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#0ea5e9" />
-              <stop offset="50%" stopColor="#38bdf8" />
+              <stop offset="50%" stopColor="#3b82f6" />
               <stop offset="100%" stopColor="#0284c7" />
             </linearGradient>
+            <filter id="glowDesktop">
+              <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
-          {/* Simple circle background */}
-          <circle
-            cx="20"
-            cy="20"
-            r="18"
+          {/* Modern rounded square background with subtle shadow */}
+          <rect
+            x="4"
+            y="4"
+            width="40"
+            height="40"
+            rx="11"
+            ry="11"
             fill="url(#logoGradientDesktop)"
             className="dark:opacity-95"
+            filter="url(#glowDesktop)"
           />
-          {/* Very simple running person icon */}
-          <g fill="white">
-            {/* Head */}
-            <circle cx="20" cy="18" r="3.5" />
-            {/* Body */}
-            <rect x="18" y="21" width="4" height="9" rx="2" />
-            {/* Arms - simple V shape */}
-            <path
-              d="M 20 22 L 14 27 M 20 22 L 26 27"
-              stroke="white"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
-            {/* Legs - simple running position */}
-            <path
-              d="M 20 30 L 16 38 M 20 30 L 24 38"
-              stroke="white"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
+          {/* Activity tracking icon - stylized checkmark with pulse effect */}
+          <g
+            fill="none"
+            stroke="white"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {/* Main checkmark representing completed activity */}
+            <path d="M 18 24 L 22 28 L 30 20" strokeWidth="3.5" />
+            {/* Pulse rings for dynamic feel */}
+            <circle cx="24" cy="24" r="9" opacity="0.25" strokeWidth="2" />
+            <circle cx="24" cy="24" r="13" opacity="0.15" strokeWidth="1.5" />
           </g>
         </svg>
       </div>
-      <span className="font-bold text-2xl sm:text-3xl bg-gradient-to-r from-brand via-sky-400 via-brand-light to-brand-dark bg-clip-text text-transparent tracking-tight uppercase">
-        SPORT TRACK
-      </span>
+      <div className="flex flex-col items-start">
+        {/* Gradient top line - smooth gradient from light to dark blue */}
+        <svg width="180" height="4" viewBox="0 0 180 4" className="mb-1" aria-hidden="true">
+          <defs>
+            <linearGradient id="topLineGradientDesktop" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#87ceeb" />
+              <stop offset="25%" stopColor="#5dade2" />
+              <stop offset="50%" stopColor="#3498db" />
+              <stop offset="75%" stopColor="#2980b9" />
+              <stop offset="100%" stopColor="#1e6fa8" />
+            </linearGradient>
+          </defs>
+          {/* Smooth gradient line */}
+          <line
+            x1="0"
+            y1="2"
+            x2="180"
+            y2="2"
+            stroke="url(#topLineGradientDesktop)"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
+        <span className="font-bold text-2xl sm:text-3xl bg-gradient-to-r from-brand via-blue-500 via-brand-light to-brand-dark bg-clip-text text-transparent tracking-tight uppercase">
+          SPORT TRACK
+        </span>
+        {/* Gradient finish line - smooth gradient from light to dark blue */}
+        <svg width="180" height="4" viewBox="0 0 180 4" className="mt-1" aria-hidden="true">
+          <defs>
+            <linearGradient id="lineGradientDesktop" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#87ceeb" />
+              <stop offset="25%" stopColor="#5dade2" />
+              <stop offset="50%" stopColor="#3498db" />
+              <stop offset="75%" stopColor="#2980b9" />
+              <stop offset="100%" stopColor="#1e6fa8" />
+            </linearGradient>
+          </defs>
+          {/* Smooth gradient line */}
+          <line
+            x1="0"
+            y1="2"
+            x2="180"
+            y2="2"
+            stroke="url(#lineGradientDesktop)"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
+      </div>
     </div>
   );
-}
+});

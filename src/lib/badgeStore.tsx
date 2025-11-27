@@ -12,6 +12,7 @@ type BadgeContextValue = {
   hydrated: boolean;
   checkNewBadges: () => Badge[];
   unlockBadge: (badge: Badge) => void;
+  markBadgeAsShown: (badgeId: string) => void;
   clearAllBadges: () => void;
   reloadFromStorage: () => void;
 };
@@ -35,10 +36,11 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem(STORAGE_KEYS.BADGES);
       if (stored) {
         const parsed = JSON.parse(stored) as Badge[];
-        // Convert unlockedAt strings back to Date objects
+        // Convert unlockedAt strings back to Date objects and ensure shown field exists
         const badgesWithDates = parsed.map((badge) => ({
           ...badge,
           unlockedAt: badge.unlockedAt ? new Date(badge.unlockedAt) : undefined,
+          shown: badge.shown !== undefined ? badge.shown : false, // Default to false if not set
         }));
         setBadges(badgesWithDates);
       }
@@ -68,21 +70,44 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Check for new badges (only returns badges that are actually new)
+  // Check for new badges (only returns badges that are actually new and not shown)
   const checkNewBadges = useCallback((): Badge[] => {
     if (!hydrated || activities.length === 0) return [];
 
     const existingBadgeIds = new Set(badges.map((b) => b.id));
+    // Also track badges that are already shown
+    const shownBadgeIds = new Set(badges.filter((b) => b.shown === true).map((b) => b.id));
+
     const newBadges = checkBadges(activities, settings, target, badges);
 
-    // Filter out badges that already exist
-    const trulyNewBadges = newBadges.filter((badge) => !existingBadgeIds.has(badge.id));
+    // Filter out badges that already exist OR are already shown
+    const trulyNewBadges = newBadges.filter(
+      (badge) => !existingBadgeIds.has(badge.id) && !shownBadgeIds.has(badge.id)
+    );
 
     if (trulyNewBadges.length > 0) {
-      const updatedBadges = [...badges, ...trulyNewBadges];
+      // Check if we should mark badges as "shown" (suppress notification)
+      const shouldSuppressBadges =
+        typeof window !== 'undefined' &&
+        (localStorage.getItem('sporttrack.dummy_data_loading') === 'true' ||
+          localStorage.getItem('sporttrack.data_importing') === 'true' ||
+          localStorage.getItem('sporttrack.is_new_login') === 'true');
+
+      // Mark badges as shown if we're suppressing notifications
+      const badgesToAdd = trulyNewBadges.map((badge) => ({
+        ...badge,
+        unlockedAt: badge.unlockedAt || new Date(),
+        shown: shouldSuppressBadges ? true : false, // Mark as shown if suppressing
+      }));
+
+      const updatedBadges = [...badges, ...badgesToAdd];
       saveBadges(updatedBadges);
-      return trulyNewBadges;
+
+      // Return only badges that should be shown (not suppressed)
+      return shouldSuppressBadges ? [] : badgesToAdd;
     }
+
+    // Return empty array - no new badges
     return [];
   }, [activities, settings, target, badges, hydrated, saveBadges]);
 
@@ -92,6 +117,20 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
       const exists = badges.some((b) => b.id === badge.id);
       if (!exists) {
         const updatedBadges = [...badges, { ...badge, unlockedAt: new Date() }];
+        saveBadges(updatedBadges);
+      }
+    },
+    [badges, saveBadges]
+  );
+
+  // Mark a badge as shown (notification displayed)
+  const markBadgeAsShown = useCallback(
+    (badgeId: string) => {
+      const badgeIndex = badges.findIndex((b) => b.id === badgeId);
+      if (badgeIndex !== -1) {
+        const updatedBadges = badges.map((badge, index) =>
+          index === badgeIndex ? { ...badge, shown: true } : badge
+        );
         saveBadges(updatedBadges);
       }
     },
@@ -111,10 +150,11 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem(STORAGE_KEYS.BADGES);
       if (stored) {
         const parsed = JSON.parse(stored) as Badge[];
-        // Convert unlockedAt strings back to Date objects
+        // Convert unlockedAt strings back to Date objects and ensure shown field exists
         const badgesWithDates = parsed.map((badge) => ({
           ...badge,
           unlockedAt: badge.unlockedAt ? new Date(badge.unlockedAt) : undefined,
+          shown: badge.shown !== undefined ? badge.shown : false, // Default to false if not set
         }));
         setBadges(badgesWithDates);
       } else {
@@ -131,10 +171,19 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
       hydrated,
       checkNewBadges,
       unlockBadge,
+      markBadgeAsShown,
       clearAllBadges,
       reloadFromStorage,
     }),
-    [badges, hydrated, checkNewBadges, unlockBadge, clearAllBadges, reloadFromStorage]
+    [
+      badges,
+      hydrated,
+      checkNewBadges,
+      unlockBadge,
+      markBadgeAsShown,
+      clearAllBadges,
+      reloadFromStorage,
+    ]
   );
 
   return <BadgeContext.Provider value={value}>{children}</BadgeContext.Provider>;

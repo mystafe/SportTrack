@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, memo } from 'react';
 import { startOfDay } from 'date-fns';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord } from '@/lib/activityStore';
@@ -37,7 +37,7 @@ function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
   return `${minutes}:${String(secs).padStart(2, '0')}`;
 }
 
-export function ActivityCard({
+export const ActivityCard = memo(function ActivityCard({
   activity,
   isToday,
   numberFormatter,
@@ -96,16 +96,18 @@ export function ActivityCard({
         {...(isMobile
           ? { ...swipeHandlers.touchHandlers, ...longPressHandlers }
           : longPressHandlers)}
-        className={`activity-card-entrance activity-card-shimmer activity-card-hover activity-ripple gpu-accelerated group relative rounded-2xl ${isToday ? 'ring-4 ring-brand/40 dark:ring-brand/50 shadow-2xl' : 'shadow-xl'} border-2 ${isToday ? 'border-brand/50 dark:border-brand/60' : 'border-gray-300/60 dark:border-gray-600/60'} bg-gradient-to-br ${isToday ? 'from-brand/10 via-white to-brand/5 dark:from-brand/20 dark:via-gray-900 dark:to-brand/10' : 'from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'} ${
+        className={`activity-card-entrance activity-card-shimmer activity-card-hover activity-ripple gpu-accelerated group relative ${density === 'compact' ? 'rounded-xl' : 'rounded-2xl'} ${isToday ? (density === 'compact' ? 'ring-2' : 'ring-4') + ' ring-brand/40 dark:ring-brand/50 shadow-xl' : 'shadow-lg'} border-2 ${isToday ? 'border-brand/50 dark:border-brand/60' : 'border-gray-300/60 dark:border-gray-600/60'} bg-gradient-to-br ${isToday ? 'from-brand/10 via-white to-brand/5 dark:from-brand/20 dark:via-gray-900 dark:to-brand/10' : 'from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'} ${
           density === 'compact'
             ? isMobile
-              ? 'px-4 py-2.5'
-              : 'px-4 py-2.5'
+              ? 'px-3 py-2'
+              : 'px-3 py-2'
             : isMobile
               ? 'px-5 py-4'
               : 'px-5 py-4'
-        } hover:shadow-2xl hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 overflow-hidden ${swipeHandlers.isSwiping ? 'cursor-grabbing scale-[0.98]' : ''}`}
+        } hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 overflow-hidden ${swipeHandlers.isSwiping ? 'cursor-grabbing scale-[0.98]' : ''}`}
         style={{ animationDelay }}
+        role="article"
+        aria-label={`${getActivityLabel(activity, lang)}, ${numberFormatter.format(activity.amount)} ${getActivityUnit(activity, lang)}, ${numberFormatter.format(activity.points)} ${t('list.pointsUnit')}, ${timeFormatter.format(new Date(activity.performedAt))}${isToday ? `, ${lang === 'tr' ? 'Bugün' : 'Today'}` : ''}`}
       >
         {/* Animated background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-brand/10 via-transparent to-brand/5 dark:from-brand/20 dark:via-transparent dark:to-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
@@ -121,78 +123,98 @@ export function ActivityCard({
         )}
 
         <div className="relative z-10">
-          {/* Header Row */}
+          {/* Header Row - Compact Layout */}
           <div
-            className={`flex items-start justify-between gap-3 ${density === 'compact' ? 'mb-2' : 'mb-3'}`}
+            className={`flex items-center justify-between gap-2 ${density === 'compact' ? 'mb-1.5' : 'mb-3'}`}
           >
-            <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
               <div
-                className={`relative ${isMobile ? 'text-3xl' : 'text-4xl'} activity-icon-float ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}
+                className={`relative flex-shrink-0 ${density === 'compact' ? (isMobile ? 'text-2xl' : 'text-2xl') : isMobile ? 'text-3xl' : 'text-4xl'} ${density === 'compact' ? '' : isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}
               >
                 {activity.icon}
-                {isToday && (
+                {isToday && density !== 'compact' && (
                   <span className="absolute -top-1 -right-1 text-xs animate-pulse">⭐</span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3
-                  className={`${isMobile ? 'text-lg' : 'text-xl'} font-black text-gray-950 dark:text-white mb-1 drop-shadow-sm truncate`}
-                >
-                  {getActivityLabel(activity, lang)}
-                </h3>
-                <Badge
-                  variant="primary"
-                  size={isMobile ? 'sm' : 'md'}
-                  className="points-badge-animated shadow-xl"
-                >
-                  <span className="text-sm drop-shadow-md">✨</span>
-                  <span className="ml-2 font-black">{numberFormatter.format(activity.points)}</span>
-                  <span
-                    className={`ml-1.5 ${isMobile ? 'text-xs' : 'text-[10px]'} opacity-95 font-bold`}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3
+                    className={`${density === 'compact' ? (isMobile ? 'text-sm' : 'text-base') : isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-950 dark:text-white truncate`}
                   >
-                    {t('list.pointsUnit')}
-                  </span>
-                </Badge>
+                    {getActivityLabel(activity, lang)}
+                  </h3>
+                  {isToday && density === 'compact' && (
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-green-500/20 dark:bg-green-500/30 text-green-700 dark:text-green-400 border border-green-500/30 flex-shrink-0">
+                      {lang === 'tr' ? 'Bugün' : 'Today'}
+                    </span>
+                  )}
+                  <Badge
+                    variant="primary"
+                    size={density === 'compact' ? 'sm' : isMobile ? 'sm' : 'md'}
+                    className={`points-badge-animated ${density === 'compact' ? 'shadow-md' : 'shadow-xl'}`}
+                  >
+                    <span className={density === 'compact' ? 'text-xs' : 'text-sm'}>✨</span>
+                    <span
+                      className={`${density === 'compact' ? 'ml-1 text-xs' : 'ml-2'} font-black`}
+                    >
+                      {numberFormatter.format(activity.points)}
+                    </span>
+                    <span
+                      className={`${density === 'compact' ? 'ml-1 text-[9px]' : isMobile ? 'text-xs' : 'text-[10px]'} opacity-95 font-bold`}
+                    >
+                      {t('list.pointsUnit')}
+                    </span>
+                  </Badge>
+                </div>
               </div>
             </div>
-            {isToday && (
+            {isToday && density !== 'compact' && (
               <span
-                className={`px-2 py-1 rounded-lg bg-green-500/20 dark:bg-green-500/30 text-green-700 dark:text-green-400 ${isMobile ? 'text-xs' : 'text-[10px]'} font-bold uppercase tracking-wide border border-green-500/30`}
+                className={`px-2 py-1 rounded-lg bg-green-500/20 dark:bg-green-500/30 text-green-700 dark:text-green-400 ${isMobile ? 'text-xs' : 'text-[10px]'} font-bold uppercase tracking-wide border border-green-500/30 flex-shrink-0`}
               >
                 {lang === 'tr' ? 'Bugün' : 'Today'}
               </span>
             )}
           </div>
 
-          {/* Details Row */}
+          {/* Details Row - Compact Inline Layout */}
           <div
-            className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 ${density === 'compact' ? 'mb-2' : 'mb-3'} font-bold flex items-center gap-2 flex-wrap`}
+            className={`${density === 'compact' ? (isMobile ? 'text-[10px]' : 'text-xs') : isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400 ${density === 'compact' ? 'mb-1.5' : 'mb-3'} font-medium flex items-center gap-1.5 flex-wrap`}
           >
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-100/80 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 border border-blue-200/50 dark:border-blue-700/50">
-              <span className="text-base">🕐</span>
+            <span className="inline-flex items-center gap-1">
+              <span className={density === 'compact' ? 'text-xs' : 'text-sm'}>🕐</span>
               <span>{timeFormatter.format(new Date(activity.performedAt))}</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-100/80 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-700/50">
-              <span className="text-base">📊</span>
-              <span className="font-black">{activity.amount}</span>
+            </span>
+            <span className="text-gray-400 dark:text-gray-600">•</span>
+            <span className="inline-flex items-center gap-1">
+              <span className={density === 'compact' ? 'text-xs' : 'text-sm'}>📊</span>
+              <span className="font-semibold">{activity.amount}</span>
               <span>{getActivityUnit(activity, lang)}</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-900/50 dark:to-pink-900/50 text-purple-800 dark:text-purple-300 border border-purple-300/50 dark:border-purple-700/50">
-              <span className="text-base">⚡</span>
-              <span className="font-black">{activity.multiplier}x</span>
-            </div>
+            </span>
+            {activity.multiplier > 1 && (
+              <>
+                <span className="text-gray-400 dark:text-gray-600">•</span>
+                <span className="inline-flex items-center gap-1">
+                  <span className={density === 'compact' ? 'text-xs' : 'text-sm'}>⚡</span>
+                  <span className="font-semibold">{activity.multiplier}x</span>
+                </span>
+              </>
+            )}
             {activity.duration && activity.duration > 0 && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-100/80 dark:bg-cyan-900/40 text-cyan-800 dark:text-cyan-300 border border-cyan-200/50 dark:border-cyan-700/50">
-                <span className="text-base">⏱️</span>
-                <span className="font-black">{formatDuration(activity.duration, lang)}</span>
-              </div>
+              <>
+                <span className="text-gray-400 dark:text-gray-600">•</span>
+                <span className="inline-flex items-center gap-1">
+                  <span className={density === 'compact' ? 'text-xs' : 'text-sm'}>⏱️</span>
+                  <span className="font-semibold">{formatDuration(activity.duration, lang)}</span>
+                </span>
+              </>
             )}
           </div>
 
           {/* Note */}
           {activity.note && (
             <div
-              className={`${isMobile ? 'text-xs' : 'text-sm'} ${density === 'compact' ? 'mb-2' : 'mb-3'} ${density === 'compact' ? 'px-3 py-1.5' : 'px-4 py-2.5'} rounded-xl bg-gradient-to-r from-gray-100/90 to-gray-50/90 dark:from-gray-800/80 dark:to-gray-700/80 border-l-4 border-brand/60 dark:border-brand/70 text-gray-800 dark:text-gray-200 line-clamp-2 font-semibold italic shadow-inner`}
+              className={`${density === 'compact' ? (isMobile ? 'text-[10px]' : 'text-xs') : isMobile ? 'text-xs' : 'text-sm'} ${density === 'compact' ? 'mb-1.5' : 'mb-3'} ${density === 'compact' ? 'px-2 py-1' : 'px-4 py-2.5'} rounded-lg bg-gradient-to-r from-gray-100/90 to-gray-50/90 dark:from-gray-800/80 dark:to-gray-700/80 border-l-2 border-brand/60 dark:border-brand/70 text-gray-700 dark:text-gray-300 ${density === 'compact' ? 'line-clamp-1' : 'line-clamp-2'} font-medium italic`}
             >
               <span className="text-brand dark:text-brand-light mr-1">"</span>
               {activity.note}
@@ -200,33 +222,35 @@ export function ActivityCard({
             </div>
           )}
 
-          {/* Action Buttons */}
+          {/* Action Buttons - Compact and Right Aligned */}
           <div
-            className={`flex items-center gap-2 pt-2 border-t border-gray-200/50 dark:border-gray-700/50 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'} transition-all duration-300`}
+            className={`flex items-center justify-end gap-1.5 ${density === 'compact' ? 'pt-1' : 'pt-1.5'} border-t border-gray-200/50 dark:border-gray-700/50 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'} transition-all duration-300`}
           >
-            <Button
-              variant="primary"
-              size={isMobile ? 'md' : 'md'}
+            <button
               onClick={() => onEdit(activity.id)}
-              icon="✏️"
-              className="flex-1"
+              className={`flex items-center justify-center ${density === 'compact' ? 'w-7 h-7' : 'w-8 h-8'} rounded-lg bg-brand/10 dark:bg-brand/20 hover:bg-brand/20 dark:hover:bg-brand/30 text-brand dark:text-brand-light transition-all duration-200 active:scale-95`}
+              aria-label={`${t('list.edit')} ${getActivityLabel(activity, lang)}`}
+              title={t('list.edit')}
             >
-              {t('list.edit')}
-            </Button>
-            <Button
-              variant="danger"
-              size={isMobile ? 'md' : 'md'}
+              <span className={`${density === 'compact' ? 'text-sm' : 'text-base'}`}>✏️</span>
+            </button>
+            <button
               onClick={() => {
                 if (!isToday) return;
                 onDelete(activity.id, activity);
               }}
               disabled={!isToday}
-              title={!isToday ? t('list.deleteDisabled') : undefined}
-              icon="🗑️"
-              className="flex-1"
+              className={`flex items-center justify-center ${density === 'compact' ? 'w-7 h-7' : 'w-8 h-8'} rounded-lg ${isToday ? 'bg-red-500/10 dark:bg-red-500/20 hover:bg-red-500/20 dark:hover:bg-red-500/30 text-red-600 dark:text-red-400' : 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-400 dark:text-gray-600 cursor-not-allowed'} transition-all duration-200 active:scale-95`}
+              aria-label={
+                !isToday
+                  ? t('list.deleteDisabled')
+                  : `${t('list.delete')} ${getActivityLabel(activity, lang)}`
+              }
+              aria-disabled={!isToday}
+              title={!isToday ? t('list.deleteDisabled') : t('list.delete')}
             >
-              {t('list.delete')}
-            </Button>
+              <span className={`${density === 'compact' ? 'text-sm' : 'text-base'}`}>🗑️</span>
+            </button>
           </div>
         </div>
       </li>
@@ -269,4 +293,4 @@ export function ActivityCard({
       )}
     </>
   );
-}
+});

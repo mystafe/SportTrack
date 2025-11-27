@@ -144,6 +144,11 @@ export function AppleHealthImport() {
   const handleImport = async () => {
     if (!parseResult || !walkingDefinition) return;
 
+    // Set flag to suppress badge notifications during import
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sporttrack.data_importing', 'true');
+    }
+
     try {
       // Find existing WALKING activities and delete them
       const existingWalkingActivities = activities.filter((a) => a.activityKey === 'WALKING');
@@ -224,9 +229,19 @@ export function AppleHealthImport() {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+
+      // Clear flag after import completes
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('sporttrack.data_importing');
+      }
     } catch (error) {
       console.error('Failed to import Apple Health data:', error);
       showToast(t('appleHealth.importFailed'), 'error');
+
+      // Clear flag even on error
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('sporttrack.data_importing');
+      }
     }
   };
 

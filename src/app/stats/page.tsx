@@ -13,6 +13,7 @@ import { PageSkeleton } from '@/components/LoadingSkeleton';
 import { ChartSkeleton } from '@/components/ChartSkeleton';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Accordion } from '@/components/ui/Accordion';
 import {
   calculateWeeklyStats,
   calculateMonthlyStats,
@@ -35,7 +36,7 @@ const ActivityPieChart = lazy(() =>
   import('@/components/charts/ActivityPieChart').then((m) => ({ default: m.ActivityPieChart }))
 );
 const ActivityHeatmap = lazy(() =>
-  import('@/components/charts/ActivityHeatmap').then((m) => ({ default: m.ActivityHeatmap }))
+  import('@/components/charts/ActivityHeatmap').then((m) => ({ default: m.default }))
 );
 const PersonalRecords = lazy(() =>
   import('@/components/PersonalRecords').then((m) => ({ default: m.PersonalRecords }))
@@ -51,6 +52,82 @@ const DurationStats = lazy(() =>
 );
 const ActivityTypeTrend = lazy(() =>
   import('@/components/ActivityTypeTrend').then((m) => ({ default: m.ActivityTypeTrend }))
+);
+const ActivityPerformanceAnalysis = lazy(() =>
+  import('@/components/ActivityPerformance').then((m) => ({
+    default: m.ActivityPerformanceAnalysis,
+  }))
+);
+const WeeklySummary = lazy(() =>
+  import('@/components/WeeklySummary').then((m) => ({ default: m.WeeklySummary }))
+);
+const ActivityComparison = lazy(() =>
+  import('@/components/ActivityComparison').then((m) => ({ default: m.ActivityComparison }))
+);
+const ActivityTrendAnalysis = lazy(() =>
+  import('@/components/ActivityTrendAnalysis').then((m) => ({ default: m.ActivityTrendAnalysis }))
+);
+const ActivityCategoryAnalysis = lazy(() =>
+  import('@/components/ActivityCategoryAnalysis').then((m) => ({
+    default: m.ActivityCategoryAnalysis,
+  }))
+);
+const ActivityRecords = lazy(() =>
+  import('@/components/ActivityRecords').then((m) => ({ default: m.ActivityRecords }))
+);
+const ActivityGoalsDashboard = lazy(() =>
+  import('@/components/ActivityGoalsDashboard').then((m) => ({ default: m.ActivityGoalsDashboard }))
+);
+const ActivityCalendar = lazy(() =>
+  import('@/components/ActivityCalendar').then((m) => ({ default: m.ActivityCalendar }))
+);
+const ActivityGoalsTimeline = lazy(() =>
+  import('@/components/ActivityGoalsTimeline').then((m) => ({ default: m.ActivityGoalsTimeline }))
+);
+const ActivityPerformanceComparison = lazy(() =>
+  import('@/components/ActivityPerformanceComparison').then((m) => ({
+    default: m.ActivityPerformanceComparison,
+  }))
+);
+const ActivityPerformanceSummary = lazy(() =>
+  import('@/components/ActivityPerformanceSummary').then((m) => ({
+    default: m.ActivityPerformanceSummary,
+  }))
+);
+const ActivityPerformanceForecast = lazy(() =>
+  import('@/components/ActivityPerformanceForecast').then((m) => ({
+    default: m.ActivityPerformanceForecast,
+  }))
+);
+const ActivityPerformanceReport = lazy(() =>
+  import('@/components/ActivityPerformanceReport').then((m) => ({
+    default: m.ActivityPerformanceReport,
+  }))
+);
+const ActivityPerformanceHeatmap = lazy(() =>
+  import('@/components/ActivityPerformanceHeatmap').then((m) => ({
+    default: m.ActivityPerformanceHeatmap,
+  }))
+);
+const ActivityPerformanceDistribution = lazy(() =>
+  import('@/components/ActivityPerformanceDistribution').then((m) => ({
+    default: m.ActivityPerformanceDistribution,
+  }))
+);
+const ActivityPerformanceDashboard = lazy(() =>
+  import('@/components/ActivityPerformanceDashboard').then((m) => ({
+    default: m.ActivityPerformanceDashboard,
+  }))
+);
+const ActivityComparisonMatrix = lazy(() =>
+  import('@/components/ActivityComparisonMatrix').then((m) => ({
+    default: m.ActivityComparisonMatrix,
+  }))
+);
+const ActivityPerformanceRecommendations = lazy(() =>
+  import('@/components/ActivityPerformanceRecommendations').then((m) => ({
+    default: m.ActivityPerformanceRecommendations,
+  }))
 );
 
 export default function StatsPage() {
@@ -461,12 +538,14 @@ export default function StatsPage() {
         )}
       </Card>
 
-      {/* Trend Chart */}
-      <div className="rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+      {/* Trend Chart - Accordion */}
+      <Accordion
+        title={t('stats.detailed.trendChart')}
+        icon="📈"
+        defaultOpen={true}
+        className="card-entrance"
+      >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-950 dark:text-white">
-            {t('stats.detailed.trendChart')}
-          </h2>
           <div className="flex items-center gap-2">
             {([7, 30, 90] as const).map((days) => (
               <Button
@@ -484,49 +563,59 @@ export default function StatsPage() {
         <Suspense fallback={<ChartSkeleton />}>
           <TrendChart activities={activities} target={target} days={trendDays} />
         </Suspense>
-      </div>
+      </Accordion>
 
-      {/* Charts Row */}
-      <div
-        className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-4 sm:gap-6`}
+      {/* Charts Row - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Aktivite Grafikleri' : 'Activity Charts'}
+        icon="📊"
+        defaultOpen={true}
+        className="card-entrance"
       >
-        {/* Bar Chart */}
-        <div className="chart-container card-entrance slide-in-left rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
-          <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">
-            {t('stats.detailed.activityComparison')}
-          </h2>
-          <Suspense fallback={<ChartSkeleton />}>
-            <ActivityBarChart activities={activities} />
-          </Suspense>
-        </div>
+        <div
+          className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-4 sm:gap-6`}
+        >
+          {/* Bar Chart */}
+          <div className="chart-container card-entrance slide-in-left rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
+            <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">
+              {t('stats.detailed.activityComparison')}
+            </h2>
+            <Suspense fallback={<ChartSkeleton />}>
+              <ActivityBarChart activities={activities} />
+            </Suspense>
+          </div>
 
-        {/* Pie Chart */}
-        <div className="chart-container card-entrance slide-in-right rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
-          <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">
-            {t('stats.detailed.activityDistribution')}
-          </h2>
-          <Suspense fallback={<ChartSkeleton />}>
-            <ActivityPieChart activities={activities} />
-          </Suspense>
+          {/* Pie Chart */}
+          <div className="chart-container card-entrance slide-in-right rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300 magnetic-hover gpu-accelerated">
+            <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">
+              {t('stats.detailed.activityDistribution')}
+            </h2>
+            <Suspense fallback={<ChartSkeleton />}>
+              <ActivityPieChart activities={activities} />
+            </Suspense>
+          </div>
         </div>
-      </div>
+      </Accordion>
 
-      {/* Heatmap */}
-      <div className="rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
-        <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">
-          {t('stats.detailed.activityHeatmap')}
-        </h2>
+      {/* Heatmap - Accordion */}
+      <Accordion
+        title={t('stats.detailed.activityHeatmap')}
+        icon="🔥"
+        defaultOpen={false}
+        className="card-entrance"
+      >
         <Suspense fallback={<ChartSkeleton />}>
           <ActivityHeatmap activities={activities} target={target} />
         </Suspense>
-      </div>
+      </Accordion>
 
-      {/* Daily Statistics */}
-      <div className="rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
-        <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">
-          {t('stats.detailed.dailyStats')}
-        </h2>
-
+      {/* Daily Statistics - Accordion */}
+      <Accordion
+        title={t('stats.detailed.dailyStats')}
+        icon="📅"
+        defaultOpen={false}
+        className="card-entrance"
+      >
         {/* Date Selector */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2">{t('stats.detailed.selectDate')}</label>
@@ -642,13 +731,15 @@ export default function StatsPage() {
             </div>
           )}
         </div>
-      </div>
+      </Accordion>
 
-      {/* Completion Rate */}
-      <div className="rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
-        <h2 className="text-lg font-bold text-gray-950 dark:text-white mb-4">
-          {t('stats.detailed.completionRate')}
-        </h2>
+      {/* Completion Rate - Accordion */}
+      <Accordion
+        title={t('stats.detailed.completionRate')}
+        icon="✅"
+        defaultOpen={false}
+        className="card-entrance"
+      >
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
@@ -664,349 +755,488 @@ export default function StatsPage() {
           {allDays.filter((day) => day.points >= target).length} / {allDays.length}{' '}
           {t('stats.detailed.totalSessions')}
         </div>
-      </div>
+      </Accordion>
 
-      {/* Advanced Metrics Section */}
-      <div
-        className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-4 sm:gap-6`}
+      {/* Advanced Metrics Section - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Gelişmiş Metrikler' : 'Advanced Metrics'}
+        icon="📈"
+        defaultOpen={false}
+        className="card-entrance"
       >
-        {/* Consistency Score Details */}
-        <Card
-          variant="default"
-          size="md"
-          hoverable
-          className="chart-container card-entrance slide-in-left gpu-accelerated"
-          header={
-            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
-              {t('stats.detailed.consistencyScore')}
-            </h2>
-          }
+        <div
+          className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-4 sm:gap-6`}
         >
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('stats.detailed.regularity')}
-              </span>
-              <div className="flex items-center gap-2">
-                <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-blue-500 transition-all duration-500 progress-bar-fill"
-                    style={{ width: `${consistencyScore.factors.regularity}%` }}
-                  />
-                </div>
-                <span className="text-sm font-semibold w-12 text-right">
-                  {consistencyScore.factors.regularity}%
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('stats.detailed.frequency')}
-              </span>
-              <div className="flex items-center gap-2">
-                <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-green-500 transition-all duration-500 progress-bar-fill"
-                    style={{ width: `${consistencyScore.factors.frequency}%` }}
-                  />
-                </div>
-                <span className="text-sm font-semibold w-12 text-right">
-                  {consistencyScore.factors.frequency}%
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('stats.detailed.progression')}
-              </span>
-              <div className="flex items-center gap-2">
-                <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-purple-500 transition-all duration-500 progress-bar-fill"
-                    style={{ width: `${consistencyScore.factors.progression}%` }}
-                  />
-                </div>
-                <span className="text-sm font-semibold w-12 text-right">
-                  {consistencyScore.factors.progression}%
-                </span>
-              </div>
-            </div>
-            <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+          {/* Consistency Score Details */}
+          <Card
+            variant="default"
+            size="md"
+            hoverable
+            className="chart-container card-entrance slide-in-left gpu-accelerated"
+            header={
+              <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+                {t('stats.detailed.consistencyScore')}
+              </h2>
+            }
+          >
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-base font-semibold text-gray-900 dark:text-white">
-                  {t('stats.detailed.consistencyScore')}
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('stats.detailed.regularity')}
                 </span>
-                <span className="text-2xl font-bold text-brand">{consistencyScore.score}/100</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-500 transition-all duration-500 progress-bar-fill"
+                      style={{ width: `${consistencyScore.factors.regularity}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-semibold w-12 text-right">
+                    {consistencyScore.factors.regularity}%
+                  </span>
+                </div>
               </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Activity Diversity Details */}
-        <Card
-          variant="default"
-          size="md"
-          hoverable
-          className="chart-container card-entrance slide-in-right gpu-accelerated"
-          header={
-            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
-              {t('stats.detailed.activityDiversity')}
-            </h2>
-          }
-        >
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('stats.detailed.uniqueActivities')}
-              </span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
-                {activityDiversity.uniqueActivities}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('stats.detailed.totalActivities')}
-              </span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
-                {activityDiversity.totalActivities}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('stats.detailed.diversityRatio')}
-              </span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
-                {(activityDiversity.diversityRatio * 100).toFixed(1)}%
-              </span>
-            </div>
-            <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <span className="text-base font-semibold text-gray-900 dark:text-white">
-                  {t('stats.detailed.activityDiversity')}
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('stats.detailed.frequency')}
                 </span>
-                <span className="text-2xl font-bold text-brand">{activityDiversity.score}/100</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-green-500 transition-all duration-500 progress-bar-fill"
+                      style={{ width: `${consistencyScore.factors.frequency}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-semibold w-12 text-right">
+                    {consistencyScore.factors.frequency}%
+                  </span>
+                </div>
               </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Progress Velocity */}
-        <Card
-          variant="default"
-          size="md"
-          hoverable
-          className="chart-container card-entrance slide-in-left gpu-accelerated"
-          header={
-            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
-              {t('stats.detailed.progressVelocity')}
-            </h2>
-          }
-        >
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {lang === 'tr' ? 'Son 30 Gün Ortalama' : 'Last 30 Days Average'}
-              </span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
-                {numberFormatter.format(Math.round(progressVelocity.currentAverage))}{' '}
-                {t('list.pointsUnit')}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {lang === 'tr' ? 'Önceki 30 Gün Ortalama' : 'Previous 30 Days Average'}
-              </span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
-                {numberFormatter.format(Math.round(progressVelocity.previousAverage))}{' '}
-                {t('list.pointsUnit')}
-              </span>
-            </div>
-            <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <span className="text-base font-semibold text-gray-900 dark:text-white">
-                  {progressVelocity.trend === 'up'
-                    ? t('stats.detailed.trendUp')
-                    : progressVelocity.trend === 'down'
-                      ? t('stats.detailed.trendDown')
-                      : t('stats.detailed.trendStable')}
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('stats.detailed.progression')}
                 </span>
-                <span
-                  className={`text-2xl font-bold ${
-                    progressVelocity.velocity > 0
-                      ? 'text-green-600 dark:text-green-400'
-                      : progressVelocity.velocity < 0
-                        ? 'text-red-600 dark:text-red-400'
-                        : 'text-gray-600 dark:text-gray-400'
-                  }`}
-                >
-                  {progressVelocity.velocity > 0 ? '+' : ''}
-                  {progressVelocity.velocity.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Most Active Day Type */}
-        <Card
-          variant="default"
-          size="md"
-          hoverable
-          className="chart-container card-entrance slide-in-right gpu-accelerated"
-          header={
-            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
-              {t('stats.detailed.mostActiveDayType')}
-            </h2>
-          }
-        >
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-2 border-blue-200 dark:border-blue-700">
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {t('stats.detailed.weekday')}
-              </span>
-              <div className="text-right">
-                <div className="text-lg font-bold text-gray-900 dark:text-white">
-                  {numberFormatter.format(mostActiveDayType.weekday.average)} {t('list.pointsUnit')}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
-                  {mostActiveDayType.weekday.count} {t('stats.highlight.sessions')}
+                <div className="flex items-center gap-2">
+                  <div className="w-32 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-purple-500 transition-all duration-500 progress-bar-fill"
+                      style={{ width: `${consistencyScore.factors.progression}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-semibold w-12 text-right">
+                    {consistencyScore.factors.progression}%
+                  </span>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-2 border-green-200 dark:border-green-700">
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {t('stats.detailed.weekend')}
-              </span>
-              <div className="text-right">
-                <div className="text-lg font-bold text-gray-900 dark:text-white">
-                  {numberFormatter.format(mostActiveDayType.weekend.average)} {t('list.pointsUnit')}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
-                  {mostActiveDayType.weekend.count} {t('stats.highlight.sessions')}
-                </div>
-              </div>
-            </div>
-            {mostActiveDayType.mostActive !== 'equal' && (
               <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
-                <div className="text-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {lang === 'tr' ? 'En Aktif:' : 'Most Active:'}{' '}
+                <div className="flex items-center justify-between">
+                  <span className="text-base font-semibold text-gray-900 dark:text-white">
+                    {t('stats.detailed.consistencyScore')}
                   </span>
-                  <span className="text-base font-bold text-brand">
-                    {mostActiveDayType.mostActive === 'weekday'
-                      ? t('stats.detailed.weekday')
-                      : t('stats.detailed.weekend')}
+                  <span className="text-2xl font-bold text-brand">
+                    {consistencyScore.score}/100
                   </span>
                 </div>
               </div>
-            )}
-          </div>
-        </Card>
+            </div>
+          </Card>
 
-        {/* Streak Statistics */}
-        <Card
-          variant="default"
-          size="md"
-          hoverable
-          className="chart-container card-entrance slide-in-left gpu-accelerated"
-          header={
-            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
-              {t('stats.detailed.streakStats')}
-            </h2>
-          }
-        >
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('stats.detailed.currentStreak')}
-              </span>
-              <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                {streakStats.currentStreak} {t('stats.highlight.sessions')}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('stats.detailed.longestStreak')}
-              </span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
-                {streakStats.longestStreak} {t('stats.highlight.sessions')}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('stats.detailed.averageStreak')}
-              </span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
-                {streakStats.averageStreak} {t('stats.highlight.sessions')}
-              </span>
-            </div>
-            <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
-              <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                {lang === 'tr'
-                  ? `${streakStats.streakHistory.length} seri kaydedildi`
-                  : `${streakStats.streakHistory.length} streaks recorded`}
+          {/* Activity Diversity Details */}
+          <Card
+            variant="default"
+            size="md"
+            hoverable
+            className="chart-container card-entrance slide-in-right gpu-accelerated"
+            header={
+              <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+                {t('stats.detailed.activityDiversity')}
+              </h2>
+            }
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('stats.detailed.uniqueActivities')}
+                </span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  {activityDiversity.uniqueActivities}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('stats.detailed.totalActivities')}
+                </span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  {activityDiversity.totalActivities}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('stats.detailed.diversityRatio')}
+                </span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  {(activityDiversity.diversityRatio * 100).toFixed(1)}%
+                </span>
+              </div>
+              <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <span className="text-base font-semibold text-gray-900 dark:text-white">
+                    {t('stats.detailed.activityDiversity')}
+                  </span>
+                  <span className="text-2xl font-bold text-brand">
+                    {activityDiversity.score}/100
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
 
-        {/* Most Active Hour */}
-        <Card
-          variant="default"
-          size="md"
-          hoverable
-          className="chart-container card-entrance slide-in-right gpu-accelerated"
-          header={
-            <h2 className="text-lg font-bold text-gray-950 dark:text-white">
-              {t('stats.detailed.mostActiveHour')}
-            </h2>
-          }
-        >
-          <div className="space-y-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-brand mb-2">
-                {mostActiveHour.hour}:00 - {mostActiveHour.hour + 1}:00
+          {/* Progress Velocity */}
+          <Card
+            variant="default"
+            size="md"
+            hoverable
+            className="chart-container card-entrance slide-in-left gpu-accelerated"
+            header={
+              <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+                {t('stats.detailed.progressVelocity')}
+              </h2>
+            }
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {lang === 'tr' ? 'Son 30 Gün Ortalama' : 'Last 30 Days Average'}
+                </span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  {numberFormatter.format(Math.round(progressVelocity.currentAverage))}{' '}
+                  {t('list.pointsUnit')}
+                </span>
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {mostActiveHour.count} {lang === 'tr' ? 'aktivite' : 'activities'} (
-                {mostActiveHour.percentage}%)
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {lang === 'tr' ? 'Önceki 30 Gün Ortalama' : 'Previous 30 Days Average'}
+                </span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  {numberFormatter.format(Math.round(progressVelocity.previousAverage))}{' '}
+                  {t('list.pointsUnit')}
+                </span>
+              </div>
+              <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <span className="text-base font-semibold text-gray-900 dark:text-white">
+                    {progressVelocity.trend === 'up'
+                      ? t('stats.detailed.trendUp')
+                      : progressVelocity.trend === 'down'
+                        ? t('stats.detailed.trendDown')
+                        : t('stats.detailed.trendStable')}
+                  </span>
+                  <span
+                    className={`text-2xl font-bold ${
+                      progressVelocity.velocity > 0
+                        ? 'text-green-600 dark:text-green-400'
+                        : progressVelocity.velocity < 0
+                          ? 'text-red-600 dark:text-red-400'
+                          : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    {progressVelocity.velocity > 0 ? '+' : ''}
+                    {progressVelocity.velocity.toFixed(1)}%
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
-              <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                {lang === 'tr'
-                  ? '24 saatlik dağılım grafiği aşağıda gösterilmiştir'
-                  : '24-hour distribution chart shown below'}
+          </Card>
+
+          {/* Most Active Day Type */}
+          <Card
+            variant="default"
+            size="md"
+            hoverable
+            className="chart-container card-entrance slide-in-right gpu-accelerated"
+            header={
+              <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+                {t('stats.detailed.mostActiveDayType')}
+              </h2>
+            }
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-2 border-blue-200 dark:border-blue-700">
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  {t('stats.detailed.weekday')}
+                </span>
+                <div className="text-right">
+                  <div className="text-lg font-bold text-gray-900 dark:text-white">
+                    {numberFormatter.format(mostActiveDayType.weekday.average)}{' '}
+                    {t('list.pointsUnit')}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {mostActiveDayType.weekday.count} {t('stats.highlight.sessions')}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-2 border-green-200 dark:border-green-700">
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  {t('stats.detailed.weekend')}
+                </span>
+                <div className="text-right">
+                  <div className="text-lg font-bold text-gray-900 dark:text-white">
+                    {numberFormatter.format(mostActiveDayType.weekend.average)}{' '}
+                    {t('list.pointsUnit')}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {mostActiveDayType.weekend.count} {t('stats.highlight.sessions')}
+                  </div>
+                </div>
+              </div>
+              {mostActiveDayType.mostActive !== 'equal' && (
+                <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+                  <div className="text-center">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {lang === 'tr' ? 'En Aktif:' : 'Most Active:'}{' '}
+                    </span>
+                    <span className="text-base font-bold text-brand">
+                      {mostActiveDayType.mostActive === 'weekday'
+                        ? t('stats.detailed.weekday')
+                        : t('stats.detailed.weekend')}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Streak Statistics */}
+          <Card
+            variant="default"
+            size="md"
+            hoverable
+            className="chart-container card-entrance slide-in-left gpu-accelerated"
+            header={
+              <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+                {t('stats.detailed.streakStats')}
+              </h2>
+            }
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('stats.detailed.currentStreak')}
+                </span>
+                <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                  {streakStats.currentStreak} {t('stats.highlight.sessions')}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('stats.detailed.longestStreak')}
+                </span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  {streakStats.longestStreak} {t('stats.highlight.sessions')}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('stats.detailed.averageStreak')}
+                </span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  {streakStats.averageStreak} {t('stats.highlight.sessions')}
+                </span>
+              </div>
+              <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+                <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                  {lang === 'tr'
+                    ? `${streakStats.streakHistory.length} seri kaydedildi`
+                    : `${streakStats.streakHistory.length} streaks recorded`}
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
-      </div>
+          </Card>
 
-      {/* Personal Records */}
-      <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
-        <PersonalRecords />
-      </Suspense>
+          {/* Most Active Hour */}
+          <Card
+            variant="default"
+            size="md"
+            hoverable
+            className="chart-container card-entrance slide-in-right gpu-accelerated"
+            header={
+              <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+                {t('stats.detailed.mostActiveHour')}
+              </h2>
+            }
+          >
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-brand mb-2">
+                  {mostActiveHour.hour}:00 - {mostActiveHour.hour + 1}:00
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {mostActiveHour.count} {lang === 'tr' ? 'aktivite' : 'activities'} (
+                  {mostActiveHour.percentage}%)
+                </div>
+              </div>
+              <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-700">
+                <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                  {lang === 'tr'
+                    ? '24 saatlik dağılım grafiği aşağıda gösterilmiştir'
+                    : '24-hour distribution chart shown below'}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </Accordion>
 
-      {/* Activity Time Analysis */}
-      <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
-        <ActivityTimeAnalysis activities={activities} />
-      </Suspense>
+      {/* Personal Records - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Kişisel Rekorlar' : 'Personal Records'}
+        icon="🏆"
+        defaultOpen={false}
+        className="card-entrance"
+      >
+        <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+          <PersonalRecords />
+        </Suspense>
+      </Accordion>
 
-      {/* Period Comparison */}
-      <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
-        <PeriodComparison />
-      </Suspense>
+      {/* Time & Period Analysis - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Zaman ve Dönem Analizi' : 'Time & Period Analysis'}
+        icon="⏰"
+        defaultOpen={false}
+        className="card-entrance"
+      >
+        <div className="space-y-4">
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityTimeAnalysis activities={activities} />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <PeriodComparison />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <DurationStats />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityTypeTrend />
+          </Suspense>
+        </div>
+      </Accordion>
 
-      {/* Duration Stats */}
-      <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
-        <DurationStats />
-      </Suspense>
+      {/* Activity Analysis - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Aktivite Analizi' : 'Activity Analysis'}
+        icon="🔍"
+        defaultOpen={false}
+        className="card-entrance"
+      >
+        <div className="space-y-4">
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityPerformanceAnalysis />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityComparison />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityTrendAnalysis />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityRecords />
+          </Suspense>
+        </div>
+      </Accordion>
 
-      {/* Activity Type Trend */}
-      <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
-        <ActivityTypeTrend />
-      </Suspense>
+      {/* Activity Category Analysis - Accordion */}
+      <Accordion
+        title={t('stats.detailed.activityDistribution')}
+        icon="📊"
+        defaultOpen={true}
+        className="card-entrance"
+      >
+        <Suspense fallback={<ChartSkeleton />}>
+          <ActivityCategoryAnalysis />
+        </Suspense>
+      </Accordion>
+
+      {/* Goals & Calendar - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Hedefler ve Takvim' : 'Goals & Calendar'}
+        icon="🎯"
+        defaultOpen={false}
+        className="card-entrance"
+      >
+        <div className="space-y-4">
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityGoalsDashboard />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityCalendar />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityGoalsTimeline />
+          </Suspense>
+        </div>
+      </Accordion>
+
+      {/* Performance Insights - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Performans İçgörüleri' : 'Performance Insights'}
+        icon="💡"
+        defaultOpen={false}
+        className="card-entrance"
+      >
+        <div className="space-y-4">
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <WeeklySummary />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityPerformanceComparison />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityPerformanceSummary />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityPerformanceForecast />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityPerformanceReport />
+          </Suspense>
+        </div>
+      </Accordion>
+
+      {/* Performance Visualization - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Performans Görselleştirme' : 'Performance Visualization'}
+        icon="📊"
+        defaultOpen={false}
+        className="card-entrance"
+      >
+        <div className="space-y-4">
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityPerformanceHeatmap />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityPerformanceDistribution />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityPerformanceDashboard />
+          </Suspense>
+          <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+            <ActivityComparisonMatrix />
+          </Suspense>
+        </div>
+      </Accordion>
+
+      {/* Recommendations - Accordion */}
+      <Accordion
+        title={lang === 'tr' ? 'Öneriler' : 'Recommendations'}
+        icon="💡"
+        defaultOpen={false}
+        className="card-entrance"
+      >
+        <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
+          <ActivityPerformanceRecommendations />
+        </Suspense>
+      </Accordion>
     </main>
   );
 }

@@ -18,6 +18,7 @@ import { useCloudSync } from '@/hooks/useCloudSync';
 import { resolveConflicts, saveLocalLastModified } from '@/lib/cloudSync/conflictResolver';
 import { cloudSyncService } from '@/lib/cloudSync/syncService';
 import { STORAGE_KEYS } from '@/lib/constants';
+import { useDialogManager } from '@/lib/dialogManager';
 
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 
@@ -36,6 +37,7 @@ export function ConflictResolutionManager() {
   const { syncToCloud } = useCloudSync();
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
+  const { dialogs } = useDialogManager();
   const [showConflictDialog, setShowConflictDialog] = useState(false);
   const [conflictData, setConflictData] = useState<{
     local: {
@@ -340,25 +342,23 @@ export function ConflictResolutionManager() {
             return;
           }
 
-          // Real conflict - automatically use "keep all" (local) strategy
-          console.log(
-            '🔄 Real conflict detected - automatically using "keep all" (local) strategy'
-          );
+          // Real conflict - show dialog to let user choose
+          console.log('🔄 Real conflict detected - showing conflict dialog');
 
           // Set conflict data first
           setConflictData(conflict);
 
-          // Automatically resolve with "local" strategy (keep all local data)
-          // Use setTimeout to ensure state is set before calling handleConflictResolve
+          // Close Settings Dialog if it's open (to prevent backdrop conflicts)
+          // Dispatch custom event to close Settings Dialog
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('sporttrack:close-settings-dialog'));
+          }
+
+          // Show conflict dialog after a short delay to ensure Settings Dialog closes first
+          // Wait for Settings Dialog to fully close (transition duration + buffer)
           setTimeout(() => {
-            handleConflictResolve('local').catch((error) => {
-              console.error('Failed to auto-resolve conflict:', error);
-              showToast(
-                lang === 'tr' ? 'Çakışma çözümü hatası' : 'Conflict resolution error',
-                'error'
-              );
-            });
-          }, 100);
+            setShowConflictDialog(true);
+          }, 350);
 
           return;
         } catch (error) {

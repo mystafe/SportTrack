@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState, useRef, lazy, Suspense } from 'react';
+import React, { FormEvent, useEffect, useState, useRef, lazy, Suspense, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useSettings, Mood } from '@/lib/settingsStore';
@@ -27,6 +27,7 @@ import { useAutoSync } from '@/hooks/useAutoSync';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { useDialogManager } from '@/lib/dialogManager';
 
 // Lazy load heavy components that are not always visible
 const DataExportImport = lazy(() =>
@@ -40,6 +41,9 @@ const AppleHealthGuide = lazy(() =>
 );
 const CloudSyncSettings = lazy(() =>
   import('@/components/CloudSyncSettings').then((m) => ({ default: m.CloudSyncSettings }))
+);
+const ActivityReminders = lazy(() =>
+  import('@/components/ActivityReminders').then((m) => ({ default: m.ActivityReminders }))
 );
 
 interface SettingsDialogProps {
@@ -59,9 +63,11 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const { challenges, clearAllChallenges, addChallenge } = useChallenges();
   const { syncToCloud } = useCloudSync();
   const { flushPendingSync } = useAutoSync();
+  const { dialogs } = useDialogManager();
   const [open, setOpen] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
+  const [showActivityRemindersDialog, setShowActivityRemindersDialog] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [showSyncSuccess, setShowSyncSuccess] = useState(false);
@@ -87,6 +93,38 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
       setReduceAnimations(settings.reduceAnimations ?? false);
     }
   }, [settings]);
+
+  // Listen for custom event to open settings
+  useEffect(() => {
+    const handleOpenSettings = () => {
+      setOpen(true);
+    };
+    window.addEventListener('open-settings', handleOpenSettings);
+    return () => {
+      window.removeEventListener('open-settings', handleOpenSettings);
+    };
+  }, []);
+
+  // Listen for custom event to close settings (e.g., from Conflict Resolution Manager)
+  useEffect(() => {
+    const handleCloseSettings = () => {
+      setOpen(false);
+    };
+    window.addEventListener('sporttrack:close-settings-dialog', handleCloseSettings);
+    return () => {
+      window.removeEventListener('sporttrack:close-settings-dialog', handleCloseSettings);
+    };
+  }, []);
+
+  // Close Settings Dialog when other dialogs are opened
+  useEffect(() => {
+    // Filter out Settings Dialog itself and check if any other dialog is open
+    const otherDialogs = dialogs.filter((d) => d.id !== 'settings-dialog');
+    if (open && otherDialogs.length > 0) {
+      // Close Settings Dialog when another dialog opens
+      setOpen(false);
+    }
+  }, [dialogs, open]);
 
   // Update name when user logs in - sync Firebase displayName to settings (only once)
   useEffect(() => {
@@ -208,16 +246,29 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     setOpen(false); // Close settings dialog immediately
+
     try {
       // CRITICAL: Flush any pending debounced sync operations first
+      // Use timeout to prevent blocking logout
       try {
-        await flushPendingSync();
-      } catch (flushError) {
+        await Promise.race([
+          flushPendingSync(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Sync timeout')), 5000)),
+        ]);
+      } catch (flushError: any) {
         // Log only in development
         if (process.env.NODE_ENV === 'development') {
           console.error('Failed to flush pending sync:', flushError);
         }
-        // Continue anyway - we'll do a full sync below
+        // Check if it's a quota error - skip sync if so
+        const isQuotaError =
+          flushError?.code === 'resource-exhausted' ||
+          flushError?.message?.includes('quota') ||
+          flushError?.message?.includes('Quota exceeded');
+        if (isQuotaError) {
+          console.warn('Firebase quota exceeded - skipping sync before logout');
+        }
+        // Continue anyway - we'll try a full sync below (with timeout)
       }
 
       // Read latest data directly from localStorage to ensure we have the most up-to-date data
@@ -280,16 +331,40 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
               hasSettings: !!latestSettings,
             });
           }
-          await syncToCloud({
-            activities: latestActivities,
-            settings: latestSettings,
-            badges: latestBadges,
-            challenges: latestChallenges,
-          });
-        } catch (syncError) {
-          // Log only in development
-          if (process.env.NODE_ENV === 'development') {
-            console.error('Failed to sync before logout:', syncError);
+          // Add timeout to prevent blocking logout
+          await Promise.race([
+            syncToCloud({
+              activities: latestActivities,
+              settings: latestSettings,
+              badges: latestBadges,
+              challenges: latestChallenges,
+            }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Sync timeout')), 8000)),
+          ]);
+        } catch (syncError: any) {
+          // Check if it's a quota error
+          const isQuotaError =
+            syncError?.code === 'resource-exhausted' ||
+            syncError?.message?.includes('quota') ||
+            syncError?.message?.includes('Quota exceeded') ||
+            syncError?.message === 'Sync timeout';
+
+          if (isQuotaError) {
+            console.warn(
+              'Firebase quota exceeded or sync timeout - continuing logout without sync'
+            );
+            // Show warning toast but don't block logout
+            showToast(
+              lang === 'tr'
+                ? 'Firebase kotası doldu. Çıkış yapılıyor ancak veriler senkronize edilemedi.'
+                : 'Firebase quota exceeded. Logging out but data could not be synced.',
+              'warning'
+            );
+          } else {
+            // Log other errors only in development
+            if (process.env.NODE_ENV === 'development') {
+              console.error('Failed to sync before logout:', syncError);
+            }
           }
           // Continue with logout even if sync fails
         }
@@ -300,9 +375,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         }
       }
 
-      await logout();
-
-      // Clear all data stores
+      // Clear all data stores BEFORE logout to prevent race conditions
       clearAllActivities();
       clearAllBadges();
       clearAllChallenges();
@@ -334,22 +407,32 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         localStorage.setItem('sporttrack.skip_login_popup', 'true');
       }
 
-      // Close settings dialog
-      setOpen(false);
+      // Perform logout
+      await logout();
 
-      // Navigate to homepage
-      router.push('/');
+      // Small delay to ensure logout completes
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
+      // Navigate to homepage using replace to prevent back navigation
+      router.replace('/');
+
+      // Show success message (only if we didn't already show a warning)
+      // Check if we already showed a warning toast by checking if there was a sync error
+      // For now, always show success message
+      showToast(lang === 'tr' ? 'Başarıyla çıkış yapıldı!' : 'Successfully logged out!', 'success');
+    } catch (error) {
+      console.error('Logout error:', error);
       showToast(
         lang === 'tr'
-          ? 'Başarıyla çıkış yapıldı! Verileriniz buluta senkronize edildi.'
-          : 'Successfully logged out! Your data has been synced to cloud.',
-        'success'
+          ? 'Çıkış yapılırken bir hata oluştu. Lütfen tekrar deneyin.'
+          : 'An error occurred while logging out. Please try again.',
+        'error'
       );
-    } catch (error) {
-      showToast(lang === 'tr' ? 'Çıkış hatası' : 'Logout error', 'error');
     } finally {
-      setIsLoggingOut(false);
+      // Reset logout state after a short delay to show completion
+      setTimeout(() => {
+        setIsLoggingOut(false);
+      }, 500);
     }
   };
 
@@ -439,21 +522,29 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   };
 
   // Settings dialog - Different content for authenticated vs non-authenticated users
-  const settingsDialog =
-    open && !showAuthDialog ? (
+  const renderSettingsDialog = () => {
+    if (!open || showAuthDialog) return null;
+    return (
       <div
-        className={`fixed inset-0 z-[10000] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/40 ${isMobile ? '' : 'backdrop-blur-sm'} px-4 py-4 overflow-y-auto safe-top safe-bottom safe-left safe-right`}
+        className={`fixed inset-0 z-[9999] flex items-start justify-center bg-black/40 dark:bg-black/50 backdrop-blur-sm px-4 pt-4 pb-4 overflow-y-auto safe-top safe-bottom safe-left safe-right transition-opacity duration-300 ${open ? 'pointer-events-auto' : 'pointer-events-none opacity-0'}`}
         onClick={(e) => {
-          if (e.target === e.currentTarget && settings) {
+          // Close when clicking outside the dialog
+          if (e.target === e.currentTarget) {
             setOpen(false);
             setError(null);
-            setName(settings.name || '');
-            setDailyTarget(String(settings.dailyTarget));
+            if (settings) {
+              setName(settings.name || '');
+              setDailyTarget(String(settings.dailyTarget));
+            }
           }
         }}
       >
         <div
-          className={`relative w-full ${isMobile ? 'max-w-full' : 'max-w-lg'} ${isMobile ? 'rounded-t-xl' : 'rounded-xl'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 ${isMobile ? 'p-2.5' : 'p-4 sm:p-5'} ${isMobile ? '' : 'my-auto'} max-h-[90vh] overflow-y-auto ${isMobile ? 'slide-up-bottom' : 'animate-scale-in'}`}
+          className={`relative w-full ${isMobile ? 'max-w-full' : 'max-w-lg'} rounded-b-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 ${isMobile ? 'p-4' : 'p-4 sm:p-5'} mt-0 sticky top-0 max-h-[90vh] overflow-y-auto slide-down-top pointer-events-auto`}
+          onClick={(e) => {
+            // Prevent closing when clicking inside the dialog
+            e.stopPropagation();
+          }}
         >
           {/* Header */}
           <div
@@ -468,9 +559,9 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   {isAuthenticated ? (lang === 'tr' ? 'Ayarlar' : 'Settings') : t('settings.title')}
                 </h2>
                 <span
-                  className={`${isMobile ? 'text-xs' : 'text-[8px] sm:text-[9px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
+                  className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
                 >
-                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.22.8
+                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.25.8
                 </span>
               </div>
               <button
@@ -492,7 +583,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
             </div>
             {!isMobile && (
               <p
-                className={`text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 mt-0.5`}
+                className={`text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-0.5`}
               >
                 {isAuthenticated
                   ? lang === 'tr'
@@ -505,7 +596,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
           {/* Form */}
           <form
-            className={isMobile ? 'space-y-1.5' : 'space-y-2.5'}
+            className={isMobile ? 'space-y-3' : 'space-y-2.5'}
             onSubmit={submit}
             autoComplete="off"
           >
@@ -516,7 +607,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 {/* Login Section */}
                 {isConfigured && (
                   <div
-                    className={`${isMobile ? 'mb-3 pb-3' : 'mb-4 pb-4'} border-b border-gray-200 dark:border-gray-700`}
+                    className={`${isMobile ? 'mb-4 pb-4' : 'mb-4 pb-4'} border-b border-gray-200 dark:border-gray-700`}
                   >
                     <button
                       type="button"
@@ -531,7 +622,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 {/* Name Field */}
                 <label className={`block ${isMobile ? 'space-y-1' : 'space-y-1.5'}`}>
                   <span
-                    className={`${isMobile ? 'text-xs' : 'text-[11px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
+                    className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-gray-700 dark:text-gray-300`}
                   >
                     {t('settings.nameLabel')}
                   </span>
@@ -551,7 +642,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <div className={`grid grid-cols-2 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.goalLabel')}
                     </span>
@@ -572,7 +663,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.moodLabel')}
                     </span>
@@ -608,7 +699,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                         <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                       }
                     >
-                      <DataExportImport />
+                      <DataExportImport onSettingsClose={() => setOpen(false)} />
                     </Suspense>
                   </div>
                 )}
@@ -643,7 +734,17 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       size="sm"
                       className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
                       onClick={async () => {
+                        // Close settings dialog immediately
+                        setOpen(false);
+
+                        // Small delay to allow dialog to close smoothly
+                        await new Promise((resolve) => setTimeout(resolve, 300));
+
                         setIsLoadingDummyData(true);
+                        // Set flag to disable badge notifications during dummy data loading
+                        if (typeof window !== 'undefined') {
+                          localStorage.setItem('sporttrack.dummy_data_loading', 'true');
+                        }
                         try {
                           // Clear existing data first
                           clearAllActivities();
@@ -824,31 +925,57 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                           // Wait a bit for activities to be processed
                           await new Promise((resolve) => setTimeout(resolve, 1500));
 
-                          // Check and unlock badges - badgeStore will handle this automatically
+                          // Check and unlock badges silently (no notifications)
                           checkNewBadges();
 
-                          // Create some challenges
+                          // Create challenges only if they don't already exist
                           const currentSettings = settings || { dailyTarget: DEFAULT_DAILY_TARGET };
-                          const dailyChallenge = createDailyChallenge(
-                            { tr: 'Günlük Hedef', en: 'Daily Goal' },
-                            currentSettings.dailyTarget,
-                            new Date()
-                          );
-                          const weeklyChallenge = createWeeklyChallenge(
-                            { tr: 'Haftalık Hedef', en: 'Weekly Goal' },
-                            50000,
-                            new Date()
-                          );
-                          const monthlyChallenge = createMonthlyChallenge(
-                            { tr: 'Aylık Hedef', en: 'Monthly Goal' },
-                            200000,
-                            new Date()
-                          );
+                          const existingChallengeIds = new Set(challenges.map((c) => c.id));
 
-                          // Add challenges
-                          addChallenge(dailyChallenge);
-                          addChallenge(weeklyChallenge);
-                          addChallenge(monthlyChallenge);
+                          // Check if daily challenge exists
+                          const hasDailyChallenge = challenges.some(
+                            (c) => c.type === 'daily' && c.status === 'active'
+                          );
+                          if (!hasDailyChallenge) {
+                            const dailyChallenge = createDailyChallenge(
+                              { tr: 'Günlük Hedef', en: 'Daily Goal' },
+                              currentSettings.dailyTarget,
+                              new Date()
+                            );
+                            if (!existingChallengeIds.has(dailyChallenge.id)) {
+                              addChallenge(dailyChallenge);
+                            }
+                          }
+
+                          // Check if weekly challenge exists
+                          const hasWeeklyChallenge = challenges.some(
+                            (c) => c.type === 'weekly' && c.status === 'active'
+                          );
+                          if (!hasWeeklyChallenge) {
+                            const weeklyChallenge = createWeeklyChallenge(
+                              { tr: 'Haftalık Hedef', en: 'Weekly Goal' },
+                              50000,
+                              new Date()
+                            );
+                            if (!existingChallengeIds.has(weeklyChallenge.id)) {
+                              addChallenge(weeklyChallenge);
+                            }
+                          }
+
+                          // Check if monthly challenge exists
+                          const hasMonthlyChallenge = challenges.some(
+                            (c) => c.type === 'monthly' && c.status === 'active'
+                          );
+                          if (!hasMonthlyChallenge) {
+                            const monthlyChallenge = createMonthlyChallenge(
+                              { tr: 'Aylık Hedef', en: 'Monthly Goal' },
+                              200000,
+                              new Date()
+                            );
+                            if (!existingChallengeIds.has(monthlyChallenge.id)) {
+                              addChallenge(monthlyChallenge);
+                            }
+                          }
 
                           showToast(
                             lang === 'tr'
@@ -857,8 +984,10 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             'success'
                           );
 
-                          // Close settings dialog
-                          setOpen(false);
+                          // Navigate to homepage after a short delay
+                          setTimeout(() => {
+                            router.push('/');
+                          }, 500);
                         } catch (error) {
                           console.error('Failed to load dummy data:', error);
                           showToast(
@@ -868,6 +997,10 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             'error'
                           );
                         } finally {
+                          // Clear flag to re-enable badge notifications
+                          if (typeof window !== 'undefined') {
+                            localStorage.removeItem('sporttrack.dummy_data_loading');
+                          }
                           setIsLoadingDummyData(false);
                         }
                       }}
@@ -991,7 +1124,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <div className={`grid grid-cols-2 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.goalLabel')}
                     </span>
@@ -1012,7 +1145,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.moodLabel')}
                     </span>
@@ -1057,7 +1190,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                           }
                         >
-                          <DataExportImport />
+                          <DataExportImport onSettingsClose={() => setOpen(false)} />
                         </Suspense>
                       )}
                       {isAuthenticated && (
@@ -1066,7 +1199,12 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             type="button"
                             variant="outline"
                             size={isMobile ? 'md' : 'sm'}
-                            onClick={handleClearData}
+                            onClick={() => {
+                              setOpen(false);
+                              setTimeout(() => {
+                                handleClearData();
+                              }, 300);
+                            }}
                             className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-base flex items-center justify-center`}
                             style={
                               isMobile
@@ -1127,7 +1265,17 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                         size="sm"
                         className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
                         onClick={async () => {
+                          // Close settings dialog immediately
+                          setOpen(false);
+
+                          // Small delay to allow dialog to close smoothly
+                          await new Promise((resolve) => setTimeout(resolve, 300));
+
                           setIsLoadingDummyData(true);
+                          // Set flag to disable badge notifications during dummy data loading
+                          if (typeof window !== 'undefined') {
+                            localStorage.setItem('sporttrack.dummy_data_loading', 'true');
+                          }
                           try {
                             // Clear existing data first
                             clearAllActivities();
@@ -1312,33 +1460,59 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             // Wait a bit for activities to be processed
                             await new Promise((resolve) => setTimeout(resolve, 1500));
 
-                            // Check and unlock badges - badgeStore will handle this automatically
+                            // Check and unlock badges silently (no notifications)
                             checkNewBadges();
 
-                            // Create some challenges
+                            // Create challenges only if they don't already exist
                             const currentSettings = settings || {
                               dailyTarget: DEFAULT_DAILY_TARGET,
                             };
-                            const dailyChallenge = createDailyChallenge(
-                              { tr: 'Günlük Hedef', en: 'Daily Goal' },
-                              currentSettings.dailyTarget,
-                              new Date()
-                            );
-                            const weeklyChallenge = createWeeklyChallenge(
-                              { tr: 'Haftalık Hedef', en: 'Weekly Goal' },
-                              50000,
-                              new Date()
-                            );
-                            const monthlyChallenge = createMonthlyChallenge(
-                              { tr: 'Aylık Hedef', en: 'Monthly Goal' },
-                              200000,
-                              new Date()
-                            );
+                            const existingChallengeIds = new Set(challenges.map((c) => c.id));
 
-                            // Add challenges
-                            addChallenge(dailyChallenge);
-                            addChallenge(weeklyChallenge);
-                            addChallenge(monthlyChallenge);
+                            // Check if daily challenge exists
+                            const hasDailyChallenge = challenges.some(
+                              (c) => c.type === 'daily' && c.status === 'active'
+                            );
+                            if (!hasDailyChallenge) {
+                              const dailyChallenge = createDailyChallenge(
+                                { tr: 'Günlük Hedef', en: 'Daily Goal' },
+                                currentSettings.dailyTarget,
+                                new Date()
+                              );
+                              if (!existingChallengeIds.has(dailyChallenge.id)) {
+                                addChallenge(dailyChallenge);
+                              }
+                            }
+
+                            // Check if weekly challenge exists
+                            const hasWeeklyChallenge = challenges.some(
+                              (c) => c.type === 'weekly' && c.status === 'active'
+                            );
+                            if (!hasWeeklyChallenge) {
+                              const weeklyChallenge = createWeeklyChallenge(
+                                { tr: 'Haftalık Hedef', en: 'Weekly Goal' },
+                                50000,
+                                new Date()
+                              );
+                              if (!existingChallengeIds.has(weeklyChallenge.id)) {
+                                addChallenge(weeklyChallenge);
+                              }
+                            }
+
+                            // Check if monthly challenge exists
+                            const hasMonthlyChallenge = challenges.some(
+                              (c) => c.type === 'monthly' && c.status === 'active'
+                            );
+                            if (!hasMonthlyChallenge) {
+                              const monthlyChallenge = createMonthlyChallenge(
+                                { tr: 'Aylık Hedef', en: 'Monthly Goal' },
+                                200000,
+                                new Date()
+                              );
+                              if (!existingChallengeIds.has(monthlyChallenge.id)) {
+                                addChallenge(monthlyChallenge);
+                              }
+                            }
 
                             showToast(
                               lang === 'tr'
@@ -1347,8 +1521,10 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               'success'
                             );
 
-                            // Close settings dialog
-                            setOpen(false);
+                            // Navigate to homepage after a short delay
+                            setTimeout(() => {
+                              router.push('/');
+                            }, 500);
                           } catch (error) {
                             console.error('Failed to load dummy data:', error);
                             showToast(
@@ -1358,6 +1534,10 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               'error'
                             );
                           } finally {
+                            // Clear flag to re-enable badge notifications
+                            if (typeof window !== 'undefined') {
+                              localStorage.removeItem('sporttrack.dummy_data_loading');
+                            }
                             setIsLoadingDummyData(false);
                           }
                         }}
@@ -1462,6 +1642,29 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   </div>
 
                   <div>
+                    <span
+                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
+                    >
+                      {lang === 'tr' ? 'Aktivite Hatırlatıcıları' : 'Activity Reminders'}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                      onClick={() => {
+                        setOpen(false);
+                        setTimeout(() => {
+                          setShowActivityRemindersDialog(true);
+                        }, 300);
+                      }}
+                      title={lang === 'tr' ? 'Aktivite Hatırlatıcıları' : 'Activity Reminders'}
+                    >
+                      ⏰
+                    </Button>
+                  </div>
+
+                  <div>
                     <Suspense
                       fallback={
                         <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
@@ -1479,6 +1682,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             }, 2000);
                           }
                         }}
+                        onSettingsClose={() => setOpen(false)}
                       />
                     </Suspense>
                   </div>
@@ -1541,7 +1745,10 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
           </form>
         </div>
       </div>
-    ) : null;
+    );
+  };
+
+  const settingsDialog = renderSettingsDialog();
 
   // For authenticated users: prioritize Firebase displayName
   // For non-authenticated users: use settings name or emoji
@@ -1683,6 +1890,38 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         </div>
       )}
 
+      {/* Dummy Data Loading Overlay - Shows while loading dummy data */}
+      {isLoadingDummyData && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-6 rounded-3xl bg-white p-10 shadow-2xl dark:bg-gray-800 animate-in fade-in zoom-in duration-300">
+            {/* Loading Spinner */}
+            <div className="relative h-20 w-20">
+              <div className="absolute inset-0 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700"></div>
+              <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-blue-600 dark:border-t-blue-400"></div>
+            </div>
+
+            {/* Loading Message */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {lang === 'tr' ? 'Veriler Yükleniyor...' : 'Loading Data...'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {lang === 'tr'
+                  ? 'Lütfen bekleyin, verileriniz yükleniyor.'
+                  : 'Please wait, your data is being loaded.'}
+              </p>
+            </div>
+
+            {/* Loading dots */}
+            <div className="flex gap-2">
+              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400 [animation-delay:-0.3s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400 [animation-delay:-0.15s]"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Syncing Overlay - Shows while syncing */}
       {isSyncing && !showSyncSuccess && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
@@ -1787,6 +2026,44 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   style={{ width: '60%' }}
                 />
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Activity Reminders Dialog */}
+      {showActivityRemindersDialog && (
+        <div
+          className="fixed inset-0 z-[10016] flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowActivityRemindersDialog(false);
+            }
+          }}
+        >
+          <div className="bg-white dark:bg-gray-900 rounded-xl border-2 border-brand/50 dark:border-brand/50 shadow-2xl max-w-2xl mx-4 max-h-[90vh] overflow-y-auto animate-scale-in">
+            <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between z-10">
+              <h2 className="text-xl font-bold text-gray-950 dark:text-white">
+                {lang === 'tr' ? 'Aktivite Hatırlatıcıları' : 'Activity Reminders'}
+              </h2>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowActivityRemindersDialog(false)}
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-950 dark:hover:text-white"
+              >
+                ✕
+              </Button>
+            </div>
+            <div className="p-4">
+              <Suspense
+                fallback={
+                  <div className="h-32 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                }
+              >
+                <ActivityReminders />
+              </Suspense>
             </div>
           </div>
         </div>

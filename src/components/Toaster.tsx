@@ -43,7 +43,7 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
         typeof window !== 'undefined' &&
         createPortal(
           <div
-            className={`fixed z-[10000] flex flex-col gap-2 ${
+            className={`fixed z-[99999] flex flex-col gap-2 ${
               isMobile ? 'left-4 right-4 safe-bottom' : 'bottom-4 right-4'
             }`}
             style={

@@ -109,6 +109,9 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
           py-12 sm:py-16
           px-4 sm:px-6
           animate-fade-in-scale
+          bg-gradient-to-br from-white via-gray-50/50 to-white dark:from-gray-900/95 dark:via-gray-800/50 dark:to-gray-900/95
+          border-2 border-gray-200/60 dark:border-gray-700/60
+          shadow-lg hover:shadow-xl transition-shadow duration-300
           ${className}
         `
           .trim()
@@ -116,22 +119,27 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       >
         <div
           className={`
-            text-6xl sm:text-7xl mb-4 sm:mb-6
+            relative text-6xl sm:text-7xl mb-4 sm:mb-6
             ${variant === 'error' ? 'animate-shake' : ''}
             ${variant === 'success' ? 'animate-scale-bounce' : ''}
+            ${variant === 'default' || variant === 'activities' || variant === 'badges' || variant === 'challenges' ? 'animate-pulse-subtle' : ''}
+            filter drop-shadow-lg
           `
             .trim()
             .replace(/\s+/g, ' ')}
           role="img"
           aria-hidden="true"
         >
+          {/* Decorative glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-brand/20 via-transparent to-brand/20 blur-2xl opacity-50 -z-10"></div>
           {displayIcon}
         </div>
         <h2
           className={`
-            text-xl sm:text-2xl font-bold
-            text-gray-900 dark:text-gray-100
+            text-xl sm:text-2xl md:text-3xl font-bold
+            text-gray-950 dark:text-gray-100
             mb-2 sm:mb-3
+            leading-tight
           `
             .trim()
             .replace(/\s+/g, ' ')}
@@ -141,11 +149,12 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
         {description && (
           <p
             className={`
-              text-sm sm:text-base
-              text-gray-600 dark:text-gray-400
+              text-sm sm:text-base md:text-lg
+              text-gray-700 dark:text-gray-300
               mb-6 sm:mb-8
-              max-w-md
+              max-w-lg
               leading-relaxed
+              font-medium
             `
               .trim()
               .replace(/\s+/g, ' ')}
