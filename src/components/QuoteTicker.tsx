@@ -92,7 +92,11 @@ export function QuoteTicker() {
     <div
       ref={containerRef}
       className={`fixed left-0 right-0 z-[45] bg-gradient-to-r from-brand/20 via-brand/15 to-brand/20 dark:from-brand/30 dark:via-brand/20 dark:to-brand/30 border-t border-brand/50 dark:border-brand/60 ${isMobile ? 'py-0' : 'py-0.5'} overflow-hidden shadow-md backdrop-blur-md`}
-      style={{ bottom: bottomPosition }}
+      style={{
+        bottom: bottomPosition,
+        marginBottom: 0,
+        paddingBottom: 0,
+      }}
     >
       <div
         className="relative w-full h-full flex items-center justify-center"
