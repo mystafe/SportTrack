@@ -78,38 +78,47 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             __html: `
               (function() {
                 try {
+                  // Check if localStorage is available
+                  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+                    return;
+                  }
+                  
                   // Function to read theme from localStorage
                   function readTheme() {
-                    // Try to get theme from theme key first (fastest, always available)
-                    let theme = null;
-                    const themeFromKey = localStorage.getItem('theme');
-                    if (themeFromKey && (themeFromKey === 'light' || themeFromKey === 'dark' || themeFromKey === 'system')) {
-                      theme = themeFromKey;
-                    }
-                    
-                    // If theme key doesn't have a value, try settings store
-                    if (!theme) {
-                      try {
-                        const settingsRaw = localStorage.getItem('sporttrack.settings.v1');
-                        if (settingsRaw) {
-                          const settings = JSON.parse(settingsRaw);
-                          if (settings && settings.theme && (settings.theme === 'light' || settings.theme === 'dark' || settings.theme === 'system')) {
-                            theme = settings.theme;
-                            // Also write to theme key for faster access next time
-                            localStorage.setItem('theme', settings.theme);
-                          }
-                        }
-                      } catch (e) {
-                        // Settings parse failed, use system
+                    try {
+                      // Try to get theme from theme key first (fastest, always available)
+                      let theme = null;
+                      const themeFromKey = localStorage.getItem('theme');
+                      if (themeFromKey && (themeFromKey === 'light' || themeFromKey === 'dark' || themeFromKey === 'system')) {
+                        theme = themeFromKey;
                       }
+                      
+                      // If theme key doesn't have a value, try settings store
+                      if (!theme) {
+                        try {
+                          const settingsRaw = localStorage.getItem('sporttrack.settings.v1');
+                          if (settingsRaw && typeof settingsRaw === 'string') {
+                            const settings = JSON.parse(settingsRaw);
+                            if (settings && typeof settings === 'object' && settings.theme && (settings.theme === 'light' || settings.theme === 'dark' || settings.theme === 'system')) {
+                              theme = settings.theme;
+                              // Also write to theme key for faster access next time
+                              localStorage.setItem('theme', settings.theme);
+                            }
+                          }
+                        } catch (e) {
+                          // Settings parse failed, use system
+                        }
+                      }
+                      
+                      // Default to system if nothing found
+                      if (!theme) {
+                        theme = 'system';
+                      }
+                      
+                      return theme;
+                    } catch (e) {
+                      return 'system';
                     }
-                    
-                    // Default to system if nothing found
-                    if (!theme) {
-                      theme = 'system';
-                    }
-                    
-                    return theme;
                   }
                   
                   // Read theme immediately
@@ -117,15 +126,24 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   
                   // Function to apply theme
                   function applyTheme(themeValue) {
-                    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    const isDark = themeValue === 'dark' || (themeValue === 'system' && systemPrefersDark);
-                    document.documentElement.classList.toggle('dark', isDark);
-                    // Also set data attribute for CSS selectors
-                    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                    try {
+                      if (typeof window === 'undefined' || !document || !document.documentElement) {
+                        return;
+                      }
+                      const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                      const isDark = themeValue === 'dark' || (themeValue === 'system' && systemPrefersDark);
+                      document.documentElement.classList.toggle('dark', isDark);
+                      // Also set data attribute for CSS selectors
+                      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                    } catch (e) {
+                      // Ignore errors
+                    }
                   }
                   
                   // Apply theme immediately before page renders to prevent flash
-                  applyTheme(theme);
+                  if (theme) {
+                    applyTheme(theme);
+                  }
                   
                   // Listen for system theme changes if using system theme
                   if (theme === 'system') {
