@@ -51,8 +51,8 @@ export function FloatingActionButton() {
     router.push('/add');
   };
 
-  // Calculate bottom position: above BottomNavigation (64px) + QuoteTicker height (~45px) + spacing (16px) + safe area
-  const bottomPosition = `calc(64px + 45px + 16px + max(16px, env(safe-area-inset-bottom, 0px)))`;
+  // Calculate bottom position: above BottomNavigation (48px) + QuoteTicker height (~24px) + spacing (8px) + safe area
+  const bottomPosition = `calc(48px + 24px + 8px + max(8px, env(safe-area-inset-bottom, 0px)))`;
 
   return (
     <Button

@@ -85,20 +85,20 @@ export function QuoteTicker() {
 
   if (!mounted || quotes.length === 0) return null;
 
-  // Calculate bottom position: above BottomNavigation (56px after resize) + safe area + extra spacing
+  // Calculate bottom position: above BottomNavigation (48px after resize) + safe area + minimal spacing
   const bottomPosition = isMobile
-    ? 'calc(56px + max(32px, env(safe-area-inset-bottom, 0px)))'
+    ? 'calc(48px + max(8px, env(safe-area-inset-bottom, 0px)))'
     : 'max(28px, env(safe-area-inset-bottom, 0px))';
 
   return (
     <div
       ref={containerRef}
-      className={`fixed left-0 right-0 z-45 bg-gradient-to-r from-brand/20 via-brand/15 to-brand/20 dark:from-brand/30 dark:via-brand/20 dark:to-brand/30 border-t border-brand/50 dark:border-brand/60 ${isMobile ? 'py-0.5' : 'py-1'} overflow-hidden shadow-lg backdrop-blur-md`}
+      className={`fixed left-0 right-0 z-45 bg-gradient-to-r from-brand/20 via-brand/15 to-brand/20 dark:from-brand/30 dark:via-brand/20 dark:to-brand/30 border-t border-brand/50 dark:border-brand/60 ${isMobile ? 'py-0' : 'py-0.5'} overflow-hidden shadow-md backdrop-blur-md`}
       style={{ bottom: bottomPosition }}
     >
       <div
         className="relative w-full h-full flex items-center justify-center"
-        style={{ minHeight: isMobile ? '1.5rem' : '1.75rem' }}
+        style={{ minHeight: isMobile ? '1.25rem' : '1.5rem' }}
       >
         {/* Subtle gradient fade edges */}
         <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-20 bg-gradient-to-r from-brand/20 via-brand/10 to-transparent dark:from-brand/30 dark:via-brand/15 z-10 pointer-events-none"></div>
@@ -107,7 +107,7 @@ export function QuoteTicker() {
         {/* Scrolling content - optimized for continuous animation */}
         <div
           ref={contentRef}
-          className={`quote-ticker-marquee flex-1 flex items-center justify-center ${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-900 dark:text-gray-100 font-semibold`}
+          className={`quote-ticker-marquee flex-1 flex items-center justify-center ${isMobile ? 'text-[9px]' : 'text-xs'} text-gray-900 dark:text-gray-100 font-semibold`}
         >
           <div className="quote-ticker-content flex items-center h-full">
             {/* First set of quotes */}

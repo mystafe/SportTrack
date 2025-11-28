@@ -18,7 +18,7 @@ export const Header = memo(function Header() {
   return (
     <header className="border-b-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 backdrop-blur sticky top-0 z-40 safe-top">
       <nav
-        className="container flex items-center justify-between h-16 sm:h-12 min-w-0"
+        className="container flex items-center justify-between h-14 sm:h-10 min-w-0"
         role="navigation"
         aria-label={t('nav.main')}
       >

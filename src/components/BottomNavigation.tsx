@@ -65,8 +65,8 @@ export const BottomNavigation = memo(function BottomNavigation() {
       role="navigation"
       aria-label={t('nav.main')}
     >
-      <div className="container mx-auto px-2 safe-left safe-right">
-        <div className="flex items-center justify-around h-14 safe-bottom">
+      <div className="container mx-auto px-1 safe-left safe-right">
+        <div className="flex items-center justify-around h-12 safe-bottom">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -74,15 +74,15 @@ export const BottomNavigation = memo(function BottomNavigation() {
                 key={item.href}
                 href={item.href}
                 className={`
-                  flex flex-col items-center justify-center gap-0.5
-                  min-w-[48px] min-h-[48px] px-2 py-1.5
-                  rounded-xl transition-all duration-300 ease-out
+                  flex flex-col items-center justify-center gap-0
+                  min-w-[44px] min-h-[44px] px-1.5 py-1
+                  rounded-lg transition-all duration-200 ease-out
                   ${
                     isActive
-                      ? 'bg-gradient-to-br from-brand/15 via-brand/10 to-brand/5 dark:from-brand/25 dark:via-brand/20 dark:to-brand/15 text-brand dark:text-brand-light shadow-lg shadow-brand/20 dark:shadow-brand/30'
+                      ? 'bg-gradient-to-br from-brand/20 via-brand/15 to-brand/10 dark:from-brand/30 dark:via-brand/25 dark:to-brand/20 text-brand dark:text-brand-light shadow-md shadow-brand/20 dark:shadow-brand/30'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                   }
-                  ${isActive ? 'scale-110' : 'scale-100 hover:scale-105'}
+                  ${isActive ? 'scale-105' : 'scale-100'}
                   active:scale-95
                   hover:bg-gray-100/80 dark:hover:bg-gray-800/80
                   relative
@@ -97,19 +97,19 @@ export const BottomNavigation = memo(function BottomNavigation() {
                 aria-current={isActive ? 'page' : undefined}
               >
                 {isActive && (
-                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand dark:bg-brand-light rounded-full animate-pulse" />
+                  <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand dark:bg-brand-light rounded-full animate-pulse" />
                 )}
                 <span
-                  className={`text-xl ${isActive ? 'scale-110 drop-shadow-lg' : 'scale-100'} transition-all duration-300 ease-out`}
+                  className={`text-lg ${isActive ? 'drop-shadow-md' : ''} transition-all duration-200 ease-out`}
                   aria-hidden="true"
                   style={{
-                    filter: isActive ? 'drop-shadow(0 2px 4px rgba(14, 165, 233, 0.3))' : 'none',
+                    filter: isActive ? 'drop-shadow(0 1px 2px rgba(14, 165, 233, 0.3))' : 'none',
                   }}
                 >
                   {item.icon}
                 </span>
                 <span
-                  className={`text-[9px] font-bold leading-tight tracking-tight ${isActive ? 'opacity-100' : 'opacity-70'} transition-opacity duration-300`}
+                  className={`text-[8px] font-semibold leading-tight tracking-tight ${isActive ? 'opacity-100' : 'opacity-60'} transition-opacity duration-200`}
                 >
                   {item.label}
                 </span>
