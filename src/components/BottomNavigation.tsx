@@ -89,6 +89,9 @@ export const BottomNavigation = memo(function BottomNavigation() {
                 `}
                 style={{
                   WebkitTapHighlightColor: 'transparent',
+                  touchAction: 'manipulation',
+                  pointerEvents: 'auto',
+                  userSelect: 'none',
                 }}
                 aria-label={item.ariaLabel}
                 aria-current={isActive ? 'page' : undefined}

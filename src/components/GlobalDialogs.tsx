@@ -10,8 +10,10 @@ import { ConflictResolutionDialog } from '@/components/ConflictResolutionDialog'
 import { useActivities, ActivityRecord } from '@/lib/activityStore';
 import { useSettings, UserSettings } from '@/lib/settingsStore';
 import { syncHistoryService } from '@/lib/cloudSync/syncHistory';
-import { useBadges, Badge } from '@/lib/badgeStore';
-import { useChallenges, Challenge } from '@/lib/challengeStore';
+import { useBadges } from '@/lib/badgeStore';
+import type { Badge } from '@/lib/badges';
+import { useChallenges } from '@/lib/challengeStore';
+import type { Challenge } from '@/lib/challenges';
 import { useEffect } from 'react';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
 

@@ -383,15 +383,12 @@ export function CloudSyncSettings({
       }
     };
 
-    window.addEventListener(
-      'sporttrack:conflict-resolve-handler',
-      handleConflictResolveEvent as EventListener
-    );
+    const eventHandler = (event: Event) => {
+      handleConflictResolveEvent(event as CustomEvent<ConflictStrategy>);
+    };
+    window.addEventListener('sporttrack:conflict-resolve-handler', eventHandler);
     return () => {
-      window.removeEventListener(
-        'sporttrack:conflict-resolve-handler',
-        handleConflictResolveEvent as EventListener
-      );
+      window.removeEventListener('sporttrack:conflict-resolve-handler', eventHandler);
     };
   }, [
     conflictData,

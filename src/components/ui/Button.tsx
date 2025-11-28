@@ -259,6 +259,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-disabled={isDisabled}
         aria-busy={loading}
         onClick={handleClick}
+        style={{
+          touchAction: 'manipulation',
+          WebkitTapHighlightColor: 'transparent',
+          pointerEvents: isDisabled ? 'none' : 'auto',
+          ...props.style,
+        }}
         {...props}
       >
         {loading && (

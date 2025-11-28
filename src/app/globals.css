@@ -196,6 +196,9 @@ html.dark {
 
 html,
 body {
+  /* Improve touch responsiveness on mobile */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   height: 100%;
   margin: 0;
   padding: 0;
