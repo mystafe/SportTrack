@@ -14,7 +14,7 @@ import { useBadges } from '@/lib/badgeStore';
 import type { Badge } from '@/lib/badges';
 import { useChallenges } from '@/lib/challengeStore';
 import type { Challenge } from '@/lib/challenges';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
 
 // Lazy load Apple Health Guide
@@ -48,24 +48,30 @@ export function GlobalDialogs() {
   const { challenges } = useChallenges();
 
   // Get local and cloud last modified dates for ConflictResolutionDialog
-  const getLocalLastModified = (): Date | null => {
-    if (typeof window === 'undefined') return null;
+  // Use useState to ensure this only runs on client-side
+  const [localLastModified, setLocalLastModified] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
       const stored = localStorage.getItem('sporttrack_last_sync');
       if (stored) {
         const date = new Date(stored);
         if (!isNaN(date.getTime())) {
-          return date;
+          setLocalLastModified(date);
+          return;
         }
       }
       if (activities.length > 0) {
-        return new Date();
+        setLocalLastModified(new Date());
+      } else {
+        setLocalLastModified(null);
       }
     } catch (error) {
       console.error('Failed to get local last modified:', error);
+      setLocalLastModified(null);
     }
-    return null;
-  };
+  }, [activities.length]);
 
   const getCloudLastModified = (): Date | null => {
     if (!conflictData) return null;
@@ -164,7 +170,7 @@ export function GlobalDialogs() {
             points: conflictData.cloud.points || 0,
             lastModified: conflictData.cloud.metadata?.lastModified || null,
           }}
-          localLastModified={getLocalLastModified()}
+          localLastModified={localLastModified}
           cloudLastModified={getCloudLastModified()}
         />
       )}

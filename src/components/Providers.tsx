@@ -21,7 +21,10 @@ import { CloudSyncLoading } from '@/components/CloudSyncLoading';
 import { UIStateProvider } from '@/lib/uiState';
 import { DialogManagerProvider } from '@/lib/dialogManager';
 import { GlobalDialogProvider } from '@/lib/globalDialogState';
-import { GlobalDialogs } from '@/components/GlobalDialogs';
+// Lazy load GlobalDialogs to prevent server-side rendering issues
+const GlobalDialogs = lazy(() =>
+  import('@/components/GlobalDialogs').then((m) => ({ default: m.GlobalDialogs }))
+);
 
 // Lazy load components that are not immediately needed
 const InstallPrompt = lazy(() =>
@@ -103,7 +106,9 @@ export function Providers({ children }: { children: ReactNode }) {
                               <Suspense fallback={null}>
                                 <WelcomeToast />
                               </Suspense>
-                              <GlobalDialogs />
+                              <Suspense fallback={null}>
+                                <GlobalDialogs />
+                              </Suspense>
                               {children}
                             </AutoSyncProvider>
                           </ToasterProvider>
