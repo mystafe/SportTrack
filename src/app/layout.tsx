@@ -219,7 +219,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             id="main-content"
             className="container py-4 sm:py-6 mobile-scroll-area"
             style={{
-              paddingTop: 'calc(56px + 2px + 1rem)',
+              paddingTop: 'calc(56px + 2px)',
               paddingBottom:
                 'max(1.5rem, calc(48px + 20px + 1rem + env(safe-area-inset-bottom, 0px)))',
             }}
