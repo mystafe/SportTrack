@@ -85,22 +85,59 @@ export function QuoteTicker() {
 
   if (!mounted || quotes.length === 0) return null;
 
-  // Calculate bottom position: directly above BottomNavigation (48px), no extra spacing
+  // Calculate bottom position: EXACTLY on top of BottomNavigation - ZERO gap
+  // BottomNavigation: h-12 (48px) + paddingBottom (safe-area)
+  // QuoteTicker must sit EXACTLY at BottomNavigation's top edge with NO gap
+  // BottomNavigation has paddingBottom: env(safe-area-inset-bottom)
+  // So QuoteTicker bottom should be: 48px (BottomNavigation content height)
+  // NO safe-area-inset-bottom here - BottomNavigation handles it
+  // AGGRESSIVE: Force exact position
   const bottomPosition = isMobile ? '48px' : 'max(28px, env(safe-area-inset-bottom, 0px))';
 
   return (
     <div
       ref={containerRef}
-      className={`fixed left-0 right-0 z-[45] bg-gradient-to-r from-brand/20 via-brand/15 to-brand/20 dark:from-brand/30 dark:via-brand/20 dark:to-brand/30 border-t border-brand/50 dark:border-brand/60 ${isMobile ? 'py-0' : 'py-0.5'} overflow-hidden shadow-md backdrop-blur-md`}
+      className={`fixed left-0 right-0 z-[45] bg-gradient-to-r from-brand/20 via-brand/15 to-brand/20 dark:from-brand/30 dark:via-brand/20 dark:to-brand/30 overflow-hidden shadow-md backdrop-blur-md`}
       style={{
-        bottom: bottomPosition,
+        bottom: isMobile ? '48px' : bottomPosition,
+        margin: 0,
+        padding: 0,
+        height: isMobile ? '20px' : '24px',
+        minHeight: isMobile ? '20px' : '24px',
+        maxHeight: isMobile ? '20px' : '24px',
+        boxSizing: 'border-box',
+        lineHeight: isMobile ? '20px' : '24px',
+        borderTop: 'none',
+        borderBottom: 'none',
+        transform: 'translateZ(0)',
+        willChange: 'transform',
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        zIndex: 45,
+        top: 'auto',
+        // AGGRESSIVE: Force no gap - sit directly on BottomNavigation
         marginBottom: 0,
         paddingBottom: 0,
+        marginTop: 0,
+        paddingTop: 0,
       }}
     >
       <div
-        className="relative w-full h-full flex items-center justify-center"
-        style={{ minHeight: isMobile ? '1.25rem' : '1.5rem' }}
+        className="relative w-full flex items-center justify-center"
+        style={{
+          height: isMobile ? '20px' : '24px',
+          minHeight: isMobile ? '20px' : '24px',
+          maxHeight: isMobile ? '20px' : '24px',
+          margin: 0,
+          padding: 0,
+          marginTop: 0,
+          marginBottom: 0,
+          paddingTop: 0,
+          paddingBottom: 0,
+          boxSizing: 'border-box',
+          lineHeight: isMobile ? '20px' : '24px',
+        }}
       >
         {/* Subtle gradient fade edges */}
         <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-20 bg-gradient-to-r from-brand/20 via-brand/10 to-transparent dark:from-brand/30 dark:via-brand/15 z-10 pointer-events-none"></div>

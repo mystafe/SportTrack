@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { memo, useMemo } from 'react';
+import { QuoteTicker } from '@/components/QuoteTicker';
 
 export const BottomNavigation = memo(function BottomNavigation() {
   const pathname = usePathname();
@@ -52,30 +53,62 @@ export const BottomNavigation = memo(function BottomNavigation() {
   if (!isMobile) return null;
 
   return (
-    <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-white via-white to-white/95 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900/95 backdrop-blur-xl border-t border-gray-200/80 dark:border-gray-700/80 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]"
-      style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        willChange: 'transform',
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      }}
-      role="navigation"
-      aria-label={t('nav.main')}
-    >
-      <div className="container mx-auto px-1 safe-left safe-right">
-        <div className="flex items-center justify-around h-12">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch={true}
-                className={`
+    <>
+      <QuoteTicker />
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-white via-white to-white/95 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]"
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          willChange: 'transform',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          marginTop: 0,
+          paddingTop: 0,
+          marginBottom: 0,
+          transform: 'translateZ(0)',
+          borderTop: 'none',
+          height: 'calc(48px + env(safe-area-inset-bottom, 0px))',
+          minHeight: 'calc(48px + env(safe-area-inset-bottom, 0px))',
+          maxHeight: 'calc(48px + env(safe-area-inset-bottom, 0px))',
+          boxSizing: 'border-box',
+        }}
+        role="navigation"
+        aria-label={t('nav.main')}
+      >
+        <div
+          className="container mx-auto px-1 safe-left safe-right"
+          style={{
+            marginTop: 0,
+            paddingTop: 0,
+            marginBottom: 0,
+            height: '48px',
+            boxSizing: 'border-box',
+          }}
+        >
+          <div
+            className="flex items-center justify-around h-12"
+            style={{
+              marginTop: 0,
+              paddingTop: 0,
+              marginBottom: 0,
+              height: '48px',
+              minHeight: '48px',
+              maxHeight: '48px',
+              boxSizing: 'border-box',
+              lineHeight: '48px',
+            }}
+          >
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  prefetch={true}
+                  className={`
                   flex flex-col items-center justify-center gap-0
                   min-w-[44px] min-h-[44px] px-1.5 py-1
                   rounded-lg transition-all duration-200 ease-out
@@ -89,37 +122,38 @@ export const BottomNavigation = memo(function BottomNavigation() {
                   hover:bg-gray-100/80 dark:hover:bg-gray-800/80
                   relative
                 `}
-                style={{
-                  WebkitTapHighlightColor: 'transparent',
-                  touchAction: 'manipulation',
-                  pointerEvents: 'auto',
-                  userSelect: 'none',
-                }}
-                aria-label={item.ariaLabel}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                {isActive && (
-                  <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand dark:bg-brand-light rounded-full animate-pulse" />
-                )}
-                <span
-                  className={`text-lg ${isActive ? 'drop-shadow-md' : ''} transition-all duration-200 ease-out`}
-                  aria-hidden="true"
                   style={{
-                    filter: isActive ? 'drop-shadow(0 1px 2px rgba(14, 165, 233, 0.3))' : 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                    touchAction: 'manipulation',
+                    pointerEvents: 'auto',
+                    userSelect: 'none',
                   }}
+                  aria-label={item.ariaLabel}
+                  aria-current={isActive ? 'page' : undefined}
                 >
-                  {item.icon}
-                </span>
-                <span
-                  className={`text-[8px] font-semibold leading-tight tracking-tight ${isActive ? 'opacity-100' : 'opacity-60'} transition-opacity duration-200`}
-                >
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
+                  {isActive && (
+                    <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand dark:bg-brand-light rounded-full animate-pulse" />
+                  )}
+                  <span
+                    className={`text-lg ${isActive ? 'drop-shadow-md' : ''} transition-all duration-200 ease-out`}
+                    aria-hidden="true"
+                    style={{
+                      filter: isActive ? 'drop-shadow(0 1px 2px rgba(14, 165, 233, 0.3))' : 'none',
+                    }}
+                  >
+                    {item.icon}
+                  </span>
+                  <span
+                    className={`text-[8px] font-semibold leading-tight tracking-tight ${isActive ? 'opacity-100' : 'opacity-60'} transition-opacity duration-200`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 });

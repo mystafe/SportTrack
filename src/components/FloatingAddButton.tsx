@@ -46,19 +46,30 @@ export function FloatingAddButton() {
   }
 
   // Calculate position above QuoteTicker - just above scrolling text
-  // QuoteTicker height: ~28px + BottomNavigation: 64px + safe-bottom
-  // Position button slightly lower
+  // BottomNavigation: 48px + safe-area + QuoteTicker: 20px + spacing: 8px
+  // For iPhone 17 Pro Max: safe-area-inset-bottom is typically 34px
   const bottomOffset = isMobile
-    ? `calc(130px + max(0px, env(safe-area-inset-bottom, 0px)))`
+    ? `calc(48px + 20px + 8px + env(safe-area-inset-bottom, 0px))`
     : '122px';
 
   return (
     <div
-      className={`fixed right-4 sm:right-6 z-[9998] transition-all duration-500 ease-in-out flex flex-col items-center gap-2`}
+      className={`fixed right-4 sm:right-6 z-[70] transition-all duration-500 ease-in-out flex flex-col items-center gap-2`}
       style={{
         willChange: 'opacity, transform',
         position: 'fixed',
         bottom: bottomOffset,
+        zIndex: 70,
+        pointerEvents: 'auto',
+        opacity: 1,
+        visibility: 'visible',
+        display: 'flex',
+        right: isMobile ? '1rem' : '1.5rem',
+        // AGGRESSIVE: Force visibility
+        opacity: 1,
+        visibility: 'visible',
+        display: 'flex',
+        pointerEvents: 'auto',
       }}
     >
       {/* Add Exercise Button */}

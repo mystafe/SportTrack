@@ -55,7 +55,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             __html: `
             /* Prevent CLS - set initial dimensions for critical elements */
             body { min-height: 100vh; }
-            main { min-height: calc(100vh - 200px); }
             /* Optimize font loading */
             @font-face {
               font-family: system-ui;
@@ -217,11 +216,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Header />
           <main
             id="main-content"
-            className="container py-4 sm:py-6 mobile-scroll-area"
+            className="mobile-scroll-area"
             style={{
               paddingTop: 'calc(56px + 2px)',
-              paddingBottom:
-                'max(1.5rem, calc(48px + 20px + 1rem + env(safe-area-inset-bottom, 0px)))',
+              paddingBottom: 'calc(48px + 20px + env(safe-area-inset-bottom, 0px))',
+              paddingLeft: '1rem',
+              paddingRight: '1rem',
+              marginBottom: 0,
+              boxSizing: 'border-box',
             }}
             role="main"
             aria-label="Main content"
@@ -229,7 +231,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {children}
           </main>
           <FloatingAddButton />
-          <QuoteTicker />
           <BottomNavigation />
         </Providers>
       </body>
