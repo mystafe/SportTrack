@@ -65,11 +65,6 @@ export function FloatingAddButton() {
         visibility: 'visible',
         display: 'flex',
         right: isMobile ? '1rem' : '1.5rem',
-        // AGGRESSIVE: Force visibility
-        opacity: 1,
-        visibility: 'visible',
-        display: 'flex',
-        pointerEvents: 'auto',
       }}
     >
       {/* Add Exercise Button */}
