@@ -85,10 +85,8 @@ export function QuoteTicker() {
 
   if (!mounted || quotes.length === 0) return null;
 
-  // Calculate bottom position: directly above BottomNavigation (48px) + safe area
-  const bottomPosition = isMobile
-    ? 'calc(48px + env(safe-area-inset-bottom, 0px))'
-    : 'max(28px, env(safe-area-inset-bottom, 0px))';
+  // Calculate bottom position: directly above BottomNavigation (48px), no extra spacing
+  const bottomPosition = isMobile ? '48px' : 'max(28px, env(safe-area-inset-bottom, 0px))';
 
   return (
     <div

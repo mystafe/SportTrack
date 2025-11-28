@@ -53,7 +53,7 @@ export const BottomNavigation = memo(function BottomNavigation() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-white via-white to-white/95 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900/95 backdrop-blur-xl border-t border-gray-200/80 dark:border-gray-700/80 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)] safe-bottom"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-white via-white to-white/95 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900/95 backdrop-blur-xl border-t border-gray-200/80 dark:border-gray-700/80 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]"
       style={{
         position: 'fixed',
         bottom: 0,
@@ -61,12 +61,13 @@ export const BottomNavigation = memo(function BottomNavigation() {
         right: 0,
         zIndex: 50,
         willChange: 'transform',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
       role="navigation"
       aria-label={t('nav.main')}
     >
       <div className="container mx-auto px-1 safe-left safe-right">
-        <div className="flex items-center justify-around h-12 safe-bottom">
+        <div className="flex items-center justify-around h-12">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
