@@ -85,15 +85,15 @@ export function QuoteTicker() {
 
   if (!mounted || quotes.length === 0) return null;
 
-  // Calculate bottom position: above BottomNavigation (48px after resize) + safe area + minimal spacing
+  // Calculate bottom position: directly above BottomNavigation (48px) + safe area
   const bottomPosition = isMobile
-    ? 'calc(48px + max(8px, env(safe-area-inset-bottom, 0px)))'
+    ? 'calc(48px + env(safe-area-inset-bottom, 0px))'
     : 'max(28px, env(safe-area-inset-bottom, 0px))';
 
   return (
     <div
       ref={containerRef}
-      className={`fixed left-0 right-0 z-45 bg-gradient-to-r from-brand/20 via-brand/15 to-brand/20 dark:from-brand/30 dark:via-brand/20 dark:to-brand/30 border-t border-brand/50 dark:border-brand/60 ${isMobile ? 'py-0' : 'py-0.5'} overflow-hidden shadow-md backdrop-blur-md`}
+      className={`fixed left-0 right-0 z-[45] bg-gradient-to-r from-brand/20 via-brand/15 to-brand/20 dark:from-brand/30 dark:via-brand/20 dark:to-brand/30 border-t border-brand/50 dark:border-brand/60 ${isMobile ? 'py-0' : 'py-0.5'} overflow-hidden shadow-md backdrop-blur-md`}
       style={{ bottom: bottomPosition }}
     >
       <div

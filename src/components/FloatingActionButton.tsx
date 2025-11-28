@@ -61,7 +61,7 @@ export function FloatingActionButton() {
       size="lg"
       onClick={handleClick}
       className="
-        fixed right-4 z-[60]
+        fixed right-4 z-[70]
         w-14 h-14 rounded-full
         shadow-2xl
         flex items-center justify-center
@@ -76,6 +76,7 @@ export function FloatingActionButton() {
         touchAction: 'manipulation',
         WebkitTapHighlightColor: 'transparent',
         pointerEvents: 'auto',
+        position: 'fixed',
       }}
       aria-label={t('actions.addActivity')}
       data-tour-id="add-activity"

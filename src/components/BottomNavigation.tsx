@@ -73,6 +73,7 @@ export const BottomNavigation = memo(function BottomNavigation() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 className={`
                   flex flex-col items-center justify-center gap-0
                   min-w-[44px] min-h-[44px] px-1.5 py-1
