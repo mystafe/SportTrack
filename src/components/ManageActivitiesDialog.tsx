@@ -319,7 +319,6 @@ export function ManageActivitiesDialog() {
                           data-form-type="other"
                           name="label"
                           type="text"
-                          name="label"
                           value={lang === 'tr' ? form.label : form.labelEn}
                           onChange={(e) => {
                             if (lang === 'tr') {
@@ -362,7 +361,6 @@ export function ManageActivitiesDialog() {
                           data-form-type="other"
                           name="labelEn"
                           type="text"
-                          name="labelEn"
                           value={lang === 'tr' ? form.labelEn : form.label}
                           onChange={(e) => {
                             if (lang === 'tr') {
@@ -397,7 +395,6 @@ export function ManageActivitiesDialog() {
                           name="icon"
                           type="text"
                           maxLength={4}
-                          name="icon"
                           value={form.icon}
                           onChange={(e) => setForm((prev) => ({ ...prev, icon: e.target.value }))}
                           className="mt-1 w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1.5 text-sm bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
@@ -416,7 +413,6 @@ export function ManageActivitiesDialog() {
                           type="number"
                           min={0.1}
                           step={0.1}
-                          name="multiplier"
                           value={form.multiplier}
                           onChange={(e) =>
                             setForm((prev) => ({
@@ -439,7 +435,6 @@ export function ManageActivitiesDialog() {
                           type="number"
                           min={1}
                           step={1}
-                          name="defaultAmount"
                           value={form.defaultAmount}
                           onChange={(e) =>
                             setForm((prev) => ({
@@ -473,7 +468,6 @@ export function ManageActivitiesDialog() {
                           data-form-type="other"
                           name="unit"
                           type="text"
-                          name="unit"
                           value={lang === 'tr' ? form.unit : form.unitEn}
                           onChange={(e) => {
                             if (lang === 'tr') {
@@ -514,7 +508,6 @@ export function ManageActivitiesDialog() {
                           data-form-type="other"
                           name="unitEn"
                           type="text"
-                          name="unitEn"
                           value={lang === 'tr' ? form.unitEn : form.unit}
                           onChange={(e) => {
                             if (lang === 'tr') {
@@ -554,7 +547,6 @@ export function ManageActivitiesDialog() {
                           data-1p-ignore="true"
                           data-form-type="other"
                           name="description"
-                          name="description"
                           value={lang === 'tr' ? form.description : form.descriptionEn}
                           onChange={(e) => {
                             if (lang === 'tr') {
@@ -587,7 +579,6 @@ export function ManageActivitiesDialog() {
                           data-lpignore="true"
                           data-1p-ignore="true"
                           data-form-type="other"
-                          name="descriptionEn"
                           name="descriptionEn"
                           value={lang === 'tr' ? form.descriptionEn : form.description}
                           onChange={(e) => {

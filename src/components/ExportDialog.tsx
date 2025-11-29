@@ -206,7 +206,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
               <Button
                 type="button"
                 variant={exportFormat === 'csv' ? 'primary' : 'outline'}
-                size={isMobile ? 'xs' : 'sm'}
+                size="sm"
                 onClick={() => setExportFormat('csv')}
                 className={`flex-1 ${isMobile ? 'text-[10px] px-2 py-1' : ''}`}
               >
@@ -215,7 +215,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
               <Button
                 type="button"
                 variant={exportFormat === 'pdf' ? 'primary' : 'outline'}
-                size={isMobile ? 'xs' : 'sm'}
+                size="sm"
                 onClick={() => setExportFormat('pdf')}
                 className={`flex-1 ${isMobile ? 'text-[10px] px-2 py-1' : ''}`}
               >
@@ -224,7 +224,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
               <Button
                 type="button"
                 variant={exportFormat === 'json' ? 'primary' : 'outline'}
-                size={isMobile ? 'xs' : 'sm'}
+                size="sm"
                 onClick={() => setExportFormat('json')}
                 className={`flex-1 ${isMobile ? 'text-[10px] px-2 py-1' : ''}`}
               >
@@ -377,7 +377,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
             <Button
               type="button"
               variant="outline"
-              size={isMobile ? 'xs' : 'sm'}
+              size="sm"
               onClick={onClose}
               fullWidth={isMobile}
               className={isMobile ? 'text-xs px-3 py-1.5' : ''}
@@ -387,7 +387,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
             <Button
               type="button"
               variant="primary"
-              size={isMobile ? 'xs' : 'sm'}
+              size="sm"
               onClick={handleExport}
               disabled={isExporting}
               loading={isExporting}
