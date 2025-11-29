@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useId } from 'react';
 import { designTokens } from '@/lib/design-tokens';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
@@ -171,7 +171,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ref
   ) => {
     const isMobile = useIsMobile();
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+    const generatedId = useId();
+    const inputId = id || generatedId;
     const hasError = !!error;
 
     // Adjust minHeight for mobile touch targets (44x44px minimum)

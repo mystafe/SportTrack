@@ -584,14 +584,14 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   <span
                     className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
                   >
-                    © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.30.2
+                    © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.30.3
                   </span>
                 )}
                 {!isAuthenticated && (
                   <span
                     className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-1 flex-shrink-0`}
                   >
-                    v0.30.2
+                    v0.30.3
                   </span>
                 )}
               </div>

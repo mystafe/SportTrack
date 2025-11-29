@@ -312,10 +312,9 @@ export const ActivityForm = memo(function ActivityForm({
                     }
                     return String(def.defaultAmount);
                   });
-                  // Open Activity Details accordion when activity is selected
-                  if (!activityDetailsOpen) {
-                    setActivityDetailsOpen(true);
-                  }
+                  // Close Activity Selection accordion and open Activity Details accordion
+                  setActivitySelectionOpen(false);
+                  setActivityDetailsOpen(true);
                 }}
                 className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} ${isMobile ? 'px-1.5 py-1 min-h-[40px]' : 'px-2 py-1.5'} shadow-md hover:shadow-xl transition-all duration-300 ${
                   active
@@ -410,20 +409,30 @@ export const ActivityForm = memo(function ActivityForm({
                 inputMode="decimal"
               />
             </label>
-            {/* Calculation Fields */}
-            <div className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} flex flex-col justify-end`}>
-              <div
-                className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}
-              >
+            {/* Calculation Fields - Only show on desktop, hide on mobile */}
+            {!isMobile && (
+              <div className={`space-y-1 flex flex-col justify-end`}>
+                <div className={`text-sm text-gray-500 dark:text-gray-400`}>
+                  {lang === 'tr' ? 'Hesaplama' : 'Calculation'}
+                </div>
+                <div className={`text-sm text-gray-600 dark:text-gray-300 font-medium`}>
+                  {definition.multiplier}x · {t('form.points')}: {pointsDisplay}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Calculation Fields - Show below amount on mobile */}
+          {isMobile && (
+            <div className={`space-y-0.5`}>
+              <div className={`text-xs text-gray-500 dark:text-gray-400`}>
                 {lang === 'tr' ? 'Hesaplama' : 'Calculation'}
               </div>
-              <div
-                className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-300 font-medium`}
-              >
+              <div className={`text-xs text-gray-600 dark:text-gray-300 font-medium`}>
                 {definition.multiplier}x · {t('form.points')}: {pointsDisplay}
               </div>
             </div>
-          </div>
+          )}
 
           {/* Description - Full Width */}
           {getActivityDescription(definition, lang) ? (
@@ -436,43 +445,47 @@ export const ActivityForm = memo(function ActivityForm({
             </div>
           ) : null}
 
-          {/* DateTime Input */}
-          <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
-            <div
-              className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
-            >
-              {t('form.datetime')}
-            </div>
-            <input
-              type="datetime-local"
-              value={performedAt}
-              onChange={(e) => setPerformedAt(e.target.value)}
-              className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2.5 py-1.5 min-h-[40px] text-sm' : 'rounded-lg px-3 py-2 min-h-[40px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-200`}
-              required
-              autoComplete="off"
-              data-form-type="other"
-              data-lpignore="true"
-              data-1p-ignore="true"
-              aria-autocomplete="none"
-              aria-label={t('form.datetime')}
-              aria-required="true"
-              name=""
-              inputMode="none"
-            />
-          </label>
-
-          {/* OK/Next Button to open Note accordion */}
-          <Button
-            type="button"
-            variant="secondary"
-            size={isMobile ? 'sm' : 'md'}
-            onClick={() => {
-              setNoteOpen(true);
-            }}
-            className="w-full"
+          {/* DateTime Input and Next Button - Side by Side */}
+          <div
+            className={`grid ${isMobile ? 'grid-cols-1 gap-1.5' : 'grid-cols-[1fr_auto] gap-2 items-end'}`}
           >
-            {lang === 'tr' ? 'İleri' : 'Next'} / {lang === 'tr' ? 'Tamam' : 'OK'}
-          </Button>
+            <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
+              <div
+                className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
+              >
+                {t('form.datetime')}
+              </div>
+              <input
+                type="datetime-local"
+                value={performedAt}
+                onChange={(e) => setPerformedAt(e.target.value)}
+                className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2.5 py-1.5 min-h-[40px] text-sm' : 'rounded-lg px-3 py-2 min-h-[40px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-200`}
+                required
+                autoComplete="off"
+                data-form-type="other"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                aria-autocomplete="none"
+                aria-label={t('form.datetime')}
+                aria-required="true"
+                name=""
+                inputMode="none"
+              />
+            </label>
+            {/* Next Button to open Note accordion */}
+            <Button
+              type="button"
+              variant="secondary"
+              size={isMobile ? 'sm' : 'md'}
+              onClick={() => {
+                setActivityDetailsOpen(false);
+                setNoteOpen(true);
+              }}
+              className={isMobile ? 'w-full' : ''}
+            >
+              {lang === 'tr' ? 'İleri' : 'Next'}
+            </Button>
+          </div>
         </div>
       </Accordion>
 
