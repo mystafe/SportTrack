@@ -17,7 +17,7 @@ import { useToaster } from '@/components/Toaster';
 export function PresetChallenges() {
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
-  const { addChallenge } = useChallenges();
+  const { challenges, addChallenge } = useChallenges();
   const { triggerHaptic } = useHapticFeedback();
   const { showToast } = useToaster();
   const [selectedCategory, setSelectedCategory] = useState<PresetChallenge['category'] | 'all'>(
@@ -41,6 +41,13 @@ export function PresetChallenges() {
     selectedCategory === 'all'
       ? PRESET_CHALLENGES
       : PRESET_CHALLENGES.filter((preset) => preset.category === selectedCategory);
+
+  // Check if a preset challenge is already active
+  const isPresetActive = (preset: PresetChallenge): boolean => {
+    return challenges.some(
+      (c) => (c.id.startsWith(preset.id + '-') || c.id === preset.id) && c.status === 'active'
+    );
+  };
 
   const handleAddPreset = (preset: PresetChallenge) => {
     try {
@@ -130,15 +137,21 @@ export function PresetChallenges() {
                     </div>
                   </div>
                 </div>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  fullWidth
-                  onClick={() => handleAddPreset(preset)}
-                  icon="➕"
-                >
-                  {lang === 'tr' ? 'Ekle' : 'Add'}
-                </Button>
+                {isPresetActive(preset) ? (
+                  <Button variant="outline" size="sm" fullWidth disabled icon="✅">
+                    {lang === 'tr' ? 'Aktif' : 'Active'}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    fullWidth
+                    onClick={() => handleAddPreset(preset)}
+                    icon="➕"
+                  >
+                    {lang === 'tr' ? 'Ekle' : 'Add'}
+                  </Button>
+                )}
               </div>
             </div>
           </Card>

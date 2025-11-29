@@ -10,6 +10,9 @@ import { PageSkeleton, ChallengeCardSkeleton } from '@/components/LoadingSkeleto
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { Accordion } from '@/components/ui/Accordion';
+import { PRESET_CHALLENGES } from '@/lib/presetChallenges';
+import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { useToaster } from '@/components/Toaster';
 
 // Lazy load challenge components
 const ChallengeCard = lazy(() =>
@@ -22,20 +25,96 @@ const PresetChallenges = lazy(() =>
   import('@/components/PresetChallenges').then((m) => ({ default: m.PresetChallenges }))
 );
 
+type ChallengeCategory =
+  | 'motivation'
+  | 'achievement'
+  | 'consistency'
+  | 'milestone'
+  | 'special'
+  | 'custom'
+  | 'all';
+
 export default function ChallengesPage() {
   const { challenges, hydrated, addChallenge, updateChallenge, deleteChallenge } = useChallenges();
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
+  const { triggerHaptic } = useHapticFeedback();
+  const { showToast } = useToaster();
   const [showDialog, setShowDialog] = useState(false);
   const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null);
   const [deletingChallenge, setDeletingChallenge] = useState<Challenge | null>(null);
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState<ChallengeCategory>('all');
+
+  // Helper function to get category from challenge
+  const getChallengeCategory = (challenge: Challenge): ChallengeCategory | null => {
+    // First check if challenge has category field
+    if (challenge.category) {
+      return challenge.category as ChallengeCategory;
+    }
+    // Fallback to preset lookup
+    if (challenge.id.startsWith('preset-')) {
+      const preset = PRESET_CHALLENGES.find(
+        (p) => challenge.id.startsWith(p.id + '-') || challenge.id === p.id
+      );
+      return preset ? (preset.category as ChallengeCategory) : null;
+    }
+    // Check if it's a custom challenge
+    if (
+      !challenge.id.startsWith('preset-') &&
+      !challenge.id.startsWith('daily-') &&
+      !challenge.id.startsWith('weekly-') &&
+      !challenge.id.startsWith('yearly-') &&
+      challenge.type === 'custom'
+    ) {
+      return 'custom';
+    }
+    return null;
+  };
+
+  // Check if challenge is custom (user-created, not auto-generated)
+  const isCustomChallenge = (challenge: Challenge): boolean => {
+    // Check if challenge has custom category (manually created)
+    if (challenge.category === 'custom') {
+      return true;
+    }
+    // Also check if it's a custom type and not auto-generated
+    return (
+      challenge.type === 'custom' &&
+      !challenge.id.startsWith('preset-') &&
+      !challenge.id.startsWith('daily-') &&
+      !challenge.id.startsWith('weekly-') &&
+      !challenge.id.startsWith('yearly-')
+    );
+  };
 
   // Memoize filtered challenges to prevent unnecessary re-renders
   // IMPORTANT: These hooks must be called before any conditional returns
-  const activeChallenges = useMemo(
-    () => challenges.filter((c) => c.status === 'active'),
-    [challenges]
-  );
+  // Sort: custom challenges first, then others (by createdAt desc for custom, then others)
+  const activeChallenges = useMemo(() => {
+    const active = challenges.filter((c) => c.status === 'active');
+    return active.sort((a, b) => {
+      const aIsCustom = isCustomChallenge(a);
+      const bIsCustom = isCustomChallenge(b);
+      // Custom challenges first
+      if (aIsCustom && !bIsCustom) return -1;
+      if (!aIsCustom && bIsCustom) return 1;
+      // Within custom challenges, newest first
+      if (aIsCustom && bIsCustom) {
+        const aTime = new Date(a.createdAt).getTime();
+        const bTime = new Date(b.createdAt).getTime();
+        return bTime - aTime; // Descending (newest first)
+      }
+      // For non-custom, keep original order
+      return 0;
+    });
+  }, [challenges]);
+
+  // Filter active challenges by category (maintains sort order)
+  const filteredActiveChallenges = useMemo(() => {
+    if (activeCategoryFilter === 'all') return activeChallenges;
+    return activeChallenges.filter((c) => getChallengeCategory(c) === activeCategoryFilter);
+  }, [activeChallenges, activeCategoryFilter]);
+
   const completedChallenges = useMemo(
     () => challenges.filter((c) => c.status === 'completed'),
     [challenges]
@@ -80,13 +159,28 @@ export default function ChallengesPage() {
   };
 
   const handleSaveChallenge = (challenge: Challenge) => {
-    if (editingChallenge) {
-      updateChallenge(editingChallenge.id, challenge);
-    } else {
-      addChallenge(challenge);
+    try {
+      if (editingChallenge) {
+        updateChallenge(editingChallenge.id, challenge);
+        triggerHaptic('success');
+        showToast(lang === 'tr' ? 'Hedef güncellendi!' : 'Challenge updated!', 'success');
+      } else {
+        addChallenge(challenge);
+        triggerHaptic('success');
+        // Small delay to ensure challenge is added before showing toast
+        setTimeout(() => {
+          showToast(lang === 'tr' ? 'Hedef eklendi!' : 'Challenge added!', 'success');
+        }, 100);
+      }
+      setShowDialog(false);
+      setEditingChallenge(null);
+    } catch (error) {
+      console.error('Failed to save challenge:', error);
+      showToast(
+        lang === 'tr' ? 'Hedef kaydedilirken hata oluştu' : 'Error saving challenge',
+        'error'
+      );
     }
-    setShowDialog(false);
-    setEditingChallenge(null);
   };
 
   return (
@@ -102,46 +196,28 @@ export default function ChallengesPage() {
           <span className={`text-2xl sm:text-3xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}>
             🎯
           </span>
-          <span className="text-gray-950 dark:text-white">{t('challenges.title')}</span>
+          <span className="text-gray-950 dark:text-white">
+            {lang === 'tr' ? 'Hedefler' : 'Goals'}
+          </span>
         </h1>
         <p className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 leading-relaxed">
           {t('challenges.subtitle')}
         </p>
       </div>
 
-      <Accordion
-        title={lang === 'tr' ? 'Yeni Hedef Oluştur' : 'Create New Challenge'}
-        icon="➕"
-        defaultOpen={false}
-        variant="compact"
-        className="card-entrance mb-6"
-      >
-        <div className="flex flex-col gap-3">
-          <Button
-            type="button"
-            variant="primary"
-            size={isMobile ? 'sm' : 'md'}
-            onClick={handleAddChallenge}
-            className={`card-entrance ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'}`}
-            fullWidth
-          >
-            + {t('challenges.addChallenge')}
-          </Button>
-        </div>
-      </Accordion>
-
-      {/* Preset Challenges - Accordion */}
-      <Accordion
-        title={lang === 'tr' ? 'Önceden Tanımlı Hedefler' : 'Preset Challenges'}
-        icon="📋"
-        defaultOpen={false}
-        variant="compact"
-        className="card-entrance mb-6"
-      >
-        <Suspense fallback={<div className="h-32 skeleton rounded-lg" />}>
-          <PresetChallenges />
-        </Suspense>
-      </Accordion>
+      {/* Create New Challenge Button - No Accordion */}
+      <div className="mb-6">
+        <Button
+          type="button"
+          variant="primary"
+          size={isMobile ? 'sm' : 'md'}
+          onClick={handleAddChallenge}
+          className={`card-entrance ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'}`}
+          fullWidth
+        >
+          + {t('challenges.addChallenge')}
+        </Button>
+      </div>
 
       {challenges.length === 0 ? (
         <EmptyState
@@ -160,29 +236,118 @@ export default function ChallengesPage() {
         />
       ) : (
         <div className="space-y-4">
-          {/* Active Challenges - Accordion */}
+          {/* Active Challenges - No Accordion */}
           {activeChallenges.length > 0 && (
-            <Accordion
-              title={`${t('challenges.active')} (${activeChallenges.length})`}
-              icon="🔥"
-              defaultOpen={true}
-              className="card-entrance"
-            >
-              <div
-                className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}
-              >
-                {activeChallenges.map((challenge, index) => (
-                  <Suspense key={`${challenge.id}-${index}`} fallback={<ChallengeCardSkeleton />}>
-                    <ChallengeCard
-                      challenge={challenge}
-                      onEdit={() => handleEditChallenge(challenge)}
-                      onDelete={() => handleDeleteChallenge(challenge)}
-                    />
-                  </Suspense>
+            <div className="space-y-6">
+              {/* Category Filter - Tüm Aktif Hedefler İçin */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {[
+                  { id: 'all' as ChallengeCategory, label: { tr: 'Tümü', en: 'All' }, icon: '📋' },
+                  {
+                    id: 'custom' as ChallengeCategory,
+                    label: { tr: 'Özel', en: 'Custom' },
+                    icon: '✨',
+                  },
+                  {
+                    id: 'motivation' as ChallengeCategory,
+                    label: { tr: 'Motivasyon', en: 'Motivation' },
+                    icon: '🚀',
+                  },
+                  {
+                    id: 'achievement' as ChallengeCategory,
+                    label: { tr: 'Başarı', en: 'Achievement' },
+                    icon: '🏆',
+                  },
+                  {
+                    id: 'consistency' as ChallengeCategory,
+                    label: { tr: 'Tutarlılık', en: 'Consistency' },
+                    icon: '🔥',
+                  },
+                  {
+                    id: 'milestone' as ChallengeCategory,
+                    label: { tr: 'Kilometre Taşı', en: 'Milestone' },
+                    icon: '🎯',
+                  },
+                  {
+                    id: 'special' as ChallengeCategory,
+                    label: { tr: 'Özel', en: 'Special' },
+                    icon: '⭐',
+                  },
+                ].map((category) => (
+                  <Button
+                    key={category.id}
+                    variant={activeCategoryFilter === category.id ? 'primary' : 'outline'}
+                    size="sm"
+                    onClick={() => {
+                      setActiveCategoryFilter(category.id);
+                      triggerHaptic('light');
+                    }}
+                    icon={category.icon}
+                  >
+                    {category.label[lang]}
+                  </Button>
                 ))}
               </div>
-            </Accordion>
+
+              {/* Dynamic Section Title Based on Filter */}
+              {filteredActiveChallenges.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-950 dark:text-white mb-3">
+                    {activeCategoryFilter === 'all'
+                      ? lang === 'tr'
+                        ? 'Tüm Hedefler'
+                        : 'All Targets'
+                      : activeCategoryFilter === 'custom'
+                        ? lang === 'tr'
+                          ? 'Özel Hedefler'
+                          : 'Custom Targets'
+                        : activeCategoryFilter === 'motivation'
+                          ? lang === 'tr'
+                            ? 'Motivasyon Hedefleri'
+                            : 'Motivation Targets'
+                          : activeCategoryFilter === 'achievement'
+                            ? lang === 'tr'
+                              ? 'Başarı Hedefleri'
+                              : 'Achievement Targets'
+                            : activeCategoryFilter === 'consistency'
+                              ? lang === 'tr'
+                                ? 'Tutarlılık Hedefleri'
+                                : 'Consistency Targets'
+                              : activeCategoryFilter === 'milestone'
+                                ? lang === 'tr'
+                                  ? 'Kilometre Taşı Hedefleri'
+                                  : 'Milestone Targets'
+                                : activeCategoryFilter === 'special'
+                                  ? lang === 'tr'
+                                    ? 'Özel Hedefler'
+                                    : 'Special Targets'
+                                  : lang === 'tr'
+                                    ? 'Hedefler'
+                                    : 'Targets'}
+                  </h3>
+                  <div
+                    className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}
+                  >
+                    {filteredActiveChallenges.map((challenge, index) => (
+                      <Suspense
+                        key={`${challenge.id}-${index}`}
+                        fallback={<ChallengeCardSkeleton />}
+                      >
+                        <ChallengeCard
+                          challenge={challenge}
+                          onEdit={() => handleEditChallenge(challenge)}
+                          onDelete={() => handleDeleteChallenge(challenge)}
+                        />
+                      </Suspense>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
+
+          {/* Preset Challenges - Accordion - HIDDEN: Preset challenges are now automatically active */}
+          {/* Preset challenges are automatically added to active challenges, so no need for separate section */}
 
           {/* Completed Challenges - Accordion */}
           {completedChallenges.length > 0 && (

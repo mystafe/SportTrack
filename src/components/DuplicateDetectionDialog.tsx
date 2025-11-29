@@ -116,7 +116,7 @@ export function DuplicateDetectionDialog({ open, onClose }: DuplicateDetectionDi
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10022] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
+      className={`fixed inset-0 z-[10022] flex items-center justify-center bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom p-4`}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"

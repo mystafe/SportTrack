@@ -4,7 +4,7 @@ import { ActivityForm } from '@/components/ActivityForm';
 import { ActivityFilters, useFilteredActivities } from '@/components/ActivityFilters';
 import { ManageActivitiesDialog } from '@/components/ManageActivitiesDialog';
 import type { FilterState } from '@/components/ActivityFilters';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { format, startOfDay } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useI18n } from '@/lib/i18n';
@@ -125,24 +125,44 @@ function ActivitiesClient() {
   );
 
   const groups = useMemo(() => {
+    if (filteredActivities.length === 0) return [];
+
+    // Pre-sort activities by date descending for better performance
+    const sortedActivities = [...filteredActivities].sort(
+      (a, b) => +new Date(b.performedAt) - +new Date(a.performedAt)
+    );
+
     const grouped = new Map<string, ActivityRecord[]>();
-    for (const activity of filteredActivities) {
+    for (const activity of sortedActivities) {
       const key = startOfDay(new Date(activity.performedAt)).toISOString();
-      grouped.set(key, [...(grouped.get(key) ?? []), activity]);
+      const existing = grouped.get(key);
+      if (existing) {
+        existing.push(activity);
+      } else {
+        grouped.set(key, [activity]);
+      }
     }
+
+    // Convert to array and sort by day (already sorted by activity date)
     return Array.from(grouped.entries())
-      .map(([day, acts]) => ({
-        day,
-        acts: acts.sort((a, b) => +new Date(b.performedAt) - +new Date(a.performedAt)),
-      }))
+      .map(([day, acts]) => ({ day, acts }))
       .sort((a, b) => +new Date(b.day) - +new Date(a.day));
   }, [filteredActivities]);
 
   const filteredStats = useMemo(() => {
+    if (filteredActivities.length === 0) return { totalPoints: 0, totalCount: 0 };
     const totalPoints = filteredActivities.reduce((sum, a) => sum + a.points, 0);
     const totalCount = filteredActivities.length;
     return { totalPoints, totalCount };
   }, [filteredActivities]);
+
+  const handleEdit = useCallback((id: string) => {
+    setEditingId(id);
+  }, []);
+
+  const handleDelete = useCallback((id: string, activity: ActivityRecord) => {
+    setDeleteConfirm({ id, activity });
+  }, []);
 
   const handleRefresh = async () => {
     // Refresh activities by reloading from localStorage
@@ -347,8 +367,8 @@ function ActivitiesClient() {
                           numberFormatter={numberFormatter}
                           timeFormatter={timeFormatter}
                           lang={lang}
-                          onEdit={(id) => setEditingId(id)}
-                          onDelete={(id, act) => setDeleteConfirm({ id, activity: act })}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
                           animationDelay={`${groupIndex * 0.1 + actIndex * 0.05}s`}
                           density={settings?.listDensity ?? 'compact'}
                         />

@@ -17,6 +17,8 @@ import type { Challenge } from '@/lib/challenges';
 import { useEffect, useState } from 'react';
 import type { ConflictStrategy } from '@/lib/cloudSync/conflictResolver';
 
+import { ImportHandler } from '@/components/ImportHandler';
+
 // Lazy load Apple Health Guide
 const AppleHealthGuide = lazy(() =>
   import('@/components/AppleHealthGuide').then((m) => ({ default: m.AppleHealthGuide }))
@@ -139,6 +141,7 @@ export function GlobalDialogs() {
         open={showDuplicateDialog}
         onClose={() => setShowDuplicateDialog(false)}
       />
+      <ImportHandler />
       <SyncHistoryDialog
         open={showSyncHistoryDialog}
         statistics={syncHistoryService.getStatistics()}

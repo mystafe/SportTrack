@@ -135,11 +135,28 @@ export function ImportPreviewDialog({
     };
   }, [data, locale]);
 
+  // Prevent body scroll and focus on content when dialog is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      // Focus on content for keyboard scrolling
+      const content = document.getElementById('import-preview-content');
+      if (content) {
+        content.focus();
+      }
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
   if (!open || !data || !previewStats) return null;
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10021] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
+      className={`fixed inset-0 z-[100000] flex items-center justify-center bg-black/80 animate-fade-in safe-bottom p-4`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onCancel();
@@ -148,11 +165,33 @@ export function ImportPreviewDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="import-preview-title"
+      style={{ zIndex: 100000 }}
     >
       <div
-        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-2xl w-full mx-4'} border-2 border-gray-200 dark:border-gray-700 animate-scale-in`}
+        className={`bg-white dark:bg-gray-900 w-full max-w-2xl max-h-[90vh] rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 animate-scale-in relative z-[100001] flex flex-col`}
+        style={{ zIndex: 100001, maxHeight: isMobile ? '85vh' : '90vh' }}
+        onClick={(e) => {
+          console.log('ImportPreviewDialog: Content clicked');
+          e.stopPropagation();
+        }}
       >
-        <div className={`${isMobile ? 'p-4' : 'p-6'}`}>
+        <div
+          id="import-preview-content"
+          className={`${isMobile ? 'p-4' : 'p-6'} overflow-y-auto custom-scrollbar flex-1 outline-none`}
+          tabIndex={-1}
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+          }}
+          onTouchStart={(e) => {
+            // Allow touch events to start scrolling
+            e.stopPropagation();
+          }}
+          onTouchMove={(e) => {
+            // Prevent event propagation to allow scrolling
+            e.stopPropagation();
+          }}
+        >
           {/* Header */}
           <div className="mb-4">
             <h2
@@ -400,13 +439,16 @@ export function ImportPreviewDialog({
 
           {/* Actions */}
           <div
-            className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-3'} mt-6`}
+            className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-3'} mt-6 ${isMobile ? 'mb-6 pb-4' : 'mb-4'}`}
           >
             <Button
               type="button"
               variant="outline"
               size={isMobile ? 'md' : 'md'}
-              onClick={onCancel}
+              onClick={(e) => {
+                e.stopPropagation();
+                onCancel();
+              }}
               fullWidth={isMobile}
               className={isMobile ? 'min-h-[44px]' : ''}
             >
@@ -416,9 +458,14 @@ export function ImportPreviewDialog({
               type="button"
               variant="primary"
               size={isMobile ? 'md' : 'md'}
-              onClick={onConfirm}
+              onClick={(e) => {
+                console.log('ImportPreviewDialog: Import button clicked');
+                e.stopPropagation();
+                e.preventDefault();
+                onConfirm();
+              }}
               fullWidth={isMobile}
-              className={isMobile ? 'min-h-[44px]' : ''}
+              className={`${isMobile ? 'min-h-[44px]' : ''} relative z-10`}
             >
               {lang === 'tr' ? '✅ Import Et' : '✅ Import'}
             </Button>

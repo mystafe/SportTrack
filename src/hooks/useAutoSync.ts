@@ -1,44 +1,35 @@
 /**
  * Auto Sync Hook
  * Automatically syncs data to cloud after activity is added
- * Uses debounced sync (5 seconds after activity added) and periodic check (every 30 seconds)
+ * Uses batch sync - changes are batched and sent once per minute
  */
 
 'use client';
 
 import { useEffect, useRef } from 'react';
 import { useAuth } from './useAuth';
-import { useCloudSync } from './useCloudSync';
 import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
 import { useBadges } from '@/lib/badgeStore';
 import { useChallenges } from '@/lib/challengeStore';
-import { useToaster } from '@/components/Toaster';
-import { useI18n } from '@/lib/i18n';
+import { batchSyncService } from '@/lib/cloudSync/batchSyncService';
 
 const INITIAL_SYNC_COMPLETE_KEY = 'sporttrack_initial_sync_complete';
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 const LAST_ACTIVITY_ADDED_KEY = 'sporttrack_last_activity_added';
 const LAST_SYNC_TIME_KEY = 'sporttrack_last_sync_time';
 
-// Debounce delay: wait 3 seconds after activity added before syncing (optimized for batch operations)
-const DEBOUNCE_DELAY_MS = 3000;
-// Periodic check interval: check every 120 seconds for changes (optimized to reduce Firebase quota usage)
-const PERIODIC_CHECK_INTERVAL_MS = 120000;
+// Use batch sync instead of immediate sync - changes are batched and sent once per minute
+// No debounce needed - batch sync handles timing
 
 export function useAutoSync() {
   const { isAuthenticated, isConfigured } = useAuth();
-  const { syncToCloud } = useCloudSync();
   const { activities, hydrated: activitiesHydrated } = useActivities();
   const { settings, hydrated: settingsHydrated } = useSettings();
   const { badges, hydrated: badgesHydrated } = useBadges();
   const { challenges, hydrated: challengesHydrated } = useChallenges();
-  const { showToast } = useToaster();
-  const { t } = useI18n();
 
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const periodicCheckRef = useRef<NodeJS.Timeout | null>(null);
-  const isSyncingRef = useRef(false);
   const lastActivityCountRef = useRef<number>(0);
   const lastCustomActivitiesCountRef = useRef<number>(0);
   const lastSyncHashRef = useRef<string | null>(null);
@@ -48,7 +39,6 @@ export function useAutoSync() {
   const settingsRef = useRef(settings);
   const badgesRef = useRef(badges);
   const challengesRef = useRef(challenges);
-  const syncToCloudRef = useRef(syncToCloud);
 
   // Update refs when values change
   useEffect(() => {
@@ -63,9 +53,6 @@ export function useAutoSync() {
   useEffect(() => {
     challengesRef.current = challenges;
   }, [challenges]);
-  useEffect(() => {
-    syncToCloudRef.current = syncToCloud;
-  }, [syncToCloud]);
 
   const allHydrated =
     activitiesHydrated && settingsHydrated && badgesHydrated && challengesHydrated;
@@ -132,14 +119,8 @@ export function useAutoSync() {
     return currentHash !== lastSyncHashRef.current;
   };
 
-  // Debounced sync function
-  const performDebouncedSync = async () => {
-    // Clear existing debounce timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = null;
-    }
-
+  // Add change to batch sync queue
+  const addToBatchSync = () => {
     // Check if quota is exceeded - disable auto-sync if so
     const quotaExceeded =
       typeof window !== 'undefined' && localStorage.getItem('sporttrack.quota_exceeded') === 'true';
@@ -189,44 +170,16 @@ export function useAutoSync() {
       return;
     }
 
-    // Prevent concurrent syncs
-    if (isSyncingRef.current) {
-      // Auto-sync skipped: Already syncing
-      return;
-    }
+    // Add to batch sync queue (will be sent once per minute)
+    batchSyncService.addChange({
+      activities: activitiesRef.current,
+      settings: settingsRef.current,
+      badges: badgesRef.current,
+      challenges: challengesRef.current,
+    });
 
-    isSyncingRef.current = true;
-    // Starting debounced sync
-
-    try {
-      await syncToCloudRef.current({
-        activities: activitiesRef.current,
-        settings: settingsRef.current,
-        badges: badgesRef.current,
-        challenges: challengesRef.current,
-      });
-
-      // Update last sync time and hash
-      const syncTime = Date.now();
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(LAST_SYNC_TIME_KEY, String(syncTime));
-      }
-      lastSyncHashRef.current = createDataHash();
-
-      // Debounced sync successful
-    } catch (error) {
-      // Check if error is due to offline mode
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      if (errorMessage.includes('Offline') || errorMessage.includes('offline')) {
-        // Offline mode - data is already queued, just log it
-        // Offline: Changes queued for sync when online
-      } else {
-        // Real error - log it
-        console.error('Debounced sync failed:', error);
-      }
-    } finally {
-      isSyncingRef.current = false;
-    }
+    // Update hash to track changes
+    lastSyncHashRef.current = createDataHash();
   };
 
   // Check if activities changed (added, edited, or deleted) - trigger debounced sync
@@ -255,29 +208,14 @@ export function useAutoSync() {
         localStorage.setItem(LAST_ACTIVITY_ADDED_KEY, String(Date.now()));
       }
 
-      // Clear existing debounce timer
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-      }
-
-      // Schedule debounced sync
-      debounceTimerRef.current = setTimeout(() => {
-        performDebouncedSync();
-      }, DEBOUNCE_DELAY_MS);
+      // Add to batch sync queue
+      addToBatchSync();
 
       // Update hash ref to prevent duplicate triggers
       prevActivitiesHashRef.current = currentHash;
     }
 
     lastActivityCountRef.current = currentCount;
-
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-      }
-    };
   }, [activities, allHydrated, isAuthenticated, isConfigured]);
 
   // Check if settings changed (custom activities, theme, language, etc.) - trigger debounced sync
@@ -299,29 +237,14 @@ export function useAutoSync() {
     if (customActivitiesCountChanged || settingsContentChanged) {
       if (typeof window !== 'undefined') {
         localStorage.setItem(LAST_ACTIVITY_ADDED_KEY, String(Date.now()));
-        // Settings change detected, scheduling debounced sync
+        // Settings change detected, adding to batch sync
       }
 
-      // Clear existing debounce timer
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-      }
-
-      // Schedule debounced sync
-      debounceTimerRef.current = setTimeout(() => {
-        performDebouncedSync();
-      }, DEBOUNCE_DELAY_MS);
+      // Add to batch sync queue
+      addToBatchSync();
     }
 
     lastCustomActivitiesCountRef.current = currentCustomActivitiesCount;
-
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-      }
-    };
   }, [settings, allHydrated, isAuthenticated, isConfigured]);
 
   // Periodic check: runs every 60 seconds to check for changes
@@ -464,43 +387,22 @@ export function useAutoSync() {
         return;
       }
 
-      // Prevent concurrent syncs
-      if (isSyncingRef.current) {
-        // Periodic check: Already syncing, skipping
-        return;
-      }
+      // Add to batch sync queue instead of syncing immediately
+      // Batch sync will handle sending once per minute
+      batchSyncService.addChange({
+        activities: activitiesRef.current,
+        settings: settingsRef.current,
+        badges: badgesRef.current,
+        challenges: challengesRef.current,
+      });
 
-      isSyncingRef.current = true;
-      // Periodic check: Starting sync
+      // Update hash to track changes
+      lastSyncHashRef.current = createDataHash();
 
-      try {
-        await syncToCloudRef.current({
-          activities: activitiesRef.current,
-          settings: settingsRef.current,
-          badges: badgesRef.current,
-          challenges: challengesRef.current,
-        });
-
-        // Update last sync time and hash
-        const syncTime = Date.now();
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(LAST_SYNC_TIME_KEY, String(syncTime));
-        }
-        lastSyncHashRef.current = createDataHash();
-
-        // Periodic check sync successful
-      } catch (error) {
-        // Check if error is due to offline mode
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        if (errorMessage.includes('Offline') || errorMessage.includes('offline')) {
-          // Offline mode - data is already queued, just log it
-          // Periodic check: Offline - changes queued for sync
-        } else {
-          // Real error - log it
-          console.error('Periodic check sync failed:', error);
-        }
-      } finally {
-        isSyncingRef.current = false;
+      // Update last sync time
+      const syncTime = Date.now();
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LAST_SYNC_TIME_KEY, String(syncTime));
       }
     };
 
@@ -518,7 +420,7 @@ export function useAutoSync() {
       }
     };
     // CRITICAL: Only depend on authentication and hydration state
-    // Do NOT depend on activities, settings, badges, challenges, or syncToCloud
+    // Do NOT depend on activities, settings, badges, or challenges
     // to prevent infinite loops. The periodic check uses refs to access current values.
   }, [isAuthenticated, isConfigured, allHydrated]);
 
@@ -535,56 +437,8 @@ export function useAutoSync() {
 
   // Flush pending sync immediately (for logout scenarios)
   const flushPendingSync = async (): Promise<void> => {
-    // Clear debounce timer and sync immediately
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = null;
-    }
-
-    // Check if there are changes that need syncing
-    if (!hasChangesSinceLastSync()) {
-      return; // No changes, nothing to sync
-    }
-
-    // Prevent concurrent syncs
-    if (isSyncingRef.current) {
-      // Wait for current sync to complete
-      return new Promise((resolve) => {
-        const checkInterval = setInterval(() => {
-          if (!isSyncingRef.current) {
-            clearInterval(checkInterval);
-            resolve();
-          }
-        }, 100);
-        // Timeout after 5 seconds
-        setTimeout(() => {
-          clearInterval(checkInterval);
-          resolve();
-        }, 5000);
-      });
-    }
-
-    isSyncingRef.current = true;
-    try {
-      await syncToCloud({
-        activities: activitiesRef.current,
-        settings: settingsRef.current,
-        badges: badgesRef.current,
-        challenges: challengesRef.current,
-      });
-
-      // Update last sync time and hash
-      const syncTime = Date.now();
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(LAST_SYNC_TIME_KEY, String(syncTime));
-      }
-      lastSyncHashRef.current = createDataHash();
-    } catch (error) {
-      console.error('Flush sync failed:', error);
-      throw error; // Re-throw to allow caller to handle
-    } finally {
-      isSyncingRef.current = false;
-    }
+    // Flush batch sync immediately
+    await batchSyncService.flushBatch();
   };
 
   return {

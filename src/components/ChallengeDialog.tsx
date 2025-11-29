@@ -41,7 +41,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
   const { t, lang } = useI18n();
   const { settings } = useSettings();
   const isMobile = useIsMobile();
-  const [type, setType] = useState<ChallengeType>('daily');
+  const [type, setType] = useState<ChallengeType>('custom');
   const [nameTr, setNameTr] = useState('');
   const [nameEn, setNameEn] = useState('');
   const [descriptionTr, setDescriptionTr] = useState('');
@@ -66,7 +66,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
       setIcon(challenge.icon || '🎯');
     } else {
       // Reset form
-      setType('daily');
+      setType('custom');
       setNameTr('');
       setNameEn('');
       setDescriptionTr('');
@@ -182,6 +182,15 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
         break;
     }
 
+    // Ensure all new challenges are active and have custom category
+    if (newChallenge) {
+      newChallenge = {
+        ...newChallenge,
+        status: 'active',
+        category: 'custom', // All manually created challenges should be custom category
+      };
+    }
+
     onSave(newChallenge);
   };
 
@@ -195,25 +204,25 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
       }}
     >
       <div
-        className={`relative w-full ${isMobile ? 'max-w-full' : 'max-w-md'} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 space-y-4 my-auto`}
+        className={`relative w-full ${isMobile ? 'max-w-full max-h-[90vh] rounded-xl' : 'max-w-md rounded-xl'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 flex flex-col ${isMobile ? 'my-auto' : 'my-auto'}`}
       >
-        <div>
+        <div className="mb-4">
           <h2 className="text-lg font-bold text-gray-950 dark:text-white">
             {challenge ? t('challenges.editChallenge') : t('challenges.addChallenge')}
           </h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className={`flex flex-col ${isMobile ? 'flex-1 min-h-0' : ''} space-y-4`}
+        >
           <Select
-            label={`${t('challenges.daily')} / ${t('challenges.weekly')} / ${t('challenges.monthly')} / ${t('challenges.yearly')} / ${t('challenges.seasonal')} / ${t('challenges.activity_specific')} / ${t('challenges.time_based')} / ${t('challenges.streak_based')} / ${t('challenges.custom')}`}
+            label={`${t('challenges.monthly')} / ${t('challenges.seasonal')} / ${t('challenges.activity_specific')} / ${t('challenges.time_based')} / ${t('challenges.streak_based')} / ${t('challenges.custom')}`}
             value={type}
             onChange={(e) => setType(e.target.value as ChallengeType)}
             size={isMobile ? 'sm' : 'md'}
             options={[
-              { value: 'daily', label: t('challenges.daily') },
-              { value: 'weekly', label: t('challenges.weekly') },
               { value: 'monthly', label: t('challenges.monthly') },
-              { value: 'yearly', label: t('challenges.yearly') },
               { value: 'seasonal', label: t('challenges.seasonal') },
               { value: 'activity_specific', label: t('challenges.activity_specific') },
               { value: 'time_based', label: t('challenges.time_based') },
@@ -222,82 +231,94 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
             ]}
           />
 
-          {type === 'custom' && (
-            <>
-              <Input
-                type="text"
-                label={`${t('challenges.name')} (TR)`}
-                value={nameTr}
-                onChange={(e) => setNameTr(e.target.value)}
-                required
-                size={isMobile ? 'sm' : 'md'}
-              />
-              <Input
-                type="text"
-                label={`${t('challenges.name')} (EN)`}
-                value={nameEn}
-                onChange={(e) => setNameEn(e.target.value)}
-                required
-                size={isMobile ? 'sm' : 'md'}
-              />
-              <Textarea
-                label={`${t('challenges.description')} (TR)`}
-                value={descriptionTr}
-                onChange={(e) => setDescriptionTr(e.target.value)}
-                rows={2}
-                size={isMobile ? 'sm' : 'md'}
-              />
-              <Textarea
-                label={`${t('challenges.description')} (EN)`}
-                value={descriptionEn}
-                onChange={(e) => setDescriptionEn(e.target.value)}
-                rows={2}
-                size={isMobile ? 'sm' : 'md'}
-              />
-            </>
-          )}
+          <div className={`${isMobile ? 'flex-1 overflow-y-auto min-h-0' : ''} space-y-4`}>
+            {type === 'custom' && (
+              <>
+                <Input
+                  type="text"
+                  label={`${t('challenges.name')} (TR)`}
+                  value={nameTr}
+                  onChange={(e) => setNameTr(e.target.value)}
+                  required
+                  size={isMobile ? 'sm' : 'md'}
+                  fullWidth
+                />
+                <Input
+                  type="text"
+                  label={`${t('challenges.name')} (EN)`}
+                  value={nameEn}
+                  onChange={(e) => setNameEn(e.target.value)}
+                  required
+                  size={isMobile ? 'sm' : 'md'}
+                  fullWidth
+                />
+                <Textarea
+                  label={`${t('challenges.description')} (TR)`}
+                  value={descriptionTr}
+                  onChange={(e) => setDescriptionTr(e.target.value)}
+                  rows={isMobile ? 4 : 2}
+                  size={isMobile ? 'sm' : 'md'}
+                  fullWidth
+                />
+                <Textarea
+                  label={`${t('challenges.description')} (EN)`}
+                  value={descriptionEn}
+                  onChange={(e) => setDescriptionEn(e.target.value)}
+                  rows={isMobile ? 4 : 2}
+                  size={isMobile ? 'sm' : 'md'}
+                  fullWidth
+                />
+              </>
+            )}
 
-          <Input
-            type="number"
-            label={t('challenges.targetPoints')}
-            value={target}
-            onChange={(e) => setTarget(e.target.value)}
-            min="1"
-            required
-            size={isMobile ? 'sm' : 'md'}
-          />
+            <Input
+              type="number"
+              label={t('challenges.targetPoints')}
+              value={target}
+              onChange={(e) => setTarget(e.target.value)}
+              min="1"
+              required
+              size={isMobile ? 'sm' : 'md'}
+              fullWidth
+            />
 
-          {type === 'custom' && (
-            <>
-              <Input
-                type="date"
-                label={t('challenges.startDate')}
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-                size={isMobile ? 'sm' : 'md'}
-              />
-              <Input
-                type="date"
-                label={t('challenges.endDate')}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required
-                size={isMobile ? 'sm' : 'md'}
-              />
-            </>
-          )}
+            {type === 'custom' && (
+              <>
+                <Input
+                  type="date"
+                  label={t('challenges.startDate')}
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  required
+                  size={isMobile ? 'sm' : 'md'}
+                  fullWidth
+                />
+                <Input
+                  type="date"
+                  label={t('challenges.endDate')}
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  required
+                  size={isMobile ? 'sm' : 'md'}
+                  fullWidth
+                />
+              </>
+            )}
 
-          <Input
-            type="text"
-            label="Emoji/Icon"
-            value={icon}
-            onChange={(e) => setIcon(e.target.value)}
-            placeholder="🎯"
-            size={isMobile ? 'sm' : 'md'}
-          />
+            <Input
+              type="text"
+              label="Emoji/Icon"
+              value={icon}
+              onChange={(e) => setIcon(e.target.value)}
+              placeholder="🎯"
+              size={isMobile ? 'sm' : 'md'}
+              fullWidth
+            />
+          </div>
 
-          <div className="flex items-center justify-end gap-2 pt-2">
+          <div
+            className={`flex items-center justify-end gap-2 pt-2 ${isMobile ? 'mt-auto flex-shrink-0' : ''}`}
+          >
             <Button type="button" variant="outline" size={isMobile ? 'sm' : 'md'} onClick={onClose}>
               {t('challenges.cancel')}
             </Button>

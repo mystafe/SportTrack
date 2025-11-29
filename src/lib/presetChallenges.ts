@@ -284,19 +284,25 @@ export function createChallengeFromPreset(
   }
 
   // Use appropriate creation function based on type
+  let challenge: import('./challenges').Challenge;
   switch (preset.type) {
     case 'daily':
-      return createDailyChallenge(preset.name, preset.target, startDate, preset.icon);
+      challenge = createDailyChallenge(preset.name, preset.target, startDate, preset.icon);
+      break;
     case 'weekly':
-      return createWeeklyChallenge(preset.name, preset.target, startDate, preset.icon);
+      challenge = createWeeklyChallenge(preset.name, preset.target, startDate, preset.icon);
+      break;
     case 'monthly':
-      return createMonthlyChallenge(preset.name, preset.target, startDate, preset.icon);
+      challenge = createMonthlyChallenge(preset.name, preset.target, startDate, preset.icon);
+      break;
     case 'yearly':
-      return createYearlyChallenge(preset.name, preset.target, startDate, preset.icon);
+      challenge = createYearlyChallenge(preset.name, preset.target, startDate, preset.icon);
+      break;
     case 'seasonal':
-      return createSeasonalChallenge(preset.name, preset.target, startDate, preset.icon);
+      challenge = createSeasonalChallenge(preset.name, preset.target, startDate, preset.icon);
+      break;
     case 'streak_based':
-      return createStreakBasedChallenge(
+      challenge = createStreakBasedChallenge(
         preset.name,
         preset.description,
         preset.target,
@@ -304,8 +310,9 @@ export function createChallengeFromPreset(
         endDate, // endDate for streak challenges
         preset.icon
       );
+      break;
     case 'time_based':
-      return createTimeBasedChallenge(
+      challenge = createTimeBasedChallenge(
         preset.name,
         preset.description,
         preset.target,
@@ -315,8 +322,9 @@ export function createChallengeFromPreset(
         endDate,
         preset.icon
       );
+      break;
     case 'activity_specific':
-      return createActivitySpecificChallenge(
+      challenge = createActivitySpecificChallenge(
         preset.name,
         preset.description,
         preset.target,
@@ -325,8 +333,9 @@ export function createChallengeFromPreset(
         endDate,
         preset.icon
       );
+      break;
     default:
-      return createCustomChallenge(
+      challenge = createCustomChallenge(
         preset.name,
         preset.description,
         preset.target,
@@ -335,4 +344,19 @@ export function createChallengeFromPreset(
         preset.icon
       );
   }
+
+  // Override ID to use preset ID as prefix to ensure consistent identification
+  // This prevents duplicates when the same preset is added multiple times
+  const presetIdPrefix = preset.id; // e.g., "preset-first-100k"
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 11);
+  // Create ID that starts with preset ID for easy matching: preset-id-timestamp-random
+  const presetChallengeId = `${presetIdPrefix}-${timestamp}-${random}`;
+
+  // Add category from preset and override ID
+  return {
+    ...challenge,
+    id: presetChallengeId,
+    category: preset.category,
+  };
 }

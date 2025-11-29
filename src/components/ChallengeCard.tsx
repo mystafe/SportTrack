@@ -8,6 +8,7 @@ import { Challenge } from '@/lib/challenges';
 import { format, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { PRESET_CHALLENGES } from '@/lib/presetChallenges';
 
 interface ChallengeCardProps {
   challenge: Challenge;
@@ -27,6 +28,68 @@ export const ChallengeCard = memo(function ChallengeCard({
   const isMobile = useIsMobile();
 
   if (!progress) return null;
+
+  // Get category from challenge or preset
+  const getCategory = () => {
+    // First check if challenge has category field
+    if (challenge.category) {
+      return challenge.category;
+    }
+    // Fallback to preset lookup
+    if (challenge.id.startsWith('preset-')) {
+      const preset = PRESET_CHALLENGES.find(
+        (p) => challenge.id.startsWith(p.id + '-') || challenge.id === p.id
+      );
+      return preset ? preset.category : null;
+    }
+    // Check if it's a custom challenge
+    if (
+      !challenge.id.startsWith('preset-') &&
+      !challenge.id.startsWith('daily-') &&
+      !challenge.id.startsWith('weekly-') &&
+      !challenge.id.startsWith('yearly-') &&
+      challenge.type === 'custom'
+    ) {
+      return 'custom';
+    }
+    return null;
+  };
+
+  const challengeCategory = getCategory();
+  const isCustom = challengeCategory === 'custom';
+
+  const categoryLabels: Record<string, { tr: string; en: string; color: string }> = {
+    motivation: {
+      tr: 'Motivasyon',
+      en: 'Motivation',
+      color: 'bg-orange-500 dark:bg-orange-600 border-orange-600 dark:border-orange-700',
+    },
+    achievement: {
+      tr: 'Başarı',
+      en: 'Achievement',
+      color: 'bg-yellow-500 dark:bg-yellow-600 border-yellow-600 dark:border-yellow-700',
+    },
+    consistency: {
+      tr: 'Tutarlılık',
+      en: 'Consistency',
+      color: 'bg-red-500 dark:bg-red-600 border-red-600 dark:border-red-700',
+    },
+    milestone: {
+      tr: 'Kilometre Taşı',
+      en: 'Milestone',
+      color: 'bg-green-500 dark:bg-green-600 border-green-600 dark:border-green-700',
+    },
+    special: {
+      tr: 'Özel',
+      en: 'Special',
+      color: 'bg-indigo-500 dark:bg-indigo-600 border-indigo-600 dark:border-indigo-700',
+    },
+    custom: {
+      tr: 'Özel',
+      en: 'Custom',
+      color: 'bg-purple-500 dark:bg-purple-600 border-purple-600 dark:border-purple-700',
+    },
+  };
 
   const getStatusColor = () => {
     switch (challenge.status) {
@@ -62,44 +125,64 @@ export const ChallengeCard = memo(function ChallengeCard({
       className={`card-entrance stagger-item rounded-xl border-2 ${isMobile ? 'p-3' : 'p-4'} ${getStatusColor()} transition-all duration-300 hover:shadow-xl hover:scale-[1.02] shadow-md bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'mobile-card-lift touch-feedback' : 'magnetic-hover'} gpu-accelerated`}
     >
       <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className={`${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'} emoji-bounce`}>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <span
+            className={`${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'} emoji-bounce flex-shrink-0`}
+          >
             {getStatusIcon()}
           </span>
-          <div>
-            <h3
-              className={`text-heading-3 text-gray-950 dark:text-white ${isMobile ? 'text-sm' : ''}`}
-            >
-              {challenge.name[lang]}
-            </h3>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3
+                className={`text-heading-3 text-gray-950 dark:text-white ${isMobile ? 'text-sm' : ''} break-words`}
+              >
+                {challenge.name[lang]}
+              </h3>
+              {/* Badge for category - Always show if category exists */}
+              {challengeCategory && categoryLabels[challengeCategory] ? (
+                <span
+                  className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${categoryLabels[challengeCategory].color} text-white shadow-sm border flex-shrink-0`}
+                >
+                  {categoryLabels[challengeCategory][lang]}
+                </span>
+              ) : null}
+            </div>
             <p className="text-label text-gray-700 dark:text-gray-300">
               {t(`challenges.${challenge.type}`)}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size={isMobile ? 'sm' : 'sm'}
-            onClick={onEdit}
-            className={`${isMobile ? 'p-2 min-h-[36px] min-w-[36px]' : 'p-1.5'} hover:scale-110 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''}`}
-            aria-label={t('challenges.editChallenge')}
-          >
-            ✏️
-          </Button>
-          {challenge.type !== 'daily' || !challenge.id.startsWith('daily-') ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size={isMobile ? 'sm' : 'sm'}
-              onClick={onDelete}
-              className={`${isMobile ? 'p-2 min-h-[36px] min-w-[36px]' : 'p-1.5'} hover:text-red-600 dark:hover:text-red-400 hover:scale-110 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''}`}
-              aria-label={t('challenges.deleteChallenge')}
-            >
-              🗑️
-            </Button>
-          ) : null}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {/* Only show edit/delete buttons for custom challenges (user-created) */}
+          {/* Hide for: preset challenges, daily/weekly/yearly challenges (auto-generated) */}
+          {challenge.category === 'custom' &&
+            !challenge.id.startsWith('preset-') &&
+            !challenge.id.startsWith('daily-') &&
+            !challenge.id.startsWith('weekly-') &&
+            !challenge.id.startsWith('yearly-') && (
+              <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size={isMobile ? 'sm' : 'sm'}
+                  onClick={onEdit}
+                  className={`${isMobile ? 'p-2 min-h-[36px] min-w-[36px]' : 'p-1.5'} hover:scale-110 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''}`}
+                  aria-label={t('challenges.editChallenge')}
+                >
+                  ✏️
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size={isMobile ? 'sm' : 'sm'}
+                  onClick={onDelete}
+                  className={`${isMobile ? 'p-2 min-h-[36px] min-w-[36px]' : 'p-1.5'} hover:text-red-600 dark:hover:text-red-400 hover:scale-110 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''}`}
+                  aria-label={t('challenges.deleteChallenge')}
+                >
+                  🗑️
+                </Button>
+              </>
+            )}
         </div>
       </div>
 

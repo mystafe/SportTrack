@@ -37,6 +37,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { useDialogManager } from '@/lib/dialogManager';
+import packageJson from '../../package.json';
 
 // Lazy load heavy components that are not always visible
 const DataExportImport = lazy(() =>
@@ -544,7 +545,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
     }
     return (
       <div
-        className={`fixed inset-0 z-[9999] flex items-start justify-center pt-16 sm:pt-20 bg-black/40 dark:bg-black/50 backdrop-blur-sm px-4 py-4 overflow-y-auto safe-top safe-bottom safe-left safe-right transition-opacity duration-300 ${open ? 'pointer-events-auto' : 'pointer-events-none opacity-0'}`}
+        className={`fixed inset-0 z-[9999] flex items-start justify-center pt-16 sm:pt-20 bg-black/40 dark:bg-black/50 backdrop-blur-sm px-4 py-4 overflow-y-auto safe-top safe-left safe-right transition-opacity duration-300 ${open ? 'pointer-events-auto' : 'pointer-events-none opacity-0'}`}
         onClick={(e) => {
           // Close when clicking on backdrop (not on dialog content)
           if (e.target === e.currentTarget) {
@@ -584,14 +585,14 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   <span
                     className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
                   >
-                    © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.30.3
+                    © {new Date().getFullYear()} · Mustafa Evleksiz · v{packageJson.version}
                   </span>
                 )}
                 {!isAuthenticated && (
                   <span
                     className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-1 flex-shrink-0`}
                   >
-                    v0.30.3
+                    v{packageJson.version}
                   </span>
                 )}
               </div>
@@ -1229,7 +1230,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     >
                       {lang === 'tr' ? 'Veri İşlemleri' : 'Data Operations'}
                     </span>
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                    <div className="flex items-center gap-1.5 flex-wrap pb-2">
                       {isAuthenticated && (
                         <Suspense
                           fallback={
@@ -1242,7 +1243,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="pb-2">
                     <div
                       className={`flex items-center justify-between gap-2 ${isMobile ? 'mb-1' : 'mb-1.5'}`}
                     >
@@ -1253,7 +1254,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       </span>
                     </div>
                     <div
-                      className={`flex items-center flex-nowrap ${isMobile ? 'gap-0.5' : 'gap-1'} overflow-x-auto`}
+                      className={`flex items-center flex-nowrap ${isMobile ? 'gap-0.5' : 'gap-1'} overflow-x-auto scrollbar-none`}
+                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                       <LanguageToggle />
                       <ThemeToggle />
@@ -1648,7 +1650,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="pt-2">
                     <NotificationSettings />
                   </div>
 

@@ -2128,6 +2128,61 @@ html {
   transform: translateZ(0);
 }
 
+/* Reduce animations mode - disable or minimize all animations */
+[data-reduce-animations='true'] *,
+[data-reduce-animations='true'] *::before,
+[data-reduce-animations='true'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Disable specific animations in reduce mode */
+[data-reduce-animations='true'] .animate-scale-in,
+[data-reduce-animations='true'] .slide-up-bottom,
+[data-reduce-animations='true'] .slide-down-top,
+[data-reduce-animations='true'] .backdrop-fade,
+[data-reduce-animations='true'] .bounce-in-mobile,
+[data-reduce-animations='true'] .slide-in-bottom-mobile,
+[data-reduce-animations='true'] .fade-in-scale-mobile,
+[data-reduce-animations='true'] .number-count-mobile,
+[data-reduce-animations='true'] .icon-wiggle-mobile,
+[data-reduce-animations='true'] .progress-fill-mobile,
+[data-reduce-animations='true'] .stagger-item,
+[data-reduce-animations='true'] .card-entrance,
+[data-reduce-animations='true'] .float-animation,
+[data-reduce-animations='true'] .float-animation-delayed,
+[data-reduce-animations='true'] .shimmer-mobile,
+[data-reduce-animations='true'] .pulse-glow-mobile,
+[data-reduce-animations='true'] .goal-completed,
+[data-reduce-animations='true'] .emoji-bounce,
+[data-reduce-animations='true'] .icon-rotate,
+[data-reduce-animations='true'] .title-entrance,
+[data-reduce-animations='true'] .number-transition {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Disable hover animations in reduce mode */
+[data-reduce-animations='true'] .hover-lift:hover,
+[data-reduce-animations='true'] .magnetic-hover:hover,
+[data-reduce-animations='true'] .tilt-3d:hover,
+[data-reduce-animations='true'] .scale-on-interact:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Disable smooth scrolling in reduce mode */
+[data-reduce-animations='true'] html {
+  scroll-behavior: auto !important;
+}
+
+[data-reduce-animations='true'] [data-smooth-scroll] {
+  scroll-behavior: auto !important;
+}
+
 .will-change-opacity {
   will-change: opacity;
 }
@@ -5169,4 +5224,16 @@ aside[role='complementary'] {
 .dark [role='tooltip'] {
   background: rgb(243, 244, 246);
   color: rgb(17, 24, 39);
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+  width: 0;
+  height: 0;
 }

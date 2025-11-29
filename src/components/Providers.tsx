@@ -51,10 +51,15 @@ function AnimationReducer({ children }: { children: ReactNode }) {
   const { settings } = useSettings();
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && settings?.reduceAnimations) {
-      document.body.classList.add('reduce-motion');
-    } else {
-      document.body.classList.remove('reduce-motion');
+    if (typeof window !== 'undefined') {
+      // Apply reduce animations setting
+      if (settings?.reduceAnimations) {
+        document.documentElement.setAttribute('data-reduce-animations', 'true');
+        document.body.classList.add('reduce-motion');
+      } else {
+        document.documentElement.removeAttribute('data-reduce-animations');
+        document.body.classList.remove('reduce-motion');
+      }
     }
   }, [settings?.reduceAnimations]);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, lazy, Suspense, useEffect, useCallback } from 'react';
+import { useState, useRef, lazy, Suspense } from 'react';
 import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
 import { useI18n } from '@/lib/i18n';
@@ -10,17 +10,12 @@ import { UserSettings } from '@/lib/settingsStore';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { ExportDialog } from '@/components/ExportDialog';
 import { ImportPreviewDialog } from '@/components/ImportPreviewDialog';
-import { ImportProgressDialog } from '@/components/ImportProgressDialog';
 import { DuplicateDetectionDialog } from '@/components/DuplicateDetectionDialog';
 import { useAppleHealthReminder } from '@/hooks/useAppleHealthReminder';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useCloudSync } from '@/hooks/useCloudSync';
 import { usePlatform } from '@/lib/hooks/usePlatform';
 import { Button } from '@/components/ui/Button';
-import { useBadges } from '@/lib/badgeStore';
-import { useChallenges } from '@/lib/challengeStore';
-import type { Badge } from '@/lib/badges';
-import type { Challenge } from '@/lib/challenges';
 import { useAuth } from '@/hooks/useAuth';
 import {
   convertLegacyToNewFormat,
@@ -28,16 +23,8 @@ import {
   type LegacyData,
 } from '@/lib/cloudSync/legacyConverter';
 import { cloudSyncService } from '@/lib/cloudSync/syncService';
-import {
-  cleanActivities,
-  validateSettings,
-  validateBadge,
-  validateChallenge,
-} from '@/lib/dataValidation';
 import { useDialogManager } from '@/lib/dialogManager';
 import { useGlobalDialogState } from '@/lib/globalDialogState';
-
-const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 
 // Lazy load Apple Health components
 const AppleHealthImport = lazy(() =>
@@ -53,20 +40,15 @@ interface DataExportImportProps {
 
 export function DataExportImport({ onSettingsClose }: DataExportImportProps = {}) {
   const { activities } = useActivities();
-  const { settings, addCustomActivity } = useSettings();
-  const { badges } = useBadges();
-  const { challenges } = useChallenges();
+  const { settings } = useSettings();
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isMobile = useIsMobile();
   const [isImporting, setIsImporting] = useState(false);
   const {
-    showExportDialog,
     setShowExportDialog,
-    showImportPreviewDialog,
     setShowImportPreviewDialog,
-    importPreviewData,
     setImportPreviewData,
     showDuplicateDialog,
     setShowDuplicateDialog,
@@ -75,34 +57,8 @@ export function DataExportImport({ onSettingsClose }: DataExportImportProps = {}
   } = useGlobalDialogState();
   const [showConversionDialog, setShowConversionDialog] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
-  const [showProgressDialog, setShowProgressDialog] = useState(false);
-  const [importProgress, setImportProgress] = useState<{
-    processed: number;
-    total: number;
-    percentage: number;
-    currentItem?: string;
-    errors?: string[];
-    warnings?: string[];
-    summary?: {
-      exercisesImported: number;
-      exercisesRemoved: number;
-      badgesImported: number;
-      badgesRemoved: number;
-      challengesImported: number;
-      challengesRemoved: number;
-      activitiesImported: number;
-      activitiesRemoved: number;
-    };
-  }>({
-    processed: 0,
-    total: 0,
-    percentage: 0,
-    currentItem: '',
-    errors: [],
-    warnings: [],
-  });
-  const { shouldShowReminder, daysSinceLastImport, dismissReminder } = useAppleHealthReminder();
-  const { syncToCloud, isConfigured } = useCloudSync();
+  const { daysSinceLastImport, shouldShowReminder, dismissReminder } = useAppleHealthReminder();
+  const { isConfigured } = useCloudSync();
   const { isAuthenticated } = useAuth();
   const { isIOS } = usePlatform();
   const { openDialog } = useDialogManager();
@@ -308,374 +264,6 @@ export function DataExportImport({ onSettingsClose }: DataExportImportProps = {}
     }
   };
 
-  // Perform actual import after preview confirmation
-  const performImport = useCallback(async () => {
-    if (!importPreviewData) return;
-
-    // Set flag to suppress badge notifications during import
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('sporttrack.data_importing', 'true');
-    }
-
-    setShowImportPreviewDialog(false);
-    setShowProgressDialog(true);
-    setIsImporting(true);
-
-    const totalItems =
-      importPreviewData.exercises.length +
-      (importPreviewData.activities?.length || 0) +
-      (importPreviewData.badges?.length || 0) +
-      (importPreviewData.challenges?.length || 0);
-    let processed = 0;
-    const errors: string[] = [];
-    const warnings: string[] = [];
-
-    // Summary tracking
-    const summary = {
-      exercisesImported: 0,
-      exercisesRemoved: 0,
-      badgesImported: 0,
-      badgesRemoved: 0,
-      challengesImported: 0,
-      challengesRemoved: 0,
-      activitiesImported: 0,
-      activitiesRemoved: 0,
-    };
-
-    try {
-      // Update progress: Starting import
-      setImportProgress({
-        processed: 0,
-        total: totalItems,
-        percentage: 0,
-        currentItem: lang === 'tr' ? 'Import başlatılıyor...' : 'Starting import...',
-        errors: [],
-      });
-
-      // Step 1: Import exercises (with validation and cleaning)
-      if (importPreviewData.exercises.length > 0) {
-        setImportProgress((prev) => ({
-          ...prev,
-          currentItem:
-            lang === 'tr'
-              ? 'Aktiviteler doğrulanıyor ve temizleniyor...'
-              : 'Validating and cleaning activities...',
-        }));
-
-        // Clean activities (validate, remove duplicates, fix issues)
-        const {
-          cleaned,
-          removed,
-          warnings: cleaningWarnings,
-        } = cleanActivities(importPreviewData.exercises);
-
-        // Update summary
-        summary.exercisesImported = cleaned.length;
-        summary.exercisesRemoved = removed.length;
-
-        // Add removal reasons to errors
-        removed.forEach(({ activity, reason }) => {
-          errors.push(`Removed: ${reason} (ID: ${activity.id})`);
-        });
-
-        // Add cleaning warnings to warnings array (not errors)
-        cleaningWarnings.forEach(({ activity, warning }) => {
-          warnings.push(`Warning for ${activity.id}: ${warning}`);
-        });
-
-        localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cleaned));
-        processed += cleaned.length;
-
-        setImportProgress((prev) => ({
-          ...prev,
-          processed,
-          percentage: Math.round((processed / totalItems) * 100),
-          errors,
-          currentItem:
-            lang === 'tr'
-              ? `${cleaned.length} aktivite import edildi${removed.length > 0 ? `, ${removed.length} kaldırıldı` : ''}`
-              : `${cleaned.length} activities imported${removed.length > 0 ? `, ${removed.length} removed` : ''}`,
-        }));
-
-        // Small delay for UI update
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      // Step 2: Import custom activities and settings (with validation)
-      if (importPreviewData.activities && importPreviewData.activities.length > 0) {
-        setImportProgress((prev) => ({
-          ...prev,
-          currentItem:
-            lang === 'tr'
-              ? 'Aktivite tanımları doğrulanıyor...'
-              : 'Validating activity definitions...',
-        }));
-
-        const userNameToImport =
-          importPreviewData.userName || importPreviewData.settings?.name || null;
-        const finalUserName = userNameToImport || importPreviewData.settings?.name || null;
-
-        const updatedSettings: UserSettings = {
-          ...importPreviewData.settings!,
-          customActivities: importPreviewData.activities.map((ad) => ({
-            id: ad.key,
-            label: ad.label,
-            labelEn: ad.labelEn,
-            icon: ad.icon,
-            multiplier: ad.multiplier,
-            unit: ad.unit,
-            unitEn: ad.unitEn,
-            defaultAmount: ad.defaultAmount,
-            description: ad.description,
-            descriptionEn: ad.descriptionEn,
-          })),
-          ...(finalUserName && finalUserName.trim() !== '' ? { name: finalUserName } : {}),
-        };
-
-        // Validate settings
-        const settingsValidation = validateSettings(updatedSettings);
-        if (!settingsValidation.isValid) {
-          settingsValidation.errors.forEach((err) => {
-            errors.push(`Settings validation error: ${err.field} - ${err.message}`);
-          });
-        }
-        if (settingsValidation.warnings.length > 0) {
-          settingsValidation.warnings.forEach((warn) => {
-            warnings.push(`Settings warning: ${warn.field} - ${warn.message}`);
-          });
-        }
-
-        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updatedSettings));
-        summary.activitiesImported = importPreviewData.activities.length;
-        processed += importPreviewData.activities.length;
-
-        setImportProgress((prev) => ({
-          ...prev,
-          processed,
-          percentage: Math.round((processed / totalItems) * 100),
-          errors,
-        }));
-
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      } else if (importPreviewData.settings) {
-        // Still update userName if available and validate settings
-        const userNameToImport =
-          importPreviewData.userName || importPreviewData.settings?.name || null;
-
-        const settingsToSave: UserSettings =
-          userNameToImport && userNameToImport.trim() !== ''
-            ? { ...importPreviewData.settings, name: userNameToImport }
-            : importPreviewData.settings;
-
-        // Validate settings
-        const settingsValidation = validateSettings(settingsToSave);
-        if (!settingsValidation.isValid) {
-          settingsValidation.errors.forEach((err) => {
-            errors.push(`Settings validation error: ${err.field} - ${err.message}`);
-          });
-        }
-
-        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settingsToSave));
-      }
-
-      // Step 3: Import badges (with validation)
-      if (importPreviewData.badges && importPreviewData.badges.length > 0) {
-        setImportProgress((prev) => ({
-          ...prev,
-          currentItem: lang === 'tr' ? 'Rozetler doğrulanıyor...' : 'Validating badges...',
-        }));
-
-        // Validate badges
-        const validBadges: Badge[] = [];
-        importPreviewData.badges.forEach((badge: any) => {
-          const validation = validateBadge(badge);
-          if (validation.isValid) {
-            validBadges.push(badge);
-          } else {
-            validation.errors.forEach((err) => {
-              errors.push(`Badge validation error (${badge.id}): ${err.field} - ${err.message}`);
-            });
-          }
-          if (validation.warnings.length > 0) {
-            validation.warnings.forEach((warn) => {
-              warnings.push(`Badge warning (${badge.id}): ${warn.field} - ${warn.message}`);
-            });
-          }
-        });
-
-        // Update summary
-        summary.badgesImported = validBadges.length;
-        summary.badgesRemoved = importPreviewData.badges.length - validBadges.length;
-
-        localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(validBadges));
-        processed += validBadges.length;
-
-        setImportProgress((prev) => ({
-          ...prev,
-          processed,
-          percentage: Math.round((processed / totalItems) * 100),
-          errors,
-        }));
-
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      // Step 4: Import challenges (with validation)
-      if (importPreviewData.challenges && importPreviewData.challenges.length > 0) {
-        setImportProgress((prev) => ({
-          ...prev,
-          currentItem: lang === 'tr' ? 'Hedefler doğrulanıyor...' : 'Validating challenges...',
-        }));
-
-        // Validate challenges
-        const validChallenges: Challenge[] = [];
-        importPreviewData.challenges.forEach((challenge: any) => {
-          const validation = validateChallenge(challenge);
-          if (validation.isValid) {
-            validChallenges.push(challenge);
-          } else {
-            validation.errors.forEach((err) => {
-              errors.push(
-                `Challenge validation error (${challenge.id}): ${err.field} - ${err.message}`
-              );
-            });
-          }
-          if (validation.warnings.length > 0) {
-            validation.warnings.forEach((warn) => {
-              warnings.push(`Challenge warning (${challenge.id}): ${warn.field} - ${warn.message}`);
-            });
-          }
-        });
-
-        // Update summary
-        summary.challengesImported = validChallenges.length;
-        summary.challengesRemoved = importPreviewData.challenges.length - validChallenges.length;
-
-        localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(validChallenges));
-        processed += validChallenges.length;
-
-        setImportProgress((prev) => ({
-          ...prev,
-          processed,
-          percentage: Math.round((processed / totalItems) * 100),
-          errors,
-        }));
-
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      // Clear conflict storage key
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem(CONFLICT_STORAGE_KEY);
-        const finalUserName =
-          importPreviewData.userName || importPreviewData.settings?.name || null;
-        if (finalUserName && finalUserName.trim() !== '') {
-          localStorage.setItem('name_dialog_shown', 'true');
-        }
-      }
-
-      // Step 5: Sync to cloud if authenticated
-      if (isAuthenticated && isConfigured) {
-        setImportProgress((prev) => ({
-          ...prev,
-          currentItem: lang === 'tr' ? 'Buluta yükleniyor...' : 'Uploading to cloud...',
-        }));
-
-        try {
-          const storedBadges = localStorage.getItem(STORAGE_KEYS.BADGES);
-          const storedChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
-          const badgesToUpload = storedBadges ? JSON.parse(storedBadges) : [];
-          const challengesToUpload = storedChallenges ? JSON.parse(storedChallenges) : [];
-
-          await syncToCloud({
-            activities: importPreviewData.exercises,
-            settings: importPreviewData.settings,
-            badges: badgesToUpload,
-            challenges: challengesToUpload,
-          });
-
-          showToast(
-            lang === 'tr'
-              ? 'Veriler içe aktarıldı ve buluta yüklendi!'
-              : 'Data imported and uploaded to cloud!',
-            'success'
-          );
-        } catch (error) {
-          console.error('Failed to sync imported data to cloud:', error);
-          errors.push(
-            `Cloud sync failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-          );
-          showToast(
-            lang === 'tr'
-              ? 'Veriler içe aktarıldı, ancak buluta yükleme başarısız oldu.'
-              : 'Data imported, but cloud upload failed.',
-            'warning'
-          );
-        }
-      } else {
-        showToast(
-          lang === 'tr' ? 'Veriler başarıyla yüklendi!' : 'Data imported successfully!',
-          'success'
-        );
-      }
-
-      // Final progress update with summary
-      setImportProgress((prev) => ({
-        ...prev,
-        processed: totalItems,
-        percentage: 100,
-        currentItem: lang === 'tr' ? 'Import tamamlandı!' : 'Import completed!',
-        errors,
-        warnings,
-        summary,
-      }));
-
-      // Clear flag after import completes (before reload)
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('sporttrack.data_importing');
-      }
-
-      // Don't auto-reload if there are errors - let user review them
-      if (errors.length === 0) {
-        // Wait a bit before reloading
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
-      } else {
-        // If there are errors, don't reload automatically
-        setIsImporting(false);
-      }
-    } catch (error) {
-      console.error('Import failed:', error);
-      const errorMessage = error instanceof Error ? error.message : t('data.importFailed');
-      errors.push(errorMessage);
-      setImportProgress((prev) => ({
-        ...prev,
-        errors,
-      }));
-      showToast(errorMessage, 'error');
-      setIsImporting(false);
-
-      // Clear flag even on error
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('sporttrack.data_importing');
-      }
-    }
-  }, [importPreviewData, lang, isAuthenticated, isConfigured, t, showToast, syncToCloud]);
-
-  // Listen for import confirm event from GlobalDialogs
-  useEffect(() => {
-    const handleImportConfirm = () => {
-      if (importPreviewData) {
-        performImport();
-      }
-    };
-    window.addEventListener('sporttrack:import-confirm', handleImportConfirm);
-    return () => {
-      window.removeEventListener('sporttrack:import-confirm', handleImportConfirm);
-    };
-  }, [importPreviewData, performImport]);
-
   const handlePreviewCancel = () => {
     setShowImportPreviewDialog(false);
     setImportPreviewData(null);
@@ -683,6 +271,37 @@ export function DataExportImport({ onSettingsClose }: DataExportImportProps = {}
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const handleFileDrop = async (e: React.DragEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file || !file.name.endsWith('.json')) {
+      return;
+    }
+
+    // Create a synthetic event for handleImport
+    const syntheticEvent = {
+      target: {
+        files: e.dataTransfer.files,
+      },
+    } as React.ChangeEvent<HTMLInputElement>;
+
+    // Close Settings Dialog first
+    if (onSettingsClose) {
+      onSettingsClose();
+    }
+    // Wait for Settings Dialog to close, then handle import
+    setTimeout(() => {
+      handleImport(syntheticEvent);
+    }, 350);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
   };
 
   return (
@@ -729,8 +348,17 @@ export function DataExportImport({ onSettingsClose }: DataExportImportProps = {}
         >
           💾
         </Button>
-        <label
-          className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-base rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 hover:scale-105 active:scale-95 text-gray-700 dark:text-gray-300 cursor-pointer font-semibold flex items-center justify-center box-border leading-none`}
+        <Button
+          type="button"
+          variant="secondary"
+          size={isMobile ? 'md' : 'sm'}
+          onClick={() => {
+            if (!isImporting && fileInputRef.current) {
+              fileInputRef.current.value = '';
+              fileInputRef.current.click();
+            }
+          }}
+          className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-base flex items-center justify-center`}
           style={
             isMobile
               ? {
@@ -750,27 +378,41 @@ export function DataExportImport({ onSettingsClose }: DataExportImportProps = {}
                   maxWidth: '24px',
                 }
           }
+          title={t('data.importTooltip')}
+          aria-label={t('data.importTooltip')}
+          onDrop={handleFileDrop}
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragOver}
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={(e) => {
-              // Close Settings Dialog first
-              if (onSettingsClose) {
-                onSettingsClose();
-              }
-              // Wait for Settings Dialog to close, then handle import
-              setTimeout(() => {
-                handleImport(e);
-              }, 350);
-            }}
-            disabled={isImporting}
-            className="hidden"
-            aria-label={t('data.importTooltip')}
-          />
           {isImporting ? '⏳' : '📥'}
-        </label>
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) {
+              if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+              }
+              return;
+            }
+
+            // Close Settings Dialog first
+            if (onSettingsClose) {
+              onSettingsClose();
+            }
+            // Wait for Settings Dialog to close, then handle import
+            setTimeout(() => {
+              handleImport(e);
+            }, 350);
+          }}
+          disabled={isImporting}
+          className="hidden"
+          aria-label={t('data.importTooltip')}
+          style={{ display: 'none' }}
+        />
         {isAuthenticated && (
           <Button
             type="button"
@@ -917,31 +559,7 @@ export function DataExportImport({ onSettingsClose }: DataExportImportProps = {}
           </div>
         </div>
       )}
-      {/* Export Dialog and Import Preview Dialog are now rendered in GlobalDialogs */}
-      <ImportProgressDialog
-        open={showProgressDialog}
-        processed={importProgress.processed}
-        total={importProgress.total}
-        percentage={importProgress.percentage}
-        currentItem={importProgress.currentItem}
-        errors={importProgress.errors}
-        warnings={importProgress.warnings}
-        summary={importProgress.summary}
-        onCancel={() => {
-          setShowProgressDialog(false);
-          setIsImporting(false);
-        }}
-        onClose={() => {
-          setShowProgressDialog(false);
-          setIsImporting(false);
-          // Reload after closing if import was successful
-          if (importProgress.percentage === 100) {
-            setTimeout(() => {
-              window.location.reload();
-            }, 500);
-          }
-        }}
-      />
+      {/* Export Dialog, Import Preview Dialog, and Import Progress Dialog are now rendered in GlobalDialogs */}
 
       {/* Legacy Format Conversion Dialog */}
       {showConversionDialog && (

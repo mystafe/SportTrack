@@ -75,6 +75,7 @@ export interface Challenge {
   completedAt?: string; // ISO string
   createdAt: string; // ISO string
   icon?: string;
+  category?: 'motivation' | 'achievement' | 'consistency' | 'milestone' | 'special' | 'custom'; // Optional category
 }
 
 export interface ChallengeProgress {
@@ -196,6 +197,7 @@ export function createDailyChallenge(
     progress: 0,
     createdAt: new Date().toISOString(),
     icon: icon || '🎯',
+    category: 'consistency', // Daily challenges are consistency-based
   };
 }
 
@@ -226,6 +228,7 @@ export function createWeeklyChallenge(
     progress: 0,
     createdAt: new Date().toISOString(),
     icon: icon || '📅',
+    category: 'consistency', // Weekly challenges are consistency-based
   };
 }
 
@@ -256,6 +259,7 @@ export function createMonthlyChallenge(
     progress: 0,
     createdAt: new Date().toISOString(),
     icon: icon || '📆',
+    category: 'consistency', // Monthly challenges are consistency-based
   };
 }
 
@@ -282,6 +286,7 @@ export function createCustomChallenge(
     progress: 0,
     createdAt: new Date().toISOString(),
     icon: icon || '🏆',
+    category: 'custom', // Mark custom challenges with custom category
   };
 }
 
@@ -342,6 +347,7 @@ export function createYearlyChallenge(
     progress: 0,
     createdAt: new Date().toISOString(),
     icon: icon || '📅',
+    category: 'milestone', // Yearly challenges are milestone-based
   };
 }
 
@@ -397,6 +403,7 @@ export function createSeasonalChallenge(
     progress: 0,
     createdAt: new Date().toISOString(),
     icon: icon || '🍂',
+    category: 'milestone', // Seasonal challenges are milestone-based
   };
 }
 
@@ -424,6 +431,7 @@ export function createActivitySpecificChallenge(
     progress: 0,
     createdAt: new Date().toISOString(),
     icon: icon || '🎯',
+    category: 'achievement', // Activity-specific challenges are achievement-based
   };
 }
 
@@ -452,6 +460,7 @@ export function createTimeBasedChallenge(
     progress: 0,
     createdAt: new Date().toISOString(),
     icon: icon || '⏰',
+    category: 'motivation', // Time-based challenges are motivation-based
   };
 }
 
@@ -486,6 +495,7 @@ export function createStreakBasedChallenge(
     progress: 0,
     createdAt: new Date().toISOString(),
     icon: icon || '🔥',
+    category: 'consistency', // Streak-based challenges are consistency-based
   };
 }
 

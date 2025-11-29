@@ -19,6 +19,10 @@ import {
   updateChallengeStatus,
   getDefaultDailyChallenge,
   getDefaultWeeklyChallenge,
+  getDefaultYearlyChallenge,
+  createDailyChallenge,
+  createWeeklyChallenge,
+  createYearlyChallenge,
   type ChallengeType,
 } from './challenges';
 import { PRESET_CHALLENGES, createChallengeFromPreset } from './presetChallenges';
@@ -137,19 +141,49 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
           }
         });
 
-        // Keep only ONE active preset challenge per preset ID
-        // Each preset should have only one active challenge at a time
-        const presetChallenges = loadedChallenges.filter((c) => c.id.startsWith('preset-'));
+        // AGGRESSIVE: Keep only ONE preset challenge per preset ID (regardless of status)
+        // Remove ALL duplicates - keep only the newest active one, or if none active, keep the newest
+        // Also handle old preset challenges that don't have preset- prefix in ID
+        const presetChallenges = loadedChallenges.filter((c) => {
+          // Include challenges that start with preset- OR match preset by name/target/type
+          if (c.id.startsWith('preset-')) {
+            return true;
+          }
+          // Check if this might be a preset challenge by matching name/target/type
+          return PRESET_CHALLENGES.some((p) => {
+            const nameMatch =
+              (p.name.tr === c.name.tr && p.name.en === c.name.en) ||
+              p.name.tr === c.name.tr ||
+              p.name.en === c.name.en;
+            const targetMatch = p.target === c.target;
+            const typeMatch = p.type === c.type;
+            return nameMatch && targetMatch && typeMatch;
+          });
+        });
+
         const presetIdMap = new Map<string, Challenge>(); // preset base ID -> challenge
 
         presetChallenges.forEach((c) => {
           // Find the base preset ID by matching with PRESET_CHALLENGES
           // Challenge IDs are like: preset-weekly-super-1764256538720-1-abc123xyz
           // We need to match with preset ID: preset-weekly-super
-          const matchingPreset = PRESET_CHALLENGES.find((p) => {
+          let matchingPreset = PRESET_CHALLENGES.find((p) => {
             // Check if challenge ID starts with preset ID followed by a dash or equals it
             return c.id.startsWith(p.id + '-') || c.id === p.id;
           });
+
+          // If not found by ID, try matching by name/target/type (for old challenges)
+          if (!matchingPreset) {
+            matchingPreset = PRESET_CHALLENGES.find((p) => {
+              const nameMatch =
+                (p.name.tr === c.name.tr && p.name.en === c.name.en) ||
+                p.name.tr === c.name.tr ||
+                p.name.en === c.name.en;
+              const targetMatch = p.target === c.target;
+              const typeMatch = p.type === c.type;
+              return nameMatch && targetMatch && typeMatch;
+            });
+          }
 
           if (matchingPreset) {
             const existing = presetIdMap.get(matchingPreset.id);
@@ -157,15 +191,26 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
               // First occurrence of this preset
               presetIdMap.set(matchingPreset.id, c);
             } else {
-              // Already have one, keep the active one or remove duplicates
+              // Already have one - decide which to keep based on status and date
+              const cDate = new Date(c.createdAt || 0).getTime();
+              const existingDate = new Date(existing.createdAt || 0).getTime();
+
+              // Priority: active > inactive, then newer > older
               if (c.status === 'active' && existing.status !== 'active') {
+                // Keep active one
                 idsToRemove.add(existing.id);
                 presetIdMap.set(matchingPreset.id, c);
               } else if (existing.status === 'active' && c.status !== 'active') {
+                // Keep existing active one
                 idsToRemove.add(c.id);
               } else {
-                // Both same status, keep the first one, remove duplicates
-                idsToRemove.add(c.id);
+                // Both same status - keep the newer one
+                if (cDate > existingDate) {
+                  idsToRemove.add(existing.id);
+                  presetIdMap.set(matchingPreset.id, c);
+                } else {
+                  idsToRemove.add(c.id);
+                }
               }
             }
           } else {
@@ -182,13 +227,8 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
           }
         });
 
-        // Remove ALL preset challenges - user should add them manually from UI
-        // This prevents thousands of preset challenges from cluttering the system
-        loadedChallenges.forEach((c) => {
-          if (c.id.startsWith('preset-')) {
-            idsToRemove.add(c.id);
-          }
-        });
+        // Preset challenge cleanup is already handled above (lines 144-179)
+        // Don't remove all preset challenges here - we want to keep active ones
 
         // AGGRESSIVE: Remove duplicate custom challenges (same name + target)
         // Keep only the most recent one for each unique name+target combination
@@ -297,43 +337,235 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
             `🧹 Aggressive cleanup: Removed ${removedCount} challenges. Remaining: ${loadedChallenges.length} (Active: ${loadedChallenges.filter((c) => c.status === 'active').length})`
           );
         }
-      }
 
-      // Create default daily and weekly challenges if they don't exist
-      const dailyTarget = settings?.dailyTarget ?? DEFAULT_DAILY_TARGET;
-      const hasDaily = loadedChallenges.some(
-        (c) => c.type === 'daily' && c.id.startsWith('daily-')
-      );
-      const hasWeekly = loadedChallenges.some(
-        (c) => c.type === 'weekly' && c.id.startsWith('weekly-') && c.target === 50000
-      );
+        // AGGRESSIVE: Final duplicate check for preset challenges AFTER cleanup
+        // This ensures we catch any duplicates that might have been missed in the first pass
+        const presetChallengesAfterCleanup = loadedChallenges.filter((c) =>
+          c.id.startsWith('preset-')
+        );
+        const presetIdMapAfterCleanup = new Map<string, Challenge>();
+        const duplicateIdsToRemove = new Set<string>();
 
-      if (!hasDaily) {
-        const defaultDaily = getDefaultDailyChallenge(dailyTarget);
-        loadedChallenges.push(defaultDaily);
-      }
-      if (!hasWeekly) {
-        const defaultWeekly = getDefaultWeeklyChallenge();
-        loadedChallenges.push(defaultWeekly);
-      }
+        presetChallengesAfterCleanup.forEach((c) => {
+          const matchingPreset = PRESET_CHALLENGES.find(
+            (p) => c.id.startsWith(p.id + '-') || c.id === p.id
+          );
 
-      // Add preset challenges ONLY if they don't exist
-      // Don't auto-create preset challenges - user should add them manually
-      // This prevents thousands of preset challenges from being created
-      const now = new Date();
-      // Only add preset challenges that are explicitly missing (not expired/completed, but completely missing)
-      PRESET_CHALLENGES.forEach((preset) => {
-        // Check if any challenge with this preset ID exists (even expired/completed)
-        const existingPreset = loadedChallenges.find((c) => {
-          // Match preset ID prefix (e.g., preset-weekly-super-xxx matches preset-weekly-super)
-          return c.id.startsWith(preset.id + '-') || c.id === preset.id;
+          if (matchingPreset) {
+            const existing = presetIdMapAfterCleanup.get(matchingPreset.id);
+            if (!existing) {
+              presetIdMapAfterCleanup.set(matchingPreset.id, c);
+            } else {
+              // Duplicate found - decide which to keep
+              const cDate = new Date(c.createdAt || 0).getTime();
+              const existingDate = new Date(existing.createdAt || 0).getTime();
+
+              // Priority: active > inactive, then newer > older
+              if (c.status === 'active' && existing.status !== 'active') {
+                duplicateIdsToRemove.add(existing.id);
+                presetIdMapAfterCleanup.set(matchingPreset.id, c);
+              } else if (existing.status === 'active' && c.status !== 'active') {
+                duplicateIdsToRemove.add(c.id);
+              } else {
+                // Both same status - keep the newer one
+                if (cDate > existingDate) {
+                  duplicateIdsToRemove.add(existing.id);
+                  presetIdMapAfterCleanup.set(matchingPreset.id, c);
+                } else {
+                  duplicateIdsToRemove.add(c.id);
+                }
+              }
+            }
+          }
         });
 
-        // Only add if completely missing (not if expired/completed - user can re-add manually)
-        if (!existingPreset) {
-          // Don't auto-add preset challenges - let user add them manually from the UI
-          // This prevents thousands of challenges from being created
+        // Remove duplicates found in second pass
+        if (duplicateIdsToRemove.size > 0) {
+          loadedChallenges = loadedChallenges.filter((c) => !duplicateIdsToRemove.has(c.id));
+          console.log(
+            `🧹 Second pass: Removed ${duplicateIdsToRemove.size} duplicate preset challenges`
+          );
         }
+      }
+
+      // Ensure daily, weekly, and yearly challenges exist and auto-renew
+      const dailyTarget = settings?.dailyTarget ?? DEFAULT_DAILY_TARGET;
+      const now = new Date();
+      const todayStr = format(startOfDay(now), 'yyyy-MM-dd');
+      const currentWeekStart = startOfWeek(now, { weekStartsOn: 1 });
+      const currentWeekStartStr = format(currentWeekStart, 'yyyy-MM-dd');
+      const currentYearStart = startOfYear(now);
+      const currentYearStr = format(currentYearStart, 'yyyy');
+
+      // Check and create/renew daily challenge
+      const existingDaily = loadedChallenges.find(
+        (c) => c.type === 'daily' && c.id.startsWith('daily-') && c.startDate.startsWith(todayStr)
+      );
+      if (!existingDaily) {
+        // Remove old daily challenges and create new one
+        loadedChallenges = loadedChallenges.filter(
+          (c) => !(c.type === 'daily' && c.id.startsWith('daily-'))
+        );
+        const newDaily = createDailyChallenge(
+          { tr: 'Günlük Hedef', en: 'Daily Goal' },
+          dailyTarget,
+          now,
+          '⭐'
+        );
+        loadedChallenges.push(newDaily);
+      } else if (existingDaily.target !== dailyTarget) {
+        // Update daily target if settings changed
+        const updatedDaily = { ...existingDaily, target: dailyTarget };
+        loadedChallenges = loadedChallenges.map((c) =>
+          c.id === existingDaily.id ? updatedDaily : c
+        );
+      }
+
+      // Check and create/renew weekly challenge
+      // Weekly target = dailyTarget * 7
+      const weeklyTarget = dailyTarget * 7;
+      const existingWeekly = loadedChallenges.find((c) => {
+        if (c.type === 'weekly' && c.id.startsWith('weekly-')) {
+          const challengeStart = parseISO(c.startDate);
+          return (
+            format(startOfWeek(challengeStart, { weekStartsOn: 1 }), 'yyyy-MM-dd') ===
+            currentWeekStartStr
+          );
+        }
+        return false;
+      });
+      if (!existingWeekly) {
+        // Remove old weekly challenges and create new one
+        loadedChallenges = loadedChallenges.filter(
+          (c) => !(c.type === 'weekly' && c.id.startsWith('weekly-'))
+        );
+        const newWeekly = createWeeklyChallenge(
+          { tr: 'Haftalık Hedef', en: 'Weekly Goal' },
+          weeklyTarget,
+          now,
+          '🔥'
+        );
+        loadedChallenges.push(newWeekly);
+      } else if (existingWeekly.target !== weeklyTarget) {
+        // Update weekly target if daily target changed
+        const updatedWeekly = { ...existingWeekly, target: weeklyTarget };
+        loadedChallenges = loadedChallenges.map((c) =>
+          c.id === existingWeekly.id ? updatedWeekly : c
+        );
+      }
+
+      // Check and create/renew yearly challenge
+      // Yearly target = dailyTarget * 365
+      const yearlyTarget = dailyTarget * 365;
+      const existingYearly = loadedChallenges.find((c) => {
+        if (c.type === 'yearly' && c.id.startsWith('yearly-')) {
+          const challengeStart = parseISO(c.startDate);
+          return format(startOfYear(challengeStart), 'yyyy') === currentYearStr;
+        }
+        return false;
+      });
+      if (!existingYearly) {
+        // Remove old yearly challenges and create new one
+        loadedChallenges = loadedChallenges.filter(
+          (c) => !(c.type === 'yearly' && c.id.startsWith('yearly-'))
+        );
+        const newYearly = createYearlyChallenge(
+          { tr: 'Yıllık Hedef', en: 'Yearly Goal' },
+          yearlyTarget,
+          now,
+          '🗓️'
+        );
+        loadedChallenges.push(newYearly);
+      } else if (existingYearly.target !== yearlyTarget) {
+        // Update yearly target if daily target changed
+        const updatedYearly = { ...existingYearly, target: yearlyTarget };
+        loadedChallenges = loadedChallenges.map((c) =>
+          c.id === existingYearly.id ? updatedYearly : c
+        );
+      }
+
+      // Add preset challenges automatically if they don't exist as active challenges
+      // IMPORTANT: Check against cleaned up challenges list (after removing duplicates)
+      // Only add if they don't exist as active challenges
+      // Use a Set to track which preset IDs already have active challenges (more efficient)
+      const activePresetIds = new Set<string>();
+      const allPresetIds = new Set<string>(); // Track ALL preset IDs (active or not) to prevent duplicates
+
+      loadedChallenges.forEach((c) => {
+        if (c.id.startsWith('preset-')) {
+          // Find matching preset base ID
+          const matchingPreset = PRESET_CHALLENGES.find(
+            (p) => c.id.startsWith(p.id + '-') || c.id === p.id
+          );
+          if (matchingPreset) {
+            allPresetIds.add(matchingPreset.id);
+            if (c.status === 'active') {
+              activePresetIds.add(matchingPreset.id);
+            }
+          }
+        }
+      });
+
+      PRESET_CHALLENGES.forEach((preset) => {
+        // Only add if no preset challenge exists for this preset ID (active or not)
+        // This prevents duplicates even if status is not active
+        if (!allPresetIds.has(preset.id)) {
+          const presetChallenge = createChallengeFromPreset(preset, now);
+          // Ensure status is active
+          presetChallenge.status = 'active';
+          loadedChallenges.push(presetChallenge);
+          // Track that we added this preset
+          allPresetIds.add(preset.id);
+        }
+      });
+
+      // Migrate existing challenges without category to have categories
+      loadedChallenges = loadedChallenges.map((challenge) => {
+        // If challenge already has category, keep it
+        if (challenge.category) {
+          return challenge;
+        }
+
+        // Assign category based on challenge type and ID
+        let category:
+          | 'motivation'
+          | 'achievement'
+          | 'consistency'
+          | 'milestone'
+          | 'special'
+          | 'custom'
+          | undefined;
+
+        if (challenge.id.startsWith('preset-')) {
+          // Get category from preset
+          const preset = PRESET_CHALLENGES.find(
+            (p) => challenge.id.startsWith(p.id + '-') || challenge.id === p.id
+          );
+          category = preset ? preset.category : undefined;
+        } else if (
+          challenge.id.startsWith('daily-') ||
+          challenge.id.startsWith('weekly-') ||
+          challenge.id.startsWith('monthly-')
+        ) {
+          category = 'consistency';
+        } else if (challenge.id.startsWith('yearly-')) {
+          category = 'milestone';
+        } else if (challenge.type === 'seasonal') {
+          category = 'milestone';
+        } else if (challenge.type === 'streak_based') {
+          category = 'consistency';
+        } else if (challenge.type === 'time_based') {
+          category = 'motivation';
+        } else if (challenge.type === 'activity_specific') {
+          category = 'achievement';
+        } else if (challenge.type === 'custom') {
+          category = 'custom';
+        }
+
+        return {
+          ...challenge,
+          category,
+        };
       });
 
       setChallenges(loadedChallenges);
@@ -424,39 +656,50 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
     }
     lastDailyTargetRef.current = settings.dailyTarget;
 
-    const currentChallenges = challengesRef.current;
-    const defaultDaily = currentChallenges.find(
-      (c) => c.type === 'daily' && c.id.startsWith('daily-')
-    );
-
-    if (defaultDaily && defaultDaily.target !== settings.dailyTarget) {
-      isUpdatingDailyTargetRef.current = true;
-
+    // Use current challenges state instead of ref to ensure we have the latest
+    setChallenges((currentChallenges) => {
       const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
-      const isToday = defaultDaily.startDate.startsWith(todayStr);
+      const todayStr = format(startOfDay(today), 'yyyy-MM-dd');
 
-      if (isToday) {
-        // Update today's challenge
+      // Find today's daily challenge
+      const defaultDaily = currentChallenges.find(
+        (c) => c.type === 'daily' && c.id.startsWith('daily-') && c.startDate.startsWith(todayStr)
+      );
+
+      if (defaultDaily && defaultDaily.target !== settings.dailyTarget) {
+        isUpdatingDailyTargetRef.current = true;
+
+        // Update today's challenge target
         const updated = currentChallenges.map((c) =>
           c.id === defaultDaily.id ? { ...c, target: settings.dailyTarget } : c
         );
         challengesRef.current = updated;
-        saveChallenges(updated);
-      } else {
-        // Create new daily challenge for today
+
+        // Save asynchronously
+        setTimeout(() => {
+          saveChallenges(updated);
+          isUpdatingDailyTargetRef.current = false;
+        }, 100);
+
+        return updated;
+      } else if (!defaultDaily) {
+        // No daily challenge for today, create one
+        isUpdatingDailyTargetRef.current = true;
         const newDaily = getDefaultDailyChallenge(settings.dailyTarget);
-        const updated = currentChallenges.filter((c) => c.id !== defaultDaily.id);
-        const finalChallenges = [...updated, newDaily];
-        challengesRef.current = finalChallenges;
-        saveChallenges(finalChallenges);
+        const updated = [...currentChallenges, newDaily];
+        challengesRef.current = updated;
+
+        // Save asynchronously
+        setTimeout(() => {
+          saveChallenges(updated);
+          isUpdatingDailyTargetRef.current = false;
+        }, 100);
+
+        return updated;
       }
 
-      // Reset flag after a short delay
-      setTimeout(() => {
-        isUpdatingDailyTargetRef.current = false;
-      }, 100);
-    }
+      return currentChallenges;
+    });
   }, [settings?.dailyTarget, hydrated, saveChallenges]);
 
   // Update challenge progress and status
@@ -537,154 +780,164 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
     }, 0);
   }, [activities, hydrated, saveChallenges]);
 
-  // Auto-renew expired challenges (daily, weekly, monthly, yearly)
-  // Use refs to prevent infinite loops - only check periodically, not on every challenge change
-  const lastAutoRenewCheckRef = useRef<number>(0);
-  const AUTO_RENEW_CHECK_INTERVAL = 300000; // Check every 5 minutes (increased from 60s)
-  const isAutoRenewingRef = useRef(false);
-
+  // Auto-renew recurring goals (daily, weekly, yearly) when period ends
+  // Check periodically and create new goals when period ends
   useEffect(() => {
-    if (!hydrated || isUpdatingRef.current || isAutoRenewingRef.current) return;
+    if (!hydrated || !activitiesHydrated || !settingsHydrated) return;
 
-    const currentChallenges = challengesRef.current;
-    if (currentChallenges.length === 0) return;
+    const checkAndRenewGoals = () => {
+      if (isUpdatingRef.current) return;
 
-    // Throttle auto-renew checks to prevent excessive updates
-    const nowTimestamp = Date.now();
-    if (nowTimestamp - lastAutoRenewCheckRef.current < AUTO_RENEW_CHECK_INTERVAL) {
-      return;
-    }
-    lastAutoRenewCheckRef.current = nowTimestamp;
-    isAutoRenewingRef.current = true;
-
-    const now = new Date();
-    const today = startOfDay(now);
-    const currentWeekStart = startOfWeek(now, { weekStartsOn: 1 });
-    const currentMonthStart = startOfMonth(now);
-    const currentYearStart = startOfYear(now);
-
-    let needsUpdate = false;
-    let updatedChallenges = [...currentChallenges];
-
-    // Check for expired daily challenge - only keep today's daily challenge
-    const todayStr = format(today, 'yyyy-MM-dd');
-    const dailyChallenges = updatedChallenges.filter(
-      (c) => c.type === 'daily' && c.id.startsWith('daily-')
-    );
-    const todayDaily = dailyChallenges.find((c) => c.startDate.startsWith(todayStr));
-    const oldDailyChallenges = dailyChallenges.filter((c) => !c.startDate.startsWith(todayStr));
-
-    // Remove old daily challenges
-    if (oldDailyChallenges.length > 0) {
-      updatedChallenges = updatedChallenges.filter((c) => !oldDailyChallenges.includes(c));
-      needsUpdate = true;
-    }
-
-    // Create today's daily challenge if it doesn't exist
-    if (!todayDaily) {
+      const currentChallenges = challengesRef.current;
+      const now = new Date();
+      const todayStr = format(startOfDay(now), 'yyyy-MM-dd');
+      const currentWeekStart = startOfWeek(now, { weekStartsOn: 1 });
+      const currentWeekStartStr = format(currentWeekStart, 'yyyy-MM-dd');
+      const currentYearStart = startOfYear(now);
+      const currentYearStr = format(currentYearStart, 'yyyy');
       const dailyTarget = settings?.dailyTarget ?? DEFAULT_DAILY_TARGET;
-      const newDaily = getDefaultDailyChallenge(dailyTarget);
-      updatedChallenges.push(newDaily);
-      needsUpdate = true;
-    }
 
-    // Check for expired weekly challenge - only keep current week's weekly challenge
-    const currentWeekStartStr = format(currentWeekStart, 'yyyy-MM-dd');
-    const weeklyChallenges = updatedChallenges.filter(
-      (c) => c.type === 'weekly' && c.id.startsWith('weekly-')
-    );
-    const currentWeekWeekly = weeklyChallenges.find((c) => {
-      const challengeStart = parseISO(c.startDate);
-      return (
-        format(startOfWeek(challengeStart, { weekStartsOn: 1 }), 'yyyy-MM-dd') ===
-        currentWeekStartStr
+      let needsUpdate = false;
+      let updatedChallenges = [...currentChallenges];
+
+      // Check daily goal - renew if expired or missing
+      const dailyGoal = updatedChallenges.find(
+        (c) => c.type === 'daily' && c.id.startsWith('daily-')
       );
-    });
-    const oldWeeklyChallenges = weeklyChallenges.filter((c) => {
-      const challengeStart = parseISO(c.startDate);
-      return (
-        format(startOfWeek(challengeStart, { weekStartsOn: 1 }), 'yyyy-MM-dd') !==
-        currentWeekStartStr
+      const dailyStartDate = dailyGoal ? parseISO(dailyGoal.startDate) : null;
+      const isDailyExpired =
+        !dailyGoal ||
+        (dailyStartDate && format(startOfDay(dailyStartDate), 'yyyy-MM-dd') !== todayStr);
+
+      if (isDailyExpired) {
+        // Remove old daily goals
+        updatedChallenges = updatedChallenges.filter(
+          (c) => !(c.type === 'daily' && c.id.startsWith('daily-'))
+        );
+        // Create new daily goal
+        const newDaily = createDailyChallenge(
+          { tr: 'Günlük Hedef', en: 'Daily Goal' },
+          dailyTarget,
+          now,
+          '⭐'
+        );
+        updatedChallenges.push(newDaily);
+        needsUpdate = true;
+      }
+
+      // Check weekly goal - renew if expired or missing
+      const weeklyGoal = updatedChallenges.find(
+        (c) => c.type === 'weekly' && c.id.startsWith('weekly-')
       );
-    });
+      const weeklyStartDate = weeklyGoal ? parseISO(weeklyGoal.startDate) : null;
+      const weeklyStartStr = weeklyStartDate
+        ? format(startOfWeek(weeklyStartDate, { weekStartsOn: 1 }), 'yyyy-MM-dd')
+        : '';
+      const isWeeklyExpired = !weeklyGoal || weeklyStartStr !== currentWeekStartStr;
 
-    // Remove old weekly challenges
-    if (oldWeeklyChallenges.length > 0) {
-      updatedChallenges = updatedChallenges.filter((c) => !oldWeeklyChallenges.includes(c));
-      needsUpdate = true;
-    }
+      if (isWeeklyExpired) {
+        // Remove old weekly goals
+        updatedChallenges = updatedChallenges.filter(
+          (c) => !(c.type === 'weekly' && c.id.startsWith('weekly-'))
+        );
+        // Create new weekly goal
+        const newWeekly = createWeeklyChallenge(
+          { tr: 'Haftalık Hedef', en: 'Weekly Goal' },
+          50000,
+          now,
+          '🔥'
+        );
+        updatedChallenges.push(newWeekly);
+        needsUpdate = true;
+      }
 
-    // Create current week's weekly challenge if it doesn't exist
-    if (!currentWeekWeekly) {
-      const newWeekly = getDefaultWeeklyChallenge();
-      updatedChallenges.push(newWeekly);
-      needsUpdate = true;
-    }
-
-    // Check for expired monthly challenge
-    const expiredMonthly = updatedChallenges.find(
-      (c) => c.type === 'monthly' && (c.status === 'expired' || c.status === 'completed')
-    );
-    const hasActiveMonthly = updatedChallenges.some(
-      (c) => c.type === 'monthly' && c.status === 'active'
-    );
-    if (expiredMonthly && !hasActiveMonthly) {
-      const { createMonthlyChallenge } = require('./challenges');
-      const newMonthly = createMonthlyChallenge(
-        { tr: 'Aylık Hedef', en: 'Monthly Goal' },
-        200000,
-        now
+      // Check yearly goal - renew if expired or missing
+      const yearlyGoal = updatedChallenges.find(
+        (c) => c.type === 'yearly' && c.id.startsWith('yearly-')
       );
-      updatedChallenges.push(newMonthly);
-      needsUpdate = true;
-    }
+      const yearlyStartDate = yearlyGoal ? parseISO(yearlyGoal.startDate) : null;
+      const yearlyStartStr = yearlyStartDate ? format(startOfYear(yearlyStartDate), 'yyyy') : '';
+      const isYearlyExpired = !yearlyGoal || yearlyStartStr !== currentYearStr;
 
-    // Check for expired yearly challenge
-    const expiredYearly = updatedChallenges.find(
-      (c) => c.type === 'yearly' && (c.status === 'expired' || c.status === 'completed')
-    );
-    const hasActiveYearly = updatedChallenges.some(
-      (c) => c.type === 'yearly' && c.status === 'active'
-    );
-    if (expiredYearly && !hasActiveYearly) {
-      const { createYearlyChallenge } = require('./challenges');
-      const newYearly = createYearlyChallenge(
-        { tr: 'Yıllık Hedef', en: 'Yearly Goal' },
-        2000000,
-        now
-      );
-      updatedChallenges.push(newYearly);
-      needsUpdate = true;
-    }
+      if (isYearlyExpired) {
+        // Remove old yearly goals
+        updatedChallenges = updatedChallenges.filter(
+          (c) => !(c.type === 'yearly' && c.id.startsWith('yearly-'))
+        );
+        // Create new yearly goal
+        const newYearly = createYearlyChallenge(
+          { tr: 'Yıllık Hedef', en: 'Yearly Goal' },
+          1000000,
+          now,
+          '🗓️'
+        );
+        updatedChallenges.push(newYearly);
+        needsUpdate = true;
+      }
 
-    // DON'T auto-renew preset challenges
-    // Preset challenges should be manually added by users, not auto-created
-    // This prevents thousands of preset challenges from being created
-    // Users can add preset challenges from the UI when they want them
+      if (needsUpdate) {
+        isUpdatingRef.current = true;
+        challengesRef.current = updatedChallenges;
+        saveChallenges(updatedChallenges);
+        setTimeout(() => {
+          isUpdatingRef.current = false;
+        }, 100);
+      }
+    };
 
-    if (needsUpdate) {
-      // Prevent concurrent updates
-      isUpdatingRef.current = true;
-      challengesRef.current = updatedChallenges;
-      saveChallenges(updatedChallenges);
-      // Reset update flags after a short delay
-      setTimeout(() => {
-        isUpdatingRef.current = false;
-        isAutoRenewingRef.current = false;
-      }, 100);
-    } else {
-      // Reset auto-renew flag even if no update needed
-      isAutoRenewingRef.current = false;
-    }
-  }, [hydrated, settings?.dailyTarget, saveChallenges]);
+    // Check immediately
+    checkAndRenewGoals();
+
+    // Check every minute to catch day/week/year transitions
+    const interval = setInterval(checkAndRenewGoals, 60000);
+
+    return () => clearInterval(interval);
+  }, [hydrated, activitiesHydrated, settingsHydrated, settings?.dailyTarget, saveChallenges]);
 
   // Add a new challenge
   const addChallenge = useCallback(
     (challenge: Challenge) => {
-      const updated = [...challenges, challenge];
+      // Ensure challenge has category and is active
+      const challengeWithCategory: Challenge = {
+        ...challenge,
+        status: 'active', // Ensure new challenges are active
+        category:
+          challenge.category ||
+          (() => {
+            // Assign category if missing
+            if (challenge.type === 'custom') return 'custom';
+            if (challenge.id.startsWith('preset-')) {
+              const preset = PRESET_CHALLENGES.find(
+                (p) => challenge.id.startsWith(p.id + '-') || challenge.id === p.id
+              );
+              return preset ? preset.category : 'custom';
+            }
+            if (
+              challenge.id.startsWith('daily-') ||
+              challenge.id.startsWith('weekly-') ||
+              challenge.id.startsWith('monthly-')
+            )
+              return 'consistency';
+            if (challenge.id.startsWith('yearly-')) return 'milestone';
+            if (challenge.type === 'seasonal') return 'milestone';
+            if (challenge.type === 'streak_based') return 'consistency';
+            if (challenge.type === 'time_based') return 'motivation';
+            if (challenge.type === 'activity_specific') return 'achievement';
+            return 'custom';
+          })(),
+      };
+
+      const currentChallenges = challengesRef.current;
+      const updated = [...currentChallenges, challengeWithCategory];
+      challengesRef.current = updated;
+
+      // Update state immediately for UI responsiveness
+      setChallenges(updated);
+
+      // Save to localStorage
       saveChallenges(updated);
     },
-    [challenges, saveChallenges]
+    [saveChallenges]
   );
 
   // Update a challenge

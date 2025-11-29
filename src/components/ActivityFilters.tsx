@@ -54,24 +54,19 @@ export const ActivityFilters = memo(function ActivityFilters({
       variant="default"
       size="md"
       hoverable
-      className={`${isMobile ? 'space-y-1.5' : 'space-y-2.5 sm:space-y-3'}`}
+      className={`${isMobile ? 'space-y-1' : 'space-y-1.5'}`}
       header={
         <h3
-          className={`${isMobile ? 'text-[10px]' : 'text-sm'} font-bold text-gray-950 dark:text-white`}
+          className={`${isMobile ? 'text-[9px]' : 'text-xs'} font-bold text-gray-950 dark:text-white`}
         >
           {t('filters.title')}
         </h3>
       }
     >
       {/* Date Range Filter */}
-      <div className={`${isMobile ? 'space-y-1' : 'space-y-1.5'}`}>
-        <label
-          className={`${isMobile ? 'text-[9px]' : 'text-xs'} font-semibold text-gray-800 dark:text-gray-200`}
-        >
-          {t('filters.dateRange')}
-        </label>
+      <div className={`${isMobile ? 'space-y-0.5' : 'space-y-0.5'}`}>
         <div
-          className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-5'} ${isMobile ? 'gap-1' : 'gap-1.5'}`}
+          className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-5'} ${isMobile ? 'gap-0.5' : 'gap-1'}`}
         >
           {(['all', 'today', 'week', 'month', 'custom'] as const).map((range) => (
             <Button
@@ -80,21 +75,21 @@ export const ActivityFilters = memo(function ActivityFilters({
               variant={filters.dateRange === range ? 'primary' : 'outline'}
               size="sm"
               onClick={() => updateFilter('dateRange', range)}
-              className={`${isMobile ? 'px-1 py-0.5 text-[8px]' : 'px-2 py-1 text-xs'}`}
+              className={`${isMobile ? 'px-0.5 py-0.5 text-[7px]' : 'px-1.5 py-0.5 text-[10px]'}`}
             >
               {t(`filters.dateRange.${range}`)}
             </Button>
           ))}
         </div>
         {filters.dateRange === 'custom' && (
-          <div className={`grid grid-cols-2 ${isMobile ? 'gap-1 mt-1' : 'gap-1.5 mt-1.5'}`}>
+          <div className={`grid grid-cols-2 ${isMobile ? 'gap-0.5 mt-0.5' : 'gap-1 mt-0.5'}`}>
             <Input
               type="date"
               value={filters.customStart || ''}
               onChange={(e) => updateFilter('customStart', e.target.value)}
               max={format(new Date(), 'yyyy-MM-dd')}
               size={isMobile ? 'sm' : 'sm'}
-              className={`${isMobile ? 'px-1 py-0.5 text-[8px]' : 'px-1.5 py-1 text-xs'}`}
+              className={`${isMobile ? 'px-0.5 py-0.5 text-[7px]' : 'px-1 py-0.5 text-[10px]'} text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700`}
             />
             <Input
               type="date"
@@ -102,83 +97,93 @@ export const ActivityFilters = memo(function ActivityFilters({
               onChange={(e) => updateFilter('customEnd', e.target.value)}
               max={format(new Date(), 'yyyy-MM-dd')}
               size={isMobile ? 'sm' : 'sm'}
-              className={`${isMobile ? 'px-1 py-0.5 text-[8px]' : 'px-1.5 py-1 text-xs'}`}
+              className={`${isMobile ? 'px-0.5 py-0.5 text-[7px]' : 'px-1 py-0.5 text-[10px]'} text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700`}
             />
           </div>
         )}
       </div>
 
-      {/* Category Filter - Compact for mobile */}
-      <div className={`${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
-        <Select
-          label={isMobile ? undefined : t('filters.category')}
-          value={filters.category}
-          onChange={(e) => updateFilter('category', e.target.value as FilterState['category'])}
-          size={isMobile ? 'sm' : 'sm'}
-          options={[
-            { value: 'all', label: t('filters.allCategories') },
-            { value: 'cardio', label: t('filters.category.cardio') },
-            { value: 'strength', label: t('filters.category.strength') },
-            { value: 'flexibility', label: t('filters.category.flexibility') },
-            { value: 'sports', label: t('filters.category.sports') },
-            { value: 'other', label: t('filters.category.other') },
-          ]}
-          className={isMobile ? 'flex-1' : 'w-full'}
-        />
+      {/* Category and Activity Type - Side by Side */}
+      <div
+        className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} ${isMobile ? 'gap-0.5' : 'gap-1'}`}
+      >
+        {/* Category Filter */}
+        <div>
+          <Select
+            label={isMobile ? undefined : t('filters.category')}
+            value={filters.category}
+            onChange={(e) => updateFilter('category', e.target.value as FilterState['category'])}
+            size={isMobile ? 'sm' : 'sm'}
+            options={[
+              { value: 'all', label: t('filters.allCategories') },
+              { value: 'cardio', label: t('filters.category.cardio') },
+              { value: 'strength', label: t('filters.category.strength') },
+              { value: 'flexibility', label: t('filters.category.flexibility') },
+              { value: 'sports', label: t('filters.category.sports') },
+              { value: 'other', label: t('filters.category.other') },
+            ]}
+            className="w-full"
+          />
+        </div>
+
+        {/* Activity Type Filter */}
+        <div>
+          <Select
+            label={isMobile ? undefined : t('filters.activityType')}
+            value={filters.activityType}
+            onChange={(e) => updateFilter('activityType', e.target.value)}
+            size={isMobile ? 'sm' : 'sm'}
+            options={[
+              { value: 'all', label: t('filters.allActivities') },
+              ...(uniqueActivityKeys
+                .map((key) => {
+                  const def = definitions.find((d) => d.key === key);
+                  if (!def) return null;
+                  return {
+                    value: key,
+                    label: getActivityLabel(def, lang),
+                  };
+                })
+                .filter(Boolean) as Array<{ value: string; label: string }>),
+            ]}
+            className="w-full"
+          />
+        </div>
       </div>
 
-      {/* Activity Type Filter */}
-      <div className={`${isMobile ? 'space-y-1' : 'space-y-1.5'}`}>
-        <Select
-          label={t('filters.activityType')}
-          value={filters.activityType}
-          onChange={(e) => updateFilter('activityType', e.target.value)}
-          size={isMobile ? 'sm' : 'sm'}
-          options={[
-            { value: 'all', label: t('filters.allActivities') },
-            ...(uniqueActivityKeys
-              .map((key) => {
-                const def = definitions.find((d) => d.key === key);
-                if (!def) return null;
-                return {
-                  value: key,
-                  label: getActivityLabel(def, lang),
-                };
-              })
-              .filter(Boolean) as Array<{ value: string; label: string }>),
-          ]}
-          className="w-full"
-        />
-      </div>
+      {/* Search and Sort - Side by Side */}
+      <div
+        className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} ${isMobile ? 'gap-0.5' : 'gap-1'}`}
+      >
+        {/* Search */}
+        <div>
+          <Input
+            type="text"
+            label={isMobile ? undefined : t('filters.search')}
+            value={filters.searchQuery}
+            onChange={(e) => updateFilter('searchQuery', e.target.value)}
+            placeholder={t('filters.searchPlaceholder')}
+            size={isMobile ? 'sm' : 'sm'}
+            className="w-full"
+          />
+        </div>
 
-      {/* Search */}
-      <div className={`${isMobile ? 'space-y-1' : 'space-y-1.5'}`}>
-        <Input
-          type="text"
-          label={t('filters.search')}
-          value={filters.searchQuery}
-          onChange={(e) => updateFilter('searchQuery', e.target.value)}
-          placeholder={t('filters.searchPlaceholder')}
-          size={isMobile ? 'sm' : 'sm'}
-          className="w-full"
-        />
-      </div>
-
-      {/* Sort */}
-      <div className={`${isMobile ? 'space-y-1' : 'space-y-1.5'}`}>
-        <Select
-          label={t('filters.sortBy')}
-          value={filters.sortBy}
-          onChange={(e) => updateFilter('sortBy', e.target.value as FilterState['sortBy'])}
-          size={isMobile ? 'sm' : 'sm'}
-          options={[
-            { value: 'date-desc', label: t('filters.sort.dateDesc') },
-            { value: 'date-asc', label: t('filters.sort.dateAsc') },
-            { value: 'points-desc', label: t('filters.sort.pointsDesc') },
-            { value: 'points-asc', label: t('filters.sort.pointsAsc') },
-          ]}
-          className="w-full"
-        />
+        {/* Sort */}
+        <div>
+          <Select
+            label={isMobile ? undefined : t('filters.sortBy')}
+            value={filters.sortBy}
+            onChange={(e) => updateFilter('sortBy', e.target.value as FilterState['sortBy'])}
+            size={isMobile ? 'sm' : 'sm'}
+            options={[
+              { value: 'date-desc', label: t('filters.sort.dateDesc') },
+              { value: 'date-asc', label: t('filters.sort.dateAsc') },
+              { value: 'points-desc', label: t('filters.sort.pointsDesc') },
+              { value: 'points-asc', label: t('filters.sort.pointsAsc') },
+            ]}
+            className="w-full"
+          />
+        </div>
       </div>
 
       {/* Clear Filters */}
@@ -197,7 +202,7 @@ export const ActivityFilters = memo(function ActivityFilters({
               sortBy: 'date-desc',
             })
           }
-          className={`w-full ${isMobile ? 'px-1.5 py-0.5 text-[8px]' : 'px-2 py-1 text-xs'} rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
+          className={`w-full ${isMobile ? 'px-1 py-0.5 text-[7px]' : 'px-1.5 py-0.5 text-[9px]'} rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
         >
           {t('filters.clear')}
         </button>
@@ -244,6 +249,15 @@ export function useFilteredActivities(filters: FilterState) {
       filtered = filtered.filter((activity) => {
         const activityDate = parseISO(activity.performedAt);
         return activityDate >= start && activityDate <= end;
+      });
+    }
+
+    // Category filter
+    if (filters.category !== 'all') {
+      const { getActivityCategory } = require('@/lib/activityConfig');
+      filtered = filtered.filter((activity) => {
+        const category = getActivityCategory(activity.activityKey);
+        return category === filters.category;
       });
     }
 

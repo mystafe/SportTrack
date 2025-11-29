@@ -7,20 +7,20 @@ export function ScrollHandler() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Sayfa değiştiğinde main elementine odaklan
-    // Küçük bir gecikme ekleyerek DOM'un hazır olmasını ve geçiş animasyonlarının bitmesini bekle
-    const timer = setTimeout(() => {
+    // Sayfa değiştiğinde scroll'u en üste al (performans için instant)
+    // requestAnimationFrame kullanarak DOM'un hazır olmasını bekle
+    const rafId = requestAnimationFrame(() => {
+      // Scroll'u en üste al (instant behavior for performance)
+      window.scrollTo({ top: 0, behavior: 'instant' });
+
+      // Main elementine odaklan (accessibility için)
       const mainElement = document.getElementById('main-content');
       if (mainElement) {
-        // preventScroll: true -> Odaklanırken tarayıcının otomatik scroll yapmasını engelle
         mainElement.focus({ preventScroll: true });
-
-        // Scroll'u en üste al
-        window.scrollTo({ top: 0, behavior: 'instant' });
       }
-    }, 50);
+    });
 
-    return () => clearTimeout(timer);
+    return () => cancelAnimationFrame(rafId);
   }, [pathname]);
 
   return null;

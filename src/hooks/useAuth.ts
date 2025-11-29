@@ -19,6 +19,8 @@ import {
 } from '@/lib/firebase/auth';
 import { isFirebaseConfigured } from '@/lib/firebase/config';
 import { cloudSyncService } from '@/lib/cloudSync/syncService';
+import { batchSyncService } from '@/lib/cloudSync/batchSyncService';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -67,21 +69,55 @@ export function useAuth() {
     };
   }, [isConfigured]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    try {
-      setError(null);
-      setLoading(true);
-      const authUser = await signIn(email, password);
-      setUser(authUser);
-      return authUser;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Login failed';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const login = useCallback(
+    async (email: string, password: string) => {
+      try {
+        setError(null);
+        setLoading(true);
+        const authUser = await signIn(email, password);
+        setUser(authUser);
+
+        // After successful login, download data from cloud (don't upload)
+        if (authUser && isConfigured) {
+          cloudSyncService.setUserId(authUser.uid);
+
+          try {
+            // Download cloud data and merge with local
+            const cloudData = await cloudSyncService.downloadFromCloud();
+            if (cloudData) {
+              // Merge cloud data with local (cloud takes precedence)
+              if (cloudData.exercises && cloudData.exercises.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudData.exercises));
+              }
+              if (cloudData.settings) {
+                localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(cloudData.settings));
+              }
+              if (cloudData.badges && cloudData.badges.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(cloudData.badges));
+              }
+              if (cloudData.challenges && cloudData.challenges.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(cloudData.challenges));
+              }
+
+              // Trigger page reload to apply new data
+              window.location.reload();
+            }
+          } catch (downloadError) {
+            console.error('Failed to download cloud data on login:', downloadError);
+          }
+        }
+
+        return authUser;
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Login failed';
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [isConfigured]
+  );
 
   const register = useCallback(async (email: string, password: string, displayName?: string) => {
     try {
@@ -105,6 +141,37 @@ export function useAuth() {
       setLoading(true);
       const authUser = await signInWithGoogle();
       setUser(authUser);
+
+      // After successful login, download data from cloud (don't upload)
+      if (authUser && isConfigured) {
+        cloudSyncService.setUserId(authUser.uid);
+
+        try {
+          // Download cloud data and merge with local
+          const cloudData = await cloudSyncService.downloadFromCloud();
+          if (cloudData) {
+            // Merge cloud data with local (cloud takes precedence)
+            if (cloudData.exercises && cloudData.exercises.length > 0) {
+              localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudData.exercises));
+            }
+            if (cloudData.settings) {
+              localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(cloudData.settings));
+            }
+            if (cloudData.badges && cloudData.badges.length > 0) {
+              localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(cloudData.badges));
+            }
+            if (cloudData.challenges && cloudData.challenges.length > 0) {
+              localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(cloudData.challenges));
+            }
+
+            // Trigger page reload to apply new data
+            window.location.reload();
+          }
+        } catch (downloadError) {
+          console.error('Failed to download cloud data on login:', downloadError);
+        }
+      }
+
       return authUser;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Google login failed';
@@ -113,19 +180,31 @@ export function useAuth() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isConfigured]);
 
   const logout = useCallback(async () => {
     try {
       setError(null);
+
+      // Flush pending batch sync before logout
+      if (isConfigured && cloudSyncService.isConfigured()) {
+        try {
+          await batchSyncService.flushBatch();
+        } catch (syncError) {
+          console.error('Failed to flush batch sync on logout:', syncError);
+        }
+      }
+
       await signOutUser();
       setUser(null);
+      cloudSyncService.setUserId(null);
+      batchSyncService.clear();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Logout failed';
       setError(errorMessage);
       throw err;
     }
-  }, []);
+  }, [isConfigured]);
 
   const resetPasswordEmail = useCallback(async (email: string) => {
     try {
