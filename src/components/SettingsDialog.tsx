@@ -558,7 +558,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         }}
       >
         <div
-          className={`relative w-full ${isMobile ? 'max-w-[95vw] sm:max-w-md' : 'max-w-lg'} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl animate-in slide-in-from-top-10 duration-300 ${isMobile ? 'p-4' : 'p-5 sm:p-6'} max-h-[85vh] overflow-y-auto pointer-events-auto`}
+          className={`relative w-full ${isMobile ? 'max-w-[95vw] sm:max-w-md' : 'max-w-lg'} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl animate-in slide-in-from-top-10 duration-500 ease-in-out ${isMobile ? 'p-4' : 'p-5 sm:p-6'} ${!isAuthenticated ? (isMobile ? 'p-3' : 'p-4') : ''} max-h-[85vh] overflow-y-auto pointer-events-auto`}
           onClick={(e) => {
             // Prevent closing when clicking inside the dialog
             e.stopPropagation();
@@ -566,21 +566,34 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         >
           {/* Header */}
           <div
-            className={`${isMobile ? 'mb-2.5 pb-2' : 'mb-3 pb-2.5'} border-b border-gray-200 dark:border-gray-700`}
+            className={`${!isAuthenticated ? (isMobile ? 'mb-2 pb-1.5' : 'mb-2 pb-2') : isMobile ? 'mb-2.5 pb-2' : 'mb-3 pb-2.5'} border-b border-gray-200 dark:border-gray-700`}
           >
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex items-center gap-2 flex-1">
+            <div
+              className={`flex items-center justify-between gap-2 ${!isAuthenticated ? 'flex-nowrap' : 'flex-wrap'}`}
+            >
+              <div
+                className={`flex items-center gap-2 ${!isAuthenticated ? 'flex-1 min-w-0' : 'flex-1'}`}
+              >
                 <h2
-                  className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} font-bold text-gray-950 dark:text-white flex items-center gap-1.5`}
+                  className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} font-bold text-gray-950 dark:text-white flex items-center gap-1.5 ${!isAuthenticated ? 'flex-shrink-0' : ''}`}
                 >
                   <span className={isMobile ? 'text-xs' : 'text-sm'}>⚙️</span>
                   {isAuthenticated ? (lang === 'tr' ? 'Ayarlar' : 'Settings') : t('settings.title')}
                 </h2>
-                <span
-                  className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
-                >
-                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.29.0
-                </span>
+                {isAuthenticated && (
+                  <span
+                    className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
+                  >
+                    © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.30.1
+                  </span>
+                )}
+                {!isAuthenticated && (
+                  <span
+                    className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-1 flex-shrink-0`}
+                  >
+                    v0.30.1
+                  </span>
+                )}
               </div>
               <button
                 type="button"
@@ -617,7 +630,15 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
           {/* Form */}
           <form
-            className={isMobile ? 'space-y-3' : 'space-y-2.5'}
+            className={
+              !isAuthenticated
+                ? isMobile
+                  ? 'space-y-2'
+                  : 'space-y-2'
+                : isMobile
+                  ? 'space-y-3'
+                  : 'space-y-2.5'
+            }
             onSubmit={submit}
             autoComplete="off"
           >
@@ -627,9 +648,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                 {/* Login Section */}
                 {isConfigured && (
-                  <div
-                    className={`${isMobile ? 'mb-4 pb-4' : 'mb-4 pb-4'} border-b border-gray-200 dark:border-gray-700`}
-                  >
+                  <div className={`${isMobile ? 'mb-2' : 'mb-2'}`}>
                     <button
                       type="button"
                       onClick={handleLoginClick}
