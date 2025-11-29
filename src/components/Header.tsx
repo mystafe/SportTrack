@@ -16,13 +16,20 @@ export const Header = memo(function Header() {
     setMounted(true);
   }, []);
   return (
-    <header className="border-b-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 backdrop-blur sticky top-0 z-40 safe-top">
+    <header
+      className="border-b-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 sticky top-0 z-[60] safe-top"
+      style={{ zIndex: 60 }}
+    >
       <nav
         className="container flex items-center justify-between h-14 sm:h-10 min-w-0"
         role="navigation"
         aria-label={t('nav.main')}
       >
-        <Link href="/" className="flex-shrink-0 flex items-center" aria-label={t('nav.home')}>
+        <Link
+          href="/"
+          className="flex-shrink-0 flex items-center no-underline hover:no-underline"
+          aria-label={t('nav.home')}
+        >
           <Logo />
         </Link>
         <div className="flex items-center gap-2 sm:gap-2 text-xs sm:text-sm min-w-0 flex-1 justify-end">
@@ -96,7 +103,18 @@ export const Header = memo(function Header() {
               </Link>
             </div>
           )}
-          {mounted && <SettingsDialog />}
+          {mounted && (
+            <div
+              style={{
+                touchAction: 'manipulation',
+                pointerEvents: 'auto',
+                zIndex: 9999,
+                position: 'relative',
+              }}
+            >
+              <SettingsDialog />
+            </div>
+          )}
         </div>
       </nav>
     </header>

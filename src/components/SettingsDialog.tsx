@@ -1,6 +1,15 @@
 'use client';
 
-import React, { FormEvent, useEffect, useState, useRef, lazy, Suspense, useMemo } from 'react';
+import React, {
+  FormEvent,
+  useEffect,
+  useState,
+  useRef,
+  lazy,
+  Suspense,
+  useMemo,
+  useCallback,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '@/lib/i18n';
 import { useSettings, Mood } from '@/lib/settingsStore';
@@ -65,6 +74,13 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const { flushPendingSync } = useAutoSync();
   const { dialogs } = useDialogManager();
   const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Debug: Log open state changes
+  useEffect(() => {}, [open]);
+
+  // Global click listener removed to prevent unintended dialog opens
+  // Button click is handled by the trigger button's onClick handler directly
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
   const [showActivityRemindersDialog, setShowActivityRemindersDialog] = useState(false);
@@ -523,12 +539,14 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
   // Settings dialog - Different content for authenticated vs non-authenticated users
   const renderSettingsDialog = () => {
-    if (!open || showAuthDialog) return null;
+    if (!open || showAuthDialog) {
+      return null;
+    }
     return (
       <div
-        className={`fixed inset-0 z-[9999] flex items-start justify-center bg-black/40 dark:bg-black/50 backdrop-blur-sm px-4 pt-4 pb-4 overflow-y-auto safe-top safe-bottom safe-left safe-right transition-opacity duration-300 ${open ? 'pointer-events-auto' : 'pointer-events-none opacity-0'}`}
+        className={`fixed inset-0 z-[9999] flex items-start justify-center pt-16 sm:pt-20 bg-black/40 dark:bg-black/50 backdrop-blur-sm px-4 py-4 overflow-y-auto safe-top safe-bottom safe-left safe-right transition-opacity duration-300 ${open ? 'pointer-events-auto' : 'pointer-events-none opacity-0'}`}
         onClick={(e) => {
-          // Close when clicking outside the dialog
+          // Close when clicking on backdrop (not on dialog content)
           if (e.target === e.currentTarget) {
             setOpen(false);
             setError(null);
@@ -540,7 +558,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         }}
       >
         <div
-          className={`relative w-full ${isMobile ? 'max-w-full' : 'max-w-lg'} rounded-b-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 ${isMobile ? 'p-4' : 'p-4 sm:p-5'} mt-0 sticky top-0 max-h-[90vh] overflow-y-auto slide-down-top pointer-events-auto`}
+          className={`relative w-full ${isMobile ? 'max-w-[95vw] sm:max-w-md' : 'max-w-lg'} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl animate-in slide-in-from-top-10 duration-300 ${isMobile ? 'p-4' : 'p-5 sm:p-6'} max-h-[85vh] overflow-y-auto pointer-events-auto`}
           onClick={(e) => {
             // Prevent closing when clicking inside the dialog
             e.stopPropagation();
@@ -553,20 +571,22 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2 flex-1">
                 <h2
-                  className={`${isMobile ? 'text-xs' : 'text-sm sm:text-base'} font-bold text-gray-950 dark:text-white flex items-center gap-1.5`}
+                  className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} font-bold text-gray-950 dark:text-white flex items-center gap-1.5`}
                 >
-                  <span className={isMobile ? 'text-sm' : 'text-base'}>⚙️</span>
+                  <span className={isMobile ? 'text-xs' : 'text-sm'}>⚙️</span>
                   {isAuthenticated ? (lang === 'tr' ? 'Ayarlar' : 'Settings') : t('settings.title')}
                 </h2>
                 <span
-                  className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
+                  className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
                 >
-                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.28.8
+                  © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.29.0
                 </span>
               </div>
               <button
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   setOpen(false);
                   setError(null);
                   if (settings) {
@@ -574,7 +594,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     setDailyTarget(String(settings.dailyTarget));
                   }
                 }}
-                className={`text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-lg leading-none flex items-center justify-center ${isMobile ? 'min-h-[44px] min-w-[44px]' : 'min-h-[36px] min-w-[36px]'}`}
+                className={`text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-base leading-none flex items-center justify-center ${isMobile ? 'min-h-[44px] min-w-[44px]' : 'min-h-[36px] min-w-[36px]'} cursor-pointer`}
+                style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
                 aria-label={lang === 'tr' ? 'Kapat' : 'Close'}
                 title={lang === 'tr' ? 'Kapat' : 'Close'}
               >
@@ -583,7 +604,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
             </div>
             {!isMobile && (
               <p
-                className={`text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-0.5`}
+                className={`text-xs sm:text-xs font-medium text-gray-600 dark:text-gray-400 mt-0.5`}
               >
                 {isAuthenticated
                   ? lang === 'tr'
@@ -612,7 +633,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     <button
                       type="button"
                       onClick={handleLoginClick}
-                      className={`w-full ${isMobile ? 'px-3 py-2 text-xs' : 'px-4 py-2.5 text-sm sm:text-base'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
+                      className={`w-full ${isMobile ? 'px-3 py-2 text-xs' : 'px-4 py-2.5 text-xs sm:text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
                     >
                       {t('nav.login') || 'Login'} / {t('auth.signUp') || 'Sign Up'}
                     </button>
@@ -622,7 +643,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 {/* Name Field */}
                 <label className={`block ${isMobile ? 'space-y-1' : 'space-y-1.5'}`}>
                   <span
-                    className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-gray-700 dark:text-gray-300`}
+                    className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
                   >
                     {t('settings.nameLabel')}
                   </span>
@@ -630,7 +651,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className={`input-enhanced w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-3 py-2.5 text-base min-h-[44px]' : 'px-3 py-2 text-sm sm:px-4 sm:py-2.5 sm:text-base min-h-[44px]'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
+                    className={`input-enhanced w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-3 py-2.5 text-sm min-h-[44px]' : 'px-3 py-2 text-xs sm:px-4 sm:py-2.5 sm:text-sm min-h-[44px]'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
                     placeholder={lang === 'tr' ? 'İsminiz' : 'Your name'}
                     autoComplete="off"
                     data-form-type="other"
@@ -642,7 +663,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <div className={`grid grid-cols-2 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.goalLabel')}
                     </span>
@@ -663,7 +684,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.moodLabel')}
                     </span>
@@ -713,14 +734,16 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   >
                     {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
                   </span>
-                  <div className={`flex items-center flex-wrap ${isMobile ? 'gap-1.5' : 'gap-3'}`}>
+                  <div
+                    className={`flex items-center flex-nowrap ${isMobile ? 'gap-0.5' : 'gap-1.5'} overflow-x-auto`}
+                  >
                     <LanguageToggle />
                     <ThemeToggle />
                     <Button
                       type="button"
                       variant={reduceAnimations ? 'primary' : 'ghost'}
                       size="sm"
-                      className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                      className={`px-0.5 py-0.5 flex-shrink-0 ${isMobile ? 'text-[6px] min-h-[16px] max-w-[18px]' : 'text-[7px] sm:text-[8px] min-h-[18px]'} hover:scale-110 active:scale-95`}
                       onClick={() => setReduceAnimations(!reduceAnimations)}
                       aria-pressed={reduceAnimations}
                       title={lang === 'tr' ? 'Animasyonları Azalt' : 'Reduce Animations'}
@@ -732,7 +755,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                      className={`px-0.5 py-0.5 flex-shrink-0 ${isMobile ? 'text-[6px] min-h-[16px] max-w-[18px]' : 'text-[7px] sm:text-[8px] min-h-[18px]'} hover:scale-110 active:scale-95`}
                       onClick={async () => {
                         // Close settings dialog immediately
                         setOpen(false);
@@ -1014,7 +1037,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                      className={`px-0.5 py-0.5 flex-shrink-0 ${isMobile ? 'text-[6px] min-h-[16px] max-w-[18px]' : 'text-[7px] sm:text-[8px] min-h-[18px]'} hover:scale-110 active:scale-95`}
                       onClick={async () => {
                         if (
                           !confirm(
@@ -1110,9 +1133,9 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     className={`${isMobile ? 'mb-2 pb-1.5' : 'mb-2.5 pb-2'} border-b border-gray-200 dark:border-gray-700`}
                   >
                     <div className="flex items-center gap-1.5">
-                      <span className={isMobile ? 'text-sm' : 'text-base'}>👤</span>
+                      <span className={isMobile ? 'text-xs' : 'text-sm'}>👤</span>
                       <span
-                        className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-900 dark:text-white truncate`}
+                        className={`${isMobile ? 'text-xs' : 'text-xs'} font-semibold text-gray-900 dark:text-white truncate`}
                       >
                         {user?.displayName || settings?.name}
                       </span>
@@ -1124,7 +1147,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <div className={`grid grid-cols-2 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.goalLabel')}
                     </span>
@@ -1145,7 +1168,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                   <label className={`block ${isMobile ? 'space-y-0.5' : 'space-y-1'}`}>
                     <span
-                      className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-gray-700 dark:text-gray-300`}
+                      className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} font-semibold text-gray-700 dark:text-gray-300`}
                     >
                       {t('settings.moodLabel')}
                     </span>
@@ -1205,7 +1228,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                                 handleClearData();
                               }, 300);
                             }}
-                            className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-base flex items-center justify-center`}
+                            className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-sm flex items-center justify-center`}
                             style={
                               isMobile
                                 ? {
@@ -1551,7 +1574,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                        className={`px-0.5 py-0.5 flex-shrink-0 ${isMobile ? 'text-[6px] min-h-[16px] max-w-[18px]' : 'text-[7px] sm:text-[8px] min-h-[18px]'} hover:scale-110 active:scale-95`}
                         onClick={async () => {
                           if (
                             !confirm(
@@ -1738,7 +1761,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
             )}
 
             {error ? (
-              <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-red-500 font-medium`}>
+              <p className={`${isMobile ? 'text-xs' : 'text-xs'} text-red-500 font-medium`}>
                 {error}
               </p>
             ) : null}
@@ -1762,28 +1785,61 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   return (
     <>
       {triggerButton ? (
-        <div onClick={() => setOpen(true)} className="cursor-pointer">
+        <div
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(true);
+          }}
+          className="cursor-pointer"
+          style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
+        >
           {triggerButton}
         </div>
       ) : (
         <button
+          ref={buttonRef}
           type="button"
-          onClick={() => setOpen(true)}
+          onMouseDown={(e) => {
+            // Prevent focus but allow click
+            e.preventDefault();
+          }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(true);
+          }}
           className={`${
             isMobile
-              ? 'px-4 py-2.5 min-h-[44px] min-w-[360px] text-sm rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 gap-2 overflow-hidden max-w-[500px] sm:max-w-none font-medium'
-              : 'px-5 py-2 text-sm rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center gap-2.5 max-w-[1800px] font-medium'
+              ? 'px-3 py-2 min-h-[36px] min-w-[auto] max-w-[160px] text-xs rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 gap-1.5 overflow-hidden font-medium'
+              : 'px-5 py-2 text-xs rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center gap-2.5 max-w-[1800px] font-medium'
           } truncate`}
+          style={{
+            touchAction: 'manipulation',
+            WebkitTapHighlightColor: 'transparent',
+            pointerEvents: 'auto',
+            zIndex: 50,
+            position: 'relative',
+            cursor: 'pointer',
+          }}
           title={displayName}
           aria-label={displayName}
           data-tour-id="profile"
         >
-          <span className={`${isMobile ? 'text-sm' : 'text-sm'} truncate`}>
+          <span
+            className={`${isMobile ? 'text-xs' : 'text-xs'} truncate`}
+            style={{ pointerEvents: 'none', userSelect: 'none' }}
+          >
             {isMobile && typeof displayName === 'string' && displayName.length > 18
               ? displayName.substring(0, 18) + '...'
               : displayName}
           </span>
-          <span className={`${isMobile ? 'text-base' : 'text-sm'} flex-shrink-0`}>⚙️</span>
+          <span
+            className={`${isMobile ? 'text-sm' : 'text-xs'} flex-shrink-0`}
+            style={{ pointerEvents: 'none', userSelect: 'none' }}
+          >
+            ⚙️
+          </span>
         </button>
       )}
       {typeof window !== 'undefined' && settingsDialog
@@ -2008,12 +2064,12 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
               <div className="text-5xl sm:text-6xl animate-spin">⏳</div>
               <div className="text-center">
                 <h3
-                  className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-950 dark:text-white mb-2`}
+                  className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-white mb-2`}
                 >
                   {lang === 'tr' ? 'Çıkış yapılıyor...' : 'Logging out...'}
                 </h3>
                 <p
-                  className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-600 dark:text-gray-400`}
+                  className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400`}
                 >
                   {lang === 'tr'
                     ? 'Verileriniz buluta senkronize ediliyor, lütfen bekleyin.'
@@ -2043,7 +2099,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         >
           <div className="bg-white dark:bg-gray-900 rounded-xl border-2 border-brand/50 dark:border-brand/50 shadow-2xl max-w-2xl mx-4 max-h-[90vh] overflow-y-auto animate-scale-in">
             <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between z-10">
-              <h2 className="text-xl font-bold text-gray-950 dark:text-white">
+              <h2 className="text-lg font-bold text-gray-950 dark:text-white">
                 {lang === 'tr' ? 'Aktivite Hatırlatıcıları' : 'Activity Reminders'}
               </h2>
               <Button

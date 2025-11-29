@@ -84,9 +84,6 @@ export function Providers({ children }: { children: ReactNode }) {
                           <ToasterProvider>
                             <AutoSyncProvider>
                               <StorageErrorHandler />
-                              <Suspense fallback={null}>
-                                <InstallPrompt />
-                              </Suspense>
                               <NotificationManager />
                               <CloudSyncLoading />
                               <Suspense fallback={null}>

@@ -59,55 +59,9 @@ export const Logo = memo(function Logo() {
             </g>
           </svg>
         </div>
-        <div className="flex flex-col items-start">
-          {/* Gradient top line - smooth gradient from light to dark blue */}
-          <svg width="120" height="3" viewBox="0 0 120 3" className="mb-0.5" aria-hidden="true">
-            <defs>
-              <linearGradient id="topLineGradientMobile" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#87ceeb" />
-                <stop offset="25%" stopColor="#5dade2" />
-                <stop offset="50%" stopColor="#3498db" />
-                <stop offset="75%" stopColor="#2980b9" />
-                <stop offset="100%" stopColor="#1e6fa8" />
-              </linearGradient>
-            </defs>
-            {/* Smooth gradient line */}
-            <line
-              x1="0"
-              y1="1.5"
-              x2="120"
-              y2="1.5"
-              stroke="url(#topLineGradientMobile)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-          </svg>
-          <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-brand via-blue-500 to-brand-dark bg-clip-text text-transparent tracking-tight whitespace-nowrap">
-            SPORT TRACK
-          </span>
-          {/* Gradient finish line - smooth gradient from light to dark blue */}
-          <svg width="120" height="3" viewBox="0 0 120 3" className="mt-0.5" aria-hidden="true">
-            <defs>
-              <linearGradient id="lineGradientMobile" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#87ceeb" />
-                <stop offset="25%" stopColor="#5dade2" />
-                <stop offset="50%" stopColor="#3498db" />
-                <stop offset="75%" stopColor="#2980b9" />
-                <stop offset="100%" stopColor="#1e6fa8" />
-              </linearGradient>
-            </defs>
-            {/* Smooth gradient line */}
-            <line
-              x1="0"
-              y1="1.5"
-              x2="120"
-              y2="1.5"
-              stroke="url(#lineGradientMobile)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
+        <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-brand via-blue-500 to-brand-dark bg-clip-text text-transparent tracking-tight whitespace-nowrap">
+          SPORT TRACK
+        </span>
       </div>
     );
   }
@@ -164,55 +118,9 @@ export const Logo = memo(function Logo() {
           </g>
         </svg>
       </div>
-      <div className="flex flex-col items-start">
-        {/* Gradient top line - smooth gradient from light to dark blue */}
-        <svg width="180" height="4" viewBox="0 0 180 4" className="mb-1" aria-hidden="true">
-          <defs>
-            <linearGradient id="topLineGradientDesktop" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#87ceeb" />
-              <stop offset="25%" stopColor="#5dade2" />
-              <stop offset="50%" stopColor="#3498db" />
-              <stop offset="75%" stopColor="#2980b9" />
-              <stop offset="100%" stopColor="#1e6fa8" />
-            </linearGradient>
-          </defs>
-          {/* Smooth gradient line */}
-          <line
-            x1="0"
-            y1="2"
-            x2="180"
-            y2="2"
-            stroke="url(#topLineGradientDesktop)"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-        </svg>
-        <span className="font-bold text-2xl sm:text-3xl bg-gradient-to-r from-brand via-blue-500 via-brand-light to-brand-dark bg-clip-text text-transparent tracking-tight uppercase">
-          SPORT TRACK
-        </span>
-        {/* Gradient finish line - smooth gradient from light to dark blue */}
-        <svg width="180" height="4" viewBox="0 0 180 4" className="mt-1" aria-hidden="true">
-          <defs>
-            <linearGradient id="lineGradientDesktop" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#87ceeb" />
-              <stop offset="25%" stopColor="#5dade2" />
-              <stop offset="50%" stopColor="#3498db" />
-              <stop offset="75%" stopColor="#2980b9" />
-              <stop offset="100%" stopColor="#1e6fa8" />
-            </linearGradient>
-          </defs>
-          {/* Smooth gradient line */}
-          <line
-            x1="0"
-            y1="2"
-            x2="180"
-            y2="2"
-            stroke="url(#lineGradientDesktop)"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
+      <span className="font-bold text-2xl sm:text-3xl bg-gradient-to-r from-brand via-blue-500 via-brand-light to-brand-dark bg-clip-text text-transparent tracking-tight uppercase">
+        SPORT TRACK
+      </span>
     </div>
   );
 });

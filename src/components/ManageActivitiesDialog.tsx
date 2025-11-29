@@ -246,11 +246,13 @@ export function ManageActivitiesDialog() {
       <button
         type="button"
         onClick={openDialog}
-        className={`px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 via-purple-600 to-indigo-600 dark:from-purple-600 dark:via-purple-700 dark:to-indigo-700 text-white hover:from-purple-600 hover:via-indigo-600 hover:to-purple-600 dark:hover:from-purple-700 dark:hover:via-indigo-700 dark:hover:to-purple-700 text-xs sm:text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 ${isMobile ? 'touch-feedback mobile-press bounce-in-mobile' : 'btn-enhanced scale-on-interact'} active:scale-95 flex items-center gap-1.5`}
+        className={`px-2 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 via-purple-600 to-indigo-600 dark:from-purple-600 dark:via-purple-700 dark:to-indigo-700 text-white hover:from-purple-600 hover:via-indigo-600 hover:to-purple-600 dark:hover:from-purple-700 dark:hover:via-indigo-700 dark:hover:to-purple-700 text-xs sm:text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 ${isMobile ? 'touch-feedback mobile-press' : 'btn-enhanced scale-on-interact'} active:scale-95 flex items-center gap-1`}
         aria-label={t('activities.custom.manageButton')}
       >
-        <span className="text-sm">⚙️</span>
-        <span>{t('activities.custom.manageButton')}</span>
+        <span className="text-xs">⚙️</span>
+        <span className="text-[10px] font-bold uppercase tracking-wide">
+          {lang === 'tr' ? 'Özelleştir' : 'Customize'}
+        </span>
       </button>
       {open
         ? createPortal(
@@ -289,7 +291,14 @@ export function ManageActivitiesDialog() {
                   </button>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 px-3 sm:px-4 py-3">
-                  <form className="space-y-3" onSubmit={submit}>
+                  <form
+                    className="space-y-3"
+                    onSubmit={submit}
+                    autoComplete="off"
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
+                  >
                     {/* Activity Name - Turkish and English side by side */}
                     <div
                       className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-2`}
@@ -304,7 +313,13 @@ export function ManageActivitiesDialog() {
                           </span>
                         </label>
                         <input
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore="true"
+                          data-form-type="other"
+                          name="label"
                           type="text"
+                          name="label"
                           value={lang === 'tr' ? form.label : form.labelEn}
                           onChange={(e) => {
                             if (lang === 'tr') {
@@ -341,7 +356,13 @@ export function ManageActivitiesDialog() {
                           </span>
                         </label>
                         <input
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore="true"
+                          data-form-type="other"
+                          name="labelEn"
                           type="text"
+                          name="labelEn"
                           value={lang === 'tr' ? form.labelEn : form.label}
                           onChange={(e) => {
                             if (lang === 'tr') {
@@ -369,8 +390,14 @@ export function ManageActivitiesDialog() {
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                         {t('activities.custom.fields.icon')}
                         <input
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore="true"
+                          data-form-type="other"
+                          name="icon"
                           type="text"
                           maxLength={4}
+                          name="icon"
                           value={form.icon}
                           onChange={(e) => setForm((prev) => ({ ...prev, icon: e.target.value }))}
                           className="mt-1 w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1.5 text-sm bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 input-enhanced"
@@ -381,9 +408,15 @@ export function ManageActivitiesDialog() {
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                         {t('activities.custom.fields.multiplier')}
                         <input
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore="true"
+                          data-form-type="other"
+                          name="multiplier"
                           type="number"
                           min={0.1}
                           step={0.1}
+                          name="multiplier"
                           value={form.multiplier}
                           onChange={(e) =>
                             setForm((prev) => ({
@@ -398,9 +431,15 @@ export function ManageActivitiesDialog() {
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                         {t('activities.custom.fields.defaultAmount')}
                         <input
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore="true"
+                          data-form-type="other"
+                          name="defaultAmount"
                           type="number"
                           min={1}
                           step={1}
+                          name="defaultAmount"
                           value={form.defaultAmount}
                           onChange={(e) =>
                             setForm((prev) => ({
@@ -428,7 +467,13 @@ export function ManageActivitiesDialog() {
                           </span>
                         </label>
                         <input
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore="true"
+                          data-form-type="other"
+                          name="unit"
                           type="text"
+                          name="unit"
                           value={lang === 'tr' ? form.unit : form.unitEn}
                           onChange={(e) => {
                             if (lang === 'tr') {
@@ -463,7 +508,13 @@ export function ManageActivitiesDialog() {
                           </span>
                         </label>
                         <input
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore="true"
+                          data-form-type="other"
+                          name="unitEn"
                           type="text"
+                          name="unitEn"
                           value={lang === 'tr' ? form.unitEn : form.unit}
                           onChange={(e) => {
                             if (lang === 'tr') {
@@ -498,6 +549,12 @@ export function ManageActivitiesDialog() {
                           </span>
                         </label>
                         <textarea
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore="true"
+                          data-form-type="other"
+                          name="description"
+                          name="description"
                           value={lang === 'tr' ? form.description : form.descriptionEn}
                           onChange={(e) => {
                             if (lang === 'tr') {
@@ -526,6 +583,12 @@ export function ManageActivitiesDialog() {
                           </span>
                         </label>
                         <textarea
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore="true"
+                          data-form-type="other"
+                          name="descriptionEn"
+                          name="descriptionEn"
                           value={lang === 'tr' ? form.descriptionEn : form.description}
                           onChange={(e) => {
                             if (lang === 'tr') {

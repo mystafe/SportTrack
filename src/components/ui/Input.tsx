@@ -228,6 +228,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             aria-describedby={
               error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
             }
+            autoComplete="off"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-form-type="other"
             {...props}
           />
           {iconRight && (

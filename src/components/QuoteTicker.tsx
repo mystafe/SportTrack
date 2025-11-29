@@ -5,7 +5,11 @@ import { getRandomQuote, type Quote } from '@/lib/quotes';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
-export function QuoteTicker() {
+interface QuoteTickerProps {
+  position?: 'fixed' | 'static';
+}
+
+export function QuoteTicker({ position = 'fixed' }: QuoteTickerProps) {
   const { lang } = useI18n();
   const isMobile = useIsMobile();
   const [quotes, setQuotes] = useState<Quote[]>([]);
@@ -16,7 +20,9 @@ export function QuoteTicker() {
   const usedQuotesRef = useRef<Set<string>>(new Set());
   const lastUpdateRef = useRef<number>(0);
 
-  // Function to get a unique random quote
+  const isFixed = position === 'fixed';
+
+  // ... existing logic ...
   const getUniqueRandomQuote = useCallback((): Quote => {
     let newQuote = getRandomQuote();
     let attempts = 0;
@@ -86,42 +92,55 @@ export function QuoteTicker() {
   if (!mounted || quotes.length === 0) return null;
 
   // Calculate bottom position: EXACTLY on top of BottomNavigation - ZERO gap
-  // BottomNavigation: h-12 (48px) + paddingBottom (safe-area)
+  // BottomNavigation: h-12 (48px) + paddingBottom (safe-area + 4px)
   // QuoteTicker must sit EXACTLY at BottomNavigation's top edge with NO gap
-  // BottomNavigation has paddingBottom: env(safe-area-inset-bottom)
-  // So QuoteTicker bottom should be: 48px (BottomNavigation content height)
-  // NO safe-area-inset-bottom here - BottomNavigation handles it
-  // AGGRESSIVE: Force exact position
-  const bottomPosition = isMobile ? '48px' : 'max(28px, env(safe-area-inset-bottom, 0px))';
+  // So QuoteTicker bottom should be: 52px + safe-area
+  const bottomPosition = isMobile
+    ? 'calc(52px + env(safe-area-inset-bottom, 20px))'
+    : 'max(28px, env(safe-area-inset-bottom, 0px))';
 
-  return (
-    <div
-      ref={containerRef}
-      className={`fixed left-0 right-0 z-[45] bg-gradient-to-r from-brand/20 via-brand/15 to-brand/20 dark:from-brand/30 dark:via-brand/20 dark:to-brand/30 overflow-hidden shadow-md backdrop-blur-md`}
-      style={{
-        bottom: isMobile ? '48px' : bottomPosition,
+  const containerStyle = isFixed
+    ? {
+        bottom: bottomPosition,
         margin: 0,
         padding: 0,
         height: isMobile ? '20px' : '24px',
         minHeight: isMobile ? '20px' : '24px',
         maxHeight: isMobile ? '20px' : '24px',
-        boxSizing: 'border-box',
+        boxSizing: 'border-box' as const,
         lineHeight: isMobile ? '20px' : '24px',
         borderTop: 'none',
         borderBottom: 'none',
         transform: 'translateZ(0)',
         willChange: 'transform',
-        position: 'fixed',
+        position: 'fixed' as const,
         left: 0,
         right: 0,
-        zIndex: 45,
+        zIndex: 998,
         top: 'auto',
-        // AGGRESSIVE: Force no gap - sit directly on BottomNavigation
         marginBottom: 0,
         paddingBottom: 0,
         marginTop: 0,
         paddingTop: 0,
-      }}
+      }
+    : {
+        margin: 0,
+        padding: 0,
+        height: isMobile ? '20px' : '24px',
+        minHeight: isMobile ? '20px' : '24px',
+        maxHeight: isMobile ? '20px' : '24px',
+        boxSizing: 'border-box' as const,
+        lineHeight: isMobile ? '20px' : '24px',
+        width: '100%',
+        position: 'relative' as const,
+        zIndex: 1,
+      };
+
+  return (
+    <div
+      ref={containerRef}
+      className={`${isFixed ? 'fixed left-0 right-0 z-[998]' : 'relative w-full'} bg-gradient-to-r from-brand/20 via-brand/15 to-brand/20 dark:from-brand/30 dark:via-brand/20 dark:to-brand/30 overflow-hidden shadow-md backdrop-blur-md`}
+      style={containerStyle}
     >
       <div
         className="relative w-full flex items-center justify-center"

@@ -149,6 +149,10 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           aria-describedby={
             error ? `${textareaId}-error` : helperText ? `${textareaId}-helper` : undefined
           }
+          autoComplete="off"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          data-form-type="other"
           {...props}
         />
         {error && (

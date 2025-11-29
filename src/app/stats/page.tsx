@@ -35,9 +35,7 @@ const ActivityBarChart = lazy(() =>
 const ActivityPieChart = lazy(() =>
   import('@/components/charts/ActivityPieChart').then((m) => ({ default: m.ActivityPieChart }))
 );
-const ActivityHeatmap = lazy(() =>
-  import('@/components/charts/ActivityHeatmap').then((m) => ({ default: m.default }))
-);
+const ActivityHeatmap = lazy(() => import('@/components/charts/ActivityHeatmap'));
 const PersonalRecords = lazy(() =>
   import('@/components/PersonalRecords').then((m) => ({ default: m.PersonalRecords }))
 );

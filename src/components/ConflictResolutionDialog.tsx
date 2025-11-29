@@ -400,7 +400,7 @@ export function ConflictResolutionDialog({
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10025] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom`}
+      className={`fixed inset-0 z-[10025] flex ${isMobile ? 'items-start pt-28 px-4' : 'items-center justify-center pt-20'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-top`}
       onClick={(e) => {
         // Only close if clicking the backdrop, not the card content
         if (e.target === e.currentTarget) {
@@ -414,7 +414,7 @@ export function ConflictResolutionDialog({
       <Card
         variant="elevated"
         size="md"
-        className={`${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-xl max-w-3xl w-full mx-4'} animate-scale-in`}
+        className={`${isMobile ? 'rounded-xl w-full max-h-[85vh] overflow-y-auto' : 'rounded-xl max-w-3xl w-full mx-4'} animate-scale-in`}
         onClick={(e) => {
           // Prevent clicks inside card from closing dialog
           e.stopPropagation();

@@ -53,54 +53,30 @@ export const BottomNavigation = memo(function BottomNavigation() {
   if (!isMobile) return null;
 
   return (
-    <>
-      <QuoteTicker />
+    <div
+      className="fixed bottom-0 left-0 right-0 z-[9999] flex flex-col shadow-[0_-4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] transition-transform duration-300 overflow-hidden"
+      style={{
+        willChange: 'transform',
+        transform: 'translateZ(0)',
+        top: 'auto',
+        height: 'auto',
+        maxHeight: '200px', // Prevent it from taking full screen height
+      }}
+    >
+      <QuoteTicker position="static" />
       <nav
-        className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-white via-white to-white/95 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]"
+        className="w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800"
         style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          willChange: 'transform',
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-          marginTop: 0,
-          paddingTop: 0,
-          marginBottom: 0,
-          transform: 'translateZ(0)',
-          borderTop: 'none',
-          height: 'calc(48px + env(safe-area-inset-bottom, 0px))',
-          minHeight: 'calc(48px + env(safe-area-inset-bottom, 0px))',
-          maxHeight: 'calc(48px + env(safe-area-inset-bottom, 0px))',
+          height: 'auto',
+          minHeight: 'auto',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 4px)', // Safe area + extra padding
           boxSizing: 'border-box',
         }}
         role="navigation"
         aria-label={t('nav.main')}
       >
-        <div
-          className="container mx-auto px-1 safe-left safe-right"
-          style={{
-            marginTop: 0,
-            paddingTop: 0,
-            marginBottom: 0,
-            height: '48px',
-            boxSizing: 'border-box',
-          }}
-        >
-          <div
-            className="flex items-center justify-around h-12"
-            style={{
-              marginTop: 0,
-              paddingTop: 0,
-              marginBottom: 0,
-              height: '48px',
-              minHeight: '48px',
-              maxHeight: '48px',
-              boxSizing: 'border-box',
-              lineHeight: '48px',
-            }}
-          >
+        <div className="container mx-auto px-1 safe-left safe-right">
+          <div className="flex items-center justify-around h-12">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -154,6 +130,6 @@ export const BottomNavigation = memo(function BottomNavigation() {
           </div>
         </div>
       </nav>
-    </>
+    </div>
   );
 });

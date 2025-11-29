@@ -107,7 +107,11 @@ export default function HomePage() {
   }, [motivationalMessage, mounted]);
 
   return (
-    <main className="space-y-4 sm:space-y-6" role="main" aria-label={t('header.overviewTitle')}>
+    <div
+      className="space-y-4 sm:space-y-6 w-full"
+      role="main"
+      aria-label={t('header.overviewTitle')}
+    >
       {/* Hero Section with Gradient Background */}
       <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-brand via-brand-dark to-purple-600 dark:from-brand dark:via-brand-dark dark:to-purple-700 p-6 sm:p-8 shadow-2xl hero-entrance">
         {/* Animated background pattern */}
@@ -347,6 +351,6 @@ export default function HomePage() {
           </Suspense>
         </Accordion>
       </div>
-    </main>
+    </div>
   );
 }

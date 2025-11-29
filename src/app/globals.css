@@ -197,7 +197,7 @@ html.dark {
 html,
 body {
   /* Improve touch responsiveness on mobile */
-  touch-action: manipulation;
+  touch-action: pan-y; /* Enable vertical scrolling for pull-to-refresh */
   -webkit-tap-highlight-color: transparent;
   height: 100%;
   margin: 0;
@@ -1310,25 +1310,41 @@ html {
 /* Mobile: Fixed header and bottom nav, scrollable content */
 @media (max-width: 768px) {
   body {
-    overflow-y: hidden !important;
-    height: 100vh !important;
-    position: fixed;
+    min-height: 100vh !important;
+    position: relative !important;
     width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    /* touch-action: none !important; REMOVED: Allow touch events to reach main-content */
   }
 
   #main-content.mobile-scroll-area {
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: calc(100vh - 56px - 48px - 20px - env(safe-area-inset-bottom, 0px));
-    max-height: calc(100vh - 56px - 48px - 20px - env(safe-area-inset-bottom, 0px));
-    -webkit-overflow-scrolling: touch;
+    /* overflow-y: auto !important; REMOVED: Let window handle scrolling */
+    overflow-x: hidden !important;
+    flex: 1 !important;
+    min-height: 100vh !important; /* Ensure full height */
+    height: auto !important;
+    -webkit-overflow-scrolling: touch !important;
     padding-top: calc(56px + 2px) !important; /* Header height (h-14 = 56px) + border */
     padding-bottom: calc(
-      48px + 20px + env(safe-area-inset-bottom, 0px)
-    ) !important; /* BottomNavigation (h-12 = 48px) + QuoteTicker (20px) + safe-area */
+      76px + env(safe-area-inset-bottom)
+    ) !important; /* Safe area handled dynamically */
     margin-bottom: 0 !important;
     box-sizing: border-box !important;
+    /* Force main-content to fill available space - no gaps */
+    position: relative !important;
+    /* Enable pull-to-refresh */
+    /* overscroll-behavior-y: auto !important; Let body handle it */
+    overscroll-behavior-x: contain !important;
+    touch-action: pan-y !important; /* Enable vertical touch scrolling */
+    pointer-events: auto !important;
   }
+
+  /* ULTRA AGGRESSIVE: Ensure body doesn't create extra space below main-content */
+  /* REMOVED: Aggressive styles that were preventing scroll on mobile */
 
   /* Remove ANY gaps between QuoteTicker and BottomNavigation */
   div[class*='z-[45]'] {
@@ -1468,7 +1484,9 @@ html {
     }
 
     /* ULTRA AGGRESSIVE: Remove ALL gaps between QuoteTicker and BottomNavigation */
-    div[class*='z-[45]'] {
+    /* Force QuoteTicker to sit EXACTLY on BottomNavigation with ZERO gap */
+    div[class*='z-[45]'],
+    div[class*='z-[45]'][style*='bottom: 48px'] {
       bottom: 48px !important;
       margin-bottom: 0 !important;
       padding-bottom: 0 !important;
@@ -1481,6 +1499,10 @@ html {
       min-height: 20px !important;
       line-height: 20px !important;
       box-sizing: border-box !important;
+      /* Force exact positioning */
+      position: fixed !important;
+      left: 0 !important;
+      right: 0 !important;
     }
 
     div[class*='z-[45]'] > div,
@@ -1496,48 +1518,72 @@ html {
       border-bottom: none !important;
     }
 
-    nav[class*='z-50'] {
-      margin-top: 0 !important;
-      padding-top: 0 !important;
-      border-top: none !important;
-    }
-
-    /* Force QuoteTicker to sit EXACTLY on BottomNavigation */
-    div[class*='z-[45]'][style*='bottom: 48px'] {
-      bottom: 48px !important;
-    }
-
+    nav[class*='z-50'],
     nav[class*='z-50'][style*='bottom: 0'] {
       margin-top: 0 !important;
       padding-top: 0 !important;
       border-top: none !important;
     }
 
-    /* ULTRA AGGRESSIVE: Force FloatingAddButton visibility */
+    /* Remove any potential gap between QuoteTicker and BottomNavigation */
+    div[class*='z-[45]'] + nav[class*='z-50'],
+    div[class*='z-[45]'] ~ nav[class*='z-50'] {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+      border-top: none !important;
+    }
+
+    /* ULTRA AGGRESSIVE: Force FloatingAddButton visibility - HIGHEST Z-INDEX */
+    div[class*='z-[9999]'],
     div[class*='z-[70]'],
+    div[style*='zIndex: 9999'],
     div[style*='zIndex: 70'],
-    div[style*='z-index: 70'] {
-      z-index: 70 !important;
+    div[style*='z-index: 9999'],
+    div[style*='z-index: 70'],
+    div[class*='fixed'][class*='right'] {
+      z-index: 9999 !important;
       pointer-events: auto !important;
       opacity: 1 !important;
       visibility: visible !important;
       display: flex !important;
       position: fixed !important;
+      touch-action: manipulation !important;
     }
 
     /* Force all children of FloatingAddButton to be visible */
+    div[class*='z-[9999]'] *,
     div[class*='z-[70]'] *,
+    div[style*='zIndex: 9999'] *,
     div[style*='zIndex: 70'] *,
-    div[style*='z-index: 70'] * {
+    div[style*='z-index: 9999'] *,
+    div[style*='z-index: 70'] *,
+    div[class*='fixed'][class*='right'] * {
       opacity: 1 !important;
       visibility: visible !important;
       pointer-events: auto !important;
     }
 
     /* Remove any overlay or backdrop that might hide the button */
+    div[class*='z-[9999]']::before,
+    div[class*='z-[9999]']::after,
     div[class*='z-[70]']::before,
     div[class*='z-[70]']::after {
       display: none !important;
+    }
+
+    /* Ensure FloatingAddButton Link is clickable */
+    div[class*='z-[9999]'] a,
+    div[class*='z-[70]'] a,
+    div[style*='zIndex: 9999'] a,
+    div[style*='zIndex: 70'] a,
+    div[class*='fixed'][class*='right'] a {
+      pointer-events: auto !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      z-index: 10000 !important;
+      position: relative !important;
+      touch-action: manipulation !important;
+      -webkit-tap-highlight-color: transparent !important;
     }
   }
 
@@ -1762,8 +1808,37 @@ html {
   }
 
   /* Enable pull-to-refresh on mobile */
-  main {
-    overscroll-behavior-y: auto;
+  main,
+  #main-content.mobile-scroll-area {
+    /* overscroll-behavior-y: auto !important; */
+    overscroll-behavior-x: contain !important;
+    touch-action: pan-y !important; /* Enable vertical touch scrolling */
+    -webkit-overflow-scrolling: touch !important;
+    /* overflow-y: auto !important; REMOVED */
+  }
+
+  /* Ensure all buttons are clickable */
+  button,
+  a,
+  [role='button'],
+  [onclick],
+  button[data-tour-id='profile'],
+  button[aria-label*='Settings'],
+  button[aria-label*='Ayarlar'] {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    pointer-events: auto !important;
+    z-index: 9999 !important;
+    position: relative !important;
+    cursor: pointer !important;
+  }
+
+  /* Force main-content to be scrollable */
+  #main-content.mobile-scroll-area {
+    /* overflow-y: auto !important; REMOVED */
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    pointer-events: auto !important;
   }
 }
 

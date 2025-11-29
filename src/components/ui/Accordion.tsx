@@ -25,7 +25,7 @@ export function Accordion({
 
   return (
     <div
-      className={`rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden transition-all duration-300 hover:border-brand/50 dark:hover:border-brand/50 hover:shadow-lg ${className}`}
+      className={`rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden transition-all duration-300 hover:border-brand/50 dark:hover:border-brand/50 hover:shadow-lg relative z-0 ${className}`}
     >
       <button
         type="button"
@@ -81,8 +81,8 @@ export function Accordion({
         aria-labelledby={`accordion-button-${typeof title === 'string' ? title.replace(/\s+/g, '-').toLowerCase() : 'accordion'}`}
         aria-hidden={!isOpen}
         className={`transition-all duration-300 ease-in-out ${
-          isOpen ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'
-        } overflow-hidden`}
+          isOpen ? 'h-auto opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+        }`}
       >
         <div
           className={`${variant === 'compact' ? (isMobile ? 'p-3 pt-2' : 'p-3 sm:p-4 pt-2 sm:pt-3') : isMobile ? 'p-4' : 'p-4 sm:p-5'}`}

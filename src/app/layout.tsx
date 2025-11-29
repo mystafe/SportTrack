@@ -7,6 +7,7 @@ import { Header } from '@/components/Header';
 import { FloatingAddButton } from '@/components/FloatingAddButton';
 import { QuoteTicker } from '@/components/QuoteTicker';
 import { SkipLink } from '@/components/SkipLink';
+import { ScrollHandler } from '@/components/ScrollHandler';
 
 export const metadata = {
   title: 'SportTrack',
@@ -66,9 +67,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body
         className="min-h-screen h-full bg-white dark:bg-black overflow-x-hidden safe-top safe-bottom"
+        data-lpignore="true"
+        data-1p-ignore="true"
         style={{
-          overflowY: 'hidden',
-          height: '100vh',
+          minHeight: '100vh',
+          margin: 0,
+          padding: 0,
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
         }}
         suppressHydrationWarning
       >
@@ -206,6 +213,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         <Providers>
           <SkipLink />
+          <ScrollHandler />
           <div
             id="aria-live-region"
             className="sr-only"
@@ -216,17 +224,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Header />
           <main
             id="main-content"
-            className="mobile-scroll-area"
+            className="mobile-scroll-area outline-none"
+            tabIndex={-1}
             style={{
               paddingTop: 'calc(56px + 2px)',
-              paddingBottom: 'calc(48px + 20px + env(safe-area-inset-bottom, 0px))',
+              paddingBottom: 'calc(76px + env(safe-area-inset-bottom))', // Safe area + BottomNav + QuoteTicker
               paddingLeft: '1rem',
               paddingRight: '1rem',
               marginBottom: 0,
               boxSizing: 'border-box',
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              minHeight: '100vh', // Ensure full height for background
+              touchAction: 'pan-y',
+              WebkitOverflowScrolling: 'touch',
             }}
             role="main"
             aria-label="Main content"
+            data-lpignore="true"
+            data-1p-ignore="true"
           >
             {children}
           </main>

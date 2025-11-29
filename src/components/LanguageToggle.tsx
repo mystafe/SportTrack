@@ -14,14 +14,14 @@ export function LanguageToggle() {
   ];
 
   return (
-    <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5">
+    <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5 flex-shrink-0">
       {options.map((opt) => (
         <Button
           key={opt.code}
           type="button"
           variant={lang === opt.code ? 'primary' : 'ghost'}
           size="sm"
-          className="px-1 py-0.5 text-[7px] sm:text-[9px] min-h-[20px] sm:min-h-[22px] hover:scale-110 active:scale-95"
+          className="px-1 py-0.5 text-[6px] sm:text-[7px] min-h-[16px] sm:min-h-[18px] hover:scale-110 active:scale-95"
           onClick={() => {
             setLang(opt.code);
             // ALWAYS save to settings store (even if settings is null, it will create default settings)

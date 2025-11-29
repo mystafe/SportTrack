@@ -6,7 +6,6 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useI18n } from '@/lib/i18n';
 import { useUIState } from '@/lib/uiState';
 import { useGlobalDialogState } from '@/lib/globalDialogState';
-import { useState, useEffect } from 'react';
 
 export function FloatingAddButton() {
   const isMobile = useIsMobile();
@@ -14,57 +13,33 @@ export function FloatingAddButton() {
   const pathname = usePathname();
   const { hideFloatingAddButton } = useUIState();
   const { hasAnyDialogOpen } = useGlobalDialogState();
-  const [settingsOpen, setSettingsOpen] = useState(false);
-
-  // Check if Settings Dialog is open
-  useEffect(() => {
-    const checkSettingsOpen = () => {
-      const settingsDialog = document.querySelector('[class*="z-[9999]"]');
-      const isOpen = settingsDialog && window.getComputedStyle(settingsDialog).display !== 'none';
-      setSettingsOpen(!!isOpen);
-    };
-
-    const observer = new MutationObserver(checkSettingsOpen);
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class', 'style'],
-    });
-    checkSettingsOpen();
-
-    const interval = setInterval(checkSettingsOpen, 100);
-    return () => {
-      observer.disconnect();
-      clearInterval(interval);
-    };
-  }, []);
+  // SettingsDialog manual check removed
 
   // Hide button on /add page, when editing/deleting, or when any dialog is open
-  if (pathname === '/add' || hideFloatingAddButton || settingsOpen || hasAnyDialogOpen) {
+  if (pathname === '/add' || hideFloatingAddButton || hasAnyDialogOpen) {
     return null;
   }
 
   // Calculate position above QuoteTicker - just above scrolling text
-  // BottomNavigation: 48px + safe-area + QuoteTicker: 20px + spacing: 8px
-  // For iPhone 17 Pro Max: safe-area-inset-bottom is typically 34px
-  const bottomOffset = isMobile
-    ? `calc(48px + 20px + 8px + env(safe-area-inset-bottom, 0px))`
-    : '122px';
+  // BottomNavigation (52px + safe-area) + QuoteTicker (20px) + spacing (8px)
+  // Total bottom offset: 80px + safe-area -> Increased to 100px to be safe
+  const bottomOffset = isMobile ? `calc(100px + env(safe-area-inset-bottom, 20px))` : '122px';
 
   return (
     <div
-      className={`fixed right-4 sm:right-6 z-[70] transition-all duration-500 ease-in-out flex flex-col items-center gap-2`}
+      className={`fixed right-4 sm:right-6 z-[10001] transition-all duration-500 ease-in-out flex flex-col items-center gap-2`}
       style={{
         willChange: 'opacity, transform',
         position: 'fixed',
         bottom: bottomOffset,
-        zIndex: 70,
+        zIndex: 10001, // Increased to stay above BottomNavigation (9999) and possibly Dialogs
         pointerEvents: 'auto',
         opacity: 1,
         visibility: 'visible',
         display: 'flex',
         right: isMobile ? '1rem' : '1.5rem',
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent',
       }}
     >
       {/* Add Exercise Button */}

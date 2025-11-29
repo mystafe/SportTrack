@@ -173,14 +173,14 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10020] flex ${isMobile ? 'items-start pt-8' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-top`}
+      className={`fixed inset-0 z-[10020] flex ${isMobile ? 'items-start pt-28' : 'items-center justify-center pt-20'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-top overflow-x-hidden`}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="export-dialog-title"
     >
       <div
-        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-xl w-full max-h-[85vh] overflow-y-auto' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4'} border-2 border-gray-200 dark:border-gray-700 animate-scale-in`}
+        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-xl w-full max-h-[85vh] overflow-y-auto overflow-x-hidden' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4'} border-2 border-gray-200 dark:border-gray-700 animate-scale-in`}
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
@@ -200,31 +200,33 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
             <label className="block text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1.5">
               {t('export.format')}
             </label>
-            <div className={`flex ${isMobile ? 'flex-row' : 'flex-row'} gap-1.5`}>
+            <div
+              className={`flex ${isMobile ? 'flex-row' : 'flex-row'} gap-1 ${isMobile ? 'text-xs' : ''}`}
+            >
               <Button
                 type="button"
                 variant={exportFormat === 'csv' ? 'primary' : 'outline'}
-                size={isMobile ? 'sm' : 'md'}
+                size={isMobile ? 'xs' : 'sm'}
                 onClick={() => setExportFormat('csv')}
-                className="flex-1"
+                className={`flex-1 ${isMobile ? 'text-[10px] px-2 py-1' : ''}`}
               >
                 CSV
               </Button>
               <Button
                 type="button"
                 variant={exportFormat === 'pdf' ? 'primary' : 'outline'}
-                size={isMobile ? 'sm' : 'md'}
+                size={isMobile ? 'xs' : 'sm'}
                 onClick={() => setExportFormat('pdf')}
-                className="flex-1"
+                className={`flex-1 ${isMobile ? 'text-[10px] px-2 py-1' : ''}`}
               >
                 PDF
               </Button>
               <Button
                 type="button"
                 variant={exportFormat === 'json' ? 'primary' : 'outline'}
-                size={isMobile ? 'sm' : 'md'}
+                size={isMobile ? 'xs' : 'sm'}
                 onClick={() => setExportFormat('json')}
-                className="flex-1"
+                className={`flex-1 ${isMobile ? 'text-[10px] px-2 py-1' : ''}`}
               >
                 JSON
               </Button>
@@ -370,25 +372,27 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
 
           {/* Actions */}
           <div
-            className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-3'}`}
+            className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-2'}`}
           >
             <Button
               type="button"
               variant="outline"
-              size={isMobile ? 'sm' : 'md'}
+              size={isMobile ? 'xs' : 'sm'}
               onClick={onClose}
               fullWidth={isMobile}
+              className={isMobile ? 'text-xs px-3 py-1.5' : ''}
             >
               {t('form.cancel')}
             </Button>
             <Button
               type="button"
               variant="primary"
-              size={isMobile ? 'sm' : 'md'}
+              size={isMobile ? 'xs' : 'sm'}
               onClick={handleExport}
               disabled={isExporting}
               loading={isExporting}
               fullWidth={isMobile}
+              className={isMobile ? 'text-xs px-3 py-1.5' : ''}
             >
               {t('export.export')}
             </Button>

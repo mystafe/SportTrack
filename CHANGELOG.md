@@ -2,6 +2,41 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.30.0] - 2025-01
+
+### Added
+
+- **Scroll Handler System**: New component for automatic focus management on page transitions
+  - Automatic focus on main content area when navigating between pages
+  - Improved keyboard navigation with arrow keys
+  - Enhanced touch scroll experience on mobile devices
+
+### Changed
+
+- **Dialog Positions**: Conflict Resolution and Export dialogs now start higher on mobile (`pt-28`)
+- **Settings Dialog Buttons**: All display settings buttons are now smaller and fit on a single row
+  - Button sizes reduced: `text-[6px]`, `min-h-[16px]`, `max-w-[18px]` on mobile
+  - Changed from `flex-wrap` to `flex-nowrap` to keep buttons in one row
+  - Reduced gap values (`gap-0.5`)
+- **Activities Page**: Increased spacing between "Egzersizler" and "Kayıtlar" accordions
+  - Mobile: `mt-6` (24px)
+  - Desktop: `mt-8` (32px)
+
+### Fixed
+
+- **Accordion Z-Index**: Fixed accordion menus appearing above header during scroll
+  - Set accordion z-index to `z-0` to ensure header always stays on top
+- **Export Dialog Overflow**: Fixed horizontal scroll issues in Export dialog
+  - Added `overflow-x-hidden` to prevent horizontal scrolling
+  - Reduced button sizes for better fit
+- **Conflict Resolution Dialog**: Fixed dialog appearing below header
+  - Adjusted positioning with proper top padding
+- **Settings Dialog Buttons**: Fixed buttons overflowing and wrapping to new line
+  - All buttons now fit on single row with optimized sizing
+- **Scroll Issues**: Fixed keyboard and touch scroll problems
+  - Added password manager ignore attributes to prevent interference
+  - Improved touch-action handling for better mobile scroll
+
 ## [0.21.1] - 2025-01
 
 ### Fixed

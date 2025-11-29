@@ -41,10 +41,25 @@ export function CloudSyncLoading() {
     checkSyncStatus();
 
     // Check periodically
-    const interval = setInterval(checkSyncStatus, 100);
+    const interval = setInterval(checkSyncStatus, 500); // Reduced frequency
 
-    return () => clearInterval(interval);
-  }, [isAuthenticated, isConfigured, lang]);
+    // Force close after 10 seconds to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (showLoading) {
+        console.warn('Sync loading timed out, forcing close');
+        setShowLoading(false);
+        // Force clear the stuck flag
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('sporttrack_sync_in_progress');
+        }
+      }
+    }, 10000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [isAuthenticated, isConfigured, lang, showLoading]);
 
   if (!showLoading) return null;
 
