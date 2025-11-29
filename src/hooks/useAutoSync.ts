@@ -18,6 +18,7 @@ const INITIAL_SYNC_COMPLETE_KEY = 'sporttrack_initial_sync_complete';
 const CONFLICT_STORAGE_KEY = 'sporttrack_sync_conflict';
 const LAST_ACTIVITY_ADDED_KEY = 'sporttrack_last_activity_added';
 const LAST_SYNC_TIME_KEY = 'sporttrack_last_sync_time';
+const PERIODIC_CHECK_INTERVAL_MS = 30000; // 30 seconds
 
 // Use batch sync instead of immediate sync - changes are batched and sent once per minute
 // No debounce needed - batch sync handles timing
