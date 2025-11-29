@@ -1683,9 +1683,11 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     <NotificationSettings />
                   </div>
 
-                  <div>
+                  <div
+                    className={`flex items-center flex-nowrap ${isMobile ? 'gap-0.5' : 'gap-1.5'} overflow-x-auto`}
+                  >
                     <span
-                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
+                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 whitespace-nowrap flex-shrink-0`}
                     >
                       {lang === 'tr' ? 'Aktivite Hatırlatıcıları' : 'Activity Reminders'}
                     </span>
@@ -1693,7 +1695,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                      className={`px-0.5 py-0.5 flex-shrink-0 ${isMobile ? 'text-[6px] min-h-[16px] max-w-[18px]' : 'text-[7px] sm:text-[8px] min-h-[18px]'} hover:scale-110 active:scale-95`}
                       onClick={() => {
                         setOpen(false);
                         setTimeout(() => {
