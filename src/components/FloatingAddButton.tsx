@@ -40,6 +40,7 @@ export function FloatingAddButton() {
         right: isMobile ? '1rem' : '1.5rem',
         touchAction: 'manipulation',
         WebkitTapHighlightColor: 'transparent',
+        paddingBottom: isMobile ? '1rem' : '1.5rem', // Add padding to prevent overlap with scrolling text
       }}
     >
       {/* Add Exercise Button */}

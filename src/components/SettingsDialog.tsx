@@ -584,14 +584,14 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                   <span
                     className={`${isMobile ? 'text-xs' : 'text-xs sm:text-xs'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-2`}
                   >
-                    © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.30.1
+                    © {new Date().getFullYear()} · Mustafa Evleksiz · Beta v0.30.2
                   </span>
                 )}
                 {!isAuthenticated && (
                   <span
                     className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-gray-400 dark:text-gray-500 font-normal whitespace-nowrap ml-1 flex-shrink-0`}
                   >
-                    v0.30.1
+                    v0.30.2
                   </span>
                 )}
               </div>
@@ -746,15 +746,19 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                 {/* Language & Theme & Reduce Animations */}
                 <div
-                  className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700`}
+                  className={`${isMobile ? 'pt-1' : 'pt-1.5'} border-t border-gray-200 dark:border-gray-700`}
                 >
-                  <span
-                    className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
-                  >
-                    {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
-                  </span>
                   <div
-                    className={`flex items-center flex-nowrap ${isMobile ? 'gap-0.5' : 'gap-1.5'} overflow-x-auto`}
+                    className={`flex items-center justify-between gap-2 ${isMobile ? 'mb-1' : 'mb-1.5'}`}
+                  >
+                    <span
+                      className={`${isMobile ? 'text-[10px]' : 'text-[9px] sm:text-[10px]'} font-medium text-gray-600 dark:text-gray-300 whitespace-nowrap flex-shrink-0`}
+                    >
+                      {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
+                    </span>
+                  </div>
+                  <div
+                    className={`flex items-center flex-nowrap ${isMobile ? 'gap-0.5' : 'gap-1'} overflow-x-auto`}
                   >
                     <LanguageToggle />
                     <ThemeToggle />
@@ -1217,11 +1221,11 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                 {/* App Settings Section */}
                 <div
-                  className={`${isMobile ? 'pt-2 space-y-1.5' : 'pt-2.5 space-y-2.5'} border-t border-gray-200 dark:border-gray-700`}
+                  className={`${isMobile ? 'pt-1.5 space-y-1' : 'pt-2 space-y-1.5'} border-t border-gray-200 dark:border-gray-700`}
                 >
                   <div>
                     <span
-                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
+                      className={`${isMobile ? 'text-[10px]' : 'text-[9px] sm:text-[10px]'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1' : 'mb-1.5'}`}
                     >
                       {lang === 'tr' ? 'Veri İşlemleri' : 'Data Operations'}
                     </span>
@@ -1235,56 +1239,21 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                           <DataExportImport onSettingsClose={() => setOpen(false)} />
                         </Suspense>
                       )}
-                      {isAuthenticated && (
-                        <>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size={isMobile ? 'md' : 'sm'}
-                            onClick={() => {
-                              setOpen(false);
-                              setTimeout(() => {
-                                handleClearData();
-                              }, 300);
-                            }}
-                            className={`${isMobile ? 'px-2 py-2' : 'px-1.5'} text-sm flex items-center justify-center`}
-                            style={
-                              isMobile
-                                ? {
-                                    height: '44px',
-                                    minHeight: '44px',
-                                    maxHeight: '44px',
-                                    width: '44px',
-                                    minWidth: '44px',
-                                    maxWidth: '44px',
-                                  }
-                                : {
-                                    height: '24px',
-                                    minHeight: '24px',
-                                    maxHeight: '24px',
-                                    width: '24px',
-                                    minWidth: '24px',
-                                    maxWidth: '24px',
-                                  }
-                            }
-                            title={t('settings.clearData')}
-                            aria-label={t('settings.clearData')}
-                          >
-                            🗑️
-                          </Button>
-                        </>
-                      )}
                     </div>
                   </div>
 
                   <div>
-                    <span
-                      className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
-                    >
-                      {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
-                    </span>
                     <div
-                      className={`flex items-center flex-wrap ${isMobile ? 'gap-1.5' : 'gap-3'}`}
+                      className={`flex items-center justify-between gap-2 ${isMobile ? 'mb-1' : 'mb-1.5'}`}
+                    >
+                      <span
+                        className={`${isMobile ? 'text-[10px]' : 'text-[9px] sm:text-[10px]'} font-medium text-gray-600 dark:text-gray-300 whitespace-nowrap flex-shrink-0`}
+                      >
+                        {lang === 'tr' ? 'Görünüm Ayarları' : 'Display Settings'}
+                      </span>
+                    </div>
+                    <div
+                      className={`flex items-center flex-nowrap ${isMobile ? 'gap-0.5' : 'gap-1'} overflow-x-auto`}
                     >
                       <LanguageToggle />
                       <ThemeToggle />
@@ -1293,7 +1262,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                         type="button"
                         variant={reduceAnimations ? 'primary' : 'ghost'}
                         size="sm"
-                        className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                        className={`px-0.5 py-0.5 flex-shrink-0 ${isMobile ? 'text-[6px] min-h-[16px] max-w-[18px]' : 'text-[7px] sm:text-[8px] min-h-[18px]'} hover:scale-110 active:scale-95`}
                         onClick={() => setReduceAnimations(!reduceAnimations)}
                         aria-pressed={reduceAnimations}
                         title={lang === 'tr' ? 'Animasyonları Azalt' : 'Reduce Animations'}
@@ -1305,7 +1274,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className={`px-1 py-0.5 ${isMobile ? 'text-[7px] min-h-[20px]' : 'text-[8px] sm:text-[9px] min-h-[22px]'} hover:scale-110 active:scale-95`}
+                        className={`px-0.5 py-0.5 flex-shrink-0 ${isMobile ? 'text-[6px] min-h-[16px] max-w-[18px]' : 'text-[7px] sm:text-[8px] min-h-[18px]'} hover:scale-110 active:scale-95`}
                         onClick={async () => {
                           // Close settings dialog immediately
                           setOpen(false);

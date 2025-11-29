@@ -10,6 +10,8 @@ type AccordionProps = {
   defaultOpen?: boolean;
   variant?: 'default' | 'compact';
   className?: string;
+  isOpen?: boolean;
+  onToggle?: (open: boolean) => void;
 };
 
 export function Accordion({
@@ -19,9 +21,18 @@ export function Accordion({
   defaultOpen = true,
   variant = 'default',
   className = '',
+  isOpen: controlledIsOpen,
+  onToggle,
 }: AccordionProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [internalIsOpen, setInternalIsOpen] = useState(defaultOpen);
   const isMobile = useIsMobile();
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const setIsOpen = (open: boolean) => {
+    if (controlledIsOpen === undefined) {
+      setInternalIsOpen(open);
+    }
+    onToggle?.(open);
+  };
 
   return (
     <div
@@ -57,7 +68,7 @@ export function Accordion({
           {icon && <span className="text-xl sm:text-2xl flex-shrink-0">{icon}</span>}
           <h3
             className={`font-bold text-gray-950 dark:text-white truncate ${
-              variant === 'compact' ? 'text-sm sm:text-base' : 'text-base sm:text-lg'
+              variant === 'compact' ? 'text-xs sm:text-sm' : 'text-sm sm:text-base'
             }`}
           >
             {title}

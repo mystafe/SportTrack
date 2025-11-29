@@ -27,7 +27,7 @@ export const Header = memo(function Header() {
       >
         <Link
           href="/"
-          className="flex-shrink-0 flex items-center no-underline hover:no-underline"
+          className="flex-shrink-0 flex items-center no-underline hover:no-underline transition-transform duration-300 hover:scale-110 active:scale-95"
           aria-label={t('nav.home')}
         >
           <Logo />

@@ -128,6 +128,9 @@ export const ActivityForm = memo(function ActivityForm({
   );
   const [note, setNote] = useState<string>(initial?.note ?? '');
   const [loading, setLoading] = useState(false);
+  const [activitySelectionOpen, setActivitySelectionOpen] = useState(true);
+  const [activityDetailsOpen, setActivityDetailsOpen] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
 
   const definition =
     definitionMap[activityKey] ??
@@ -284,11 +287,13 @@ export const ActivityForm = memo(function ActivityForm({
     >
       {/* Activity Selection - Accordion */}
       <Accordion
-        title={t('form.selectActivity')}
+        title={activityKey ? getActivityLabel(definition, lang) : t('form.selectActivity')}
         icon="🏃"
         defaultOpen={true}
         variant="compact"
         className="card-entrance"
+        isOpen={activitySelectionOpen}
+        onToggle={setActivitySelectionOpen}
       >
         <div className={`grid grid-cols-3 sm:grid-cols-3 ${isMobile ? 'gap-1.5' : 'gap-2'}`}>
           {definitions.map((def) => {
@@ -307,6 +312,10 @@ export const ActivityForm = memo(function ActivityForm({
                     }
                     return String(def.defaultAmount);
                   });
+                  // Open Activity Details accordion when activity is selected
+                  if (!activityDetailsOpen) {
+                    setActivityDetailsOpen(true);
+                  }
                 }}
                 className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} ${isMobile ? 'px-1.5 py-1 min-h-[40px]' : 'px-2 py-1.5'} shadow-md hover:shadow-xl transition-all duration-300 ${
                   active
@@ -355,44 +364,66 @@ export const ActivityForm = memo(function ActivityForm({
 
       {/* Activity Details - Accordion */}
       <Accordion
-        title={lang === 'tr' ? 'Aktivite Detayları' : 'Activity Details'}
+        title={
+          activityKey
+            ? `${lang === 'tr' ? 'Aktivite Detayları' : 'Activity Details'} - ${getActivityLabel(definition, lang)} (${amount} ${getActivityUnit(definition, lang)})`
+            : lang === 'tr'
+              ? 'Aktivite Detayları'
+              : 'Activity Details'
+        }
         icon="📝"
-        defaultOpen={true}
+        defaultOpen={false}
         variant="compact"
         className="card-entrance"
+        isOpen={activityDetailsOpen}
+        onToggle={setActivityDetailsOpen}
       >
         <div className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
-          {/* Amount Input */}
-          <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
-            <div
-              className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
-            >
-              {t('form.amount')} ({getActivityUnit(definition, lang)})
+          {/* Amount Input and Calculation Fields - Side by Side */}
+          <div className={`grid ${isMobile ? 'grid-cols-1 gap-1.5' : 'grid-cols-2 gap-2'}`}>
+            <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
+              <div
+                className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
+              >
+                {t('form.amount')} ({getActivityUnit(definition, lang)})
+              </div>
+              <Input
+                type="number"
+                min={1}
+                step={1}
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                size={isMobile ? 'md' : 'md'}
+                variant="default"
+                required
+                autoComplete="off"
+                data-form-type="other"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                aria-autocomplete="none"
+                role="spinbutton"
+                aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
+                aria-describedby={
+                  getActivityDescription(definition, lang) ? 'amount-description' : undefined
+                }
+                name=""
+                inputMode="decimal"
+              />
+            </label>
+            {/* Calculation Fields */}
+            <div className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} flex flex-col justify-end`}>
+              <div
+                className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}
+              >
+                {lang === 'tr' ? 'Hesaplama' : 'Calculation'}
+              </div>
+              <div
+                className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-300 font-medium`}
+              >
+                {definition.multiplier}x · {t('form.points')}: {pointsDisplay}
+              </div>
             </div>
-            <Input
-              type="number"
-              min={1}
-              step={1}
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              size={isMobile ? 'md' : 'md'}
-              variant="default"
-              fullWidth
-              required
-              autoComplete="off"
-              data-form-type="other"
-              data-lpignore="true"
-              data-1p-ignore="true"
-              aria-autocomplete="none"
-              role="spinbutton"
-              aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
-              aria-describedby={
-                getActivityDescription(definition, lang) ? 'amount-description' : undefined
-              }
-              name=""
-              inputMode="decimal"
-            />
-          </label>
+          </div>
 
           {/* Description - Full Width */}
           {getActivityDescription(definition, lang) ? (
@@ -404,17 +435,6 @@ export const ActivityForm = memo(function ActivityForm({
               {getActivityDescription(definition, lang)}
             </div>
           ) : null}
-
-          {/* Points Calculation - Full Width */}
-          <div
-            className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400 w-full flex items-center gap-2`}
-          >
-            <span>{definition.multiplier}x</span>
-            <span>·</span>
-            <span>
-              {t('form.points')}: {pointsDisplay}
-            </span>
-          </div>
 
           {/* DateTime Input */}
           <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
@@ -440,6 +460,19 @@ export const ActivityForm = memo(function ActivityForm({
               inputMode="none"
             />
           </label>
+
+          {/* OK/Next Button to open Note accordion */}
+          <Button
+            type="button"
+            variant="secondary"
+            size={isMobile ? 'sm' : 'md'}
+            onClick={() => {
+              setNoteOpen(true);
+            }}
+            className="w-full"
+          >
+            {lang === 'tr' ? 'İleri' : 'Next'} / {lang === 'tr' ? 'Tamam' : 'OK'}
+          </Button>
         </div>
       </Accordion>
 
@@ -450,6 +483,8 @@ export const ActivityForm = memo(function ActivityForm({
         defaultOpen={false}
         variant="compact"
         className="card-entrance"
+        isOpen={noteOpen}
+        onToggle={setNoteOpen}
       >
         <Textarea
           value={note}
