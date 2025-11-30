@@ -24,11 +24,51 @@ export function ChallengeCompletionNotification() {
   const [isExiting, setIsExiting] = useState(false);
   const shownChallengeIdsRef = useRef<Set<string>>(new Set());
   const [showConfetti, setShowConfetti] = useState(false);
+  const isInitializedRef = useRef<boolean>(false);
+
+  // Initialize shownChallengeIdsRef from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isInitializedRef.current) {
+      try {
+        const stored = localStorage.getItem('sporttrack.shown_challenge_ids');
+        const storedIds = stored ? (JSON.parse(stored) as string[]) : [];
+        shownChallengeIdsRef.current = new Set(storedIds);
+        isInitializedRef.current = true;
+      } catch (error) {
+        console.error('Failed to load shown challenge IDs:', error);
+        isInitializedRef.current = true;
+      }
+    }
+  }, []);
+
+  // Save shownChallengeIdsRef to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isInitializedRef.current) {
+      try {
+        const idsArray = Array.from(shownChallengeIdsRef.current);
+        localStorage.setItem('sporttrack.shown_challenge_ids', JSON.stringify(idsArray));
+      } catch (error) {
+        console.error('Failed to save shown challenge IDs:', error);
+      }
+    }
+  }, [shownChallengeIdsRef.current.size]); // Trigger when size changes
 
   // Memoize completed challenges check to avoid infinite loops
+  // Only check challenges that are newly completed (status === 'completed' with completedAt timestamp)
+  // OR active challenges that just reached completion (progress.isCompleted && status === 'active')
   const completedChallengesList = useMemo(() => {
     return challenges.filter((c) => {
+      // Challenge is newly completed if:
+      // 1. Status is 'completed' and has completedAt timestamp (recently completed)
+      // 2. OR status is 'active' but progress shows completion (just completed, status not yet updated)
       const progress = calculateChallengeProgress(c, activities);
+      if (c.status === 'completed' && c.completedAt) {
+        // Already marked as completed - check if recent (within last hour)
+        const completedAt = new Date(c.completedAt);
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+        return completedAt >= oneHourAgo;
+      }
+      // Active challenge that just reached completion
       return progress.isCompleted && c.status === 'active';
     });
   }, [challenges, activities]);
@@ -39,13 +79,33 @@ export function ChallengeCompletionNotification() {
   useEffect(() => {
     // Get IDs of currently completed challenges
     const currentCompletedIds = new Set(completedChallengesList.map((c) => c.id));
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000); // 1 hour ago
 
     // Find newly completed challenges (in current but not in previous)
-    const newCompleted = completedChallengesList.filter(
-      (challenge) =>
-        !prevCompletedIdsRef.current.has(challenge.id) &&
-        !shownChallengeIdsRef.current.has(challenge.id)
-    );
+    // Also filter by completedAt timestamp - only show notifications for challenges completed recently (within last 1 hour)
+    const newCompleted = completedChallengesList.filter((challenge) => {
+      // Skip if already shown
+      if (shownChallengeIdsRef.current.has(challenge.id)) {
+        return false;
+      }
+
+      // Check if challenge was completed recently (within last 1 hour)
+      if (challenge.completedAt) {
+        const completedAt = new Date(challenge.completedAt);
+        const isRecent = completedAt >= oneHourAgo;
+
+        // Only show if recently completed AND not previously shown
+        if (isRecent && !prevCompletedIdsRef.current.has(challenge.id)) {
+          return true;
+        }
+        return false;
+      }
+
+      // If no completedAt timestamp, skip (shouldn't happen after migration)
+      // This prevents old challenges without timestamps from showing notifications
+      return false;
+    });
 
     // Update the ref with current completed IDs
     prevCompletedIdsRef.current = currentCompletedIds;

@@ -93,11 +93,27 @@ export function BadgeUnlockNotification() {
     // Check for new badges - only truly new badges will be returned
     const newBadges = checkNewBadges();
     if (newBadges.length > 0) {
-      // Only add badges that haven't been shown yet
-      // Check both the badge's shown flag and our local shownBadgeIds set
-      const unseenBadges = newBadges.filter(
-        (badge) => badge.shown !== true && !shownBadgeIds.has(badge.id)
-      );
+      const now = new Date();
+      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000); // 1 hour ago
+
+      // Only add badges that:
+      // 1. Haven't been shown yet
+      // 2. Were unlocked recently (within last 1 hour) - prevents showing old badges after login
+      const unseenBadges = newBadges.filter((badge) => {
+        const isNotShown = badge.shown !== true && !shownBadgeIds.has(badge.id);
+        if (!isNotShown) return false;
+
+        // Check if badge was unlocked recently (within last 1 hour)
+        if (badge.unlockedAt) {
+          const unlockedAt =
+            badge.unlockedAt instanceof Date ? badge.unlockedAt : new Date(badge.unlockedAt);
+          return unlockedAt >= oneHourAgo;
+        }
+
+        // If no unlockedAt, assume it's new (shouldn't happen after migration, but handle gracefully)
+        return true;
+      });
+
       if (unseenBadges.length > 0) {
         setUnlockedBadges((prev) => [...prev, ...unseenBadges]);
         const newShownIds = new Set(shownBadgeIds);

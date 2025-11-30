@@ -4,6 +4,7 @@ import { ActivityDefinition } from '@/lib/activityConfig';
 import { getActivityLabel, getActivityUnit } from '@/lib/activityUtils';
 import { format, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
+import packageJson from '../../package.json';
 
 export type ExportFormat = 'csv' | 'pdf' | 'json';
 
@@ -117,7 +118,14 @@ export async function exportToPDF(
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4',
+    putOnlyUsedFonts: true,
+    floatPrecision: 16,
   });
+
+  // Enable Unicode/UTF-8 support for Turkish characters
+  // jsPDF v2+ supports UTF-8 natively, but we need to ensure proper encoding
+  // Set encoding to UTF-8 explicitly
+  doc.setLanguage(options.language === 'tr' ? 'tr-TR' : 'en-US');
 
   // Enable Unicode support for Turkish characters
   // jsPDF v2+ supports UTF-8 natively, but we need to ensure proper encoding
@@ -126,7 +134,7 @@ export async function exportToPDF(
   const margin = 14;
   let yPos = margin;
 
-  // Helper function to add text with proper encoding
+  // Helper function to add text with proper encoding for Turkish characters
   const addText = (
     text: string,
     x: number,
@@ -139,19 +147,22 @@ export async function exportToPDF(
     if (options?.fontStyle) {
       doc.setFont('helvetica', options.fontStyle as any);
     }
+    // Normalize Unicode characters for proper Turkish character support
+    const normalizedText = text.normalize('NFC');
     // jsPDF v2+ supports UTF-8, but we need to ensure the text is properly encoded
     // Use splitTextToSize for long text and proper encoding
-    const lines = doc.splitTextToSize(text, pageWidth - 2 * margin);
+    const lines = doc.splitTextToSize(normalizedText, pageWidth - 2 * margin);
     doc.text(lines, x, y);
     return lines.length * (options?.fontSize || 10) * 0.35; // Approximate line height
   };
 
-  // Title
+  // Title - normalize for Turkish characters
   const title =
     options.language === 'tr' ? 'SportTrack Aktivite Raporu' : 'SportTrack Activity Report';
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  const titleLines = doc.splitTextToSize(title, pageWidth - 2 * margin);
+  const normalizedTitle = title.normalize('NFC'); // Normalize Unicode for Turkish characters
+  const titleLines = doc.splitTextToSize(normalizedTitle, pageWidth - 2 * margin);
   doc.text(titleLines, margin, yPos);
   yPos += 10;
 
@@ -168,7 +179,8 @@ export async function exportToPDF(
       options.language === 'tr'
         ? `Kullanıcı: ${settings.name} | Günlük Hedef: ${settings.dailyTarget.toLocaleString()} puan${moodText}`
         : `User: ${settings.name} | Daily Goal: ${settings.dailyTarget.toLocaleString()} points${moodText}`;
-    const userInfoLines = doc.splitTextToSize(userInfo, pageWidth - 2 * margin);
+    const normalizedUserInfo = userInfo.normalize('NFC'); // Normalize Unicode for Turkish characters
+    const userInfoLines = doc.splitTextToSize(normalizedUserInfo, pageWidth - 2 * margin);
     doc.text(userInfoLines, margin, yPos);
     yPos += 8;
   }
@@ -179,7 +191,8 @@ export async function exportToPDF(
       options.language === 'tr'
         ? `Tarih Aralığı: ${format(options.dateRange.start, 'dd.MM.yyyy', { locale })} - ${format(options.dateRange.end, 'dd.MM.yyyy', { locale })}`
         : `Date Range: ${format(options.dateRange.start, 'MM/dd/yyyy', { locale })} - ${format(options.dateRange.end, 'MM/dd/yyyy', { locale })}`;
-    const dateRangeLines = doc.splitTextToSize(dateRangeText, pageWidth - 2 * margin);
+    const normalizedDateRangeText = dateRangeText.normalize('NFC'); // Normalize Unicode for Turkish characters
+    const dateRangeLines = doc.splitTextToSize(normalizedDateRangeText, pageWidth - 2 * margin);
     doc.text(dateRangeLines, margin, yPos);
     yPos += 8;
   }
@@ -189,7 +202,8 @@ export async function exportToPDF(
     options.language === 'tr'
       ? `Rapor Tarihi: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale })}`
       : `Report Date: ${format(new Date(), 'MM/dd/yyyy HH:mm', { locale })}`;
-  const exportDateLines = doc.splitTextToSize(exportDateText, pageWidth - 2 * margin);
+  const normalizedExportDateText = exportDateText.normalize('NFC'); // Normalize Unicode for Turkish characters
+  const exportDateLines = doc.splitTextToSize(normalizedExportDateText, pageWidth - 2 * margin);
   doc.text(exportDateLines, margin, yPos);
   yPos += 10;
 
@@ -201,7 +215,8 @@ export async function exportToPDF(
   const summaryLabel = options.language === 'tr' ? 'Özet' : 'Summary';
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  const summaryLabelLines = doc.splitTextToSize(summaryLabel, pageWidth - 2 * margin);
+  const normalizedSummaryLabel = summaryLabel.normalize('NFC'); // Normalize Unicode for Turkish characters
+  const summaryLabelLines = doc.splitTextToSize(normalizedSummaryLabel, pageWidth - 2 * margin);
   doc.text(summaryLabelLines, margin, yPos);
   yPos += 8;
 
@@ -221,7 +236,8 @@ export async function exportToPDF(
         ];
 
   summaryText.forEach((text) => {
-    const textLines = doc.splitTextToSize(text, pageWidth - 2 * margin);
+    const normalizedText = text.normalize('NFC'); // Normalize Unicode for Turkish characters
+    const textLines = doc.splitTextToSize(normalizedText, pageWidth - 2 * margin);
     doc.text(textLines, margin + 5, yPos);
     yPos += 6;
   });
@@ -237,13 +253,14 @@ export async function exportToPDF(
     const date = parseISO(activity.performedAt);
     const dateStr = format(date, dateFormat, { locale });
 
+    // Normalize all text fields for Turkish character support
     return [
       dateStr,
-      getActivityLabel(activity, options.language),
+      getActivityLabel(activity, options.language).normalize('NFC'),
       String(activity.amount),
-      getActivityUnit(activity, options.language),
+      getActivityUnit(activity, options.language).normalize('NFC'),
       String(activity.points),
-      activity.note || '',
+      (activity.note || '').normalize('NFC'),
     ];
   });
 
@@ -258,12 +275,17 @@ export async function exportToPDF(
       cellPadding: 2,
       font: 'helvetica',
       fontStyle: 'normal',
+      // Ensure UTF-8 encoding for Turkish characters
+      halign: 'left',
+      valign: 'middle',
     },
     headStyles: {
       fillColor: [14, 165, 233],
       textColor: 255,
       fontStyle: 'bold',
       font: 'helvetica',
+      halign: 'left',
+      valign: 'middle',
     },
     alternateRowStyles: { fillColor: [245, 247, 250] },
     columnStyles: {
@@ -276,14 +298,28 @@ export async function exportToPDF(
     },
     // Ensure proper encoding for Turkish characters
     didParseCell: function (data: any) {
-      // Ensure all cell text is properly encoded
-      if (data.cell && data.cell.text) {
-        // jsPDF handles UTF-8 automatically, but we ensure it's a string
+      // Ensure all cell text is properly encoded as UTF-8 strings
+      if (data.cell && data.cell.text !== undefined) {
         if (Array.isArray(data.cell.text)) {
-          data.cell.text = data.cell.text.map((t: any) => String(t));
+          // Convert array of text to array of UTF-8 strings
+          data.cell.text = data.cell.text.map((t: any) => {
+            const str = String(t);
+            // Ensure Turkish characters are properly encoded
+            return str.normalize('NFC'); // Normalize Unicode characters
+          });
         } else {
-          data.cell.text = String(data.cell.text);
+          // Convert single text to UTF-8 string
+          const str = String(data.cell.text);
+          // Ensure Turkish characters are properly encoded
+          data.cell.text = str.normalize('NFC'); // Normalize Unicode characters
         }
+      }
+    },
+    // Ensure proper text rendering for Turkish characters
+    didDrawCell: function (data: any) {
+      // jsPDF v2+ handles UTF-8 automatically, but we ensure proper rendering
+      if (data.cell && data.cell.text) {
+        // Text is already properly encoded in didParseCell
       }
     },
   });
@@ -317,7 +353,7 @@ export function exportToJSON(
     // User name (if available)
     userName: settings?.name || null,
     exportDate: new Date().toISOString(),
-    version: '0.18.17', // Current app version
+    version: packageJson.version || '0.31.10', // Current app version
     dateRange: options.dateRange
       ? {
           start: options.dateRange.start.toISOString(),

@@ -20,7 +20,6 @@ import { PullToRefresh } from '@/components/PullToRefresh';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/EmptyState';
-import { useRouter } from 'next/navigation';
 import { useUIState } from '@/lib/uiState';
 import { Accordion } from '@/components/ui/Accordion';
 import { lazy, Suspense } from 'react';
@@ -44,7 +43,6 @@ function formatDuration(seconds: number, lang: 'tr' | 'en'): string {
 export default function ActivitiesPage() {
   const { t } = useI18n();
   const isMobile = useIsMobile();
-  const router = useRouter();
   return (
     <div className="space-y-4 sm:space-y-5" role="region" aria-label={t('nav.activities')}>
       <div className="flex items-center justify-between gap-1 sm:gap-2 relative z-0">
@@ -77,7 +75,6 @@ export default function ActivitiesPage() {
 function ActivitiesClient() {
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
-  const router = useRouter();
   const { activities, deleteActivity, hydrated } = useActivities();
   const { settings } = useSettings();
   const { showToast } = useToaster();
@@ -267,10 +264,7 @@ function ActivitiesClient() {
                   }}
                   onSaved={() => {
                     setEditingId(null);
-                    // Redirect to home after edit
-                    setTimeout(() => {
-                      router.push('/');
-                    }, 500);
+                    // Stay on the same page, toast already shown by ActivityForm
                   }}
                   onCancel={() => setEditingId(null)}
                 />
@@ -297,10 +291,7 @@ function ActivitiesClient() {
                   setEditingId(null);
                 }
                 setDeleteConfirm(null);
-                // Redirect to home after delete
-                setTimeout(() => {
-                  router.push('/');
-                }, 500);
+                // Stay on the same page
               }
             }}
             onCancel={() => setDeleteConfirm(null)}
@@ -342,41 +333,91 @@ function ActivitiesClient() {
             />
           ) : (
             <div className={isMobile ? 'space-y-3' : 'space-y-2'}>
-              {groups.map(({ day, acts }, groupIndex) => (
-                <div key={day} className={isMobile ? 'space-y-2' : 'space-y-1'}>
-                  <div className="sticky top-0 z-10 date-header-entrance bg-gradient-to-r from-brand/10 via-brand/5 to-brand/10 dark:from-brand/20 dark:via-brand/10 dark:to-brand/20 backdrop-blur-md px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white border-b-2 border-brand/30 dark:border-brand/40 rounded-t-xl shadow-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-brand dark:text-brand-light">📅</span>
-                      <span className="drop-shadow-sm">
-                        {format(new Date(day), 'd MMMM EEEE', { locale: dateLocale })}
-                      </span>
+              {/* Performance optimization: Only render visible groups for large lists */}
+              {groups.length > 50 ? (
+                // For very large lists, limit initial rendering
+                <>
+                  {groups.slice(0, 30).map(({ day, acts }, groupIndex) => (
+                    <div key={day} className={isMobile ? 'space-y-2' : 'space-y-1'}>
+                      <div className="sticky top-0 z-10 date-header-entrance bg-gradient-to-r from-brand/10 via-brand/5 to-brand/10 dark:from-brand/20 dark:via-brand/10 dark:to-brand/20 backdrop-blur-md px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white border-b-2 border-brand/30 dark:border-brand/40 rounded-t-xl shadow-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="text-brand dark:text-brand-light">📅</span>
+                          <span className="drop-shadow-sm">
+                            {format(new Date(day), 'd MMMM EEEE', { locale: dateLocale })}
+                          </span>
+                        </div>
+                      </div>
+                      <ul
+                        className={`${(settings?.listDensity ?? 'compact') === 'compact' ? (isMobile ? 'space-y-2' : 'space-y-1') : isMobile ? 'space-y-3' : 'space-y-2'} ${isMobile ? 'px-0 pb-3' : 'px-1 pb-2'}`}
+                      >
+                        {acts.map((activity, actIndex) => {
+                          const isToday =
+                            startOfDay(new Date(activity.performedAt)).toISOString() === todayKey;
+                          return (
+                            <ActivityCard
+                              key={activity.id}
+                              activity={activity}
+                              isToday={isToday}
+                              todayKey={todayKey}
+                              numberFormatter={numberFormatter}
+                              timeFormatter={timeFormatter}
+                              lang={lang}
+                              onEdit={handleEdit}
+                              onDelete={handleDelete}
+                              animationDelay={`${groupIndex * 0.1 + actIndex * 0.05}s`}
+                              density={settings?.listDensity ?? 'compact'}
+                            />
+                          );
+                        })}
+                      </ul>
                     </div>
+                  ))}
+                  {groups.length > 30 && (
+                    <div className="p-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                      {lang === 'tr'
+                        ? `... ve ${groups.length - 30} gün daha (filtreleme için yukarıdaki filtreleri kullanın)`
+                        : `... and ${groups.length - 30} more days (use filters above to narrow down)`}
+                    </div>
+                  )}
+                </>
+              ) : (
+                // Normal rendering for smaller lists
+                groups.map(({ day, acts }, groupIndex) => (
+                  <div key={day} className={isMobile ? 'space-y-2' : 'space-y-1'}>
+                    <div className="sticky top-0 z-10 date-header-entrance bg-gradient-to-r from-brand/10 via-brand/5 to-brand/10 dark:from-brand/20 dark:via-brand/10 dark:to-brand/20 backdrop-blur-md px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white border-b-2 border-brand/30 dark:border-brand/40 rounded-t-xl shadow-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-brand dark:text-brand-light">📅</span>
+                        <span className="drop-shadow-sm">
+                          {format(new Date(day), 'd MMMM EEEE', { locale: dateLocale })}
+                        </span>
+                      </div>
+                    </div>
+                    <ul
+                      className={`${(settings?.listDensity ?? 'compact') === 'compact' ? (isMobile ? 'space-y-2' : 'space-y-1') : isMobile ? 'space-y-3' : 'space-y-2'} ${isMobile ? 'px-0 pb-3' : 'px-1 pb-2'}`}
+                    >
+                      {acts.map((activity, actIndex) => {
+                        const isToday =
+                          startOfDay(new Date(activity.performedAt)).toISOString() === todayKey;
+                        return (
+                          <ActivityCard
+                            key={activity.id}
+                            activity={activity}
+                            isToday={isToday}
+                            todayKey={todayKey}
+                            numberFormatter={numberFormatter}
+                            timeFormatter={timeFormatter}
+                            lang={lang}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            animationDelay={`${groupIndex * 0.1 + actIndex * 0.05}s`}
+                            density={settings?.listDensity ?? 'compact'}
+                          />
+                        );
+                      })}
+                    </ul>
                   </div>
-                  <ul
-                    className={`${(settings?.listDensity ?? 'compact') === 'compact' ? (isMobile ? 'space-y-2' : 'space-y-1') : isMobile ? 'space-y-3' : 'space-y-2'} ${isMobile ? 'px-0 pb-3' : 'px-1 pb-2'}`}
-                  >
-                    {acts.map((activity, actIndex) => {
-                      const isToday =
-                        startOfDay(new Date(activity.performedAt)).toISOString() === todayKey;
-                      return (
-                        <ActivityCard
-                          key={activity.id}
-                          activity={activity}
-                          isToday={isToday}
-                          todayKey={todayKey}
-                          numberFormatter={numberFormatter}
-                          timeFormatter={timeFormatter}
-                          lang={lang}
-                          onEdit={handleEdit}
-                          onDelete={handleDelete}
-                          animationDelay={`${groupIndex * 0.1 + actIndex * 0.05}s`}
-                          density={settings?.listDensity ?? 'compact'}
-                        />
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           )}
         </div>

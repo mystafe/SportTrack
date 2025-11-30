@@ -126,18 +126,66 @@ export function ConflictResolutionDialog({
       e.preventDefault();
       e.stopPropagation();
     }
-    if (selectedLocal && selectedCloud) {
-      // Both selected: merge
-      onResolve('merge');
-    } else if (selectedLocal) {
-      // Only local selected: use local
-      onResolve('local');
-    } else if (selectedCloud) {
-      // Only cloud selected: use cloud
-      onResolve('cloud');
-    } else {
-      // Nothing selected: use newest
-      onResolve('newest');
+
+    console.log('🔵 handleContinue called', { selectedLocal, selectedCloud });
+
+    try {
+      let strategy: ConflictStrategy;
+      if (selectedLocal && selectedCloud) {
+        // Both selected: merge
+        console.log('🔄 Resolving with merge strategy');
+        strategy = 'merge';
+      } else if (selectedLocal) {
+        // Only local selected: use local
+        console.log('🔄 Resolving with local strategy');
+        strategy = 'local';
+      } else if (selectedCloud) {
+        // Only cloud selected: use cloud
+        console.log('🔄 Resolving with cloud strategy');
+        strategy = 'cloud';
+      } else {
+        // Nothing selected: use newest
+        console.log('🔄 Resolving with newest strategy (no selection)');
+        strategy = 'newest';
+      }
+      // Build conflict payload for manager (so it doesn't depend on state/localStorage timing)
+      const conflictPayload = {
+        local: {
+          activities: (localData.activities as ActivityRecord[]) || [],
+          settings: (localData.settings as UserSettings | null) || null,
+          badges: (localData.badges as Badge[]) || [],
+          challenges: (localData.challenges as unknown[]) || [],
+        },
+        cloud: {
+          activities: ((cloudData.exercises as ActivityRecord[]) || []) as ActivityRecord[],
+          settings: (cloudData.settings as UserSettings | null) || null,
+          badges: (cloudData.badges as Badge[]) || [],
+          challenges: (cloudData.challenges as unknown[]) || [],
+          points: (cloudData.points as number) || 0,
+        },
+      };
+
+      // Call parent resolver
+      onResolve(strategy, conflictPayload as any);
+      // Also dispatch a custom event to guarantee manager receives the action
+      try {
+        window.dispatchEvent(
+          new CustomEvent('sporttrack:conflict-continue', {
+            detail: { strategy, conflict: conflictPayload },
+          })
+        );
+        console.log('📣 Dispatched sporttrack:conflict-continue', { strategy });
+      } catch (err) {
+        // noop
+      }
+      // Fallback: write to localStorage so manager polling can detect continue (same-tab safe)
+      try {
+        localStorage.setItem('sporttrack_conflict_continue', strategy);
+      } catch {
+        // ignore
+      }
+    } catch (error) {
+      console.error('❌ Error in handleContinue:', error);
     }
   };
 
@@ -165,7 +213,46 @@ export function ConflictResolutionDialog({
         differentActivities: [],
         localOnlyBadges: [],
         cloudOnlyBadges: [],
+        localOnlyActivityTypes: [],
+        cloudOnlyActivityTypes: [],
+        differentActivityTypes: [],
+        settingsDifferences: [],
       };
+    }
+
+    // Get local settings (for activity types comparison)
+    // Always use current settings from store instead of localData.settings
+    let localSettings = currentSettings || (localData.settings as UserSettings | null | undefined);
+
+    // Always read theme and language from localStorage as they might be more up-to-date
+    if (typeof window !== 'undefined') {
+      const themeFromStorage = localStorage.getItem(STORAGE_KEYS.THEME) as
+        | 'light'
+        | 'dark'
+        | 'system'
+        | null;
+      const languageFromStorage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) as 'tr' | 'en' | null;
+
+      if (localSettings) {
+        // Merge localStorage values with settings (localStorage takes precedence)
+        localSettings = {
+          ...localSettings,
+          theme: themeFromStorage || localSettings.theme || 'system',
+          language: languageFromStorage || localSettings.language || 'tr',
+        };
+      } else {
+        // If no settings at all, create minimal settings from localStorage
+        if (themeFromStorage || languageFromStorage) {
+          localSettings = {
+            name: '',
+            dailyTarget: 10000,
+            customActivities: [],
+            baseActivityOverrides: [],
+            theme: themeFromStorage || 'system',
+            language: languageFromStorage || 'tr',
+          };
+        }
+      }
     }
 
     const localActivities = localData.activities || [];
@@ -211,43 +298,38 @@ export function ConflictResolutionDialog({
       (cloud) => !localBadges.some((local) => local.id === cloud.id)
     );
 
+    // Find activity type differences (custom activities)
+    const localCustomActivities = localSettings?.customActivities || [];
+    const cloudActivityDefinitions = (cloudData.activities as ActivityDefinition[]) || [];
+    const cloudCustomActivities = cloudActivityDefinitions.filter((def) => def.isCustom === true);
+
+    // Compare by key/id
+    const localOnlyActivityTypes = localCustomActivities.filter(
+      (local) => !cloudCustomActivities.some((cloud) => cloud.key === local.id)
+    );
+    const cloudOnlyActivityTypes = cloudCustomActivities.filter(
+      (cloud) => !localCustomActivities.some((local) => local.id === cloud.key)
+    );
+
+    // Find different activity types (same key but different properties)
+    const differentActivityTypes = localCustomActivities
+      .filter((local) => {
+        const cloud = cloudCustomActivities.find((c) => c.key === local.id);
+        if (!cloud) return false;
+        // Compare key fields
+        return (
+          local.label !== cloud.label ||
+          local.multiplier !== cloud.multiplier ||
+          local.unit !== cloud.unit ||
+          local.icon !== cloud.icon
+        );
+      })
+      .map((local) => {
+        const cloud = cloudCustomActivities.find((c) => c.key === local.id)!;
+        return { local, cloud };
+      });
+
     // Find settings differences
-    // Always use current settings from store instead of localData.settings
-    // This ensures that any settings changes made after conflict detection are reflected
-    // If theme/language are not in settings, read from localStorage as fallback
-    let localSettings = currentSettings || (localData.settings as UserSettings | null | undefined);
-
-    // Always read theme and language from localStorage as they might be more up-to-date
-    // This ensures that any changes made via ThemeToggle/LanguageToggle are reflected
-    if (typeof window !== 'undefined') {
-      const themeFromStorage = localStorage.getItem(STORAGE_KEYS.THEME) as
-        | 'light'
-        | 'dark'
-        | 'system'
-        | null;
-      const languageFromStorage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) as 'tr' | 'en' | null;
-
-      if (localSettings) {
-        // Merge localStorage values with settings (localStorage takes precedence)
-        localSettings = {
-          ...localSettings,
-          theme: themeFromStorage || localSettings.theme || 'system',
-          language: languageFromStorage || localSettings.language || 'tr',
-        };
-      } else {
-        // If no settings at all, create minimal settings from localStorage
-        if (themeFromStorage || languageFromStorage) {
-          localSettings = {
-            name: '',
-            dailyTarget: 10000,
-            customActivities: [],
-            baseActivityOverrides: [],
-            theme: themeFromStorage || 'system',
-            language: languageFromStorage || 'tr',
-          };
-        }
-      }
-    }
 
     const cloudSettings = cloudData.settings as UserSettings | null | undefined;
     const settingsDifferences: {
@@ -302,6 +384,9 @@ export function ConflictResolutionDialog({
       differentActivities,
       localOnlyBadges,
       cloudOnlyBadges,
+      localOnlyActivityTypes,
+      cloudOnlyActivityTypes,
+      differentActivityTypes,
       settingsDifferences,
     };
   }, [localData, cloudData, currentSettings, localStorageVersion]);
@@ -352,15 +437,21 @@ export function ConflictResolutionDialog({
     const exercises = localData.activities || [];
     const totalPoints = exercises.reduce((sum, ex) => sum + (ex.points || 0), 0);
 
-    // Don't include activities/settings in comparison - they sync automatically
+    // Count unique activity types from exercises
+    const uniqueActivityTypes = new Set(exercises.map((ex) => ex.activityKey));
+
+    // Count custom activity types from settings
+    const customActivityTypes = currentSettings?.customActivities?.length || 0;
+    const totalActivityTypes = uniqueActivityTypes.size + customActivityTypes;
+
     return {
       exercises: exercises.length,
-      activities: 0, // Activities and settings sync automatically, not shown in comparison
+      activityTypes: totalActivityTypes, // Total unique activity types (from exercises + custom)
       badges: localData.badges?.length || 0,
       challenges: localData.challenges?.length || 0,
       totalPoints,
     };
-  }, [localData]);
+  }, [localData, currentSettings]);
 
   // Calculate cloud statistics
   const cloudStats = useMemo(() => {
@@ -368,14 +459,23 @@ export function ConflictResolutionDialog({
     // activities is ActivityDefinition[], not ActivityRecord[], so we only use exercises
     const exercises = cloudExercises;
 
-    // Don't include activities/settings in comparison - they sync automatically
+    // Count unique activity types from exercises
+    const uniqueActivityTypes = new Set(exercises.map((ex) => ex.activityKey));
+
+    // Count custom activity types from cloudData.activities (ActivityDefinition[])
+    const cloudActivityDefinitions = (cloudData.activities as ActivityDefinition[]) || [];
+    const customActivityTypes = cloudActivityDefinitions.filter(
+      (def) => def.isCustom === true
+    ).length;
+    const totalActivityTypes = uniqueActivityTypes.size + customActivityTypes;
+
     // Total Points: Calculate from exercises array (most accurate)
     // cloudData.points might be stale or incorrect, so always calculate from actual exercises
     const totalPoints = exercises.reduce((sum, ex) => sum + (ex.points || 0), 0);
 
     return {
       exercises: exercises.length,
-      activities: 0, // Activities and settings sync automatically, not shown in comparison
+      activityTypes: totalActivityTypes, // Total unique activity types (from exercises + custom)
       badges: (cloudData.badges as Badge[])?.length || 0,
       challenges: (cloudData.challenges || [])?.length || 0,
       totalPoints,
@@ -392,6 +492,7 @@ export function ConflictResolutionDialog({
       differences.localOnlyBadges.length === 0 &&
       differences.cloudOnlyBadges.length === 0 &&
       localStats.exercises === cloudStats.exercises &&
+      localStats.activityTypes === cloudStats.activityTypes &&
       localStats.badges === cloudStats.badges &&
       localStats.challenges === cloudStats.challenges &&
       localStats.totalPoints === cloudStats.totalPoints
@@ -497,6 +598,10 @@ export function ConflictResolutionDialog({
                   {lang === 'tr' ? 'Egzersizler' : 'Exercises'}
                 </div>
                 <div>
+                  <span className="font-semibold">{localStats.activityTypes}</span>{' '}
+                  {lang === 'tr' ? 'Aktivite Tipleri' : 'Activity Types'}
+                </div>
+                <div>
                   <span className="font-semibold">{localStats.badges}</span>{' '}
                   {lang === 'tr' ? 'Başarılar' : 'Badges'}
                 </div>
@@ -563,6 +668,10 @@ export function ConflictResolutionDialog({
                 <div>
                   <span className="font-semibold">{cloudStats.exercises}</span>{' '}
                   {lang === 'tr' ? 'Egzersizler' : 'Exercises'}
+                </div>
+                <div>
+                  <span className="font-semibold">{cloudStats.activityTypes}</span>{' '}
+                  {lang === 'tr' ? 'Aktivite Tipleri' : 'Activity Types'}
                 </div>
                 <div>
                   <span className="font-semibold">{cloudStats.badges}</span>{' '}
@@ -770,6 +879,118 @@ export function ConflictResolutionDialog({
                 </div>
               )}
 
+              {/* Activity Types */}
+              {(differences.localOnlyActivityTypes.length > 0 ||
+                differences.cloudOnlyActivityTypes.length > 0 ||
+                differences.differentActivityTypes.length > 0) && (
+                <div>
+                  <div
+                    className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-indigo-900 dark:text-indigo-100 mb-1`}
+                  >
+                    🎯 {lang === 'tr' ? 'Aktivite Tipleri:' : 'Activity Types:'}
+                  </div>
+                  {differences.localOnlyActivityTypes.length > 0 && (
+                    <div>
+                      <div
+                        className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-indigo-800 dark:text-indigo-200 mb-1`}
+                      >
+                        📲 {lang === 'tr' ? 'Sadece Yerelde:' : 'Only in Local:'}{' '}
+                        {differences.localOnlyActivityTypes.length}
+                      </div>
+                      <div className="space-y-1">
+                        {differences.localOnlyActivityTypes.slice(0, 3).map((activity) => (
+                          <div
+                            key={activity.id}
+                            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-indigo-700 dark:text-indigo-300`}
+                          >
+                            • {activity.icon} {activity.label || activity.labelEn || activity.id}
+                          </div>
+                        ))}
+                        {differences.localOnlyActivityTypes.length > 3 && (
+                          <div
+                            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-indigo-600 dark:text-indigo-400 italic`}
+                          >
+                            ... {lang === 'tr' ? 've' : 'and'}{' '}
+                            {differences.localOnlyActivityTypes.length - 3}{' '}
+                            {lang === 'tr' ? 'aktivite tipi daha' : 'more activity types'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {differences.cloudOnlyActivityTypes.length > 0 && (
+                    <div className="mt-2">
+                      <div
+                        className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-indigo-800 dark:text-indigo-200 mb-1`}
+                      >
+                        ☁️ {lang === 'tr' ? 'Sadece Bulutta:' : 'Only in Cloud:'}{' '}
+                        {differences.cloudOnlyActivityTypes.length}
+                      </div>
+                      <div className="space-y-1">
+                        {differences.cloudOnlyActivityTypes.slice(0, 3).map((activity) => (
+                          <div
+                            key={activity.key}
+                            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-indigo-700 dark:text-indigo-300`}
+                          >
+                            • {activity.icon} {activity.label || activity.labelEn || activity.key}
+                          </div>
+                        ))}
+                        {differences.cloudOnlyActivityTypes.length > 3 && (
+                          <div
+                            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-indigo-600 dark:text-indigo-400 italic`}
+                          >
+                            ... {lang === 'tr' ? 've' : 'and'}{' '}
+                            {differences.cloudOnlyActivityTypes.length - 3}{' '}
+                            {lang === 'tr' ? 'aktivite tipi daha' : 'more activity types'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {differences.differentActivityTypes.length > 0 && (
+                    <div className="mt-2">
+                      <div
+                        className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-orange-800 dark:text-orange-200 mb-1`}
+                      >
+                        ⚠️ {lang === 'tr' ? 'Farklı Olanlar:' : 'Different:'}{' '}
+                        {differences.differentActivityTypes.length}
+                      </div>
+                      <div className="space-y-1">
+                        {differences.differentActivityTypes.slice(0, 2).map(({ local, cloud }) => (
+                          <div
+                            key={local.id}
+                            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} p-1.5 rounded bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700`}
+                          >
+                            <div className="font-medium text-orange-900 dark:text-orange-100 mb-0.5">
+                              {local.icon} {local.label || local.labelEn || local.id}
+                            </div>
+                            <div className="text-orange-800 dark:text-orange-200">
+                              📲 {lang === 'tr' ? 'Yerel:' : 'Local:'}{' '}
+                              {local.label || local.labelEn || local.id} ({local.multiplier}x,{' '}
+                              {local.unit})
+                            </div>
+                            <div className="text-orange-800 dark:text-orange-200">
+                              ☁️ {lang === 'tr' ? 'Bulut:' : 'Cloud:'}{' '}
+                              {cloud.label || cloud.labelEn || cloud.key} ({cloud.multiplier}x,{' '}
+                              {cloud.unit})
+                            </div>
+                          </div>
+                        ))}
+                        {differences.differentActivityTypes.length > 2 && (
+                          <div
+                            className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-orange-600 dark:text-orange-400 italic`}
+                          >
+                            ... {lang === 'tr' ? 've' : 'and'}{' '}
+                            {differences.differentActivityTypes.length - 2}{' '}
+                            {lang === 'tr' ? 'aktivite tipi daha' : 'more activity types'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Badges */}
               {(differences.localOnlyBadges.length > 0 ||
                 differences.cloudOnlyBadges.length > 0) && (
@@ -887,6 +1108,9 @@ export function ConflictResolutionDialog({
                 differences.differentActivities.length === 0 &&
                 differences.localOnlyBadges.length === 0 &&
                 differences.cloudOnlyBadges.length === 0 &&
+                differences.localOnlyActivityTypes.length === 0 &&
+                differences.cloudOnlyActivityTypes.length === 0 &&
+                differences.differentActivityTypes.length === 0 &&
                 (!differences.settingsDifferences ||
                   differences.settingsDifferences.length === 0) && (
                   <div
@@ -927,9 +1151,11 @@ export function ConflictResolutionDialog({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              console.log('🔵 Continue button clicked', { selectedLocal, selectedCloud });
               handleContinue(e);
             }}
             className="flex-1"
+            disabled={false} // Always allow continue, even if nothing selected (will use 'newest' strategy)
           >
             {lang === 'tr' ? 'Devam Et' : 'Continue'}
           </Button>

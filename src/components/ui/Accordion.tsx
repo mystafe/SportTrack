@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, ReactNode } from 'react';
+import { useState, ReactNode, useEffect, useRef } from 'react';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 type AccordionProps = {
@@ -27,12 +27,58 @@ export function Accordion({
   const [internalIsOpen, setInternalIsOpen] = useState(defaultOpen);
   const isMobile = useIsMobile();
   const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const contentRef = useRef<HTMLDivElement>(null);
+
   const setIsOpen = (open: boolean) => {
     if (controlledIsOpen === undefined) {
       setInternalIsOpen(open);
     }
     onToggle?.(open);
   };
+
+  // Prevent focus on interactive elements when accordion is closed
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    const interactiveSelectors = [
+      'button',
+      'a[href]',
+      'input',
+      'select',
+      'textarea',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(', ');
+
+    const interactiveElements =
+      contentRef.current.querySelectorAll<HTMLElement>(interactiveSelectors);
+
+    if (!isOpen) {
+      // When closed: disable focus on all interactive elements
+      interactiveElements.forEach((el) => {
+        // Store original tabIndex if it exists
+        if (!el.hasAttribute('data-original-tabindex')) {
+          const originalTabIndex = el.getAttribute('tabindex');
+          if (originalTabIndex !== null) {
+            el.setAttribute('data-original-tabindex', originalTabIndex);
+          }
+        }
+        el.setAttribute('tabindex', '-1');
+        el.setAttribute('aria-hidden', 'true');
+      });
+    } else {
+      // When open: restore original tabIndex and remove aria-hidden
+      interactiveElements.forEach((el) => {
+        const originalTabIndex = el.getAttribute('data-original-tabindex');
+        if (originalTabIndex !== null) {
+          el.setAttribute('tabindex', originalTabIndex);
+          el.removeAttribute('data-original-tabindex');
+        } else {
+          el.removeAttribute('tabindex');
+        }
+        el.removeAttribute('aria-hidden');
+      });
+    }
+  }, [isOpen]);
 
   return (
     <div
@@ -94,9 +140,13 @@ export function Accordion({
         className={`transition-all duration-300 ease-in-out ${
           isOpen ? 'h-auto opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
         }`}
+        style={!isOpen ? { pointerEvents: 'none' } : undefined}
+        ref={contentRef}
       >
         <div
           className={`${variant === 'compact' ? (isMobile ? 'p-3 pt-2' : 'p-3 sm:p-4 pt-2 sm:pt-3') : isMobile ? 'p-4' : 'p-4 sm:p-5'}`}
+          tabIndex={isOpen ? undefined : -1}
+          style={!isOpen ? { pointerEvents: 'none' } : undefined}
         >
           {children}
         </div>

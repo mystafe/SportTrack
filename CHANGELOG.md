@@ -2,6 +2,43 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.31.12] - 2025-01
+
+### Added
+
+- **Conflict Resolution - Activity Types Comparison**: Conflict manager ekranına aktivite tipleri karşılaştırması eklendi
+  - Local ve cloud'daki custom aktivite tipleri karşılaştırılıyor
+  - Sadece local'de, sadece cloud'da veya farklı olan aktivite tipleri gösteriliyor
+  - Aktivite tipleri sayısı ana karşılaştırma kutularında gösteriliyor
+
+- **Dummy Data Summary Dialog**: Dummy veri yükleme sonrası özet ekranı eklendi
+  - Yüklenen aktivite, badge ve challenge sayıları gösteriliyor
+  - Toplam puan ve tarih aralığı bilgisi eklendi
+  - Kullanıcıya yüklenen verilerin detaylı özeti sunuluyor
+
+### Changed
+
+- **Settings Dialog Buttons**: Verileri Sıfırla ve Uyumluluk Modu butonlarından metinler kaldırıldı
+  - Butonlar artık sadece ikon gösteriyor (🗑️ ve 🔄)
+  - Metinler tooltip olarak gösteriliyor
+  - Daha kompakt ve modern görünüm
+
+- **Dummy Data Generation**: Dummy veri üretimi iyileştirildi
+  - Olmayan aktivite tipleri (CYCLING, YOGA, STRETCHING) kaldırıldı
+  - Mevcut aktivite tipleriyle değiştirildi (STAIRS, CRUNCH, SWIMMING)
+  - Badge unlock kontrolü iyileştirildi - çoklu kontrol ve reload eklendi
+
+### Fixed
+
+- **Dummy Data Loading Error**: Dummy veri yükleme sırasında aktivite bulunamama hatası düzeltildi
+  - Olmayan aktivite tipleri referansları kaldırıldı
+  - Null kontrolü eklendi - aktivite bulunamazsa atlanıyor
+
+- **Badge Unlock After Dummy Data**: Dummy veri yükleme sonrası badge'lerin unlock edilmemesi sorunu düzeltildi
+  - Aktivite reload işlemi eklendi
+  - Badge kontrolü birden fazla kez yapılıyor (bağımlı badge'ler için)
+  - Her kontrol sonrası badge state'i reload ediliyor
+
 ## [0.30.0] - 2025-01
 
 ### Added

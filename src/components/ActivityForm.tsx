@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState, memo } from 'react';
-import { useRouter } from 'next/navigation';
 import { ActivityDefinition, ActivityKey } from '@/lib/activityConfig';
 import { useI18n } from '@/lib/i18n';
 import { ActivityRecord, useActivities } from '@/lib/activityStore';
@@ -73,7 +72,6 @@ export const ActivityForm = memo(function ActivityForm({
   initial,
   preselectedActivityKey,
 }: ActivityFormProps) {
-  const router = useRouter();
   const isMobile = useIsMobile();
   const { triggerHaptic } = useHapticFeedback();
   const baseDefinitions = useActivityDefinitions();
@@ -254,23 +252,13 @@ export const ActivityForm = memo(function ActivityForm({
               );
             });
           }
-
-          // Navigate to homepage after adding activity
-          router.push('/');
         }, 500);
 
         setAmount(String(definition.defaultAmount));
         setNote('');
         setPerformedAt(toLocalInputValue(new Date()));
         onCreated?.();
-        // Only redirect if onCreated callback doesn't handle it
-        if (!onCreated) {
-          setTimeout(() => {
-            if (typeof window !== 'undefined') {
-              window.location.href = '/';
-            }
-          }, 2000);
-        }
+        // Stay on the same page - no redirect
       }
     } finally {
       setLoading(false);

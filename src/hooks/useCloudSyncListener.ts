@@ -310,6 +310,7 @@ export function useCloudSyncListener() {
       // Initial sync already complete (from previous page load), skip everything
       // Reset refs to match localStorage state
       initialSyncDoneRef.current = true;
+      initialSyncCheckStartedRef.current = false;
       return;
     }
 
@@ -323,22 +324,48 @@ export function useCloudSyncListener() {
       return;
     }
 
+    // CRITICAL: Double-check initial sync status before starting
+    // This prevents race conditions where localStorage was updated between checks
+    const doubleCheckInitialSyncComplete =
+      typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
+
+    if (doubleCheckInitialSyncComplete) {
+      initialSyncDoneRef.current = true;
+      initialSyncCheckStartedRef.current = false;
+      return;
+    }
+
     // Mark that we're starting the initial sync check
     initialSyncCheckStartedRef.current = true;
 
     // CRITICAL FIX: Force initial sync check immediately on login
     // Download cloud data directly without checking local data
     const performInitialSyncCheck = async () => {
-      // Check if initial sync is already complete
-      if (initialSyncComplete && initialSyncDoneRef.current) {
+      // CRITICAL: Double-check initial sync status at the start of function
+      // This prevents race conditions where localStorage was updated between checks
+      const tripleCheckInitialSyncComplete =
+        typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
+
+      if (tripleCheckInitialSyncComplete || initialSyncDoneRef.current) {
         // Initial sync already complete, skipping
         initialSyncCheckStartedRef.current = false;
+        initialSyncDoneRef.current = true;
         return;
       }
 
       // Prevent multiple simultaneous sync attempts
       if (isReloadingRef.current) {
         initialSyncCheckStartedRef.current = false;
+        return;
+      }
+
+      // CRITICAL: Check one more time before starting (race condition prevention)
+      const finalCheckInitialSyncComplete =
+        typeof window !== 'undefined' && localStorage.getItem(INITIAL_SYNC_COMPLETE_KEY) === 'true';
+
+      if (finalCheckInitialSyncComplete) {
+        initialSyncCheckStartedRef.current = false;
+        initialSyncDoneRef.current = true;
         return;
       }
 
@@ -476,14 +503,19 @@ export function useCloudSyncListener() {
                 localStorage.removeItem(CONFLICT_STORAGE_KEY);
 
                 // Reload stores from localStorage (no page reload needed)
-                reloadActivitiesRef.current();
-                reloadBadgesRef.current();
-                reloadChallengesRef.current();
-
-                // Clear sync in progress flag after stores are reloaded
+                // Use setTimeout to prevent state update during render
                 setTimeout(() => {
-                  localStorage.removeItem('sporttrack_sync_in_progress');
-                }, 100);
+                  reloadActivitiesRef.current();
+                  reloadBadgesRef.current();
+                  reloadChallengesRef.current();
+
+                  // Clear sync in progress flag after stores are reloaded
+                  setTimeout(() => {
+                    localStorage.removeItem('sporttrack_sync_in_progress');
+                    isReloadingRef.current = false;
+                    initialSyncCheckStartedRef.current = false;
+                  }, 100);
+                }, 0);
                 return;
               }
             }
@@ -522,13 +554,29 @@ export function useCloudSyncListener() {
     };
 
     // Perform initial sync check immediately
-    performInitialSyncCheck();
+    // Use a flag to prevent multiple calls
+    let isCancelled = false;
+    performInitialSyncCheck()
+      .then(() => {
+        if (!isCancelled) {
+          initialSyncCheckStartedRef.current = false;
+        }
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          initialSyncCheckStartedRef.current = false;
+        }
+      });
 
     // Check if initial sync is already complete - if so, don't subscribe to listener
     // Reuse the initialSyncComplete variable defined at the start of useEffect
     if (initialSyncComplete && initialSyncDoneRef.current) {
       // Initial sync already complete, skipping cloud listener subscription
-      return;
+      // Return cleanup function
+      return () => {
+        isCancelled = true;
+        initialSyncCheckStartedRef.current = false;
+      };
     }
 
     let unsubscribeFn: (() => void) | null = null;
@@ -684,6 +732,8 @@ export function useCloudSyncListener() {
         unsubscribeFn();
         isUnsubscribed = true;
       }
+      // Reset sync flags on cleanup to prevent stale state
+      initialSyncCheckStartedRef.current = false;
     };
   }, [isAuthenticated, isConfigured, allHydrated]); // Removed activities, settings, badges, challenges, saveSettings from dependencies
 }

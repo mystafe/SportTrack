@@ -76,6 +76,7 @@ export interface Challenge {
   createdAt: string; // ISO string
   icon?: string;
   category?: 'motivation' | 'achievement' | 'consistency' | 'milestone' | 'special' | 'custom'; // Optional category
+  recurring?: boolean; // If true, challenge will auto-renew when expired/completed (for daily/weekly/yearly)
 }
 
 export interface ChallengeProgress {
@@ -135,14 +136,21 @@ export function updateChallengeStatus(
   const now = new Date();
   const endDate = challenge.endDate ? parseISO(challenge.endDate) : null;
 
+  // For daily/weekly/yearly challenges, don't mark as completed if progress is very low (< 5%)
+  // This prevents accidental completion due to rounding errors or data issues
+  const isLowProgress = progress.percentage < 5;
+  const isRecurringChallenge =
+    challenge.type === 'daily' || challenge.type === 'weekly' || challenge.type === 'yearly';
+
   // Check if expired
   if (endDate && now > endDate && challenge.status === 'active') {
-    if (progress.isCompleted) {
+    // For recurring challenges with low progress, mark as expired instead of completed
+    if (progress.isCompleted && (!isRecurringChallenge || !isLowProgress)) {
       return {
         ...challenge,
         status: 'completed',
         progress: progress.current,
-        completedAt: endDate.toISOString(),
+        completedAt: now.toISOString(), // Use current time, not endDate
       };
     } else {
       return {
@@ -153,8 +161,16 @@ export function updateChallengeStatus(
     }
   }
 
-  // Check if completed
+  // Check if completed (only if not low progress for recurring challenges)
   if (progress.isCompleted && challenge.status === 'active') {
+    // Don't mark recurring challenges as completed if progress is suspiciously low
+    if (isRecurringChallenge && isLowProgress) {
+      // Keep as active, just update progress
+      return {
+        ...challenge,
+        progress: progress.current,
+      };
+    }
     return {
       ...challenge,
       status: 'completed',
@@ -198,6 +214,7 @@ export function createDailyChallenge(
     createdAt: new Date().toISOString(),
     icon: icon || '🎯',
     category: 'consistency', // Daily challenges are consistency-based
+    recurring: true, // Daily challenges auto-renew
   };
 }
 
@@ -229,6 +246,7 @@ export function createWeeklyChallenge(
     createdAt: new Date().toISOString(),
     icon: icon || '📅',
     category: 'consistency', // Weekly challenges are consistency-based
+    recurring: true, // Weekly challenges auto-renew
   };
 }
 
@@ -348,6 +366,7 @@ export function createYearlyChallenge(
     createdAt: new Date().toISOString(),
     icon: icon || '📅',
     category: 'milestone', // Yearly challenges are milestone-based
+    recurring: true, // Yearly challenges auto-renew
   };
 }
 

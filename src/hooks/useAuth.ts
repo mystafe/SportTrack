@@ -125,8 +125,16 @@ export function useAuth() {
                 localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(cloudData.challenges));
               }
 
-              // Trigger page reload to apply new data
-              window.location.reload();
+              // Mark initial sync as complete to prevent useCloudSyncListener from triggering again
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('sporttrack_initial_sync_complete', 'true');
+              }
+
+              // No reload needed - useCloudSyncListener will reload stores automatically
+              // Trigger a custom event to refresh stores if needed
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('sporttrack:refresh-data'));
+              }
             }
           } catch (downloadError) {
             console.error('Failed to download cloud data on login:', downloadError);
@@ -216,8 +224,16 @@ export function useAuth() {
               localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(cloudData.challenges));
             }
 
-            // Trigger page reload to apply new data
-            window.location.reload();
+            // Mark initial sync as complete to prevent useCloudSyncListener from triggering again
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('sporttrack_initial_sync_complete', 'true');
+            }
+
+            // No reload needed - useCloudSyncListener will reload stores automatically
+            // Trigger a custom event to refresh stores if needed
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('sporttrack:refresh-data'));
+            }
           }
         } catch (downloadError) {
           console.error('Failed to download cloud data on login:', downloadError);

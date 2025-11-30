@@ -3,6 +3,8 @@
 import { useState, useRef, lazy, Suspense } from 'react';
 import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
+import { useBadges } from '@/lib/badgeStore';
+import { useChallenges } from '@/lib/challengeStore';
 import { useI18n } from '@/lib/i18n';
 import { useToaster } from '@/components/Toaster';
 import { ActivityRecord } from '@/lib/activityStore';
@@ -25,6 +27,7 @@ import {
 import { cloudSyncService } from '@/lib/cloudSync/syncService';
 import { useDialogManager } from '@/lib/dialogManager';
 import { useGlobalDialogState } from '@/lib/globalDialogState';
+import packageJson from '../../package.json';
 
 // Lazy load Apple Health components
 const AppleHealthImport = lazy(() =>
@@ -41,6 +44,8 @@ interface DataExportImportProps {
 export function DataExportImport({ onSettingsClose }: DataExportImportProps = {}) {
   const { activities } = useActivities();
   const { settings } = useSettings();
+  const { badges } = useBadges();
+  const { challenges } = useChallenges();
   const { t, lang } = useI18n();
   const { showToast } = useToaster();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -65,11 +70,33 @@ export function DataExportImport({ onSettingsClose }: DataExportImportProps = {}
 
   const handleExport = () => {
     try {
+      // Get current version from package.json
+      const currentVersion = packageJson.version || '0.31.10';
+
       const data = {
-        activities,
+        // New format: exercises instead of activities
+        exercises: activities,
+        // Activity definitions (if needed)
+        activities: [],
+        // Settings
         settings,
+        // Badges with unlockedAt timestamps
+        badges: badges.map((badge) => ({
+          ...badge,
+          unlockedAt: badge.unlockedAt
+            ? badge.unlockedAt instanceof Date
+              ? badge.unlockedAt.toISOString()
+              : badge.unlockedAt
+            : undefined,
+        })),
+        // Challenges with completedAt timestamps
+        challenges: challenges.map((challenge) => ({
+          ...challenge,
+          completedAt: challenge.completedAt || undefined,
+          recurring: challenge.recurring || undefined,
+        })),
         exportDate: new Date().toISOString(),
-        version: '0.18.17',
+        version: currentVersion,
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);

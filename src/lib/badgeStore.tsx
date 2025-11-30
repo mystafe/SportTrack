@@ -36,12 +36,33 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem(STORAGE_KEYS.BADGES);
       if (stored) {
         const parsed = JSON.parse(stored) as Badge[];
+        const now = new Date();
+        let needsMigration = false;
+
         // Convert unlockedAt strings back to Date objects and ensure shown field exists
-        const badgesWithDates = parsed.map((badge) => ({
-          ...badge,
-          unlockedAt: badge.unlockedAt ? new Date(badge.unlockedAt) : undefined,
-          shown: badge.shown !== undefined ? badge.shown : false, // Default to false if not set
-        }));
+        // Migration: If unlockedAt is missing, set it to current time (for old badges)
+        const badgesWithDates = parsed.map((badge) => {
+          const hasUnlockedAt = badge.unlockedAt !== undefined && badge.unlockedAt !== null;
+          if (!hasUnlockedAt) {
+            needsMigration = true;
+          }
+          return {
+            ...badge,
+            unlockedAt: badge.unlockedAt ? new Date(badge.unlockedAt) : now, // Migration: Set to now if missing
+            shown: badge.shown !== undefined ? badge.shown : false, // Default to false if not set
+          };
+        });
+
+        // Save migrated badges back to localStorage if migration was needed
+        if (needsMigration) {
+          try {
+            localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(badgesWithDates));
+            console.log('✅ Migrated badges: Added unlockedAt timestamps to old badges');
+          } catch (migrationError) {
+            console.error('Failed to save migrated badges:', migrationError);
+          }
+        }
+
         setBadges(badgesWithDates);
       }
     } catch (error) {
@@ -150,12 +171,33 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem(STORAGE_KEYS.BADGES);
       if (stored) {
         const parsed = JSON.parse(stored) as Badge[];
+        const now = new Date();
+        let needsMigration = false;
+
         // Convert unlockedAt strings back to Date objects and ensure shown field exists
-        const badgesWithDates = parsed.map((badge) => ({
-          ...badge,
-          unlockedAt: badge.unlockedAt ? new Date(badge.unlockedAt) : undefined,
-          shown: badge.shown !== undefined ? badge.shown : false, // Default to false if not set
-        }));
+        // Migration: If unlockedAt is missing, set it to current time (for old badges)
+        const badgesWithDates = parsed.map((badge) => {
+          const hasUnlockedAt = badge.unlockedAt !== undefined && badge.unlockedAt !== null;
+          if (!hasUnlockedAt) {
+            needsMigration = true;
+          }
+          return {
+            ...badge,
+            unlockedAt: badge.unlockedAt ? new Date(badge.unlockedAt) : now, // Migration: Set to now if missing
+            shown: badge.shown !== undefined ? badge.shown : false, // Default to false if not set
+          };
+        });
+
+        // Save migrated badges back to localStorage if migration was needed
+        if (needsMigration) {
+          try {
+            localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(badgesWithDates));
+            console.log('✅ Migrated badges: Added unlockedAt timestamps to old badges');
+          } catch (migrationError) {
+            console.error('Failed to save migrated badges:', migrationError);
+          }
+        }
+
         setBadges(badgesWithDates);
       } else {
         setBadges([]);

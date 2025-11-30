@@ -38,6 +38,11 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { useDialogManager } from '@/lib/dialogManager';
 import packageJson from '../../package.json';
+import { ResetDataProgressDialog } from '@/components/ResetDataProgressDialog';
+import { CompatibilityModeProgressDialog } from '@/components/CompatibilityModeProgressDialog';
+import { DummyDataSummaryDialog } from '@/components/DummyDataSummaryDialog';
+import type { Badge } from '@/lib/badges';
+import type { Challenge } from '@/lib/challenges';
 
 // Lazy load heavy components that are not always visible
 const DataExportImport = lazy(() =>
@@ -68,9 +73,19 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const { isAuthenticated, isConfigured, user, logout } = useAuth();
   const { showToast } = useToaster();
   const router = useRouter();
-  const { activities, clearAllActivities, addActivity } = useActivities();
-  const { badges, clearAllBadges, checkNewBadges } = useBadges();
-  const { challenges, clearAllChallenges, addChallenge } = useChallenges();
+  const {
+    activities,
+    clearAllActivities,
+    addActivity,
+    reloadFromStorage: reloadActivities,
+  } = useActivities();
+  const { badges, clearAllBadges, checkNewBadges, reloadFromStorage: reloadBadges } = useBadges();
+  const {
+    challenges,
+    clearAllChallenges,
+    addChallenge,
+    reloadFromStorage: reloadChallenges,
+  } = useChallenges();
   const { syncToCloud } = useCloudSync();
   const { flushPendingSync } = useAutoSync();
   const { dialogs } = useDialogManager();
@@ -90,6 +105,37 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   const [showSyncSuccess, setShowSyncSuccess] = useState(false);
   const [isClearingData, setIsClearingData] = useState(false);
   const [showClearDataSuccess, setShowClearDataSuccess] = useState(false);
+  const [showResetProgress, setShowResetProgress] = useState(false);
+  const [resetProgress, setResetProgress] = useState<{
+    step:
+      | 'preparing'
+      | 'clearing-activities'
+      | 'clearing-badges'
+      | 'clearing-challenges'
+      | 'clearing-settings'
+      | 'clearing-cloud'
+      | 'completed'
+      | 'error';
+    percentage: number;
+    error: string | null;
+  }>({ step: 'preparing', percentage: 0, error: null });
+  const [showCompatibilityProgress, setShowCompatibilityProgress] = useState(false);
+  const [compatibilityProgress, setCompatibilityProgress] = useState<{
+    step:
+      | 'preparing'
+      | 'migrating-badges'
+      | 'migrating-challenges'
+      | 'migrating-activities'
+      | 'completed'
+      | 'error';
+    percentage: number;
+    error: string | null;
+    conversionLogs: Array<{
+      type: 'badge' | 'challenge' | 'activity';
+      action: string;
+      count: number;
+    }>;
+  }>({ step: 'preparing', percentage: 0, error: null, conversionLogs: [] });
   const [name, setName] = useState<string>(settings?.name ?? '');
   const [dailyTarget, setDailyTarget] = useState<string>(
     String(settings?.dailyTarget ?? DEFAULT_DAILY_TARGET)
@@ -100,6 +146,14 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
   );
   const [isLoadingDummyData, setIsLoadingDummyData] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDummySummary, setShowDummySummary] = useState(false);
+  const [dummySummaryStats, setDummySummaryStats] = useState<{
+    activitiesCount: number;
+    badgesCount: number;
+    challengesCount: number;
+    totalPoints: number;
+    dateRange: { start: Date; end: Date };
+  } | null>(null);
   const hasSyncedNameRef = useRef(false);
 
   useEffect(() => {
@@ -457,6 +511,328 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
     setShowClearDataDialog(true);
   };
 
+  const handleResetData = async () => {
+    // Show confirmation dialog first
+    const confirmed = window.confirm(
+      lang === 'tr'
+        ? 'Tüm verileriniz ve ayarlarınız kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam etmek istediğinize emin misiniz?'
+        : 'All your data and settings will be permanently deleted. This action cannot be undone. Are you sure you want to continue?'
+    );
+
+    if (!confirmed) return;
+
+    // Show progress dialog
+    setShowResetProgress(true);
+    setResetProgress({ step: 'preparing', percentage: 0, error: null });
+
+    try {
+      // Step 1: Preparing (10%)
+      setResetProgress({ step: 'preparing', percentage: 10, error: null });
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Step 2: Clear activities (20%)
+      setResetProgress({ step: 'clearing-activities', percentage: 20, error: null });
+      clearAllActivities();
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Step 3: Clear badges (40%)
+      setResetProgress({ step: 'clearing-badges', percentage: 40, error: null });
+      clearAllBadges();
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Step 4: Clear challenges (60%)
+      setResetProgress({ step: 'clearing-challenges', percentage: 60, error: null });
+      clearAllChallenges();
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Step 5: Clear settings (80%)
+      setResetProgress({ step: 'clearing-settings', percentage: 80, error: null });
+      saveSettings({
+        name: '',
+        dailyTarget: 10000,
+        customActivities: [],
+        mood: undefined,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Step 6: Clear cloud data (if authenticated) (90%)
+      if (isAuthenticated && isConfigured) {
+        setResetProgress({ step: 'clearing-cloud', percentage: 90, error: null });
+        try {
+          await syncToCloud(
+            {
+              activities: [],
+              settings: null,
+              badges: [],
+              challenges: [],
+            },
+            { isReset: true }
+          );
+        } catch (uploadError) {
+          console.error('Failed to clear cloud storage:', uploadError);
+          // Continue anyway
+        }
+      }
+
+      // Clear all localStorage data
+      if (typeof window !== 'undefined') {
+        Object.keys(localStorage).forEach((key) => {
+          if (
+            key.startsWith('sporttrack.') ||
+            key === 'theme' ||
+            key === 'lang' ||
+            key === 'name_dialog_shown'
+          ) {
+            localStorage.removeItem(key);
+          }
+        });
+
+        localStorage.removeItem('sporttrack_initial_sync_complete');
+        localStorage.removeItem('sporttrack_sync_conflict');
+        localStorage.removeItem('sporttrack_last_login_time');
+        localStorage.removeItem('sporttrack_last_user_id');
+        localStorage.setItem('sporttrack.skip_login_popup', 'true');
+      }
+
+      // Step 7: Completed (100%)
+      setResetProgress({ step: 'completed', percentage: 100, error: null });
+      showToast(
+        lang === 'tr' ? 'Tüm veriler başarıyla sıfırlandı' : 'All data successfully reset',
+        'success'
+      );
+
+      // Close settings dialog after a delay
+      setTimeout(() => {
+        setOpen(false);
+        router.push('/');
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to reset data:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setResetProgress({
+        step: 'error',
+        percentage: 100,
+        error: lang === 'tr' ? `Sıfırlama hatası: ${errorMessage}` : `Reset error: ${errorMessage}`,
+      });
+      showToast(lang === 'tr' ? 'Veri sıfırlama hatası' : 'Error resetting data', 'error');
+    }
+  };
+
+  const handleCompatibilityMode = async () => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      lang === 'tr'
+        ? 'Uyumluluk modu, eski formattaki verilerinizi yeni formata dönüştürecek. Bu işlem verilerinizi güncelleyecektir. Devam etmek istediğinize emin misiniz?'
+        : 'Compatibility mode will convert your old format data to the new format. This will update your data. Are you sure you want to continue?'
+    );
+
+    if (!confirmed) return;
+
+    // Close settings dialog immediately so user can see the progress dialog
+    setOpen(false);
+
+    // Small delay to allow dialog to close smoothly
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // Show progress dialog
+    setShowCompatibilityProgress(true);
+    setCompatibilityProgress({
+      step: 'preparing',
+      percentage: 0,
+      error: null,
+      conversionLogs: [],
+    });
+
+    try {
+      const conversionLogs: Array<{
+        type: 'badge' | 'challenge' | 'activity';
+        action: string;
+        count: number;
+      }> = [];
+
+      // Step 1: Preparing (10%)
+      setCompatibilityProgress({
+        step: 'preparing',
+        percentage: 10,
+        error: null,
+        conversionLogs: [],
+      });
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Step 2: Migrate badges (30%)
+      setCompatibilityProgress({
+        step: 'migrating-badges',
+        percentage: 30,
+        error: null,
+        conversionLogs: [],
+      });
+
+      // Get badges from localStorage
+      const badgesStr = localStorage.getItem(STORAGE_KEYS.BADGES);
+      if (badgesStr) {
+        const badges = JSON.parse(badgesStr) as Badge[];
+        const now = new Date();
+        let badgesMigrated = 0;
+
+        const migratedBadges = badges.map((badge) => {
+          if (!badge.unlockedAt) {
+            badgesMigrated++;
+            return {
+              ...badge,
+              unlockedAt: now.toISOString(),
+            };
+          }
+          return badge;
+        });
+
+        if (badgesMigrated > 0) {
+          localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(migratedBadges));
+          conversionLogs.push({
+            type: 'badge',
+            action: lang === 'tr' ? 'Başarılara tarih eklendi' : 'Added dates to badges',
+            count: badgesMigrated,
+          });
+        }
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Step 3: Migrate challenges (60%)
+      setCompatibilityProgress({
+        step: 'migrating-challenges',
+        percentage: 60,
+        error: null,
+        conversionLogs,
+      });
+
+      // Get challenges from localStorage
+      const challengesStr = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+      if (challengesStr) {
+        const challenges = JSON.parse(challengesStr) as Challenge[];
+        const now = new Date();
+        let challengesMigrated = 0;
+
+        const migratedChallenges = challenges.map((challenge) => {
+          if (challenge.status === 'completed' && !challenge.completedAt) {
+            challengesMigrated++;
+            return {
+              ...challenge,
+              completedAt: now.toISOString(),
+            };
+          }
+          return challenge;
+        });
+
+        if (challengesMigrated > 0) {
+          localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(migratedChallenges));
+          conversionLogs.push({
+            type: 'challenge',
+            action:
+              lang === 'tr'
+                ? 'Tamamlanan hedeflere tarih eklendi'
+                : 'Added dates to completed challenges',
+            count: challengesMigrated,
+          });
+        }
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Step 4: Migrate activities (if needed) (90%)
+      setCompatibilityProgress({
+        step: 'migrating-activities',
+        percentage: 90,
+        error: null,
+        conversionLogs,
+      });
+
+      // Activities are already in the correct format, but we can check for any old format
+      const activitiesStr = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+      if (activitiesStr) {
+        try {
+          const activities = JSON.parse(activitiesStr);
+          let activitiesMigrated = 0;
+
+          if (Array.isArray(activities)) {
+            // Check for old format activities that might need migration
+            const migratedActivities = activities.map((activity: any) => {
+              // Ensure all required fields exist
+              if (!activity.id || !activity.activityKey || !activity.performedAt) {
+                activitiesMigrated++;
+                // This is an old format activity, but we can't migrate it without more info
+                // Just ensure it has required fields
+                return {
+                  ...activity,
+                  id: activity.id || `migrated-${Date.now()}-${Math.random()}`,
+                  activityKey: activity.activityKey || 'WALKING',
+                  performedAt: activity.performedAt || new Date().toISOString(),
+                };
+              }
+              return activity;
+            });
+
+            if (activitiesMigrated > 0) {
+              localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(migratedActivities));
+              conversionLogs.push({
+                type: 'activity',
+                action: lang === 'tr' ? 'Egzersizler güncellendi' : 'Activities updated',
+                count: activitiesMigrated,
+              });
+            } else {
+              conversionLogs.push({
+                type: 'activity',
+                action: lang === 'tr' ? 'Egzersizler kontrol edildi' : 'Activities checked',
+                count: activities.length,
+              });
+            }
+          }
+        } catch (parseError) {
+          console.error('Failed to parse activities:', parseError);
+          conversionLogs.push({
+            type: 'activity',
+            action: lang === 'tr' ? 'Egzersizler kontrol edilemedi' : 'Activities check failed',
+            count: 0,
+          });
+        }
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Step 5: Completed (100%)
+      setCompatibilityProgress({
+        step: 'completed',
+        percentage: 100,
+        error: null,
+        conversionLogs,
+      });
+
+      // Reload stores to apply changes
+      reloadActivities();
+      reloadBadges();
+      reloadChallenges();
+
+      showToast(
+        lang === 'tr'
+          ? 'Uyumluluk modu başarıyla tamamlandı'
+          : 'Compatibility mode completed successfully',
+        'success'
+      );
+    } catch (error) {
+      console.error('Failed to run compatibility mode:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setCompatibilityProgress({
+        step: 'error',
+        percentage: 100,
+        error:
+          lang === 'tr'
+            ? `Uyumluluk hatası: ${errorMessage}`
+            : `Compatibility error: ${errorMessage}`,
+        conversionLogs: [],
+      });
+      showToast(lang === 'tr' ? 'Uyumluluk modu hatası' : 'Compatibility mode error', 'error');
+    }
+  };
+
   const confirmClearData = async () => {
     // Close dialog and show clearing animation
     setShowClearDataDialog(false);
@@ -759,7 +1135,8 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     </span>
                   </div>
                   <div
-                    className={`flex items-center flex-nowrap ${isMobile ? 'gap-0.5' : 'gap-1'} overflow-x-auto`}
+                    className={`flex items-center flex-nowrap ${isMobile ? 'gap-0.5' : 'gap-1'} overflow-x-auto scrollbar-none`}
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   >
                     <LanguageToggle />
                     <ThemeToggle />
@@ -808,6 +1185,11 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             createMonthlyChallenge,
                           } = await import('@/lib/challenges');
 
+                          // Helper function to compute points
+                          const computePoints = (multiplier: number, amount: number): number => {
+                            return Math.max(0, Math.round(amount * multiplier));
+                          };
+
                           // Helper function to round numbers nicely
                           const roundAmount = (
                             amount: number,
@@ -831,10 +1213,10 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             return Math.round(amount);
                           };
 
-                          // Generate dummy activities for the last 240 days (8 months)
+                          // Generate dummy activities for the last 240 days (8 months) - optimized for performance
                           const now = new Date();
                           const activitiesToAdd: Parameters<typeof addActivity>[0][] = [];
-                          const totalDays = 240;
+                          const totalDays = 240; // Increased to generate more badges
 
                           for (let dayOffset = 0; dayOffset < totalDays; dayOffset++) {
                             const baseDate = new Date(now);
@@ -843,9 +1225,13 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             const dayOfWeek = baseDate.getDay(); // 0 = Sunday, 6 = Saturday
 
                             // Different activity patterns for different days
+                            // Ensure daily target is met for streak badges
+                            const dailyTarget = currentSettings.dailyTarget || DEFAULT_DAILY_TARGET;
+                            let dailyPoints = 0;
+
                             if (dayOfWeek === 0) {
-                              // Sunday - Rest day, 1-2 activities
-                              const numActivities = Math.random() > 0.3 ? 1 : 2;
+                              // Sunday - Rest day but still meet target, 2-3 activities
+                              const numActivities = Math.random() > 0.4 ? 2 : 3;
                               for (let i = 0; i < numActivities; i++) {
                                 const activityDate = new Date(baseDate);
                                 activityDate.setHours(
@@ -854,25 +1240,80 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                                   0,
                                   0
                                 );
+                                // More varied activities on Sunday
+                                const sundayActivities = [
+                                  'WALKING',
+                                  'CRUNCH',
+                                  'SWIMMING',
+                                  'STAIRS',
+                                ];
+                                const activityKey =
+                                  sundayActivities[
+                                    Math.floor(Math.random() * sundayActivities.length)
+                                  ];
                                 const activity = BASE_ACTIVITY_DEFINITIONS.find(
-                                  (a) => a.key === 'WALKING'
-                                )!;
-                                const amount = roundAmount(2000 + Math.random() * 2000, activity);
+                                  (a) => a.key === activityKey
+                                );
+                                if (!activity) continue; // Skip if activity not found
+                                let amount: number;
+                                if (activity.key === 'WALKING') {
+                                  amount = roundAmount(4000 + Math.random() * 4000, activity);
+                                } else if (activity.key === 'STAIRS') {
+                                  amount = roundAmount(20 + Math.random() * 30, activity);
+                                } else if (
+                                  activity.key === 'CRUNCH' ||
+                                  activity.key === 'SWIMMING'
+                                ) {
+                                  amount = roundAmount(25 + Math.random() * 35, activity);
+                                } else {
+                                  amount = roundAmount(
+                                    activity.defaultAmount * (0.8 + Math.random() * 0.4),
+                                    activity
+                                  );
+                                }
+                                const points = computePoints(activity.multiplier, amount);
+                                dailyPoints += points;
                                 activitiesToAdd.push({
                                   definition: activity,
                                   amount,
                                   performedAt: activityDate.toISOString(),
                                 });
                               }
+
+                              // Ensure daily target is met
+                              if (dailyPoints < dailyTarget) {
+                                const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
+                                  (a) => a.key === 'WALKING'
+                                )!;
+                                const extraAmount = roundAmount(
+                                  (dailyTarget - dailyPoints) / extraActivity.multiplier + 1000,
+                                  extraActivity
+                                );
+                                const extraDate = new Date(baseDate);
+                                extraDate.setHours(
+                                  16 + Math.floor(Math.random() * 2),
+                                  Math.floor(Math.random() * 60),
+                                  0,
+                                  0
+                                );
+                                activitiesToAdd.push({
+                                  definition: extraActivity,
+                                  amount: extraAmount,
+                                  performedAt: extraDate.toISOString(),
+                                });
+                              }
                             } else if (dayOfWeek === 6) {
-                              // Saturday - Active day, 3-4 activities
-                              const numActivities = Math.random() > 0.5 ? 3 : 4;
+                              // Saturday - Active day, 4-5 activities with high points
+                              const numActivities = Math.random() > 0.3 ? 4 : 5;
                               const activityTypes = [
                                 'RUNNING',
                                 'SWIMMING',
                                 'WEIGHT_LIFTING',
                                 'PUSH_UP',
                                 'SIT_UP',
+                                'STAIRS',
+                                'WALKING',
+                                'CRUNCH',
                               ];
                               for (let i = 0; i < numActivities; i++) {
                                 const activityKey =
@@ -888,22 +1329,32 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                                       ? 10 + Math.floor(Math.random() * 2)
                                       : i === 2
                                         ? 15 + Math.floor(Math.random() * 2)
-                                        : 18 + Math.floor(Math.random() * 2);
+                                        : i === 3
+                                          ? 18 + Math.floor(Math.random() * 2)
+                                          : 20 + Math.floor(Math.random() * 2);
                                 activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
 
                                 let amount: number;
                                 if (activity.key === 'RUNNING') {
-                                  amount = roundAmount(3000 + Math.random() * 3000, activity);
+                                  amount = roundAmount(5000 + Math.random() * 5000, activity);
                                 } else if (activity.key === 'SWIMMING') {
-                                  amount = roundAmount(20 + Math.random() * 40, activity);
-                                } else if (activity.key === 'WEIGHT_LIFTING') {
                                   amount = roundAmount(30 + Math.random() * 60, activity);
+                                } else if (activity.key === 'WEIGHT_LIFTING') {
+                                  amount = roundAmount(50 + Math.random() * 100, activity);
+                                } else if (activity.key === 'STAIRS') {
+                                  amount = roundAmount(30 + Math.random() * 50, activity);
+                                } else if (activity.key === 'STAIRS') {
+                                  amount = roundAmount(40 + Math.random() * 60, activity);
+                                } else if (activity.key === 'WALKING') {
+                                  amount = roundAmount(8000 + Math.random() * 8000, activity);
                                 } else {
                                   amount = roundAmount(
-                                    activity.defaultAmount * (0.5 + Math.random() * 0.8),
+                                    activity.defaultAmount * (0.8 + Math.random() * 1.2),
                                     activity
                                   );
                                 }
+                                const points = computePoints(activity.multiplier, amount);
+                                dailyPoints += points;
 
                                 activitiesToAdd.push({
                                   definition: activity,
@@ -911,15 +1362,37 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                                   performedAt: activityDate.toISOString(),
                                 });
                               }
-                            } else {
-                              // Weekdays - Regular activity, 2-4 activities
-                              const numActivities =
-                                Math.random() > 0.4 ? (Math.random() > 0.5 ? 2 : 3) : 4;
 
-                              // Use different activities each day
-                              const availableActivities = BASE_ACTIVITY_DEFINITIONS.filter(
-                                (a) => a.key !== 'WALKING' || Math.random() > 0.7 // Less walking on weekdays
-                              );
+                              // Ensure daily target is exceeded for weekend warrior badge
+                              if (dailyPoints < dailyTarget * 1.5) {
+                                const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
+                                  (a) => a.key === 'RUNNING'
+                                )!;
+                                const extraAmount = roundAmount(
+                                  (dailyTarget * 1.5 - dailyPoints) / extraActivity.multiplier +
+                                    2000,
+                                  extraActivity
+                                );
+                                const extraDate = new Date(baseDate);
+                                extraDate.setHours(
+                                  19 + Math.floor(Math.random() * 2),
+                                  Math.floor(Math.random() * 60),
+                                  0,
+                                  0
+                                );
+                                activitiesToAdd.push({
+                                  definition: extraActivity,
+                                  amount: extraAmount,
+                                  performedAt: extraDate.toISOString(),
+                                });
+                              }
+                            } else {
+                              // Weekdays - Regular activity, 3-5 activities with variety
+                              const numActivities =
+                                Math.random() > 0.3 ? (Math.random() > 0.5 ? 3 : 4) : 5;
+
+                              // Use different activities each day for variety_seeker badge
+                              const availableActivities = BASE_ACTIVITY_DEFINITIONS;
 
                               for (let i = 0; i < numActivities; i++) {
                                 const activity =
@@ -927,38 +1400,75 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                                     Math.floor(Math.random() * availableActivities.length)
                                   ];
                                 const activityDate = new Date(baseDate);
+                                // Vary hours for early_bird, noon_warrior, night_owl badges
                                 const hour =
                                   i === 0
-                                    ? 6 + Math.floor(Math.random() * 2)
+                                    ? 6 + Math.floor(Math.random() * 3) // Early bird (6-9)
                                     : i === 1
-                                      ? 12 + Math.floor(Math.random() * 2)
+                                      ? 12 + Math.floor(Math.random() * 2) // Noon warrior (12-14)
                                       : i === 2
                                         ? 17 + Math.floor(Math.random() * 2)
-                                        : 20 + Math.floor(Math.random() * 2);
+                                        : i === 3
+                                          ? 20 + Math.floor(Math.random() * 2)
+                                          : 22 + Math.floor(Math.random() * 2); // Night owl (21-24)
                                 activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
 
                                 let amount: number;
                                 if (activity.key === 'WALKING') {
-                                  amount = roundAmount(5000 + Math.random() * 5000, activity);
+                                  amount = roundAmount(7000 + Math.random() * 7000, activity);
                                 } else if (activity.key === 'RUNNING') {
-                                  amount = roundAmount(2000 + Math.random() * 3000, activity);
+                                  amount = roundAmount(4000 + Math.random() * 5000, activity);
                                 } else if (activity.key === 'SWIMMING') {
-                                  amount = roundAmount(15 + Math.random() * 30, activity);
+                                  amount = roundAmount(25 + Math.random() * 45, activity);
                                 } else if (activity.key === 'WEIGHT_LIFTING') {
-                                  amount = roundAmount(20 + Math.random() * 50, activity);
+                                  amount = roundAmount(35 + Math.random() * 70, activity);
                                 } else if (activity.key === 'STAIRS') {
-                                  amount = roundAmount(20 + Math.random() * 30, activity);
+                                  amount = roundAmount(30 + Math.random() * 50, activity);
+                                } else if (activity.key === 'STAIRS') {
+                                  amount = roundAmount(30 + Math.random() * 50, activity);
+                                } else if (activity.key === 'CRUNCH') {
+                                  amount = roundAmount(20 + Math.random() * 40, activity);
+                                } else if (
+                                  activity.key === 'PUSH_UP' ||
+                                  activity.key === 'SIT_UP'
+                                ) {
+                                  amount = roundAmount(20 + Math.random() * 40, activity);
                                 } else {
                                   amount = roundAmount(
-                                    activity.defaultAmount * (0.6 + Math.random() * 0.6),
+                                    activity.defaultAmount * (0.8 + Math.random() * 1.0),
                                     activity
                                   );
                                 }
+                                const points = computePoints(activity.multiplier, amount);
+                                dailyPoints += points;
 
                                 activitiesToAdd.push({
                                   definition: activity,
                                   amount,
                                   performedAt: activityDate.toISOString(),
+                                });
+                              }
+
+                              // Ensure daily target is met for streak badges
+                              if (dailyPoints < dailyTarget) {
+                                const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
+                                  (a) => a.key === 'WALKING'
+                                )!;
+                                const extraAmount = roundAmount(
+                                  (dailyTarget - dailyPoints) / extraActivity.multiplier + 1000,
+                                  extraActivity
+                                );
+                                const extraDate = new Date(baseDate);
+                                extraDate.setHours(
+                                  18 + Math.floor(Math.random() * 2),
+                                  Math.floor(Math.random() * 60),
+                                  0,
+                                  0
+                                );
+                                activitiesToAdd.push({
+                                  definition: extraActivity,
+                                  amount: extraAmount,
+                                  performedAt: extraDate.toISOString(),
                                 });
                               }
                             }
@@ -969,11 +1479,64 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             addActivity(activity);
                           });
 
-                          // Wait a bit for activities to be processed
-                          await new Promise((resolve) => setTimeout(resolve, 1500));
+                          // Wait a bit for activities to be processed and saved to localStorage
+                          await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                          // Force reload activities from storage to ensure badge check has latest data
+                          reloadActivities();
+                          await new Promise((resolve) => setTimeout(resolve, 500));
 
                           // Check and unlock badges silently (no notifications)
-                          checkNewBadges();
+                          // Call checkNewBadges multiple times to catch all badges (some badges depend on others)
+                          let newBadges: Badge[] = [];
+                          for (let i = 0; i < 3; i++) {
+                            const badges = checkNewBadges();
+                            if (badges.length > 0) {
+                              newBadges = [...newBadges, ...badges];
+                              // Reload badges to get updated state
+                              reloadBadges();
+                              await new Promise((resolve) => setTimeout(resolve, 300));
+                            } else {
+                              break; // No more badges to unlock
+                            }
+                          }
+                          console.log(`✅ Unlocked ${newBadges.length} badges from dummy data`);
+
+                          // Reload badges to get final count
+                          reloadBadges();
+                          await new Promise((resolve) => setTimeout(resolve, 300));
+
+                          // Get final counts from localStorage
+                          const finalActivities = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+                          const finalBadges = localStorage.getItem(STORAGE_KEYS.BADGES);
+                          const finalChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+
+                          const activitiesArray = finalActivities
+                            ? JSON.parse(finalActivities)
+                            : [];
+                          const badgesArray = finalBadges ? JSON.parse(finalBadges) : [];
+                          const challengesArray = finalChallenges
+                            ? JSON.parse(finalChallenges)
+                            : [];
+
+                          // Calculate total points
+                          const totalPoints = activitiesArray.reduce(
+                            (sum: number, act: any) => sum + (act.points || 0),
+                            0
+                          );
+
+                          // Calculate date range
+                          const activityDates = activitiesArray.map(
+                            (act: any) => new Date(act.performedAt)
+                          );
+                          const startDate =
+                            activityDates.length > 0
+                              ? new Date(Math.min(...activityDates.map((d: Date) => d.getTime())))
+                              : new Date();
+                          const endDate =
+                            activityDates.length > 0
+                              ? new Date(Math.max(...activityDates.map((d: Date) => d.getTime())))
+                              : new Date();
 
                           // Create challenges only if they don't already exist
                           const currentSettings = settings || { dailyTarget: DEFAULT_DAILY_TARGET };
@@ -1024,17 +1587,18 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             }
                           }
 
-                          showToast(
-                            lang === 'tr'
-                              ? `✅ ${activitiesToAdd.length} aktivite, rozetler ve challenge'lar yüklendi!`
-                              : `✅ ${activitiesToAdd.length} activities, badges, and challenges loaded!`,
-                            'success'
-                          );
-
-                          // Navigate to homepage after a short delay
-                          setTimeout(() => {
-                            router.push('/');
-                          }, 500);
+                          // Show summary dialog
+                          setDummySummaryStats({
+                            activitiesCount: activitiesArray.length,
+                            badgesCount: badgesArray.length,
+                            challengesCount: challengesArray.length,
+                            totalPoints,
+                            dateRange: {
+                              start: startDate,
+                              end: endDate,
+                            },
+                          });
+                          setShowDummySummary(true);
                         } catch (error) {
                           console.error('Failed to load dummy data:', error);
                           showToast(
@@ -1240,6 +1804,37 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                           <DataExportImport onSettingsClose={() => setOpen(false)} />
                         </Suspense>
                       )}
+                      <Button
+                        type="button"
+                        variant="danger"
+                        size={isMobile ? 'sm' : 'md'}
+                        className={`${isMobile ? 'text-xs px-2 py-1.5 min-h-[36px]' : 'text-sm px-3 py-2 min-h-[40px]'} flex items-center justify-center`}
+                        onClick={handleResetData}
+                        disabled={
+                          isClearingData ||
+                          (showResetProgress &&
+                            resetProgress.step !== 'completed' &&
+                            resetProgress.step !== 'error')
+                        }
+                        title={lang === 'tr' ? 'Verileri Sıfırla' : 'Reset Data'}
+                      >
+                        <span>🗑️</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size={isMobile ? 'sm' : 'md'}
+                        className={`${isMobile ? 'text-xs px-2 py-1.5 min-h-[36px]' : 'text-sm px-3 py-2 min-h-[40px]'} flex items-center justify-center`}
+                        onClick={handleCompatibilityMode}
+                        disabled={
+                          showCompatibilityProgress &&
+                          compatibilityProgress.step !== 'completed' &&
+                          compatibilityProgress.step !== 'error'
+                        }
+                        title={lang === 'tr' ? 'Uyumluluk Modu' : 'Compatibility Mode'}
+                      >
+                        <span>🔄</span>
+                      </Button>
                     </div>
                   </div>
 
@@ -1306,6 +1901,11 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               createMonthlyChallenge,
                             } = await import('@/lib/challenges');
 
+                            // Helper function to compute points
+                            const computePoints = (multiplier: number, amount: number): number => {
+                              return Math.max(0, Math.round(amount * multiplier));
+                            };
+
                             // Helper function to round numbers nicely
                             const roundAmount = (
                               amount: number,
@@ -1332,10 +1932,14 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               return Math.round(amount);
                             };
 
-                            // Generate dummy activities for the last 240 days (8 months)
+                            // Generate dummy activities for the last 240 days (8 months) - optimized for performance
                             const now = new Date();
                             const activitiesToAdd: Parameters<typeof addActivity>[0][] = [];
-                            const totalDays = 240;
+                            const totalDays = 240; // Increased to generate more badges
+                            const currentSettings = settings || {
+                              dailyTarget: DEFAULT_DAILY_TARGET,
+                            };
+                            const dailyTarget = currentSettings.dailyTarget || DEFAULT_DAILY_TARGET;
 
                             for (let dayOffset = 0; dayOffset < totalDays; dayOffset++) {
                               const baseDate = new Date(now);
@@ -1344,9 +1948,12 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               const dayOfWeek = baseDate.getDay(); // 0 = Sunday, 6 = Saturday
 
                               // Different activity patterns for different days
+                              // Ensure daily target is met for streak badges
+                              let dailyPoints = 0;
+
                               if (dayOfWeek === 0) {
-                                // Sunday - Rest day, 1-2 activities
-                                const numActivities = Math.random() > 0.3 ? 1 : 2;
+                                // Sunday - Rest day but still meet target, 2-3 activities
+                                const numActivities = Math.random() > 0.4 ? 2 : 3;
                                 for (let i = 0; i < numActivities; i++) {
                                   const activityDate = new Date(baseDate);
                                   activityDate.setHours(
@@ -1355,32 +1962,88 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                                     0,
                                     0
                                   );
+                                  // More varied activities on Sunday
+                                  const sundayActivities = [
+                                    'WALKING',
+                                    'CRUNCH',
+                                    'SWIMMING',
+                                    'STAIRS',
+                                  ];
+                                  const activityKey =
+                                    sundayActivities[
+                                      Math.floor(Math.random() * sundayActivities.length)
+                                    ];
                                   const activity = BASE_ACTIVITY_DEFINITIONS.find(
-                                    (a) => a.key === 'WALKING'
-                                  )!;
-                                  const amount = roundAmount(2000 + Math.random() * 2000, activity);
+                                    (a) => a.key === activityKey
+                                  );
+                                  if (!activity) continue; // Skip if activity not found
+                                  let amount: number;
+                                  if (activity.key === 'WALKING') {
+                                    amount = roundAmount(4000 + Math.random() * 4000, activity);
+                                  } else if (activity.key === 'STAIRS') {
+                                    amount = roundAmount(20 + Math.random() * 30, activity);
+                                  } else if (
+                                    activity.key === 'CRUNCH' ||
+                                    activity.key === 'SWIMMING'
+                                  ) {
+                                    amount = roundAmount(25 + Math.random() * 35, activity);
+                                  } else {
+                                    amount = roundAmount(
+                                      activity.defaultAmount * (0.8 + Math.random() * 0.4),
+                                      activity
+                                    );
+                                  }
+                                  const points = computePoints(activity.multiplier, amount);
+                                  dailyPoints += points;
                                   activitiesToAdd.push({
                                     definition: activity,
                                     amount,
                                     performedAt: activityDate.toISOString(),
                                   });
                                 }
+
+                                // Ensure daily target is met
+                                if (dailyPoints < dailyTarget) {
+                                  const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
+                                    (a) => a.key === 'WALKING'
+                                  )!;
+                                  const extraAmount = roundAmount(
+                                    (dailyTarget - dailyPoints) / extraActivity.multiplier + 1000,
+                                    extraActivity
+                                  );
+                                  const extraDate = new Date(baseDate);
+                                  extraDate.setHours(
+                                    16 + Math.floor(Math.random() * 2),
+                                    Math.floor(Math.random() * 60),
+                                    0,
+                                    0
+                                  );
+                                  activitiesToAdd.push({
+                                    definition: extraActivity,
+                                    amount: extraAmount,
+                                    performedAt: extraDate.toISOString(),
+                                  });
+                                }
                               } else if (dayOfWeek === 6) {
-                                // Saturday - Active day, 3-4 activities
-                                const numActivities = Math.random() > 0.5 ? 3 : 4;
+                                // Saturday - Active day, 4-5 activities with high points
+                                const numActivities = Math.random() > 0.3 ? 4 : 5;
                                 const activityTypes = [
                                   'RUNNING',
                                   'SWIMMING',
                                   'WEIGHT_LIFTING',
                                   'PUSH_UP',
                                   'SIT_UP',
+                                  'STAIRS',
+                                  'WALKING',
+                                  'CRUNCH',
                                 ];
                                 for (let i = 0; i < numActivities; i++) {
                                   const activityKey =
                                     activityTypes[Math.floor(Math.random() * activityTypes.length)];
                                   const activity = BASE_ACTIVITY_DEFINITIONS.find(
                                     (a) => a.key === activityKey
-                                  )!;
+                                  );
+                                  if (!activity) continue; // Skip if activity not found
                                   const activityDate = new Date(baseDate);
                                   const hour =
                                     i === 0
@@ -1389,22 +2052,32 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                                         ? 10 + Math.floor(Math.random() * 2)
                                         : i === 2
                                           ? 15 + Math.floor(Math.random() * 2)
-                                          : 18 + Math.floor(Math.random() * 2);
+                                          : i === 3
+                                            ? 18 + Math.floor(Math.random() * 2)
+                                            : 20 + Math.floor(Math.random() * 2);
                                   activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
 
                                   let amount: number;
                                   if (activity.key === 'RUNNING') {
-                                    amount = roundAmount(3000 + Math.random() * 3000, activity);
+                                    amount = roundAmount(5000 + Math.random() * 5000, activity);
                                   } else if (activity.key === 'SWIMMING') {
-                                    amount = roundAmount(20 + Math.random() * 40, activity);
-                                  } else if (activity.key === 'WEIGHT_LIFTING') {
                                     amount = roundAmount(30 + Math.random() * 60, activity);
+                                  } else if (activity.key === 'WEIGHT_LIFTING') {
+                                    amount = roundAmount(50 + Math.random() * 100, activity);
+                                  } else if (activity.key === 'STAIRS') {
+                                    amount = roundAmount(30 + Math.random() * 50, activity);
+                                  } else if (activity.key === 'STAIRS') {
+                                    amount = roundAmount(40 + Math.random() * 60, activity);
+                                  } else if (activity.key === 'WALKING') {
+                                    amount = roundAmount(8000 + Math.random() * 8000, activity);
                                   } else {
                                     amount = roundAmount(
-                                      activity.defaultAmount * (0.5 + Math.random() * 0.8),
+                                      activity.defaultAmount * (0.8 + Math.random() * 1.2),
                                       activity
                                     );
                                   }
+                                  const points = computePoints(activity.multiplier, amount);
+                                  dailyPoints += points;
 
                                   activitiesToAdd.push({
                                     definition: activity,
@@ -1412,15 +2085,37 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                                     performedAt: activityDate.toISOString(),
                                   });
                                 }
-                              } else {
-                                // Weekdays - Regular activity, 2-4 activities
-                                const numActivities =
-                                  Math.random() > 0.4 ? (Math.random() > 0.5 ? 2 : 3) : 4;
 
-                                // Use different activities each day
-                                const availableActivities = BASE_ACTIVITY_DEFINITIONS.filter(
-                                  (a) => a.key !== 'WALKING' || Math.random() > 0.7 // Less walking on weekdays
-                                );
+                                // Ensure daily target is exceeded for weekend warrior badge
+                                if (dailyPoints < dailyTarget * 1.5) {
+                                  const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
+                                    (a) => a.key === 'RUNNING'
+                                  )!;
+                                  const extraAmount = roundAmount(
+                                    (dailyTarget * 1.5 - dailyPoints) / extraActivity.multiplier +
+                                      2000,
+                                    extraActivity
+                                  );
+                                  const extraDate = new Date(baseDate);
+                                  extraDate.setHours(
+                                    19 + Math.floor(Math.random() * 2),
+                                    Math.floor(Math.random() * 60),
+                                    0,
+                                    0
+                                  );
+                                  activitiesToAdd.push({
+                                    definition: extraActivity,
+                                    amount: extraAmount,
+                                    performedAt: extraDate.toISOString(),
+                                  });
+                                }
+                              } else {
+                                // Weekdays - Regular activity, 3-5 activities with variety
+                                const numActivities =
+                                  Math.random() > 0.3 ? (Math.random() > 0.5 ? 3 : 4) : 5;
+
+                                // Use different activities each day for variety_seeker badge
+                                const availableActivities = BASE_ACTIVITY_DEFINITIONS;
 
                                 for (let i = 0; i < numActivities; i++) {
                                   const activity =
@@ -1428,38 +2123,75 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                                       Math.floor(Math.random() * availableActivities.length)
                                     ];
                                   const activityDate = new Date(baseDate);
+                                  // Vary hours for early_bird, noon_warrior, night_owl badges
                                   const hour =
                                     i === 0
-                                      ? 6 + Math.floor(Math.random() * 2)
+                                      ? 6 + Math.floor(Math.random() * 3) // Early bird (6-9)
                                       : i === 1
-                                        ? 12 + Math.floor(Math.random() * 2)
+                                        ? 12 + Math.floor(Math.random() * 2) // Noon warrior (12-14)
                                         : i === 2
                                           ? 17 + Math.floor(Math.random() * 2)
-                                          : 20 + Math.floor(Math.random() * 2);
+                                          : i === 3
+                                            ? 20 + Math.floor(Math.random() * 2)
+                                            : 22 + Math.floor(Math.random() * 2); // Night owl (21-24)
                                   activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
 
                                   let amount: number;
                                   if (activity.key === 'WALKING') {
-                                    amount = roundAmount(5000 + Math.random() * 5000, activity);
+                                    amount = roundAmount(7000 + Math.random() * 7000, activity);
                                   } else if (activity.key === 'RUNNING') {
-                                    amount = roundAmount(2000 + Math.random() * 3000, activity);
+                                    amount = roundAmount(4000 + Math.random() * 5000, activity);
                                   } else if (activity.key === 'SWIMMING') {
-                                    amount = roundAmount(15 + Math.random() * 30, activity);
+                                    amount = roundAmount(25 + Math.random() * 45, activity);
                                   } else if (activity.key === 'WEIGHT_LIFTING') {
-                                    amount = roundAmount(20 + Math.random() * 50, activity);
+                                    amount = roundAmount(35 + Math.random() * 70, activity);
                                   } else if (activity.key === 'STAIRS') {
-                                    amount = roundAmount(20 + Math.random() * 30, activity);
+                                    amount = roundAmount(30 + Math.random() * 50, activity);
+                                  } else if (activity.key === 'STAIRS') {
+                                    amount = roundAmount(30 + Math.random() * 50, activity);
+                                  } else if (activity.key === 'CRUNCH') {
+                                    amount = roundAmount(20 + Math.random() * 40, activity);
+                                  } else if (
+                                    activity.key === 'PUSH_UP' ||
+                                    activity.key === 'SIT_UP'
+                                  ) {
+                                    amount = roundAmount(20 + Math.random() * 40, activity);
                                   } else {
                                     amount = roundAmount(
-                                      activity.defaultAmount * (0.6 + Math.random() * 0.6),
+                                      activity.defaultAmount * (0.8 + Math.random() * 1.0),
                                       activity
                                     );
                                   }
+                                  const points = computePoints(activity.multiplier, amount);
+                                  dailyPoints += points;
 
                                   activitiesToAdd.push({
                                     definition: activity,
                                     amount,
                                     performedAt: activityDate.toISOString(),
+                                  });
+                                }
+
+                                // Ensure daily target is met for streak badges
+                                if (dailyPoints < dailyTarget) {
+                                  const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
+                                    (a) => a.key === 'WALKING'
+                                  )!;
+                                  const extraAmount = roundAmount(
+                                    (dailyTarget - dailyPoints) / extraActivity.multiplier + 1000,
+                                    extraActivity
+                                  );
+                                  const extraDate = new Date(baseDate);
+                                  extraDate.setHours(
+                                    18 + Math.floor(Math.random() * 2),
+                                    Math.floor(Math.random() * 60),
+                                    0,
+                                    0
+                                  );
+                                  activitiesToAdd.push({
+                                    definition: extraActivity,
+                                    amount: extraAmount,
+                                    performedAt: extraDate.toISOString(),
                                   });
                                 }
                               }
@@ -1470,16 +2202,66 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               addActivity(activity);
                             });
 
-                            // Wait a bit for activities to be processed
-                            await new Promise((resolve) => setTimeout(resolve, 1500));
+                            // Wait a bit for activities to be processed and saved to localStorage
+                            await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                            // Force reload activities from storage to ensure badge check has latest data
+                            reloadActivities();
+                            await new Promise((resolve) => setTimeout(resolve, 500));
 
                             // Check and unlock badges silently (no notifications)
-                            checkNewBadges();
+                            // Call checkNewBadges multiple times to catch all badges (some badges depend on others)
+                            let newBadges: Badge[] = [];
+                            for (let i = 0; i < 3; i++) {
+                              const badges = checkNewBadges();
+                              if (badges.length > 0) {
+                                newBadges = [...newBadges, ...badges];
+                                // Reload badges to get updated state
+                                reloadBadges();
+                                await new Promise((resolve) => setTimeout(resolve, 300));
+                              } else {
+                                break; // No more badges to unlock
+                              }
+                            }
+                            console.log(`✅ Unlocked ${newBadges.length} badges from dummy data`);
+
+                            // Reload badges to get final count
+                            reloadBadges();
+                            await new Promise((resolve) => setTimeout(resolve, 300));
+
+                            // Get final counts from localStorage
+                            const finalActivities = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+                            const finalBadges = localStorage.getItem(STORAGE_KEYS.BADGES);
+                            const finalChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+
+                            const activitiesArray = finalActivities
+                              ? JSON.parse(finalActivities)
+                              : [];
+                            const badgesArray = finalBadges ? JSON.parse(finalBadges) : [];
+                            const challengesArray = finalChallenges
+                              ? JSON.parse(finalChallenges)
+                              : [];
+
+                            // Calculate total points
+                            const totalPoints = activitiesArray.reduce(
+                              (sum: number, act: any) => sum + (act.points || 0),
+                              0
+                            );
+
+                            // Calculate date range
+                            const activityDates = activitiesArray.map(
+                              (act: any) => new Date(act.performedAt)
+                            );
+                            const startDate =
+                              activityDates.length > 0
+                                ? new Date(Math.min(...activityDates.map((d: Date) => d.getTime())))
+                                : new Date();
+                            const endDate =
+                              activityDates.length > 0
+                                ? new Date(Math.max(...activityDates.map((d: Date) => d.getTime())))
+                                : new Date();
 
                             // Create challenges only if they don't already exist
-                            const currentSettings = settings || {
-                              dailyTarget: DEFAULT_DAILY_TARGET,
-                            };
                             const existingChallengeIds = new Set(challenges.map((c) => c.id));
 
                             // Check if daily challenge exists
@@ -1527,17 +2309,85 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               }
                             }
 
-                            showToast(
-                              lang === 'tr'
-                                ? `✅ ${activitiesToAdd.length} aktivite, rozetler ve challenge'lar yüklendi!`
-                                : `✅ ${activitiesToAdd.length} activities, badges, and challenges loaded!`,
-                              'success'
-                            );
+                            // Add custom challenges for better demo data
+                            const { createCustomChallenge } = await import('@/lib/challenges');
+                            // Use the 'now' variable already defined above
 
-                            // Navigate to homepage after a short delay
-                            setTimeout(() => {
-                              router.push('/');
-                            }, 500);
+                            // Custom Challenge 1: "30 Günlük Süreklilik" (30-Day Consistency)
+                            const consistencyStart = new Date(now);
+                            consistencyStart.setDate(consistencyStart.getDate() - 15); // Started 15 days ago
+                            const consistencyEnd = new Date(now);
+                            consistencyEnd.setDate(consistencyEnd.getDate() + 15); // Ends in 15 days
+                            const consistencyChallenge = createCustomChallenge(
+                              { tr: '30 Günlük Süreklilik', en: '30-Day Consistency' },
+                              {
+                                tr: '30 gün boyunca her gün en az 5000 puan kazan',
+                                en: 'Earn at least 5000 points every day for 30 days',
+                              },
+                              150000, // 30 days * 5000 points
+                              consistencyStart,
+                              consistencyEnd
+                            );
+                            consistencyChallenge.category = 'consistency';
+                            consistencyChallenge.icon = '🔥';
+                            if (!existingChallengeIds.has(consistencyChallenge.id)) {
+                              addChallenge(consistencyChallenge);
+                            }
+
+                            // Custom Challenge 2: "Haftalık Koşu Hedefi" (Weekly Running Goal)
+                            const runningStart = new Date(now);
+                            runningStart.setDate(
+                              runningStart.getDate() - (runningStart.getDay() || 7) + 1
+                            ); // Start of week
+                            const runningEnd = new Date(runningStart);
+                            runningEnd.setDate(runningEnd.getDate() + 6); // End of week
+                            const runningChallenge = createCustomChallenge(
+                              { tr: 'Haftalık Koşu Hedefi', en: 'Weekly Running Goal' },
+                              { tr: 'Bu hafta 20 km koş', en: 'Run 20 km this week' },
+                              40000, // Running points equivalent
+                              runningStart,
+                              runningEnd
+                            );
+                            runningChallenge.category = 'achievement';
+                            runningChallenge.icon = '🏃';
+                            if (!existingChallengeIds.has(runningChallenge.id)) {
+                              addChallenge(runningChallenge);
+                            }
+
+                            // Custom Challenge 3: "Aylık Güç Antrenmanı" (Monthly Strength Training)
+                            const strengthStart = new Date(now);
+                            strengthStart.setDate(1); // Start of month
+                            strengthStart.setHours(0, 0, 0, 0);
+                            const strengthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0); // End of month
+                            strengthEnd.setHours(23, 59, 59, 999);
+                            const strengthChallenge = createCustomChallenge(
+                              { tr: 'Aylık Güç Antrenmanı', en: 'Monthly Strength Training' },
+                              {
+                                tr: 'Bu ay 50.000 puan güç antrenmanı yap',
+                                en: 'Do 50,000 points of strength training this month',
+                              },
+                              50000,
+                              strengthStart,
+                              strengthEnd
+                            );
+                            strengthChallenge.category = 'milestone';
+                            strengthChallenge.icon = '💪';
+                            if (!existingChallengeIds.has(strengthChallenge.id)) {
+                              addChallenge(strengthChallenge);
+                            }
+
+                            // Show summary dialog
+                            setDummySummaryStats({
+                              activitiesCount: activitiesArray.length,
+                              badgesCount: badgesArray.length,
+                              challengesCount: challengesArray.length,
+                              totalPoints,
+                              dateRange: {
+                                start: startDate,
+                                end: endDate,
+                              },
+                            });
+                            setShowDummySummary(true);
                           } catch (error) {
                             console.error('Failed to load dummy data:', error);
                             showToast(
@@ -1726,7 +2576,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                   {/* Sign Out - Separate Row */}
                   {isAuthenticated && (
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap pb-4">
                       <Button
                         type="button"
                         variant="danger"
@@ -1776,6 +2626,56 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
   return (
     <>
+      {/* Reset Data Progress Dialog */}
+      <ResetDataProgressDialog
+        open={showResetProgress}
+        step={resetProgress.step}
+        percentage={resetProgress.percentage}
+        error={resetProgress.error}
+        onClose={() => {
+          setShowResetProgress(false);
+          if (resetProgress.step === 'completed') {
+            setResetProgress({ step: 'preparing', percentage: 0, error: null });
+          }
+        }}
+      />
+
+      {/* Compatibility Mode Progress Dialog */}
+      <CompatibilityModeProgressDialog
+        open={showCompatibilityProgress}
+        step={compatibilityProgress.step}
+        percentage={compatibilityProgress.percentage}
+        error={compatibilityProgress.error}
+        conversionLogs={compatibilityProgress.conversionLogs}
+        onClose={() => {
+          setShowCompatibilityProgress(false);
+          if (compatibilityProgress.step === 'completed') {
+            setCompatibilityProgress({
+              step: 'preparing',
+              percentage: 0,
+              error: null,
+              conversionLogs: [],
+            });
+          }
+        }}
+      />
+
+      {/* Dummy Data Summary Dialog */}
+      {dummySummaryStats && (
+        <DummyDataSummaryDialog
+          open={showDummySummary}
+          statistics={dummySummaryStats}
+          onClose={() => {
+            setShowDummySummary(false);
+            setDummySummaryStats(null);
+            // Navigate to homepage after closing
+            setTimeout(() => {
+              router.push('/');
+            }, 300);
+          }}
+        />
+      )}
+
       {triggerButton ? (
         <div
           onClick={(e) => {
