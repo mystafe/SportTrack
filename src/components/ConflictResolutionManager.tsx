@@ -941,7 +941,7 @@ export function ConflictResolutionManager() {
         localActivities: conflictLocalData.activities.length,
         cloudActivities: cloudDataWithMetadata.exercises.length,
         localBadges: conflictLocalData.badges.length,
-        cloudBadges: cloudDataWithMetadata.badges.length,
+        cloudBadges: cloudDataWithMetadata.badges?.length || 0,
       });
 
       // Wait a bit for conflict dialog to close completely before showing progress dialog

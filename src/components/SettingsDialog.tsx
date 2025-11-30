@@ -1217,6 +1217,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                           const now = new Date();
                           const activitiesToAdd: Parameters<typeof addActivity>[0][] = [];
                           const totalDays = 240; // Increased to generate more badges
+                          const currentSettings = settings || { dailyTarget: DEFAULT_DAILY_TARGET };
 
                           for (let dayOffset = 0; dayOffset < totalDays; dayOffset++) {
                             const baseDate = new Date(now);
@@ -1539,7 +1540,6 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               : new Date();
 
                           // Create challenges only if they don't already exist
-                          const currentSettings = settings || { dailyTarget: DEFAULT_DAILY_TARGET };
                           const existingChallengeIds = new Set(challenges.map((c) => c.id));
 
                           // Check if daily challenge exists

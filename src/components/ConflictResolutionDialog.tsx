@@ -166,7 +166,7 @@ export function ConflictResolutionDialog({
       };
 
       // Call parent resolver
-      onResolve(strategy, conflictPayload as any);
+      onResolve(strategy);
       // Also dispatch a custom event to guarantee manager receives the action
       try {
         window.dispatchEvent(

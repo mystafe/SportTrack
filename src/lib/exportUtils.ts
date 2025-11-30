@@ -125,7 +125,7 @@ export async function exportToPDF(
   // Enable Unicode/UTF-8 support for Turkish characters
   // jsPDF v2+ supports UTF-8 natively, but we need to ensure proper encoding
   // Set encoding to UTF-8 explicitly
-  doc.setLanguage(options.language === 'tr' ? 'tr-TR' : 'en-US');
+  doc.setLanguage(options.language === 'tr' ? 'tr' : 'en');
 
   // Enable Unicode support for Turkish characters
   // jsPDF v2+ supports UTF-8 natively, but we need to ensure proper encoding
