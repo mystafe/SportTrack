@@ -82,13 +82,39 @@ export function useAuth() {
           cloudSyncService.setUserId(authUser.uid);
 
           try {
-            // Download cloud data and merge with local
+            // First, flush any pending batch sync changes to preserve local changes
+            const { batchSyncService } = await import('@/lib/cloudSync/batchSyncService');
+            try {
+              await batchSyncService.flushBatch();
+            } catch (flushError) {
+              console.warn('Failed to flush batch sync before download:', flushError);
+              // Continue anyway - we'll merge with local data
+            }
+
+            // Get current local data before downloading
+            const localActivitiesStr = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+            const localActivities = localActivitiesStr ? JSON.parse(localActivitiesStr) : [];
+            const localActivitiesMap = new Map(localActivities.map((a: any) => [a.id, a]));
+
+            // Download cloud data
             const cloudData = await cloudSyncService.downloadFromCloud();
             if (cloudData) {
-              // Merge cloud data with local (cloud takes precedence)
+              // Merge cloud data with local (preserve local changes that aren't in cloud)
               if (cloudData.exercises && cloudData.exercises.length > 0) {
-                localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudData.exercises));
+                const cloudActivitiesMap = new Map(cloudData.exercises.map((a: any) => [a.id, a]));
+
+                // Merge: cloud activities + local activities not in cloud
+                const mergedActivities = [
+                  ...cloudData.exercises,
+                  ...localActivities.filter((local: any) => !cloudActivitiesMap.has(local.id)),
+                ];
+
+                localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(mergedActivities));
+              } else if (localActivities.length > 0) {
+                // Cloud has no activities, keep local
+                localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(localActivities));
               }
+
               if (cloudData.settings) {
                 localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(cloudData.settings));
               }
@@ -147,13 +173,39 @@ export function useAuth() {
         cloudSyncService.setUserId(authUser.uid);
 
         try {
-          // Download cloud data and merge with local
+          // First, flush any pending batch sync changes to preserve local changes
+          const { batchSyncService } = await import('@/lib/cloudSync/batchSyncService');
+          try {
+            await batchSyncService.flushBatch();
+          } catch (flushError) {
+            console.warn('Failed to flush batch sync before download:', flushError);
+            // Continue anyway - we'll merge with local data
+          }
+
+          // Get current local data before downloading
+          const localActivitiesStr = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+          const localActivities = localActivitiesStr ? JSON.parse(localActivitiesStr) : [];
+          const localActivitiesMap = new Map(localActivities.map((a: any) => [a.id, a]));
+
+          // Download cloud data
           const cloudData = await cloudSyncService.downloadFromCloud();
           if (cloudData) {
-            // Merge cloud data with local (cloud takes precedence)
+            // Merge cloud data with local (preserve local changes that aren't in cloud)
             if (cloudData.exercises && cloudData.exercises.length > 0) {
-              localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudData.exercises));
+              const cloudActivitiesMap = new Map(cloudData.exercises.map((a: any) => [a.id, a]));
+
+              // Merge: cloud activities + local activities not in cloud
+              const mergedActivities = [
+                ...cloudData.exercises,
+                ...localActivities.filter((local: any) => !cloudActivitiesMap.has(local.id)),
+              ];
+
+              localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(mergedActivities));
+            } else if (localActivities.length > 0) {
+              // Cloud has no activities, keep local
+              localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(localActivities));
             }
+
             if (cloudData.settings) {
               localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(cloudData.settings));
             }

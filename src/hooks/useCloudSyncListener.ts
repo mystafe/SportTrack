@@ -372,16 +372,38 @@ export function useCloudSyncListener() {
                 localStorage.setItem('sporttrack_sync_in_progress', 'true');
               }
 
-              // Apply cloud data directly to localStorage (ignore local data)
+              // Apply cloud data to localStorage, merging with local changes
               if (typeof window !== 'undefined') {
+                // First, flush any pending batch sync changes to preserve local changes
+                try {
+                  const { batchSyncService } = await import('@/lib/cloudSync/batchSyncService');
+                  await batchSyncService.flushBatch();
+                } catch (flushError) {
+                  console.warn('Failed to flush batch sync before download:', flushError);
+                  // Continue anyway - we'll merge with local data
+                }
+
+                // Get current local data before downloading
+                const localActivitiesStr = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+                const localActivities = localActivitiesStr ? JSON.parse(localActivitiesStr) : [];
+
                 // Write activities (use exercises from new structure, fallback to activities for backward compatibility)
                 const cloudExercises = (cloudData.exercises ||
                   cloudData.activities ||
                   []) as Array<unknown>;
                 if (cloudExercises.length > 0) {
-                  localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(cloudExercises));
+                  // Merge cloud data with local (preserve local changes that aren't in cloud)
+                  const cloudActivitiesMap = new Map(cloudExercises.map((a: any) => [a.id, a]));
+                  const mergedActivities = [
+                    ...cloudExercises,
+                    ...localActivities.filter((local: any) => !cloudActivitiesMap.has(local.id)),
+                  ];
+                  localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(mergedActivities));
+                } else if (localActivities.length > 0) {
+                  // Cloud has no exercises, keep local
+                  localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(localActivities));
                 } else {
-                  // If no exercises, clear local activities
+                  // Both empty, clear
                   localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify([]));
                 }
 
