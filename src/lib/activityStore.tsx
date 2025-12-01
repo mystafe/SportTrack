@@ -12,6 +12,7 @@ import { STORAGE_KEYS, TIMEOUTS } from '@/lib/constants';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { isQuotaError } from '@/lib/errorHandler';
 import { useSettings, type BaseActivityOverride } from '@/lib/settingsStore';
+import { trackEvent } from '@/lib/analytics';
 
 const STORAGE_KEY = STORAGE_KEYS.ACTIVITIES;
 
@@ -209,6 +210,13 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
     );
     setActivities((prev) => [record, ...prev]);
 
+    // Track analytics
+    trackEvent('activity_added', {
+      activityKey: record.activityKey,
+      points: record.points,
+      amount: record.amount,
+    });
+
     // Update local last modified date
     if (typeof window !== 'undefined') {
       try {
@@ -221,61 +229,84 @@ export function ActivitiesProvider({ children }: { children: React.ReactNode }) 
     return record;
   }, []);
 
-  const updateActivity = useCallback((id: string, input: UpdateActivityInput) => {
-    let updated: ActivityRecord | null = null;
-    setActivities((prev) =>
-      prev.map((record) => {
-        if (record.id !== id) {
-          return record;
+  const updateActivity = useCallback(
+    (id: string, input: UpdateActivityInput): ActivityRecord | null => {
+      // Find the record first
+      const record = activities.find((r) => r.id === id);
+      if (!record) {
+        return null;
+      }
+
+      const iso = input.performedAt
+        ? validateAndSanitizeDate(input.performedAt)
+        : validateAndSanitizeDate(record.performedAt);
+      const multiplier = input.definition.multiplier;
+      const updatedRecord: ActivityRecord = {
+        ...record,
+        activityKey: input.definition.key,
+        label: input.definition.label,
+        labelEn: input.definition.labelEn,
+        icon: input.definition.icon,
+        unit: input.definition.unit,
+        unitEn: input.definition.unitEn,
+        multiplier,
+        amount: input.amount,
+        performedAt: iso,
+        note: input.note ?? null,
+        points: computePoints(multiplier, input.amount),
+        isCustom: input.definition.isCustom ?? false,
+        duration: input.duration && input.duration > 0 ? input.duration : undefined,
+      };
+
+      setActivities((prev) => prev.map((r) => (r.id === id ? updatedRecord : r)));
+
+      // Track analytics
+      trackEvent('activity_updated', {
+        activityKey: updatedRecord.activityKey,
+        points: updatedRecord.points,
+        amount: updatedRecord.amount,
+      });
+
+      // Update local last modified date
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('sporttrack_last_sync', new Date().toISOString());
+        } catch (error) {
+          console.error('Failed to save local last modified:', error);
         }
-        const iso = input.performedAt
-          ? validateAndSanitizeDate(input.performedAt)
-          : validateAndSanitizeDate(record.performedAt);
-        const multiplier = input.definition.multiplier;
-        updated = {
-          ...record,
-          activityKey: input.definition.key,
-          label: input.definition.label,
-          labelEn: input.definition.labelEn,
-          icon: input.definition.icon,
-          unit: input.definition.unit,
-          unitEn: input.definition.unitEn,
-          multiplier,
-          amount: input.amount,
-          performedAt: iso,
-          note: input.note ?? null,
-          points: computePoints(multiplier, input.amount),
-          isCustom: input.definition.isCustom ?? false,
-          duration: input.duration && input.duration > 0 ? input.duration : undefined,
-        };
-        return updated;
-      })
-    );
-
-    // Update local last modified date
-    if (updated && typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('sporttrack_last_sync', new Date().toISOString());
-      } catch (error) {
-        console.error('Failed to save local last modified:', error);
       }
-    }
 
-    return updated;
-  }, []);
+      return updatedRecord;
+    },
+    [activities]
+  );
 
-  const deleteActivity = useCallback((id: string) => {
-    setActivities((prev) => prev.filter((record) => record.id !== id));
+  const deleteActivity = useCallback(
+    (id: string) => {
+      // Find activity before deleting for analytics
+      const activity = activities.find((a) => a.id === id);
 
-    // Update local last modified date
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('sporttrack_last_sync', new Date().toISOString());
-      } catch (error) {
-        console.error('Failed to save local last modified:', error);
+      setActivities((prev) => prev.filter((record) => record.id !== id));
+
+      // Track analytics
+      if (activity) {
+        trackEvent('activity_deleted', {
+          activityKey: activity.activityKey,
+          points: activity.points,
+        });
       }
-    }
-  }, []);
+
+      // Update local last modified date
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('sporttrack_last_sync', new Date().toISOString());
+        } catch (error) {
+          console.error('Failed to save local last modified:', error);
+        }
+      }
+    },
+    [activities]
+  );
 
   const clearAllActivities = useCallback(() => {
     setActivities([]);

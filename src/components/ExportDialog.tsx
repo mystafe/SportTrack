@@ -173,14 +173,14 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10020] flex ${isMobile ? 'items-start pt-28' : 'items-center justify-center pt-20'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-top overflow-x-hidden`}
+      className={`fixed inset-0 z-[10020] flex ${isMobile ? 'items-start pt-28' : 'items-center justify-center pt-20'} bg-black/50 dark:bg-black/60 backdrop-blur-md animate-fade-in safe-top overflow-x-hidden`}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="export-dialog-title"
     >
       <div
-        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-xl w-full max-h-[85vh] overflow-y-auto overflow-x-hidden' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4'} border-2 border-gray-200 dark:border-gray-700 animate-scale-in`}
+        className={`glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'rounded-2xl w-full max-h-[85vh] overflow-y-auto overflow-x-hidden' : 'rounded-2xl shadow-2xl max-w-md w-full mx-4'} border-2 border-white/20 dark:border-gray-700/50 animate-scale-in`}
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
@@ -188,47 +188,50 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className={`${isMobile ? 'p-4' : 'p-5'}`}>
-          <h2
-            id="export-dialog-title"
-            className={`${isMobile ? 'text-lg' : 'text-lg'} font-bold text-gray-950 dark:text-white mb-3`}
-          >
-            {t('export.title')}
-          </h2>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl icon-bounce">📤</span>
+            <h2
+              id="export-dialog-title"
+              className={`${isMobile ? 'text-lg' : 'text-lg'} font-bold text-gray-950 dark:text-white neon-glow-brand`}
+            >
+              {t('export.title')}
+            </h2>
+          </div>
 
           {/* Format Selection */}
-          <div className="mb-3">
-            <label className="block text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1.5">
+          <div className="mb-4">
+            <label className="block text-xs font-semibold text-gray-800 dark:text-gray-200 mb-2">
               {t('export.format')}
             </label>
             <div
-              className={`flex ${isMobile ? 'flex-row' : 'flex-row'} gap-1 ${isMobile ? 'text-xs' : ''}`}
+              className={`flex ${isMobile ? 'flex-row' : 'flex-row'} gap-2 ${isMobile ? 'text-xs' : ''}`}
             >
               <Button
                 type="button"
                 variant={exportFormat === 'csv' ? 'primary' : 'outline'}
                 size="sm"
                 onClick={() => setExportFormat('csv')}
-                className={`flex-1 ${isMobile ? 'text-[10px] px-2 py-1' : ''}`}
+                className={`flex-1 btn-enhanced hover:scale-105 active:scale-95 transition-all duration-200 ${isMobile ? 'text-[10px] px-2 py-1' : ''} ${exportFormat === 'csv' ? 'animate-gradient shadow-lg' : ''}`}
               >
-                CSV
+                📄 CSV
               </Button>
               <Button
                 type="button"
                 variant={exportFormat === 'pdf' ? 'primary' : 'outline'}
                 size="sm"
                 onClick={() => setExportFormat('pdf')}
-                className={`flex-1 ${isMobile ? 'text-[10px] px-2 py-1' : ''}`}
+                className={`flex-1 btn-enhanced hover:scale-105 active:scale-95 transition-all duration-200 ${isMobile ? 'text-[10px] px-2 py-1' : ''} ${exportFormat === 'pdf' ? 'animate-gradient shadow-lg' : ''}`}
               >
-                PDF
+                📑 PDF
               </Button>
               <Button
                 type="button"
                 variant={exportFormat === 'json' ? 'primary' : 'outline'}
                 size="sm"
                 onClick={() => setExportFormat('json')}
-                className={`flex-1 ${isMobile ? 'text-[10px] px-2 py-1' : ''}`}
+                className={`flex-1 btn-enhanced hover:scale-105 active:scale-95 transition-all duration-200 ${isMobile ? 'text-[10px] px-2 py-1' : ''} ${exportFormat === 'json' ? 'animate-gradient shadow-lg' : ''}`}
               >
-                JSON
+                📋 JSON
               </Button>
             </div>
           </div>
@@ -313,29 +316,32 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
           </div>
 
           {/* Preview */}
-          <div className="mb-3 p-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700">
+          <div className="mb-4 p-3 rounded-xl bg-gradient-to-br from-blue-50 via-sky-50 to-blue-50 dark:from-blue-900/30 dark:via-sky-900/20 dark:to-blue-900/30 border-2 border-blue-300 dark:border-blue-600 shadow-md">
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-blue-900 dark:text-blue-100`}
+                className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-blue-900 dark:text-blue-100 flex items-center gap-1.5`}
               >
-                📊 {lang === 'tr' ? 'Export Önizlemesi' : 'Export Preview'}
+                <span className="text-lg icon-bounce">📊</span>
+                {lang === 'tr' ? 'Export Önizlemesi' : 'Export Preview'}
               </span>
               <button
                 type="button"
                 onClick={() => setShowPreview(!showPreview)}
-                className={`${isMobile ? 'text-xs' : 'text-sm'} text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200`}
+                className={`${isMobile ? 'text-xs' : 'text-sm'} text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-transform duration-200 ${showPreview ? 'rotate-180' : ''}`}
               >
-                {showPreview ? '▼' : '▶'}
+                ▼
               </button>
             </div>
-            <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-blue-800 dark:text-blue-200`}>
+            <div
+              className={`${isMobile ? 'text-xs' : 'text-sm'} text-blue-800 dark:text-blue-200 font-medium`}
+            >
               {lang === 'tr'
                 ? `${filteredActivities.length} aktivite export edilecek`
                 : `${filteredActivities.length} activities will be exported`}
               {filteredActivities.length > 0 && (
-                <div className="mt-1">
+                <div className="mt-2 p-2 rounded-lg bg-blue-100/50 dark:bg-blue-800/30">
                   {lang === 'tr' ? 'Toplam Puan:' : 'Total Points:'}{' '}
-                  <span className="font-bold">
+                  <span className="font-black text-blue-900 dark:text-blue-100 neon-glow">
                     {filteredActivities.reduce((sum, a) => sum + a.points, 0).toLocaleString()}
                   </span>
                 </div>
@@ -372,7 +378,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
 
           {/* Actions */}
           <div
-            className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-2'}`}
+            className={`flex items-center ${isMobile ? 'flex-col-reverse gap-2' : 'justify-end gap-2'} pt-2`}
           >
             <Button
               type="button"
@@ -380,7 +386,7 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
               size="sm"
               onClick={onClose}
               fullWidth={isMobile}
-              className={isMobile ? 'text-xs px-3 py-1.5' : ''}
+              className={`btn-enhanced hover:scale-105 active:scale-95 transition-all duration-200 ${isMobile ? 'text-xs px-3 py-1.5' : ''}`}
             >
               {t('form.cancel')}
             </Button>
@@ -392,9 +398,18 @@ export function ExportDialog({ open, onClose }: ExportDialogProps) {
               disabled={isExporting}
               loading={isExporting}
               fullWidth={isMobile}
-              className={isMobile ? 'text-xs px-3 py-1.5' : ''}
+              className={`btn-enhanced animate-gradient hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg hover:shadow-xl shadow-brand/30 ${isMobile ? 'text-xs px-3 py-1.5' : ''}`}
             >
-              {t('export.export')}
+              {isExporting ? (
+                <span className="flex items-center gap-2">
+                  <span className="animate-spin">⏳</span>
+                  {lang === 'tr' ? 'Export ediliyor...' : 'Exporting...'}
+                </span>
+              ) : (
+                <>
+                  <span className="icon-bounce">📤</span> {t('export.export')}
+                </>
+              )}
             </Button>
           </div>
         </div>

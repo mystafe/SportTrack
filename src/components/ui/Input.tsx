@@ -78,8 +78,8 @@ const sizeStyles: Record<
 
 const variantStyles: Record<InputVariant, string> = {
   default: `
-    bg-white dark:bg-gray-900
-    border-2 border-gray-200 dark:border-gray-700
+    bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
+    border-2 border-white/20 dark:border-gray-700/50
     text-gray-900 dark:text-gray-100
     placeholder:text-gray-400 dark:placeholder:text-gray-500
     focus:border-brand focus:ring-2 focus:ring-brand/20
@@ -94,15 +94,15 @@ const variantStyles: Record<InputVariant, string> = {
     disabled:opacity-60
   `,
   filled: `
-    bg-gray-50 dark:bg-gray-800
-    border-2 border-transparent
+    bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-xl
+    border-2 border-white/20 dark:border-gray-700/30
     text-gray-900 dark:text-gray-100
     placeholder:text-gray-400 dark:placeholder:text-gray-500
-    focus:bg-white dark:focus:bg-gray-900
+    focus:bg-white/95 dark:focus:bg-gray-900/95
     focus:border-brand focus:ring-2 focus:ring-brand/20
     focus:outline-none
     focus-visible:ring-2 focus-visible:ring-brand/30
-    hover:bg-gray-100 dark:hover:bg-gray-700
+    hover:bg-gray-100/95 dark:hover:bg-gray-700/95
     active:border-brand active:ring-1 active:ring-brand/10
     transition-all duration-fast ease-out
     disabled:bg-gray-50 dark:disabled:bg-gray-800
@@ -111,8 +111,8 @@ const variantStyles: Record<InputVariant, string> = {
     disabled:opacity-60
   `,
   outlined: `
-    bg-transparent
-    border-2 border-gray-300 dark:border-gray-600
+    bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl
+    border-2 border-white/30 dark:border-gray-600/50
     text-gray-900 dark:text-gray-100
     placeholder:text-gray-400 dark:placeholder:text-gray-500
     focus:border-brand focus:ring-2 focus:ring-brand/20

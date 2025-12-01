@@ -118,16 +118,21 @@ export function ActivityGoals() {
       variant="default"
       size="md"
       hoverable
-      className="card-entrance"
+      className="card-entrance glass-effect card-3d"
       header={
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🎯</span>
-            <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white">
+            <span className="text-xl icon-bounce">🎯</span>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white neon-glow-brand">
               {lang === 'tr' ? 'Aktivite Hedefleri' : 'Activity Goals'}
             </h2>
           </div>
-          <Button variant="primary" size="sm" onClick={() => setShowAddForm(!showAddForm)}>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="hover:scale-110 transition-transform"
+          >
             {showAddForm ? '✕' : '+'}
           </Button>
         </div>
@@ -136,7 +141,7 @@ export function ActivityGoals() {
       <div className="space-y-4">
         {/* Add Form */}
         {showAddForm && (
-          <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <div className="p-4 rounded-lg glass-effect bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-2 border-white/20 dark:border-gray-700/50 shadow-lg">
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -208,11 +213,11 @@ export function ActivityGoals() {
                 return (
                   <div
                     key={goal.id}
-                    className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+                    className="p-3 rounded-lg glass-effect bg-blue-50/90 dark:bg-blue-900/30 backdrop-blur-xl border-2 border-blue-200/50 dark:border-blue-800/50 card-3d hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="text-xl flex-shrink-0">{goal.icon}</span>
+                        <span className="text-xl flex-shrink-0 icon-bounce">{goal.icon}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-gray-950 dark:text-white">
                             {lang === 'tr' ? goal.label : goal.labelEn || goal.label}
@@ -254,11 +259,21 @@ export function ActivityGoals() {
                           {progress}%
                         </span>
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden shadow-inner relative progress-glow">
                         <div
-                          className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
-                          style={{ width: `${progress}%` }}
-                        />
+                          className={`h-2 rounded-full transition-all duration-500 ${progress >= 100 ? 'bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 animate-gradient pulse-glow' : 'bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 animate-gradient'}`}
+                          style={{ width: `${Math.min(100, progress)}%` }}
+                        >
+                          {progress > 0 && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer rounded-full" />
+                          )}
+                          {progress >= 90 && progress < 100 && (
+                            <div className="absolute inset-0 bg-white/20 animate-pulse rounded-full" />
+                          )}
+                          {progress >= 100 && (
+                            <div className="absolute inset-0 shimmer rounded-full" />
+                          )}
+                        </div>
                       </div>
                       {daysRemaining > 0 && (
                         <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -285,11 +300,11 @@ export function ActivityGoals() {
               {completedGoals.slice(0, 5).map((goal) => (
                 <div
                   key={goal.id}
-                  className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                  className="p-3 rounded-lg glass-effect bg-green-50/90 dark:bg-green-900/30 backdrop-blur-xl border-2 border-green-200/50 dark:border-green-800/50 card-3d hover:shadow-xl hover:scale-[1.02] transition-all duration-300 pulse-glow"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <span className="text-xl flex-shrink-0">{goal.icon}</span>
+                      <span className="text-xl flex-shrink-0 icon-bounce">{goal.icon}</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-950 dark:text-white">
                           {lang === 'tr' ? goal.label : goal.labelEn || goal.label}
@@ -314,7 +329,7 @@ export function ActivityGoals() {
         {/* Empty State */}
         {goals.length === 0 && (
           <div className="text-center py-6">
-            <div className="text-4xl mb-3">🎯</div>
+            <div className="text-4xl mb-3 float-enhanced">🎯</div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {lang === 'tr'
                 ? 'Henüz hedef yok. Yeni bir hedef ekleyin!'

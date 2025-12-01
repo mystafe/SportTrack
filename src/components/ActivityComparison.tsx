@@ -190,11 +190,11 @@ export function ActivityComparison() {
       variant="default"
       size="md"
       hoverable
-      className="card-entrance"
+      className="card-entrance glass-effect card-3d"
       header={
         <div className="flex items-center gap-2">
-          <span className="text-xl">⚖️</span>
-          <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white">
+          <span className="text-xl icon-bounce">⚖️</span>
+          <h2 className="text-lg sm:text-xl font-bold shimmer-text text-gray-950 dark:text-white">
             {lang === 'tr' ? 'Aktivite Karşılaştırması' : 'Activity Comparison'}
           </h2>
         </div>
@@ -203,7 +203,7 @@ export function ActivityComparison() {
       <div className="space-y-4">
         {/* Activity Selector */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 shimmer-text">
             {lang === 'tr'
               ? 'Karşılaştırılacak Aktiviteler (Max 4)'
               : 'Activities to Compare (Max 4)'}
@@ -220,14 +220,14 @@ export function ActivityComparison() {
                   key={key}
                   type="button"
                   onClick={() => (isSelected ? handleRemoveActivity(key) : handleAddActivity(key))}
-                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  className={`px-3 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
                     isSelected
-                      ? 'bg-brand text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      ? 'bg-brand text-white shadow-lg hover:shadow-xl hover:scale-110 pulse-glow'
+                      : 'glass-effect bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/20 dark:border-gray-700/30 text-gray-700 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:scale-105 hover:shadow-md'
                   }`}
                   disabled={!isSelected && selectedActivities.length >= 4}
                 >
-                  {activity.icon}{' '}
+                  <span className="icon-bounce">{activity.icon}</span>{' '}
                   {lang === 'tr' ? activity.label : activity.labelEn || activity.label}
                 </button>
               );
@@ -241,11 +241,11 @@ export function ActivityComparison() {
             {activityStats.map((stats) => (
               <div
                 key={stats.activityKey}
-                className="p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"
+                className="p-4 rounded-xl border-2 border-white/30 dark:border-gray-700/50 glass-effect bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl hover:shadow-xl hover:scale-[1.02] transition-all duration-300 card-3d"
               >
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-2xl">{stats.icon}</span>
-                  <h3 className="text-base font-bold text-gray-950 dark:text-white">
+                  <span className="text-2xl icon-bounce">{stats.icon}</span>
+                  <h3 className="text-base font-bold shimmer-text text-gray-950 dark:text-white">
                     {stats.label}
                   </h3>
                 </div>
@@ -300,20 +300,24 @@ export function ActivityComparison() {
                     </div>
                   )}
 
-                  <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                  <div className="pt-2 border-t border-white/20 dark:border-gray-700/50">
+                    <div className="flex items-center justify-between glass-effect bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-lg px-2 py-1 mb-1 border border-white/20 dark:border-gray-700/30">
+                      <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
                         {lang === 'tr' ? '30 Günlük Trend' : '30-Day Trend'}
                       </span>
-                      <span className={`text-sm font-bold ${getTrendColor(stats.trend30Days)}`}>
+                      <span
+                        className={`text-sm font-bold ${getTrendColor(stats.trend30Days)} pulse-glow`}
+                      >
                         {getTrendIcon(stats.trend30Days)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between mt-1">
-                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center justify-between glass-effect bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-lg px-2 py-1 border border-white/20 dark:border-gray-700/30">
+                      <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
                         {lang === 'tr' ? '7 Günlük Trend' : '7-Day Trend'}
                       </span>
-                      <span className={`text-sm font-bold ${getTrendColor(stats.trend7Days)}`}>
+                      <span
+                        className={`text-sm font-bold ${getTrendColor(stats.trend7Days)} pulse-glow`}
+                      >
                         {getTrendIcon(stats.trend7Days)}
                       </span>
                     </div>
@@ -325,9 +329,9 @@ export function ActivityComparison() {
         )}
 
         {selectedActivities.length === 0 && (
-          <div className="text-center py-6">
-            <div className="text-4xl mb-3">⚖️</div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-center py-6 glass-effect bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl border border-white/20 dark:border-gray-700/30">
+            <div className="text-4xl mb-3 icon-bounce">⚖️</div>
+            <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
               {lang === 'tr'
                 ? 'Karşılaştırmak için aktiviteler seçin'
                 : 'Select activities to compare'}

@@ -8,6 +8,8 @@ import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 import { calculateStreakStats } from '@/lib/statisticsUtils';
 import { startOfDay, subDays, format, isSameDay, parseISO } from 'date-fns';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useAnimatedCounter } from '@/lib/hooks/useAnimatedCounter';
+import { ShareButton } from '@/components/ShareButton';
 import { Card } from '@/components/ui/Card';
 import { Accordion } from '@/components/ui/Accordion';
 
@@ -64,6 +66,20 @@ export const StreakVisualization = memo(function StreakVisualization() {
     };
   }, [activities, dailyTarget, hydrated]);
 
+  // Animated counters for streak stats (after streakData is defined)
+  const currentStreakCounter = useAnimatedCounter(streakData.currentStreak, {
+    duration: 800,
+    easing: 'easeOut',
+  });
+  const longestStreakCounter = useAnimatedCounter(streakData.longestStreak, {
+    duration: 1000,
+    easing: 'easeOut',
+  });
+  const averageStreakCounter = useAnimatedCounter(streakData.averageStreak, {
+    duration: 1000,
+    easing: 'easeOut',
+  });
+
   if (!hydrated) {
     return null;
   }
@@ -84,7 +100,7 @@ export const StreakVisualization = memo(function StreakVisualization() {
       defaultOpen={true}
       className="mb-4"
     >
-      <Card variant="outlined" size="lg" className="p-4 sm:p-6">
+      <Card variant="outlined" size="lg" className="p-4 sm:p-6 glass-effect card-3d">
         {/* Streak Stats */}
         <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
           <div className="text-center">
@@ -92,7 +108,7 @@ export const StreakVisualization = memo(function StreakVisualization() {
               {lang === 'tr' ? 'Mevcut Seri' : 'Current Streak'}
             </div>
             <div className="text-2xl sm:text-3xl font-bold text-brand dark:text-brand-light">
-              {streakData.currentStreak}
+              {currentStreakCounter.displayValue}
             </div>
             <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-500">
               {lang === 'tr' ? 'gün' : 'days'}
@@ -103,7 +119,7 @@ export const StreakVisualization = memo(function StreakVisualization() {
               {lang === 'tr' ? 'En Uzun Seri' : 'Longest Streak'}
             </div>
             <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400">
-              {streakData.longestStreak}
+              {longestStreakCounter.displayValue}
             </div>
             <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-500">
               {lang === 'tr' ? 'gün' : 'days'}
@@ -114,7 +130,7 @@ export const StreakVisualization = memo(function StreakVisualization() {
               {lang === 'tr' ? 'Ortalama Seri' : 'Average Streak'}
             </div>
             <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
-              {streakData.averageStreak}
+              {averageStreakCounter.displayValue}
             </div>
             <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-500">
               {lang === 'tr' ? 'gün' : 'days'}
@@ -136,10 +152,11 @@ export const StreakVisualization = memo(function StreakVisualization() {
                   className={`
                     aspect-square rounded-sm sm:rounded-md
                     ${getIntensityColor(day.completed, day.points)}
-                    ${isToday ? 'ring-2 ring-brand dark:ring-brand-light ring-offset-1 dark:ring-offset-gray-800' : ''}
+                    ${isToday ? 'ring-2 ring-brand dark:ring-brand-light ring-offset-1 dark:ring-offset-gray-800 shadow-lg' : ''}
                     transition-all duration-200 hover:scale-110 cursor-pointer
                     flex items-center justify-center
                     group relative
+                    hover:shadow-md
                   `}
                   title={`${format(day.date, 'd MMM yyyy')}: ${day.points.toLocaleString()} ${lang === 'tr' ? 'puan' : 'points'}`}
                 >
@@ -158,7 +175,7 @@ export const StreakVisualization = memo(function StreakVisualization() {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center justify-center gap-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4">
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded bg-gray-200 dark:bg-gray-800" />
             <span>{lang === 'tr' ? 'Hedef altı' : 'Below target'}</span>
@@ -171,6 +188,27 @@ export const StreakVisualization = memo(function StreakVisualization() {
             <div className="w-3 h-3 rounded bg-green-600 dark:bg-green-500" />
             <span>{lang === 'tr' ? 'Mükemmel' : 'Excellent'}</span>
           </div>
+        </div>
+
+        {/* Share Button */}
+        <div className="flex justify-center">
+          <ShareButton
+            type="streak"
+            data={{
+              type: 'streak',
+              title: lang === 'tr' ? 'Seri Görselleştirmem' : 'My Streak Visualization',
+              streak: {
+                current: streakData.currentStreak,
+                longest: streakData.longestStreak,
+              },
+              theme:
+                typeof window !== 'undefined' && document.documentElement.classList.contains('dark')
+                  ? 'dark'
+                  : 'light',
+            }}
+            variant="full"
+            size={isMobile ? 'sm' : 'md'}
+          />
         </div>
       </Card>
     </Accordion>

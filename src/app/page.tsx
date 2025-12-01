@@ -13,21 +13,31 @@ const StatsCards = lazy(() =>
 const StatsHighlights = lazy(() =>
   import('@/components/StatsHighlights').then((m) => ({ default: m.StatsHighlights }))
 );
-import { QuickAdd } from '@/components/QuickAdd';
-import { ActivityTemplates } from '@/components/ActivityTemplates';
-import { ActivitySuggestions } from '@/components/ActivitySuggestions';
-import { DailySummary } from '@/components/DailySummary';
-import { ActivityGoals } from '@/components/ActivityGoals';
+// These components are already lazy loaded below
 import { useActivitiesSummary, useActivities } from '@/lib/activityStore';
 import { getMotivationalMessage, type MotivationalMessage } from '@/lib/motivationalMessages';
 import { startOfDay, isSameDay } from 'date-fns';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { Accordion } from '@/components/ui/Accordion';
-import { QuickStats } from '@/components/QuickStats';
-import { RecentActivities } from '@/components/RecentActivities';
-import { DashboardWidgets } from '@/components/DashboardWidgets';
-import { QuickActions } from '@/components/QuickActions';
-import { StreakVisualization } from '@/components/StreakVisualization';
+// Lazy load additional components for better performance
+const QuickStats = lazy(() =>
+  import('@/components/QuickStats').then((m) => ({ default: m.QuickStats }))
+);
+const RecentActivities = lazy(() =>
+  import('@/components/RecentActivities').then((m) => ({ default: m.RecentActivities }))
+);
+const DashboardWidgets = lazy(() =>
+  import('@/components/DashboardWidgets').then((m) => ({ default: m.DashboardWidgets }))
+);
+const QuickActions = lazy(() =>
+  import('@/components/QuickActions').then((m) => ({ default: m.QuickActions }))
+);
+const StreakVisualization = lazy(() =>
+  import('@/components/StreakVisualization').then((m) => ({ default: m.StreakVisualization }))
+);
+const WeeklyInsights = lazy(() =>
+  import('@/components/WeeklyInsights').then((m) => ({ default: m.WeeklyInsights }))
+);
 
 // Lazy load heavy components for better performance
 const DailySummaryLazy = lazy(() =>
@@ -202,7 +212,7 @@ export default function HomePage() {
 
             <div className="flex items-center gap-4 relative z-50">
               <span
-                className={`text-3xl sm:text-4xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'} flex-shrink-0`}
+                className={`text-3xl sm:text-4xl ${isMobile ? 'emoji-celebrate' : 'emoji-bounce'} flex-shrink-0 icon-bounce sparkle`}
               >
                 {motivationalMessage.emoji}
               </span>
@@ -255,6 +265,9 @@ export default function HomePage() {
 
         {/* Streak Visualization - Always Visible */}
         <StreakVisualization />
+
+        {/* Weekly Insights - Smart AI Tips */}
+        <WeeklyInsights />
 
         {/* Stats Cards and Highlights Side by Side - Accordion */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">

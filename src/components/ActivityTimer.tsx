@@ -90,7 +90,7 @@ export function ActivityTimer({ onDurationChange, initialDuration = 0 }: Activit
   };
 
   return (
-    <div className="space-y-3">
+    <div className="glass-effect card-3d space-y-3 p-4 rounded-lg border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
           {t('timer.title')}

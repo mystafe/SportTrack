@@ -50,23 +50,23 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const variantStyles: Record<CardVariant, string> = {
   default: `
-    bg-white dark:bg-gray-900/95
-    border-2 border-gray-200 dark:border-gray-700
+    bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
+    border-2 border-white/20 dark:border-gray-700/50
     shadow-elevation-2
   `,
   elevated: `
-    bg-white dark:bg-gray-900/95
-    border-2 border-gray-200 dark:border-gray-700
+    bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
+    border-2 border-white/20 dark:border-gray-700/50
     shadow-elevation-4
   `,
   outlined: `
-    bg-transparent
-    border-2 border-gray-300 dark:border-gray-600
+    bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl
+    border-2 border-white/30 dark:border-gray-600/50
     shadow-none
   `,
   filled: `
-    bg-gray-50 dark:bg-gray-800/95
-    border-2 border-transparent
+    bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-xl
+    border-2 border-white/20 dark:border-gray-700/30
     shadow-elevation-1
   `,
 };
@@ -131,7 +131,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
       duration-normal
       ease-out
       ${variantStyle}
-      ${hoverable ? 'hover:shadow-elevation-5 hover:scale-[1.02] hover:border-brand/50' : ''}
+      ${hoverable ? 'hover:shadow-elevation-5 hover:scale-[1.02] hover:border-brand/50 dark:hover:border-brand/50' : ''}
       ${clickable ? `cursor-pointer touch-feedback mobile-press ${isMobile ? 'active:scale-[0.97] active:brightness-95' : 'active:scale-[0.98]'}` : ''}
       ${className}
     `

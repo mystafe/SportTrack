@@ -8,6 +8,7 @@ import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 import { Confetti } from '@/components/Confetti';
+import { ShareButton } from '@/components/ShareButton';
 import type { Badge } from '@/lib/badges';
 
 export function BadgeUnlockNotification() {
@@ -257,7 +258,7 @@ export function BadgeUnlockNotification() {
     <>
       <Confetti active={showConfetti} color={getConfettiColor(currentBadge.rarity)} />
       <div
-        className={`fixed inset-0 z-[100] flex items-center justify-center pointer-events-auto bg-black/30 dark:bg-black/50 backdrop-blur-sm`}
+        className={`fixed inset-0 z-[100] flex items-center justify-center pointer-events-auto bg-black/40 dark:bg-black/60 backdrop-blur-md`}
         onClick={handleBackdropClick}
       >
         <div
@@ -310,6 +311,24 @@ export function BadgeUnlockNotification() {
                 {currentBadge.description[lang]}
               </div>
             )}
+            <div className="flex items-center gap-2 mt-2">
+              <ShareButton
+                type="badge"
+                data={{
+                  type: 'badge',
+                  title: lang === 'tr' ? 'Yeni Rozet Kazandım!' : 'New Badge Unlocked!',
+                  badge: {
+                    icon: currentBadge.icon,
+                    name: currentBadge.name[lang],
+                    description: currentBadge.description[lang],
+                  },
+                  theme: 'dark',
+                }}
+                variant="full"
+                size={isMobile ? 'sm' : 'md'}
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white"
+              />
+            </div>
             <div
               className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-white/80 text-center mt-1 italic`}
             >

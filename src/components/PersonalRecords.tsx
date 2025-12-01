@@ -69,7 +69,7 @@ export const PersonalRecords = memo(function PersonalRecords() {
             {recordsByType.overall.map((record) => (
               <div
                 key={record.id}
-                className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300"
+                className="card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -106,7 +106,7 @@ export const PersonalRecords = memo(function PersonalRecords() {
             {recordsByType.activities.map((record) => (
               <div
                 key={record.id}
-                className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 shadow-md hover:shadow-xl transition-shadow duration-300"
+                className="card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">

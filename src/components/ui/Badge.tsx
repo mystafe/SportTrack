@@ -33,28 +33,34 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const variantStyles: Record<BadgeVariant, string> = {
   default: `
-    bg-gray-100 dark:bg-gray-800
+    bg-gray-100/95 dark:bg-gray-800/95 backdrop-blur-xl
     text-gray-700 dark:text-gray-300
+    border border-white/20 dark:border-gray-700/50
   `,
   primary: `
-    bg-primary-100 dark:bg-primary-900/30
+    bg-primary-100/95 dark:bg-primary-900/40 backdrop-blur-xl
     text-primary-700 dark:text-primary-300
+    border border-primary-200/50 dark:border-primary-800/50
   `,
   success: `
-    bg-success-100 dark:bg-success-900/30
+    bg-success-100/95 dark:bg-success-900/40 backdrop-blur-xl
     text-success-700 dark:text-success-300
+    border border-success-200/50 dark:border-success-800/50
   `,
   warning: `
-    bg-warning-100 dark:bg-warning-900/30
+    bg-warning-100/95 dark:bg-warning-900/40 backdrop-blur-xl
     text-warning-700 dark:text-warning-300
+    border border-warning-200/50 dark:border-warning-800/50
   `,
   error: `
-    bg-error-100 dark:bg-error-900/30
+    bg-error-100/95 dark:bg-error-900/40 backdrop-blur-xl
     text-error-700 dark:text-error-300
+    border border-error-200/50 dark:border-error-800/50
   `,
   info: `
-    bg-info-100 dark:bg-info-900/30
+    bg-info-100/95 dark:bg-info-900/40 backdrop-blur-xl
     text-info-700 dark:text-info-300
+    border border-info-200/50 dark:border-info-800/50
   `,
 };
 

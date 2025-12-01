@@ -6,6 +6,7 @@ import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 import { STORAGE_KEYS } from '@/lib/constants';
+import { trackEvent } from '@/lib/analytics';
 
 type BadgeContextValue = {
   badges: Badge[];
@@ -123,6 +124,14 @@ export function BadgeProvider({ children }: { children: React.ReactNode }) {
 
       const updatedBadges = [...badges, ...badgesToAdd];
       saveBadges(updatedBadges);
+
+      // Track analytics for each new badge
+      badgesToAdd.forEach((badge) => {
+        trackEvent('badge_unlocked', {
+          badgeId: badge.id,
+          badgeName: badge.name.tr || badge.name.en,
+        });
+      });
 
       // Return only badges that should be shown (not suppressed)
       return shouldSuppressBadges ? [] : badgesToAdd;

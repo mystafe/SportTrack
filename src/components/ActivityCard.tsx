@@ -74,7 +74,7 @@ export const ActivityCard = memo(function ActivityCard({
     <>
       <li
         {...longPressHandlers}
-        className={`activity-card-entrance activity-card-shimmer activity-card-hover activity-ripple gpu-accelerated group relative ${density === 'compact' ? 'rounded-xl' : 'rounded-2xl'} ${isToday ? (density === 'compact' ? 'ring-2' : 'ring-4') + ' ring-brand/40 dark:ring-brand/50 shadow-xl' : 'shadow-lg'} border-2 ${isToday ? 'border-brand/50 dark:border-brand/60' : 'border-gray-300/60 dark:border-gray-600/60'} bg-gradient-to-br ${isToday ? 'from-brand/10 via-white to-brand/5 dark:from-brand/20 dark:via-gray-900 dark:to-brand/10' : 'from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'} ${
+        className={`activity-card-entrance activity-card-shimmer activity-card-hover activity-ripple gpu-accelerated group relative card-3d ${density === 'compact' ? 'rounded-xl' : 'rounded-2xl'} ${isToday ? (density === 'compact' ? 'ring-2' : 'ring-4') + ' ring-brand/40 dark:ring-brand/50 shadow-xl pulse-glow' : 'shadow-lg'} border-2 ${isToday ? 'border-brand/50 dark:border-brand/60' : 'border-gray-300/60 dark:border-gray-600/60'} bg-gradient-to-br ${isToday ? 'from-brand/10 via-white to-brand/5 dark:from-brand/20 dark:via-gray-900 dark:to-brand/10' : 'from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'} ${
           density === 'compact'
             ? isMobile
               ? 'px-3 py-2'
@@ -90,8 +90,8 @@ export const ActivityCard = memo(function ActivityCard({
         {/* Animated background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-brand/10 via-transparent to-brand/5 dark:from-brand/20 dark:via-transparent dark:to-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
 
-        {/* Shine effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-2xl pointer-events-none"></div>
+        {/* Enhanced shine effect */}
+        <div className="absolute inset-0 shimmer opacity-0 group-hover:opacity-50 transition-opacity duration-1000 rounded-2xl pointer-events-none"></div>
 
         <div className="relative z-10">
           {/* Header Row - Compact Layout */}
@@ -100,11 +100,11 @@ export const ActivityCard = memo(function ActivityCard({
           >
             <div className="flex items-center gap-2 flex-1 min-w-0">
               <div
-                className={`relative flex-shrink-0 ${density === 'compact' ? (isMobile ? 'text-2xl' : 'text-2xl') : isMobile ? 'text-3xl' : 'text-4xl'} ${density === 'compact' ? '' : isMobile ? 'emoji-celebrate' : 'emoji-bounce'}`}
+                className={`relative flex-shrink-0 ${density === 'compact' ? (isMobile ? 'text-2xl' : 'text-2xl') : isMobile ? 'text-3xl' : 'text-4xl'} ${density === 'compact' ? '' : isMobile ? 'emoji-celebrate' : 'emoji-bounce'} icon-bounce`}
               >
                 {activity.icon}
                 {isToday && density !== 'compact' && (
-                  <span className="absolute -top-1 -right-1 text-xs animate-pulse">⭐</span>
+                  <span className="absolute -top-1 -right-1 text-xs float-enhanced">⭐</span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -141,7 +141,7 @@ export const ActivityCard = memo(function ActivityCard({
             </div>
             {isToday && density !== 'compact' && (
               <span
-                className={`px-2 py-1 rounded-lg bg-green-500/20 dark:bg-green-500/30 text-green-700 dark:text-green-400 ${isMobile ? 'text-xs' : 'text-[10px]'} font-bold uppercase tracking-wide border border-green-500/30 flex-shrink-0`}
+                className={`px-2 py-1 rounded-lg bg-green-500/20 dark:bg-green-500/30 text-green-700 dark:text-green-400 ${isMobile ? 'text-xs' : 'text-[10px]'} font-bold uppercase tracking-wide border border-green-500/30 flex-shrink-0 pulse-glow`}
               >
                 {lang === 'tr' ? 'Bugün' : 'Today'}
               </span>

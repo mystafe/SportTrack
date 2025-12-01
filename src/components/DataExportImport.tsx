@@ -547,7 +547,7 @@ export function DataExportImport({ onSettingsClose }: DataExportImportProps = {}
       {/* Health Guide is now rendered in GlobalDialogs */}
       {shouldShowReminder && (
         <div
-          className={`mt-2 ${isMobile ? 'p-2' : 'p-2.5'} rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10`}
+          className={`mt-2 ${isMobile ? 'p-2' : 'p-2.5'} rounded-lg border-2 border-blue-200/50 dark:border-blue-800/50 glass-effect bg-gradient-to-r from-blue-50/80 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 backdrop-blur-sm hover:scale-[1.02] transition-all duration-200`}
         >
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
@@ -713,7 +713,7 @@ function LegacyConversionDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[10014] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[10014] flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-md animate-fade-in"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -724,7 +724,7 @@ function LegacyConversionDialog({
       aria-labelledby="conversion-dialog-title"
     >
       <div
-        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto mx-4' : 'rounded-xl shadow-xl max-w-md w-full mx-4'} border-2 border-purple-200 dark:border-purple-700 animate-scale-in`}
+        className={`glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto mx-4' : 'rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.01] max-w-md w-full mx-4'} border-2 border-white/20 dark:border-gray-700/50 animate-scale-in`}
       >
         <div className={`${isMobile ? 'p-6' : 'p-6'}`}>
           <h2
@@ -751,7 +751,7 @@ function LegacyConversionDialog({
           )}
 
           <label
-            className={`block w-full ${isMobile ? 'px-3 py-2 text-sm' : 'px-4 py-3 text-sm'} rounded-lg border-2 border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20 hover:from-purple-100 hover:to-purple-50 dark:hover:from-purple-800 dark:hover:to-purple-700 transition-all duration-200 cursor-pointer font-semibold text-purple-700 dark:text-purple-300 text-center`}
+            className={`block w-full ${isMobile ? 'px-3 py-2 text-sm' : 'px-4 py-3 text-sm'} rounded-lg border-2 border-purple-200/50 dark:border-purple-700/50 glass-effect bg-gradient-to-r from-purple-50/80 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/20 hover:from-purple-100 hover:to-purple-50 dark:hover:from-purple-800 dark:hover:to-purple-700 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer font-semibold text-purple-700 dark:text-purple-300 text-center backdrop-blur-sm`}
           >
             <input
               ref={fileInputRef}

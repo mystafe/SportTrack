@@ -212,11 +212,11 @@ export function AuthDialog({ open, onClose, initialMode = 'login' }: AuthDialogP
 
   const dialog = (
     <div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 py-4 overflow-y-auto"
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-md px-4 py-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className={`${isMobile ? 'w-full' : 'w-full max-w-md'} bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 p-6 my-auto`}
+        className={`${isMobile ? 'w-full' : 'w-full max-w-md'} glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-xl shadow-2xl border-2 border-white/20 dark:border-gray-700/50 p-6 my-auto hover:scale-[1.01] transition-all duration-300`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">

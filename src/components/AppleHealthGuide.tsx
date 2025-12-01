@@ -12,7 +12,7 @@ export function AppleHealthGuide() {
 
   return (
     <div
-      className={`rounded-lg border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 ${isMobile ? 'p-2' : 'p-2.5'} ${isMobile ? 'space-y-1.5' : 'space-y-2'}`}
+      className={`glass-effect card-3d rounded-lg border-2 border-white/20 dark:border-gray-700/50 bg-gradient-to-br from-blue-50/95 to-blue-100/50 dark:from-blue-900/30 dark:to-blue-800/20 backdrop-blur-xl shadow-lg ${isMobile ? 'p-2' : 'p-2.5'} ${isMobile ? 'space-y-1.5' : 'space-y-2'}`}
     >
       <Button
         type="button"

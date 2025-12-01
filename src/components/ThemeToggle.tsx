@@ -119,7 +119,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5 flex-shrink-0">
+    <div className="inline-flex items-center gap-0.5 rounded-lg glass-effect card-3d border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg p-0.5 flex-shrink-0">
       <Button
         type="button"
         variant={theme === 'light' ? 'primary' : 'ghost'}

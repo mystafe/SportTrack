@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useActivities } from '@/lib/activityStore';
 import { useSettings } from '@/lib/settingsStore';
@@ -9,6 +9,8 @@ import { calculateWeeklyStats } from '@/lib/statisticsUtils';
 import { compareWeeks } from '@/lib/comparisonUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { Card } from '@/components/ui/Card';
+import { WeeklyStoryMode } from '@/components/WeeklyStoryMode';
+import { Button } from '@/components/ui/Button';
 import {
   startOfWeek,
   endOfWeek,
@@ -26,6 +28,7 @@ export function WeeklySummary() {
   const { activities } = useActivities();
   const { settings } = useSettings();
   const isMobile = useIsMobile();
+  const [isStoryModeOpen, setIsStoryModeOpen] = useState(false);
   const dailyTarget =
     settings?.dailyTarget && settings.dailyTarget > 0 ? settings.dailyTarget : DEFAULT_DAILY_TARGET;
   const dateLocale = lang === 'tr' ? tr : enUS;
@@ -148,17 +151,29 @@ export function WeeklySummary() {
               {lang === 'tr' ? 'Haftalık Özet' : 'Weekly Summary'}
             </h2>
           </div>
-          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            {format(currentWeekStart, 'dd MMM', { locale: dateLocale })} -{' '}
-            {format(currentWeekEnd, 'dd MMM yyyy', { locale: dateLocale })}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              {format(currentWeekStart, 'dd MMM', { locale: dateLocale })} -{' '}
+              {format(currentWeekEnd, 'dd MMM yyyy', { locale: dateLocale })}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsStoryModeOpen(true)}
+              className="text-xs px-2 py-1 min-h-[32px]"
+              aria-label={lang === 'tr' ? 'Hikaye Modunu Aç' : 'Open Story Mode'}
+            >
+              <span className="mr-1">📖</span>
+              {lang === 'tr' ? 'Hikaye' : 'Story'}
+            </Button>
+          </div>
         </div>
       }
     >
       <div className="space-y-4 sm:space-y-5">
         {/* Week Comparison */}
         {weekComparison && (
-          <div className="p-3 sm:p-4 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800">
+          <div className="p-3 sm:p-4 rounded-lg glass-effect bg-gradient-to-r from-blue-50/80 to-purple-50/80 dark:from-blue-900/30 dark:to-purple-900/30 backdrop-blur-sm border-2 border-blue-200/50 dark:border-blue-800/50 hover:scale-[1.01] transition-all duration-300">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {lang === 'tr' ? 'Geçen Hafta ile Karşılaştırma' : 'vs Last Week'}
@@ -196,7 +211,7 @@ export function WeeklySummary() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+          <div className="p-3 rounded-lg glass-effect bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/10 dark:border-gray-700/30 hover:scale-[1.02] hover:shadow-md transition-all duration-300">
             <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
               {lang === 'tr' ? 'Toplam Puan' : 'Total Points'}
             </p>
@@ -204,7 +219,7 @@ export function WeeklySummary() {
               {numberFormatter.format(currentWeek.totalPoints)}
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+          <div className="p-3 rounded-lg glass-effect bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/10 dark:border-gray-700/30 hover:scale-[1.02] hover:shadow-md transition-all duration-300">
             <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
               {lang === 'tr' ? 'Günlük Ortalama' : 'Daily Avg'}
             </p>
@@ -212,7 +227,7 @@ export function WeeklySummary() {
               {numberFormatter.format(Math.round(currentWeek.averagePerDay))}
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+          <div className="p-3 rounded-lg glass-effect bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/10 dark:border-gray-700/30 hover:scale-[1.02] hover:shadow-md transition-all duration-300">
             <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
               {lang === 'tr' ? 'Tamamlanan Gün' : 'Completed Days'}
             </p>
@@ -220,7 +235,7 @@ export function WeeklySummary() {
               {currentWeek.completedDays}/7
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+          <div className="p-3 rounded-lg glass-effect bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/10 dark:border-gray-700/30 hover:scale-[1.02] hover:shadow-md transition-all duration-300">
             <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
               {lang === 'tr' ? 'Tamamlama Oranı' : 'Completion Rate'}
             </p>
@@ -276,7 +291,7 @@ export function WeeklySummary() {
               {topActivities.map((activity) => (
                 <div
                   key={activity.label}
-                  className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center justify-between p-2 sm:p-3 rounded-lg glass-effect bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/10 dark:border-gray-700/30 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-[1.02] hover:shadow-md transition-all duration-300"
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="text-lg sm:text-xl flex-shrink-0">{activity.icon}</span>
@@ -336,6 +351,11 @@ export function WeeklySummary() {
           </div>
         )}
       </div>
+      <WeeklyStoryMode
+        isOpen={isStoryModeOpen}
+        onClose={() => setIsStoryModeOpen(false)}
+        autoPlay={false}
+      />
     </Card>
   );
 }

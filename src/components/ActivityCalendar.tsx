@@ -114,12 +114,12 @@ export function ActivityCalendar() {
       variant="default"
       size="md"
       hoverable
-      className="card-entrance"
+      className="card-entrance glass-effect card-3d"
       header={
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl">📅</span>
-            <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white">
+            <span className="text-xl icon-bounce">📅</span>
+            <h2 className="text-lg sm:text-xl font-bold shimmer-text text-gray-950 dark:text-white">
               {format(currentMonth, 'MMMM yyyy', { locale: dateLocale })}
             </h2>
           </div>
@@ -128,7 +128,7 @@ export function ActivityCalendar() {
               variant="ghost"
               size="sm"
               onClick={handlePreviousMonth}
-              className="p-1.5 min-w-[32px] min-h-[32px]"
+              className="p-1.5 min-w-[32px] min-h-[32px] hover:scale-110 transition-transform duration-200"
               aria-label={lang === 'tr' ? 'Önceki ay' : 'Previous month'}
             >
               ←
@@ -137,7 +137,7 @@ export function ActivityCalendar() {
               variant="ghost"
               size="sm"
               onClick={handleToday}
-              className="px-2 py-1 text-xs"
+              className="px-2 py-1 text-xs hover:scale-110 transition-transform duration-200"
               aria-label={lang === 'tr' ? 'Bugün' : 'Today'}
             >
               {lang === 'tr' ? 'Bugün' : 'Today'}
@@ -146,7 +146,7 @@ export function ActivityCalendar() {
               variant="ghost"
               size="sm"
               onClick={handleNextMonth}
-              className="p-1.5 min-w-[32px] min-h-[32px]"
+              className="p-1.5 min-w-[32px] min-h-[32px] hover:scale-110 transition-transform duration-200"
               aria-label={lang === 'tr' ? 'Sonraki ay' : 'Next month'}
             >
               →
@@ -162,7 +162,7 @@ export function ActivityCalendar() {
             {weekDays.map((day) => (
               <div
                 key={day}
-                className={`text-center text-xs font-semibold text-gray-600 dark:text-gray-400 py-2 ${
+                className={`text-center text-xs font-bold text-gray-700 dark:text-gray-300 py-2 ${
                   isMobile ? 'px-1' : 'px-2'
                 }`}
               >
@@ -182,14 +182,14 @@ export function ActivityCalendar() {
               return (
                 <div
                   key={index}
-                  className={`min-h-[60px] sm:min-h-[80px] p-1 rounded-lg border-2 transition-all duration-200 ${
+                  className={`min-h-[60px] sm:min-h-[80px] p-1 rounded-xl border-2 transition-all duration-300 ${
                     isCurrentMonth
-                      ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                      : 'bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-800 opacity-50'
-                  } ${isToday ? 'ring-2 ring-brand ring-offset-2 dark:ring-offset-gray-900' : ''} ${
+                      ? 'glass-effect bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-white/30 dark:border-gray-700/50'
+                      : 'bg-gray-50/50 dark:bg-gray-900/50 border-gray-100/30 dark:border-gray-800/30 opacity-50'
+                  } ${isToday ? 'ring-2 ring-brand ring-offset-2 dark:ring-offset-gray-900 pulse-glow' : ''} ${
                     dayActivities.length > 0
-                      ? 'hover:shadow-md hover:scale-[1.02] cursor-pointer'
-                      : ''
+                      ? 'hover:shadow-xl hover:scale-[1.03] hover:border-brand/50 dark:hover:border-brand-light/50 cursor-pointer card-3d'
+                      : 'hover:shadow-md hover:scale-[1.01]'
                   }`}
                 >
                   <div className="flex flex-col h-full">
@@ -211,12 +211,14 @@ export function ActivityCalendar() {
                       {dayActivities.slice(0, isMobile ? 2 : 3).map((activity, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center gap-1 text-[10px] sm:text-xs bg-gray-100 dark:bg-gray-700 rounded px-1 py-0.5 truncate"
+                          className="flex items-center gap-1 text-[10px] sm:text-xs glass-effect bg-white/60 dark:bg-gray-700/60 backdrop-blur-sm border border-white/20 dark:border-gray-600/30 rounded-lg px-1 py-0.5 truncate hover:shadow-md hover:scale-[1.05] transition-all duration-200"
                           title={`${activity.label}: ${activity.points} ${lang === 'tr' ? 'puan' : 'points'}`}
                         >
                           <span className="flex-shrink-0">{activity.icon}</span>
-                          <span className="truncate flex-1 min-w-0">{activity.label}</span>
-                          <span className="flex-shrink-0 font-semibold text-brand">
+                          <span className="truncate flex-1 min-w-0 font-medium">
+                            {activity.label}
+                          </span>
+                          <span className="flex-shrink-0 font-bold text-brand dark:text-brand-light">
                             {activity.points}
                           </span>
                         </div>
@@ -231,8 +233,8 @@ export function ActivityCalendar() {
 
                     {/* Total points */}
                     {totalPoints > 0 && (
-                      <div className="mt-auto pt-1 border-t border-gray-200 dark:border-gray-700">
-                        <div className="text-[10px] font-bold text-brand text-center">
+                      <div className="mt-auto pt-1 border-t border-white/20 dark:border-gray-700/50">
+                        <div className="text-[10px] font-bold text-brand dark:text-brand-light text-center pulse-glow">
                           {totalPoints} {lang === 'tr' ? 'puan' : 'pts'}
                         </div>
                       </div>
@@ -246,19 +248,19 @@ export function ActivityCalendar() {
       </div>
 
       {/* Legend */}
-      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-center gap-4 text-xs text-gray-600 dark:text-gray-400">
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded border-2 border-brand" />
-            <span>{lang === 'tr' ? 'Bugün' : 'Today'}</span>
+      <div className="mt-4 pt-4 border-t border-white/20 dark:border-gray-700/50">
+        <div className="flex items-center justify-center gap-4 text-xs text-gray-700 dark:text-gray-300 flex-wrap">
+          <div className="flex items-center gap-1.5 glass-effect bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-lg px-2 py-1 border border-white/20 dark:border-gray-700/30">
+            <div className="w-3 h-3 rounded border-2 border-brand pulse-glow" />
+            <span className="font-medium">{lang === 'tr' ? 'Bugün' : 'Today'}</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 glass-effect bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-lg px-2 py-1 border border-white/20 dark:border-gray-700/30">
             <div className="w-3 h-3 rounded bg-gray-200 dark:bg-gray-700" />
-            <span>{lang === 'tr' ? 'Aktivite var' : 'Has activity'}</span>
+            <span className="font-medium">{lang === 'tr' ? 'Aktivite var' : 'Has activity'}</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 glass-effect bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-lg px-2 py-1 border border-white/20 dark:border-gray-700/30">
             <div className="w-3 h-3 rounded bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600" />
-            <span>{lang === 'tr' ? 'Boş gün' : 'Empty day'}</span>
+            <span className="font-medium">{lang === 'tr' ? 'Boş gün' : 'Empty day'}</span>
           </div>
         </div>
       </div>

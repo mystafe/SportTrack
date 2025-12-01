@@ -10,6 +10,7 @@ import { useSettings } from '@/lib/settingsStore';
 import { DEFAULT_DAILY_TARGET } from '@/lib/activityConfig';
 import { getActivityLabel } from '@/lib/activityUtils';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useAnimatedCounter } from '@/lib/hooks/useAnimatedCounter';
 import { StatsHighlightsSkeleton } from '@/components/LoadingSkeleton';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -89,6 +90,48 @@ export const StatsHighlights = memo(function StatsHighlights() {
     return totals.size > 0 ? Math.round(sum / totals.size) : 0;
   }, [activities]);
 
+  // Animated counters (after bestDay, topActivity, averageDailyPoints are defined)
+  const bestDayPointsCounter = useAnimatedCounter(bestDay?.points ?? 0, {
+    duration: 1000,
+    easing: 'easeOut',
+    formatter: (val) => numberFormatter.format(Math.round(val)),
+  });
+  const topActivityPointsCounter = useAnimatedCounter(topActivity?.points ?? 0, {
+    duration: 1000,
+    easing: 'easeOut',
+    formatter: (val) => numberFormatter.format(Math.round(val)),
+  });
+  const topActivityCountCounter = useAnimatedCounter(topActivity?.count ?? 0, {
+    duration: 800,
+    easing: 'easeOut',
+  });
+  const streakCounter = useAnimatedCounter(summary.streakDays, {
+    duration: 800,
+    easing: 'easeOut',
+  });
+  const averageDailyCounter = useAnimatedCounter(averageDailyPoints, {
+    duration: 1000,
+    easing: 'easeOut',
+    formatter: (val) => numberFormatter.format(Math.round(val)),
+  });
+  const totalPointsCounter = useAnimatedCounter(summary.totalPoints, {
+    duration: 1200,
+    easing: 'easeOut',
+    formatter: (val) => numberFormatter.format(Math.round(val)),
+  });
+  const todayPointsCounter = useAnimatedCounter(summary.todayPoints, {
+    duration: 1000,
+    easing: 'easeOut',
+    formatter: (val) => numberFormatter.format(Math.round(val)),
+  });
+  const progressPctCounter = useAnimatedCounter(
+    Math.round((summary.todayPoints / summary.targetPoints) * 100),
+    {
+      duration: 800,
+      easing: 'easeOut',
+    }
+  );
+
   const totalDays = useMemo(() => {
     const days = new Set<string>();
     for (const activity of activities) {
@@ -122,14 +165,20 @@ export const StatsHighlights = memo(function StatsHighlights() {
 
   return (
     <section className="mt-0">
-      <Card variant="default" size="sm" hoverable className="card-entrance" header={renderHeader()}>
+      <Card
+        variant="default"
+        size="sm"
+        hoverable
+        className="card-entrance glass-effect card-3d"
+        header={renderHeader()}
+      >
         {isOpen && (
           <div
             id="stats-highlights"
             className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2'} ${isMobile ? 'gap-2' : 'gap-3'}`}
           >
             <div
-              className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}
+              className={`stagger-item stats-highlight-card card-entrance glass-effect card-3d ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'p-3' : 'p-4'} shadow-lg hover:shadow-xl transition-all duration-300 space-y-1 gpu-accelerated hover:scale-105`}
             >
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -146,7 +195,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
                   <div
                     className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'number-count-mobile' : 'number-count'}`}
                   >
-                    {numberFormatter.format(bestDay.points)} {t('list.pointsUnit')}
+                    {bestDayPointsCounter.displayValue} {t('list.pointsUnit')}
                   </div>
                 </>
               ) : (
@@ -159,7 +208,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
             </div>
 
             <div
-              className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}
+              className={`stagger-item stats-highlight-card card-entrance glass-effect card-3d ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'p-3' : 'p-4'} shadow-lg hover:shadow-xl transition-all duration-300 space-y-1 gpu-accelerated hover:scale-105`}
             >
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -181,8 +230,8 @@ export const StatsHighlights = memo(function StatsHighlights() {
                   <div
                     className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'number-count-mobile' : 'number-count'}`}
                   >
-                    {numberFormatter.format(topActivity.points)} {t('list.pointsUnit')} •{' '}
-                    {topActivity.count} {t('stats.highlight.sessions')}
+                    {topActivityPointsCounter.displayValue} {t('list.pointsUnit')} •{' '}
+                    {topActivityCountCounter.displayValue} {t('stats.highlight.sessions')}
                   </div>
                 </>
               ) : (
@@ -195,7 +244,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
             </div>
 
             <div
-              className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}
+              className={`stagger-item stats-highlight-card card-entrance glass-effect card-3d ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'p-3' : 'p-4'} shadow-lg hover:shadow-xl transition-all duration-300 space-y-1 gpu-accelerated hover:scale-105`}
             >
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -205,7 +254,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
               <div
                 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}
               >
-                {summary.streakDays}
+                {streakCounter.displayValue}
               </div>
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold`}
@@ -217,7 +266,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
             </div>
 
             <div
-              className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}
+              className={`stagger-item stats-highlight-card card-entrance glass-effect card-3d ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'p-3' : 'p-4'} shadow-lg hover:shadow-xl transition-all duration-300 space-y-1 gpu-accelerated hover:scale-105`}
             >
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -227,7 +276,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
               <div
                 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}
               >
-                {numberFormatter.format(averageDailyPoints)} {t('list.pointsUnit')}
+                {averageDailyCounter.displayValue} {t('list.pointsUnit')}
               </div>
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'number-count-mobile' : 'number-count'}`}
@@ -237,7 +286,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
             </div>
 
             <div
-              className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}
+              className={`stagger-item stats-highlight-card card-entrance glass-effect card-3d ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'p-3' : 'p-4'} shadow-lg hover:shadow-xl transition-all duration-300 space-y-1 gpu-accelerated hover:scale-105`}
             >
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -247,7 +296,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
               <div
                 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}
               >
-                {numberFormatter.format(summary.totalPoints)} {t('list.pointsUnit')}
+                {totalPointsCounter.displayValue} {t('list.pointsUnit')}
               </div>
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'number-count-mobile' : 'number-count'}`}
@@ -259,7 +308,7 @@ export const StatsHighlights = memo(function StatsHighlights() {
             </div>
 
             <div
-              className={`stagger-item stats-highlight-card card-entrance ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3' : 'p-4'} shadow-md hover:shadow-xl transition-shadow duration-300 space-y-1 gpu-accelerated`}
+              className={`stagger-item stats-highlight-card card-entrance glass-effect card-3d ${isMobile ? 'mobile-card-lift touch-feedback bounce-in-mobile' : ''} rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'p-3' : 'p-4'} shadow-lg hover:shadow-xl transition-all duration-300 space-y-1 gpu-accelerated hover:scale-105`}
             >
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -269,23 +318,21 @@ export const StatsHighlights = memo(function StatsHighlights() {
               <div
                 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-950 dark:text-gray-100 ${isMobile ? 'number-count-mobile' : 'number-transition'}`}
               >
-                {numberFormatter.format(summary.todayPoints)} /{' '}
-                {numberFormatter.format(summary.targetPoints)}
+                {todayPointsCounter.displayValue} / {numberFormatter.format(summary.targetPoints)}
               </div>
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700 dark:text-gray-300 font-semibold ${isMobile ? 'number-count-mobile' : 'number-count'}`}
               >
-                {Math.round((summary.todayPoints / summary.targetPoints) * 100)}%{' '}
-                {t('stats.highlight.complete')}
+                {progressPctCounter.displayValue}% {t('stats.highlight.complete')}
               </div>
             </div>
 
             <Link
               href="/stats"
-              className={`stagger-item card-entrance slide-in-right magnetic-hover hover-scale-glow rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gradient-to-br from-brand/10 via-brand/8 to-brand/5 dark:from-brand/20 dark:via-brand/15 dark:to-brand/10 ${isMobile ? 'p-3' : 'p-4'} shadow-lg group gpu-accelerated col-span-2`}
+              className={`stagger-item card-entrance slide-in-right magnetic-hover hover-scale-glow glass-effect card-3d rounded-xl border-2 border-brand/30 dark:border-brand/40 bg-gradient-to-br from-brand/15 via-brand/10 to-brand/5 dark:from-brand/25 dark:via-brand/20 dark:to-brand/15 backdrop-blur-xl ${isMobile ? 'p-3' : 'p-4'} shadow-xl hover:shadow-2xl group gpu-accelerated col-span-2 transition-all duration-300 hover:scale-105 pulse-glow`}
             >
               <div
-                className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-gray-900 dark:text-white group-hover:text-brand transition-colors whitespace-nowrap overflow-hidden text-ellipsis`}
+                className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-gray-900 dark:text-white group-hover:text-brand transition-colors whitespace-nowrap overflow-hidden text-ellipsis neon-glow-brand shimmer-text`}
                 title={`${t('stats.detailed.title')} - ${t('stats.detailed.subtitle')}`}
               >
                 {t('stats.detailed.title')} - {t('stats.detailed.subtitle')}

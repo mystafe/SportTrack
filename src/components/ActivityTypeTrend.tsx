@@ -81,7 +81,7 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
             {t('activityTrend.subtitle')}
           </p>
         </div>
-        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-6 shadow-md">
+        <div className="card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-6 shadow-lg">
           <p className="text-body text-gray-600 dark:text-gray-400 text-center">
             {t('activityTrend.noData')}
           </p>
@@ -118,7 +118,7 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
         </div>
       </div>
 
-      <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+      <div className="card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.01]">
         {chartData.length === 0 ? (
           <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
             {t('activityTrend.noData')}
@@ -137,9 +137,12 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
                 <YAxis stroke="#6b7280" fontSize={isMobile ? 10 : 12} tick={{ fill: '#6b7280' }} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '0.75rem',
+                    boxShadow: '0 8px 16px -4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
                     fontSize: isMobile ? '12px' : '14px',
                   }}
                 />
@@ -170,7 +173,7 @@ export const ActivityTypeTrend = memo(function ActivityTypeTrend() {
               {topTrends.map((trend, index) => (
                 <div
                   key={trend.activityKey}
-                  className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-3"
+                  className="rounded-lg glass-effect card-3d border-2 border-white/20 dark:border-gray-800/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xl">{trend.icon}</span>

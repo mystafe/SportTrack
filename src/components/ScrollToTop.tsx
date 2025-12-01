@@ -92,33 +92,43 @@ export function ScrollToTop() {
   };
 
   // Calculate position above QuoteTicker - just above scrolling text
-  // QuoteTicker height: ~32px + BottomNavigation: 64px + safe-bottom
+  // QuoteTicker height: ~24px + BottomNavigation: 52px + safe-bottom
   // Position button just above QuoteTicker with small gap
-  const bottomOffset = isMobile
-    ? `calc(112px + max(0px, env(safe-area-inset-bottom, 0px)))`
-    : '104px';
+  // Use calc() to ensure fixed position regardless of scroll
+  const bottomOffset = isMobile ? `calc(76px + env(safe-area-inset-bottom, 0px))` : '76px';
 
   return (
     <div
-      className={`fixed right-4 sm:right-6 z-[9999] transition-all duration-500 ease-in-out flex flex-col items-center gap-2`}
-      style={{
-        willChange: 'opacity, transform',
-        position: 'fixed',
-        bottom: bottomOffset,
-      }}
+      className={`fixed right-4 sm:right-6 z-[9999] flex flex-col items-center gap-2`}
+      style={
+        {
+          willChange: 'opacity, transform',
+          position: 'fixed',
+          bottom: bottomOffset,
+          right: isMobile ? '1rem' : '1.5rem',
+          transform: 'translateZ(0)',
+          WebkitTransform: 'translateZ(0)',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          overscrollBehavior: 'none',
+          WebkitOverscrollBehavior: 'none',
+          touchAction: 'pan-x pan-up',
+        } as React.CSSProperties
+      }
     >
       {/* Add Exercise Button - Above Top Button */}
       <div className="flex flex-col items-center gap-1">
         <div className="relative">
-          {/* Backdrop blur effect (Apple liquid glass effect) */}
-          <div className="absolute inset-0 rounded-full bg-white/30 dark:bg-gray-900/30 backdrop-blur-md backdrop-saturate-150 -z-10"></div>
+          {/* Enhanced Apple liquid glass effect */}
+          <div className="absolute inset-0 rounded-full bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl backdrop-saturate-150 -z-10 shadow-2xl"></div>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-transparent to-white/10 dark:from-gray-800/20 dark:via-transparent dark:to-gray-800/10 -z-10"></div>
           <Button
             onClick={handleAddActivity}
             onTouchStart={handleAddActivityTouch}
             type="button"
             variant="ghost"
             size={isMobile ? 'sm' : 'md'}
-            className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-white/20 dark:bg-gray-900/20 backdrop-blur-sm text-brand dark:text-brand-light shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isMobile ? 'touch-feedback mobile-press touch-manipulation' : ''} opacity-100 relative p-0 border border-white/20 dark:border-gray-700/30 z-50`}
+            className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full glass-effect card-3d bg-white/30 dark:bg-gray-900/30 backdrop-blur-xl text-brand dark:text-brand-light shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 active:scale-95 ${isMobile ? 'touch-feedback mobile-press touch-manipulation' : ''} opacity-100 relative p-0 border-2 border-white/30 dark:border-gray-700/40 z-50 pulse-glow hover:pulse-glow`}
             style={{
               touchAction: 'manipulation',
               WebkitTapHighlightColor: 'transparent',
@@ -130,7 +140,7 @@ export function ScrollToTop() {
             data-tour-id="add-activity"
           >
             <span
-              className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black drop-shadow-lg relative z-10 whitespace-nowrap`}
+              className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black drop-shadow-lg relative z-10 whitespace-nowrap icon-bounce`}
             >
               𓂃🪶
             </span>
@@ -150,17 +160,18 @@ export function ScrollToTop() {
           type="button"
           variant="primary"
           size={isMobile ? 'sm' : 'md'}
-          className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''} border-2 border-white/20 dark:border-white/15 opacity-30 hover:opacity-60 relative overflow-visible p-0`}
+          className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full glass-effect card-3d bg-gradient-to-br from-brand via-brand-dark to-brand text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 ${isMobile ? 'touch-feedback mobile-press' : ''} border-2 border-white/30 dark:border-white/20 opacity-40 hover:opacity-100 relative overflow-visible p-0 animate-gradient pulse-glow hover:pulse-glow`}
           aria-label={t('scrollToTop') || 'Scroll to top'}
           title={t('scrollToTop') || 'Scroll to top'}
         >
           <span
-            className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black drop-shadow-md relative z-10`}
+            className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black drop-shadow-lg relative z-10 icon-bounce`}
           >
             ↑
           </span>
-          {/* Subtle glow effect - only on hover */}
-          <div className="absolute inset-0 rounded-full bg-brand/20 blur-sm -z-10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+          {/* Enhanced glow effect */}
+          <div className="absolute inset-0 rounded-full bg-brand/30 blur-md -z-10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50"></div>
         </Button>
       )}
     </div>

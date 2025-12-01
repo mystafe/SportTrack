@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { useUIState } from '@/lib/uiState';
 import { Accordion } from '@/components/ui/Accordion';
+import { useScreenReaderAnnouncement } from '@/lib/hooks/useScreenReaderAnnouncement';
 import { lazy, Suspense } from 'react';
 
 // Lazy load heavy components
@@ -79,6 +80,8 @@ function ActivitiesClient() {
   const { settings } = useSettings();
   const { showToast } = useToaster();
   const { setHideFloatingAddButton } = useUIState();
+  const [announcement, setAnnouncement] = useState<string | null>(null);
+  useScreenReaderAnnouncement(announcement);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     id: string;
@@ -286,7 +289,9 @@ function ActivitiesClient() {
             onConfirm={() => {
               if (deleteConfirm) {
                 deleteActivity(deleteConfirm.id);
-                showToast(t('toast.activityDeleted'), 'success');
+                const deleteMsg = t('toast.activityDeleted');
+                showToast(deleteMsg, 'success');
+                setAnnouncement(deleteMsg);
                 if (editingId === deleteConfirm.id) {
                   setEditingId(null);
                 }

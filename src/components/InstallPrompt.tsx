@@ -104,7 +104,7 @@ export function InstallPrompt() {
         <Card
           variant="default"
           size="md"
-          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3"
+          className="glass-effect card-3d flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 hover:scale-[1.02] transition-all duration-300"
         >
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-xs sm:text-sm mb-0.5 sm:mb-1 text-gray-950 dark:text-white">

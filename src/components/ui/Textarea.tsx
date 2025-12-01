@@ -101,8 +101,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       ${sizeConfig.padding}
       ${sizeConfig.fontSize}
       ${sizeConfig.minHeight}
-      bg-white dark:bg-gray-900
-      border-2 ${hasError ? 'border-error' : 'border-gray-200 dark:border-gray-700'}
+      bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
+      border-2 ${hasError ? 'border-error' : 'border-white/20 dark:border-gray-700/50'}
       text-gray-900 dark:text-gray-100
       placeholder:text-gray-400 dark:placeholder:text-gray-500
       rounded-lg

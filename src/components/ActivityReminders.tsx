@@ -167,7 +167,7 @@ export function ActivityReminders() {
       <div className="space-y-4">
         {/* Add Form */}
         {showAddForm && (
-          <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <div className="p-4 rounded-lg glass-effect bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-white/20 dark:border-gray-700/50 hover:scale-[1.01] transition-all duration-300">
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -244,7 +244,7 @@ export function ActivityReminders() {
             {reminders.map((reminder) => (
               <div
                 key={reminder.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                className="flex items-center justify-between p-3 rounded-lg glass-effect bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-white/20 dark:border-gray-700/50 hover:scale-[1.02] hover:shadow-md transition-all duration-300"
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <span className="text-2xl flex-shrink-0">{reminder.icon}</span>

@@ -501,7 +501,7 @@ export function ConflictResolutionDialog({
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10025] flex ${isMobile ? 'items-start pt-28 px-4' : 'items-center justify-center pt-20'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-top`}
+      className={`fixed inset-0 z-[10025] flex ${isMobile ? 'items-start pt-28 px-4' : 'items-center justify-center pt-20'} bg-black/40 dark:bg-black/60 ${isMobile ? '' : 'backdrop-blur-md'} animate-fade-in safe-top`}
       onClick={(e) => {
         // Only close if clicking the backdrop, not the card content
         if (e.target === e.currentTarget) {

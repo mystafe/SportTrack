@@ -60,9 +60,10 @@ export function CircularProgress({
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          className="text-brand transition-all duration-700 ease-out circular-progress"
+          className="text-brand transition-all duration-700 ease-out circular-progress drop-shadow-lg"
           style={{
             strokeDashoffset,
+            filter: 'drop-shadow(0 0 4px rgba(14, 165, 233, 0.5))',
           }}
         />
       </svg>

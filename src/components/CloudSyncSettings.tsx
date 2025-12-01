@@ -532,8 +532,8 @@ export function CloudSyncSettings({
     <>
       {/* Syncing Overlay - Shows while syncing */}
       {syncing && !showSyncSuccess && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
-          <div className="flex flex-col items-center gap-6 rounded-3xl bg-white p-10 shadow-2xl dark:bg-gray-800 animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-6 rounded-3xl glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-10 shadow-2xl border-2 border-white/20 dark:border-gray-700/50 animate-in fade-in zoom-in duration-300 hover:scale-[1.02] transition-all">
             {/* Loading Spinner */}
             <div className="relative h-20 w-20">
               <div className="absolute inset-0 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700"></div>
@@ -564,8 +564,8 @@ export function CloudSyncSettings({
 
       {/* Sync Success Overlay */}
       {showSyncSuccess && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
-          <div className="flex flex-col items-center gap-6 rounded-3xl bg-white p-10 shadow-2xl dark:bg-gray-800 animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-6 rounded-3xl glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-10 shadow-2xl border-2 border-white/20 dark:border-gray-700/50 animate-in fade-in zoom-in duration-300 hover:scale-[1.02] transition-all">
             {/* Success Checkmark Animation */}
             <div className="relative h-20 w-20">
               <div className="absolute inset-0 rounded-full bg-green-500/20 animate-ping"></div>

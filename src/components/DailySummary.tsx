@@ -94,7 +94,7 @@ export function DailySummary() {
         variant="default"
         size="md"
         hoverable
-        className="card-entrance border-2 border-dashed border-gray-300 dark:border-gray-600"
+        className="card-entrance glass-effect card-3d border-2 border-dashed border-white/20 dark:border-gray-700/50"
       >
         <div className="text-center py-6 sm:py-8">
           <div className="text-4xl sm:text-5xl mb-3">📅</div>
@@ -122,7 +122,7 @@ export function DailySummary() {
       variant="default"
       size="md"
       hoverable
-      className="card-entrance"
+      className="card-entrance glass-effect card-3d"
       header={
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -148,19 +148,23 @@ export function DailySummary() {
               {numberFormatter.format(summary.todayPoints)} / {numberFormatter.format(dailyTarget)}
             </span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 sm:h-4 overflow-hidden">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 sm:h-4 overflow-hidden shadow-inner relative progress-glow">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${
+              className={`h-full rounded-full transition-all duration-500 shadow-sm ${
                 progress >= 100
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-600'
+                  ? 'bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 animate-gradient pulse-glow'
                   : progress >= 75
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600'
+                    ? 'bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 animate-gradient'
                     : progress >= 50
-                      ? 'bg-gradient-to-r from-yellow-500 to-orange-500'
-                      : 'bg-gradient-to-r from-red-500 to-pink-500'
+                      ? 'bg-gradient-to-r from-yellow-500 via-orange-400 to-orange-500 animate-gradient'
+                      : 'bg-gradient-to-r from-red-500 via-pink-400 to-pink-500 animate-gradient'
               }`}
               style={{ width: `${progress}%` }}
-            />
+            >
+              {progress > 0 && (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer rounded-full" />
+              )}
+            </div>
           </div>
           {remainingPoints > 0 && (
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -173,7 +177,7 @@ export function DailySummary() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+          <div className="p-3 rounded-lg glass-effect bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-2 border-white/20 dark:border-gray-700/50 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
             <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
               {lang === 'tr' ? 'Toplam Aktivite' : 'Total Activities'}
             </p>
@@ -181,7 +185,7 @@ export function DailySummary() {
               {todayActivities.length}
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+          <div className="p-3 rounded-lg glass-effect bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-2 border-white/20 dark:border-gray-700/50 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
             <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
               {lang === 'tr' ? 'Aktivite Türü' : 'Activity Types'}
             </p>
@@ -209,7 +213,7 @@ export function DailySummary() {
               {activitiesByType.slice(0, 5).map((activity) => (
                 <div
                   key={activity.label}
-                  className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center justify-between p-2 sm:p-3 rounded-lg glass-effect bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-2 border-white/20 dark:border-gray-700/50 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.01]"
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="text-lg sm:text-xl flex-shrink-0">{activity.icon}</span>

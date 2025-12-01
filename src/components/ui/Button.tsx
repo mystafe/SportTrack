@@ -60,39 +60,41 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: `
-    bg-gradient-to-r from-brand to-brand-dark
+    bg-gradient-to-r from-brand via-brand-light to-brand-dark
     text-white
     shadow-elevation-2 shadow-colored-primary
-    hover:from-brand-dark hover:to-brand
+    hover:from-brand-dark hover:via-brand hover:to-brand-light
     hover:shadow-elevation-4 hover:shadow-colored-primary-hover
+    hover:scale-105
     active:scale-[0.98]
     disabled:from-gray-400 disabled:to-gray-500 disabled:shadow-none
     disabled:cursor-not-allowed
     disabled:opacity-70
+    animate-gradient
+    pulse-glow
   `,
   secondary: `
-    bg-gradient-to-r from-gray-100 to-white
-    dark:from-gray-800 dark:to-gray-700
+    bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
     text-gray-900 dark:text-gray-100
-    border-2 border-gray-200 dark:border-gray-700
+    border-2 border-white/20 dark:border-gray-700/50
     shadow-elevation-1
-    hover:from-gray-200 hover:to-gray-100
-    dark:hover:from-gray-700 dark:hover:to-gray-600
+    hover:bg-white dark:hover:bg-gray-800/95
     hover:border-gray-300 dark:hover:border-gray-600
     hover:shadow-elevation-2
+    hover:scale-105
     active:scale-[0.98]
-    disabled:from-gray-100 disabled:to-gray-100
-    disabled:dark:from-gray-800 disabled:dark:to-gray-800
+    disabled:bg-gray-100 disabled:dark:bg-gray-800
     disabled:text-gray-500 dark:disabled:text-gray-500
     disabled:border-gray-200 disabled:dark:border-gray-700
     disabled:cursor-not-allowed
   `,
   outline: `
-    bg-transparent
+    bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl
     text-gray-900 dark:text-gray-100
-    border-2 border-gray-300 dark:border-gray-600
-    hover:bg-gray-50 dark:hover:bg-gray-800
+    border-2 border-white/30 dark:border-gray-600/50
+    hover:bg-white dark:hover:bg-gray-800/90
     hover:border-gray-400 dark:hover:border-gray-500
+    hover:scale-105
     active:scale-[0.98]
     disabled:text-gray-500 dark:disabled:text-gray-500
     disabled:border-gray-200 disabled:dark:border-gray-700

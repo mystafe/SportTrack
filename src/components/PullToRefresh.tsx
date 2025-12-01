@@ -54,7 +54,7 @@ export function PullToRefresh({
             transition: isRefreshing ? 'opacity 0.3s ease-out' : 'none',
           }}
         >
-          <div className="bg-white dark:bg-gray-900 rounded-full p-3 shadow-lg border-2 border-gray-200 dark:border-gray-700">
+          <div className="glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-full p-3 shadow-xl border-2 border-white/20 dark:border-gray-700/50">
             {isRefreshing ? (
               <div className="w-6 h-6 border-3 border-brand border-t-transparent rounded-full pull-refresh" />
             ) : (

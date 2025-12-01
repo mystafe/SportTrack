@@ -36,7 +36,7 @@ export const DurationStats = memo(function DurationStats() {
             {t('stats.duration.subtitle')}
           </p>
         </div>
-        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-6 shadow-md">
+        <div className="card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-6 shadow-lg">
           <p className="text-body text-gray-600 dark:text-gray-400 text-center">
             {t('stats.duration.noDurationData')}
           </p>
@@ -58,7 +58,7 @@ export const DurationStats = memo(function DurationStats() {
 
       <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-4'} spacing-md`}>
         <div
-          className={`card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300`}
+          className={`card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
         >
           <div className="text-label text-gray-700 dark:text-gray-300">
             {t('stats.duration.averageDaily')}
@@ -71,7 +71,7 @@ export const DurationStats = memo(function DurationStats() {
         </div>
 
         <div
-          className={`card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300`}
+          className={`card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
         >
           <div className="text-label text-gray-700 dark:text-gray-300">
             {t('stats.duration.totalDuration')}
@@ -84,7 +84,7 @@ export const DurationStats = memo(function DurationStats() {
         </div>
 
         <div
-          className={`card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300`}
+          className={`card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
         >
           <div className="text-label text-gray-700 dark:text-gray-300">
             {t('stats.duration.daysWithDuration')}
@@ -97,7 +97,7 @@ export const DurationStats = memo(function DurationStats() {
         </div>
 
         <div
-          className={`card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-md hover:shadow-xl transition-shadow duration-300`}
+          className={`card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'p-3 space-y-1.5' : 'p-4 space-y-2'} shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
         >
           <div className="text-label text-gray-700 dark:text-gray-300">
             {t('stats.duration.longestDay')}

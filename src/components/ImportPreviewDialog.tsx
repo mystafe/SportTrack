@@ -156,7 +156,7 @@ export function ImportPreviewDialog({
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[100000] flex items-center justify-center bg-black/80 animate-fade-in safe-bottom p-4`}
+      className={`fixed inset-0 z-[100000] flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-md animate-fade-in safe-bottom p-4`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onCancel();
@@ -168,7 +168,7 @@ export function ImportPreviewDialog({
       style={{ zIndex: 100000 }}
     >
       <div
-        className={`bg-white dark:bg-gray-900 w-full max-w-2xl max-h-[90vh] rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 animate-scale-in relative z-[100001] flex flex-col`}
+        className={`glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl w-full max-w-2xl max-h-[90vh] rounded-xl shadow-2xl border-2 border-white/20 dark:border-gray-700/50 animate-scale-in hover:scale-[1.01] transition-all duration-300 relative z-[100001] flex flex-col`}
         style={{ zIndex: 100001, maxHeight: isMobile ? '85vh' : '90vh' }}
         onClick={(e) => {
           console.log('ImportPreviewDialog: Content clicked');

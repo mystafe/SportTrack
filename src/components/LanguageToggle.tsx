@@ -14,7 +14,7 @@ export function LanguageToggle() {
   ];
 
   return (
-    <div className="inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-card p-0.5 flex-shrink-0">
+    <div className="inline-flex items-center gap-0.5 rounded-lg glass-effect border border-white/20 dark:border-gray-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300 p-0.5 flex-shrink-0 hover:scale-105">
       {options.map((opt) => (
         <Button
           key={opt.code}

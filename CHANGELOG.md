@@ -2,6 +2,31 @@
 
 All notable changes to SportTrack will be documented in this file.
 
+## [0.38.8] - 2025-12-02
+
+### Fixed
+
+- **Build Errors**: Tüm TypeScript ve ESLint hataları düzeltildi
+  - ActivityForm, BottomNavigation, Header, QuoteTicker, ScrollToTop, FloatingAddButton component'lerinde WebkitOverscrollBehavior tip hataları düzeltildi
+  - CommandPalette'de keywords array tip hataları düzeltildi
+  - ActivityIntensityHeatmap'te null kontrolü eklendi
+  - WeeklyStoryMode'da bestDay tipi açıkça belirtildi
+  - activityStore'da updateActivity fonksiyonunun tip sorunları düzeltildi
+  - ShareButton'da variant tipi düzeltildi
+  - StatsCards'da theme tipi düzeltildi
+  - useFocusTrap, useIntersectionObserver, usePullToRefresh, useSwipeGesture hook'larında ref tip hataları düzeltildi
+  - useHapticFeedback'de vibrate kontrolü düzeltildi
+  - dataExport'da generateFilename fonksiyonunda isim çakışması düzeltildi
+  - analytics'te mostUsedFeature tipi düzeltildi
+  - SettingsDialog'da UserSettings tip hataları düzeltildi
+
+### Changed
+
+- **Build Process**: Production build optimizasyonları iyileştirildi
+  - Tüm vendor prefix'ler için tip güvenliği sağlandı
+  - React.CSSProperties cast'leri eklendi
+  - Null safety kontrolleri güçlendirildi
+
 ## [0.31.12] - 2025-01
 
 ### Added

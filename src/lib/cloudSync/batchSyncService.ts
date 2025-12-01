@@ -27,6 +27,10 @@ class BatchSyncService {
   private isSyncing: boolean = false;
   private readonly BATCH_INTERVAL_MS = 60000; // 1 minute
   private lastBatchTime: number = 0;
+  private consecutiveFailures: number = 0;
+  private readonly MAX_CONSECUTIVE_FAILURES = 3; // Stop retrying after 3 failures
+  private lastFailureTime: number = 0;
+  private readonly BACKOFF_BASE_MS = 60000; // Start with 1 minute
 
   /**
    * Add a change to the batch queue
@@ -70,7 +74,7 @@ class BatchSyncService {
 
   /**
    * Start the batch timer
-   * Only starts if there are pending changes
+   * Only starts if there are pending changes and not in backoff period
    */
   private startBatchTimer(): void {
     // Don't start timer if there are no pending changes
@@ -78,14 +82,39 @@ class BatchSyncService {
       return;
     }
 
+    // Don't start if Firebase is not configured
+    if (!cloudSyncService.isConfigured()) {
+      // Clear pending changes if Firebase is not configured
+      this.pendingChanges = [];
+      return;
+    }
+
+    // Don't start if we've exceeded max consecutive failures
+    if (this.consecutiveFailures >= this.MAX_CONSECUTIVE_FAILURES) {
+      // Clear pending changes to prevent infinite loop
+      this.pendingChanges = [];
+      this.consecutiveFailures = 0;
+      return;
+    }
+
     if (this.batchTimer) {
       return; // Timer already running
     }
 
-    // Calculate time until next minute boundary
+    // Calculate time until next batch (with exponential backoff on failures)
     const now = Date.now();
     const timeSinceLastBatch = now - this.lastBatchTime;
-    const timeUntilNextBatch = Math.max(0, this.BATCH_INTERVAL_MS - timeSinceLastBatch);
+    const timeSinceLastFailure = now - this.lastFailureTime;
+
+    // Exponential backoff: wait longer after failures
+    const backoffDelay =
+      this.consecutiveFailures > 0
+        ? Math.min(this.BACKOFF_BASE_MS * Math.pow(2, this.consecutiveFailures - 1), 300000) // Max 5 minutes
+        : 0;
+
+    const baseDelay = Math.max(0, this.BATCH_INTERVAL_MS - timeSinceLastBatch);
+    const backoffRemaining = Math.max(0, backoffDelay - timeSinceLastFailure);
+    const timeUntilNextBatch = Math.max(baseDelay, backoffRemaining);
 
     this.batchTimer = setTimeout(() => {
       this.flushBatch();
@@ -146,20 +175,75 @@ class BatchSyncService {
         mergedData.challenges.length > 0 ||
         (mergedData.settings !== null && mergedData.settings.name?.trim() !== '');
 
+      // Only attempt sync if configured
       if (hasData && cloudSyncService.isConfigured()) {
-        await cloudSyncService.uploadToCloud(mergedData);
-        this.lastBatchTime = Date.now();
+        try {
+          await cloudSyncService.uploadToCloud(mergedData);
+          this.lastBatchTime = Date.now();
+          // Reset failure counter on success
+          this.consecutiveFailures = 0;
+        } catch (syncError) {
+          // Re-throw to be caught by outer catch block
+          throw syncError;
+        }
+      } else if (hasData && !cloudSyncService.isConfigured()) {
+        // Silently skip if not configured - don't log errors
+        // Clear pending changes to prevent infinite loop
+        this.pendingChanges = [];
+        this.consecutiveFailures = 0;
+        this.isSyncing = false;
+        return;
       }
 
       // Clear pending changes after successful sync
       this.pendingChanges = [];
+      this.consecutiveFailures = 0;
     } catch (error) {
-      console.error('Batch sync failed:', error);
-      // Keep pending changes for retry
+      // Silently handle timeout/configuration errors - don't spam console
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isTimeoutError =
+        errorMessage.includes('TIMEOUT') ||
+        errorMessage.includes('timeout') ||
+        errorMessage.includes('resource-exhausted') ||
+        errorMessage.includes('Quota exceeded');
+
+      const isConfigError =
+        errorMessage.includes('not configured') ||
+        errorMessage.includes('Firestore database may not exist');
+
+      // Increment failure counter
+      this.consecutiveFailures++;
+      this.lastFailureTime = Date.now();
+
+      // Only log non-timeout/config errors (and only first few times)
+      if (!isTimeoutError && !isConfigError && this.consecutiveFailures <= 2) {
+        console.error('Batch sync failed:', error);
+      } else if (isTimeoutError || isConfigError) {
+        // Use debug level for timeout/config errors (less noisy)
+        // Only log first failure to avoid spam
+        if (this.consecutiveFailures === 1) {
+          console.debug('Batch sync skipped (timeout/config):', errorMessage);
+        }
+      }
+
+      // If we've exceeded max failures or it's a config error, clear pending changes
+      if (this.consecutiveFailures >= this.MAX_CONSECUTIVE_FAILURES || isConfigError) {
+        // Clear pending changes to prevent infinite loop
+        this.pendingChanges = [];
+        this.consecutiveFailures = 0;
+      }
+      // Otherwise keep pending changes for retry (with backoff)
     } finally {
       this.isSyncing = false;
-      // Restart timer if there are new changes
-      if (this.pendingChanges.length > 0) {
+      // Only restart timer if:
+      // 1. There are pending changes
+      // 2. We haven't exceeded max failures
+      // 3. Firebase is configured
+      if (
+        this.pendingChanges.length > 0 &&
+        this.consecutiveFailures < this.MAX_CONSECUTIVE_FAILURES &&
+        cloudSyncService.isConfigured()
+      ) {
         this.startBatchTimer();
       }
     }
@@ -181,6 +265,8 @@ class BatchSyncService {
       this.batchTimer = null;
     }
     this.pendingChanges = [];
+    this.consecutiveFailures = 0;
+    this.lastFailureTime = 0;
   }
 
   /**

@@ -104,8 +104,8 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
       ${sizeConfig.checkbox}
       rounded
       border-2
-      ${hasError ? 'border-error' : 'border-gray-300 dark:border-gray-600'}
-      bg-white dark:bg-gray-900
+      ${hasError ? 'border-error' : 'border-white/30 dark:border-gray-600/50'}
+      bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
       text-brand
       focus:outline-none
       focus:ring-2

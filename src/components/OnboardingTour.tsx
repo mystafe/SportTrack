@@ -626,10 +626,10 @@ export function OnboardingTour({ steps, onComplete, onSkip }: OnboardingTourProp
             ref={tooltipRef}
             className={`${
               tooltipPosition === 'center'
-                ? 'fixed z-[10004] bg-white dark:bg-gray-900 rounded-xl shadow-2xl border-2 border-brand/30 p-4 sm:p-6 animate-scale-in'
+                ? 'fixed z-[10004] glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-xl shadow-2xl border-2 border-white/20 dark:border-gray-700/50 p-4 sm:p-6 animate-scale-in'
                 : `fixed z-[10004] ${
                     isMobile ? 'w-[calc(100vw-2rem)] max-w-sm' : 'w-80'
-                  } bg-white dark:bg-gray-900 rounded-xl shadow-2xl border-2 border-brand/30 p-4 sm:p-6 animate-scale-in`
+                  } glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-xl shadow-2xl border-2 border-white/20 dark:border-gray-700/50 p-4 sm:p-6 animate-scale-in`
             }`}
             style={
               tooltipPosition === 'center'

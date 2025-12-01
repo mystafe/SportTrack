@@ -257,7 +257,7 @@ export function ManageActivitiesDialog() {
       {open
         ? createPortal(
             <div
-              className={`fixed inset-0 z-[9999] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} px-3 sm:px-4 py-4 overflow-y-auto animate-fade-in`}
+              className={`fixed inset-0 z-[9999] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 dark:bg-black/60 backdrop-blur-md px-3 sm:px-4 py-4 overflow-y-auto animate-fade-in`}
               onClick={(e) => {
                 if (e.target === e.currentTarget) {
                   closeDialog();
@@ -268,22 +268,25 @@ export function ManageActivitiesDialog() {
               aria-labelledby="manage-activities-title"
             >
               <div
-                className={`w-full ${isMobile ? 'max-w-full rounded-t-xl' : 'max-w-3xl rounded-xl'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 ${isMobile ? 'max-h-[90vh]' : 'max-h-[85vh]'} overflow-y-auto animate-scale-in`}
+                className={`glass-effect card-3d w-full ${isMobile ? 'max-w-full rounded-t-2xl' : 'max-w-3xl rounded-2xl'} border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl transition-shadow duration-300 ${isMobile ? 'max-h-[90vh]' : 'max-h-[85vh]'} overflow-y-auto animate-scale-in`}
               >
-                <div className="flex items-start justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-b-2 border-gray-200 dark:border-gray-700">
-                  <div>
-                    <h2
-                      id="manage-activities-title"
-                      className="text-sm sm:text-base font-bold text-gray-950 dark:text-white"
-                    >
-                      {t('activities.custom.title')}
-                    </h2>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-0.5">
-                      {t('activities.custom.subtitle')}
-                    </p>
+                <div className="flex items-start justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-b-2 border-gray-200/60 dark:border-gray-700/60">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl icon-bounce">⚙️</span>
+                    <div>
+                      <h2
+                        id="manage-activities-title"
+                        className="text-sm sm:text-base font-bold text-gray-950 dark:text-white neon-glow-brand"
+                      >
+                        {t('activities.custom.title')}
+                      </h2>
+                      <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-0.5">
+                        {t('activities.custom.subtitle')}
+                      </p>
+                    </div>
                   </div>
                   <button
-                    className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 text-lg sm:text-xl flex-shrink-0 ml-2"
+                    className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 text-lg sm:text-xl flex-shrink-0 ml-2 transition-colors duration-200 hover:scale-110 active:scale-95"
                     onClick={closeDialog}
                     aria-label={t('form.cancel')}
                   >
@@ -611,13 +614,36 @@ export function ManageActivitiesDialog() {
                         </p>
                       ) : null;
                     })()}
-                    {error ? <p className="text-xs text-red-500">{error}</p> : null}
-                    <div className="flex items-center justify-end gap-2 pt-1">
-                      <Button type="button" variant="outline" size="sm" onClick={closeDialog}>
+                    {error ? (
+                      <p className="text-xs text-red-500 font-semibold p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700">
+                        {error}
+                      </p>
+                    ) : null}
+                    <div className="flex items-center justify-end gap-2 pt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={closeDialog}
+                        className="btn-enhanced hover:scale-105 active:scale-95 transition-all duration-200"
+                      >
                         {t('form.cancel')}
                       </Button>
-                      <Button type="submit" variant="primary" size="sm">
-                        {isEditing ? t('activities.custom.save') : t('activities.custom.add')}
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        size="sm"
+                        className="btn-enhanced animate-gradient hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg hover:shadow-xl shadow-brand/30"
+                      >
+                        {isEditing ? (
+                          <>
+                            <span className="icon-bounce">💾</span> {t('activities.custom.save')}
+                          </>
+                        ) : (
+                          <>
+                            <span className="icon-bounce">➕</span> {t('activities.custom.add')}
+                          </>
+                        )}
                       </Button>
                     </div>
                   </form>
@@ -635,7 +661,7 @@ export function ManageActivitiesDialog() {
                           {customActivities.map((activity) => (
                             <li
                               key={activity.id}
-                              className="border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gradient-to-r from-gray-50/50 to-white dark:from-gray-800/30 dark:to-gray-800/50 px-2 py-1.5 flex items-center justify-between gap-2 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700/50 dark:hover:to-gray-700/30 transition-all duration-200"
+                              className="border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gradient-to-r from-gray-50/50 to-white dark:from-gray-800/30 dark:to-gray-800/50 px-2 py-1.5 flex items-center justify-between gap-2 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700/50 dark:hover:to-gray-700/30 transition-all duration-200 hover:scale-[1.02] card-3d shadow-sm hover:shadow-md"
                             >
                               <div className="min-w-0 flex-1">
                                 <div className="text-xs sm:text-sm font-bold flex items-center gap-1.5 truncate text-gray-950 dark:text-gray-100">
@@ -651,16 +677,16 @@ export function ManageActivitiesDialog() {
                               </div>
                               <div className="flex items-center gap-1.5 text-[10px] sm:text-xs flex-shrink-0">
                                 <button
-                                  className="text-brand dark:text-brand-light hover:text-brand-dark dark:hover:text-brand font-semibold hover:underline px-1 transition-all duration-200"
+                                  className="text-brand dark:text-brand-light hover:text-brand-dark dark:hover:text-brand font-semibold hover:underline px-1 transition-all duration-200 hover:scale-110 active:scale-95"
                                   onClick={() => handleEdit(activity)}
                                 >
-                                  {t('activities.custom.edit')}
+                                  ✏️ {t('activities.custom.edit')}
                                 </button>
                                 <button
-                                  className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold hover:underline px-1 transition-all duration-200"
+                                  className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold hover:underline px-1 transition-all duration-200 hover:scale-110 active:scale-95"
                                   onClick={() => handleDelete(activity.id)}
                                 >
-                                  {t('activities.custom.remove')}
+                                  🗑️ {t('activities.custom.remove')}
                                 </button>
                               </div>
                             </li>
@@ -676,7 +702,7 @@ export function ManageActivitiesDialog() {
                         {baseDefinitions.map((activity: ActivityDefinition) => (
                           <li
                             key={activity.key}
-                            className="border border-dashed border-gray-200 dark:border-gray-700 rounded px-2 py-1.5 flex items-center justify-between gap-2"
+                            className="border border-dashed border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 flex items-center justify-between gap-2 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors duration-200"
                           >
                             <div className="min-w-0 flex-1">
                               <div className="font-medium text-xs sm:text-sm text-gray-700 dark:text-gray-200 flex items-center gap-1.5">
@@ -690,10 +716,10 @@ export function ManageActivitiesDialog() {
                             </div>
                             <div className="flex items-center gap-1.5 text-[10px] sm:text-xs flex-shrink-0">
                               <button
-                                className="text-brand hover:underline px-1"
+                                className="text-brand hover:underline px-1 transition-all duration-200 hover:scale-110 active:scale-95"
                                 onClick={() => handleEdit(activity)}
                               >
-                                {t('activities.custom.edit')}
+                                ✏️ {t('activities.custom.edit')}
                               </button>
                             </div>
                           </li>

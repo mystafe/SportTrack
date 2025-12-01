@@ -62,7 +62,7 @@ export const RecentActivities = memo(function RecentActivities() {
         <Link
           key={activity.id}
           href="/activities"
-          className={`block ${isMobile ? 'p-4 min-h-[64px]' : 'p-3'} rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-brand/50 dark:hover:border-brand/50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group stagger-item ${isMobile ? 'touch-feedback active:scale-[0.98]' : ''}`}
+          className={`block ${isMobile ? 'p-4 min-h-[64px]' : 'p-3'} rounded-lg glass-effect card-3d border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl hover:border-brand/50 dark:hover:border-brand/50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 group stagger-item hover:scale-[1.01] ${isMobile ? 'touch-feedback active:scale-[0.98]' : ''}`}
           style={{ animationDelay: `${index * 0.05}s` }}
         >
           <div className="flex items-center justify-between gap-3">

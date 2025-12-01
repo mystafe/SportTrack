@@ -62,7 +62,7 @@ export function ActivitySuggestions() {
         {suggestions.map((suggestion, index) => (
           <div
             key={`${suggestion.activity.key}-${index}`}
-            className={`rounded-lg border-2 p-3 sm:p-4 transition-all duration-300 ${getSuggestionPriorityColor(suggestion.priority)} hover:shadow-md ${isMobile ? 'touch-feedback active:scale-[0.98]' : 'hover:scale-[1.02]'}`}
+            className={`rounded-lg glass-effect card-3d p-3 sm:p-4 backdrop-blur-xl transition-all duration-300 ${getSuggestionPriorityColor(suggestion.priority)} hover:shadow-lg ${isMobile ? 'touch-feedback active:scale-[0.98]' : 'hover:scale-[1.02]'}`}
           >
             <div className="flex items-start gap-3">
               <div className="text-3xl sm:text-4xl flex-shrink-0">{suggestion.icon}</div>

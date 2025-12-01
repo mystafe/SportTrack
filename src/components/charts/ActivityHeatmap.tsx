@@ -95,7 +95,7 @@ export default function ActivityHeatmap({ activities, target }: ActivityHeatmapP
 
   if (yearData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
+      <div className="flex items-center justify-center h-64 glass-effect bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl border border-white/20 dark:border-gray-700/30 text-gray-600 dark:text-gray-400">
         {lang === 'tr' ? 'Yeterli veri yok' : 'Not enough data'}
       </div>
     );
@@ -105,14 +105,14 @@ export default function ActivityHeatmap({ activities, target }: ActivityHeatmapP
     <div className="overflow-x-auto">
       <div className="inline-block min-w-full">
         <div
-          className={`grid ${isMobile ? 'grid-cols-7' : 'grid-cols-[repeat(53,minmax(0,1fr))]'} gap-1`}
+          className={`grid ${isMobile ? 'grid-cols-7' : 'grid-cols-[repeat(53,minmax(0,1fr))]'} gap-1.5 p-2`}
         >
           {weeks.map((week, weekIndex) => (
-            <div key={weekIndex} className="flex flex-col gap-1">
+            <div key={weekIndex} className="flex flex-col gap-1.5">
               {week.map((day, dayIndex) => (
                 <div
                   key={day.key}
-                  className={`w-3 h-3 ${getIntensityColor(day.intensity)} rounded-sm transition-all hover:scale-125 hover:z-10`}
+                  className={`w-3 h-3 ${getIntensityColor(day.intensity)} rounded-md transition-all duration-300 hover:scale-150 hover:z-10 hover:shadow-lg hover:ring-2 hover:ring-white/50 dark:hover:ring-gray-700/50 cursor-pointer card-3d`}
                   title={`${format(day.date, 'MMM d, yyyy')}: ${day.points} ${lang === 'tr' ? 'puan' : 'points'}`}
                 />
               ))}
@@ -120,16 +120,20 @@ export default function ActivityHeatmap({ activities, target }: ActivityHeatmapP
           ))}
         </div>
       </div>
-      <div className="flex items-center justify-between mt-4 text-xs text-gray-500">
-        <span>{lang === 'tr' ? 'Daha az' : 'Less'}</span>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-gray-100 dark:bg-gray-800 rounded-sm" />
-          <div className="w-3 h-3 bg-gray-300 dark:bg-gray-600 rounded-sm" />
-          <div className="w-3 h-3 bg-yellow-400 dark:bg-yellow-600 rounded-sm" />
-          <div className="w-3 h-3 bg-green-400 dark:bg-green-600 rounded-sm" />
-          <div className="w-3 h-3 bg-green-600 dark:bg-green-500 rounded-sm" />
+      <div className="flex items-center justify-between mt-4 px-2">
+        <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+          {lang === 'tr' ? 'Daha az' : 'Less'}
+        </span>
+        <div className="flex items-center gap-1.5 glass-effect bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/20 dark:border-gray-700/30">
+          <div className="w-3 h-3 bg-gray-100 dark:bg-gray-800 rounded-md transition-all hover:scale-125" />
+          <div className="w-3 h-3 bg-gray-300 dark:bg-gray-600 rounded-md transition-all hover:scale-125" />
+          <div className="w-3 h-3 bg-yellow-400 dark:bg-yellow-600 rounded-md transition-all hover:scale-125" />
+          <div className="w-3 h-3 bg-green-400 dark:bg-green-600 rounded-md transition-all hover:scale-125" />
+          <div className="w-3 h-3 bg-green-600 dark:bg-green-500 rounded-md transition-all hover:scale-125 pulse-glow" />
         </div>
-        <span>{lang === 'tr' ? 'Daha fazla' : 'More'}</span>
+        <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+          {lang === 'tr' ? 'Daha fazla' : 'More'}
+        </span>
       </div>
     </div>
   );

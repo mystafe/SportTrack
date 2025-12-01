@@ -28,6 +28,7 @@ import {
 import { PRESET_CHALLENGES, createChallengeFromPreset } from './presetChallenges';
 import { STORAGE_KEYS } from './constants';
 import { DEFAULT_DAILY_TARGET } from './activityConfig';
+import { trackEvent } from './analytics';
 
 type ChallengeContextValue = {
   challenges: Challenge[];
@@ -897,7 +898,19 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
     // Update progress only for active challenges
     const updatedActive = activeChallenges.map((challenge) => {
       const progress = calculateChallengeProgress(challenge, activities);
-      return updateChallengeStatus(challenge, progress);
+      const updated = updateChallengeStatus(challenge, progress);
+
+      // Track analytics when challenge is completed
+      if (updated.status === 'completed' && challenge.status !== 'completed') {
+        trackEvent('challenge_completed', {
+          challengeId: updated.id,
+          challengeType: updated.type,
+          challengeName: updated.name.tr || updated.name.en,
+          target: updated.target,
+        });
+      }
+
+      return updated;
     });
 
     // Combine updated active challenges with unchanged inactive ones

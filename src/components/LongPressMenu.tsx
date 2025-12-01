@@ -86,7 +86,7 @@ export function LongPressMenu({ isOpen, position, onClose, children }: LongPress
   const menu = (
     <div
       ref={menuRef}
-      className={`fixed z-[10002] ${isMobile ? 'min-w-[200px]' : 'min-w-[240px]'} bg-white dark:bg-gray-900 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden animate-scale-in`}
+      className={`fixed z-[10002] ${isMobile ? 'min-w-[200px]' : 'min-w-[240px]'} glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-xl border-2 border-white/20 dark:border-gray-700/50 shadow-2xl hover:shadow-3xl overflow-hidden animate-scale-in hover:scale-[1.02] transition-all duration-300`}
       style={{
         left: `${adjustedPosition.x}px`,
         top: `${adjustedPosition.y}px`,

@@ -36,8 +36,11 @@ const ActivityBarChart = lazy(() =>
 const ActivityPieChart = lazy(() =>
   import('@/components/charts/ActivityPieChart').then((m) => ({ default: m.ActivityPieChart }))
 );
-const ActivityHeatmap = lazy(() =>
-  import('@/components/charts/ActivityHeatmap').then((m) => ({ default: m.default }))
+const ActivityHeatmap = lazy(() => import('@/components/charts/ActivityHeatmap'));
+const ActivityIntensityHeatmap = lazy(() =>
+  import('@/components/charts/ActivityIntensityHeatmap').then((m) => ({
+    default: m.ActivityIntensityHeatmap,
+  }))
 );
 const PersonalRecords = lazy(() =>
   import('@/components/PersonalRecords').then((m) => ({ default: m.PersonalRecords }))
@@ -611,7 +614,25 @@ export default function StatsPage() {
           className="card-entrance"
         >
           <Suspense fallback={<ChartSkeleton />}>
-            <ActivityHeatmap activities={activities} target={target} />
+            <Suspense
+              fallback={
+                <div className="h-64 animate-pulse bg-gray-200 dark:bg-gray-800 rounded-lg" />
+              }
+            >
+              <ActivityHeatmap activities={activities} target={target} />
+            </Suspense>
+          </Suspense>
+        </Accordion>
+
+        {/* Activity Intensity Heatmap - Accordion */}
+        <Accordion
+          title={lang === 'tr' ? 'Aktivite Yoğunluk Haritası' : 'Activity Intensity Heatmap'}
+          icon="🔥"
+          defaultOpen={false}
+          className="card-entrance"
+        >
+          <Suspense fallback={<ChartSkeleton />}>
+            <ActivityIntensityHeatmap days={365} />
           </Suspense>
         </Accordion>
 

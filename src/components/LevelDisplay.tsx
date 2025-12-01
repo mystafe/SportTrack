@@ -40,7 +40,7 @@ export function LevelDisplay() {
           <span>{Math.round(levelInfo.progress * 100)}%</span>
         </div>
         <div
-          className={`w-full ${isMobile ? 'h-2' : 'h-2.5'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden relative shadow-inner`}
+          className={`w-full ${isMobile ? 'h-2' : 'h-2.5'} glass-effect bg-gray-200/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full overflow-hidden relative shadow-inner border border-white/10 dark:border-gray-700/30`}
           role="progressbar"
           aria-valuenow={Math.round(levelInfo.progress * 100)}
           aria-valuemin={0}
@@ -48,7 +48,7 @@ export function LevelDisplay() {
           aria-label={`${t('level.level')} ${levelInfo.level} - ${Math.round(levelInfo.progress * 100)}%`}
         >
           <div
-            className={`${isMobile ? 'h-2' : 'h-2.5'} bg-gradient-to-r from-brand via-brand-light to-brand-dark rounded-full transition-all duration-700 ease-out progress-fill shadow-sm`}
+            className={`${isMobile ? 'h-2' : 'h-2.5'} bg-gradient-to-r from-brand via-brand-light to-brand-dark rounded-full transition-all duration-700 ease-out progress-fill shadow-sm progress-bar-glow`}
             style={{ width: `${levelInfo.progress * 100}%` }}
           />
           {levelInfo.progress > 0 && (

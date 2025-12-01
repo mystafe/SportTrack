@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, lazy, Suspense, useMemo } from 'react';
+import { useState, lazy, Suspense, useMemo, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useChallenges } from '@/lib/challengeStore';
 import { Challenge, ChallengeType } from '@/lib/challenges';
@@ -14,6 +14,8 @@ import { PRESET_CHALLENGES } from '@/lib/presetChallenges';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
 import { useToaster } from '@/components/Toaster';
 import { PullToRefresh } from '@/components/PullToRefresh';
+import { ChallengeImportDialog } from '@/components/ChallengeImportDialog';
+import { extractChallengeFromUrl } from '@/lib/challengeShare';
 
 // Lazy load challenge components
 const ChallengeCard = lazy(() =>
@@ -45,6 +47,15 @@ export default function ChallengesPage() {
   const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null);
   const [deletingChallenge, setDeletingChallenge] = useState<Challenge | null>(null);
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<ChallengeCategory>('all');
+  const [showImportDialog, setShowImportDialog] = useState(false);
+
+  // Check for import parameter in URL
+  useEffect(() => {
+    const shareableChallenge = extractChallengeFromUrl();
+    if (shareableChallenge) {
+      setShowImportDialog(true);
+    }
+  }, []);
 
   // Helper function to get category from challenge
   const getChallengeCategory = (challenge: Challenge): ChallengeCategory | null => {
@@ -459,6 +470,20 @@ export default function ChallengesPage() {
           onCancel={() => setDeletingChallenge(null)}
         />
       </main>
+
+      {/* Challenge Import Dialog */}
+      <ChallengeImportDialog
+        open={showImportDialog}
+        onClose={() => setShowImportDialog(false)}
+        onImport={(challenge) => {
+          showToast(
+            lang === 'tr'
+              ? `"${challenge.name.tr}" challenge'ı başarıyla içe aktarıldı!`
+              : `"${challenge.name.en}" challenge imported successfully!`,
+            'success'
+          );
+        }}
+      />
     </PullToRefresh>
   );
 }

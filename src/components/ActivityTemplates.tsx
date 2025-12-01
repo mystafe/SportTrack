@@ -106,16 +106,22 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
   };
 
   return (
-    <Card variant="default" size="sm" hoverable className="card-entrance" header={renderHeader()}>
+    <Card
+      variant="default"
+      size="sm"
+      hoverable
+      className="card-entrance glass-effect card-3d"
+      header={renderHeader()}
+    >
       {isOpen && (
         <div id="activity-templates" className={isMobile ? 'space-y-2' : 'space-y-3'}>
           {templatesByCategory.map(({ category, templates }) => (
             <div key={category} className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
               <h4
-                className={`${isMobile ? 'text-[8px]' : 'text-[9px] sm:text-[10px]'} font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5`}
+                className={`${isMobile ? 'text-[8px]' : 'text-[9px] sm:text-[10px]'} font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5 neon-glow-brand`}
               >
                 <span
-                  className={`inline-block w-0.5 ${isMobile ? 'h-2.5' : 'h-3'} bg-brand rounded-full`}
+                  className={`inline-block w-1 ${isMobile ? 'h-2.5' : 'h-3'} bg-gradient-to-b from-brand via-brand-light to-brand-dark rounded-full pulse-glow`}
                 ></span>
                 {t(`templates.category.${category}`)}
               </h4>
@@ -130,7 +136,7 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
                     size={isMobile ? 'md' : 'sm'}
                     onClick={() => handleTemplateClick(template)}
                     disabled={isAdding}
-                    className={`stagger-item template-card-enhanced ${isMobile ? 'touch-feedback mobile-press mobile-card-lift fade-in-scale-mobile' : 'ripple-effect magnetic-hover tilt-3d'} relative flex flex-col items-start ${isMobile ? 'gap-2 p-2.5 rounded-lg min-h-[100px]' : 'gap-3 p-4 rounded-xl min-h-[120px]'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 hover:border-brand dark:hover:border-brand/60 hover:bg-gradient-to-br hover:from-brand/5 hover:via-brand/3 hover:to-brand/5 dark:hover:from-brand/10 dark:hover:via-brand/8 dark:hover:to-brand/10 hover:shadow-xl hover:shadow-brand/20 dark:hover:shadow-brand/30 transition-all duration-300 scale-on-interact disabled:opacity-50 disabled:cursor-not-allowed group gpu-accelerated`}
+                    className={`stagger-item template-card-enhanced ${isMobile ? 'touch-feedback mobile-press mobile-card-lift fade-in-scale-mobile' : 'ripple-effect magnetic-hover tilt-3d'} relative flex flex-col items-start ${isMobile ? 'gap-2 p-2.5 rounded-xl min-h-[100px]' : 'gap-3 p-4 rounded-2xl min-h-[120px]'} border-2 border-white/20 dark:border-gray-700/50 glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl hover:border-brand/50 dark:hover:border-brand/60 hover:bg-gradient-to-br hover:from-brand/10 hover:via-brand/5 hover:to-brand/10 dark:hover:from-brand/20 dark:hover:via-brand/10 dark:hover:to-brand/20 hover:shadow-xl hover:shadow-brand/30 dark:hover:shadow-brand/40 transition-all duration-300 scale-on-interact disabled:opacity-50 disabled:cursor-not-allowed group gpu-accelerated`}
                     aria-label={t('templates.selectTemplate', { template: template.name[lang] })}
                     aria-busy={isAdding}
                     aria-disabled={isAdding}
@@ -145,13 +151,13 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
                   >
                     <div className={`flex items-start ${isMobile ? 'gap-2' : 'gap-3'} w-full`}>
                       <div
-                        className={`${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl'} transform group-hover:scale-110 transition-transform duration-300`}
+                        className={`${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl'} transform group-hover:scale-110 transition-transform duration-300 icon-bounce`}
                       >
                         {template.icon}
                       </div>
                       <div className="flex-1 text-left min-w-0">
                         <div
-                          className={`${isMobile ? 'text-sm' : 'text-base'} font-bold text-gray-950 dark:text-white ${isMobile ? 'mb-0.5' : 'mb-1'} group-hover:text-brand transition-colors`}
+                          className={`${isMobile ? 'text-sm' : 'text-base'} font-bold text-gray-950 dark:text-white ${isMobile ? 'mb-0.5' : 'mb-1'} group-hover:text-brand transition-colors shimmer-text`}
                         >
                           {template.name[lang]}
                         </div>
@@ -182,8 +188,8 @@ export const ActivityTemplates = memo(function ActivityTemplates() {
                       </div>
                     </div>
                     {isAdding && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-xl ">
-                        <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent"></div>
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl z-10">
+                        <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent pulse-glow"></div>
                       </div>
                     )}
                   </Button>

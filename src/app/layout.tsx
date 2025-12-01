@@ -10,8 +10,71 @@ import { SkipLink } from '@/components/SkipLink';
 import { ScrollHandler } from '@/components/ScrollHandler';
 
 export const metadata = {
-  title: 'SportTrack',
-  description: 'Ön tanımlı aktivitelerle günlük 10.000 puan hedefini takip et',
+  title: {
+    default: 'SportTrack - Fitness Activity Tracker',
+    template: '%s | SportTrack',
+  },
+  description:
+    'Track your daily fitness activities with SportTrack. Set goals, earn badges, complete challenges, and stay motivated on your fitness journey.',
+  keywords: [
+    'fitness',
+    'activity tracker',
+    'sports',
+    'health',
+    'wellness',
+    'exercise',
+    'workout',
+    'PWA',
+  ],
+  authors: [{ name: 'SportTrack Team' }],
+  creator: 'SportTrack',
+  publisher: 'SportTrack',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://sporttrack.app'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'tr_TR',
+    alternateLocale: 'en_US',
+    url: '/',
+    siteName: 'SportTrack',
+    title: 'SportTrack - Fitness Activity Tracker',
+    description:
+      'Track your daily fitness activities with SportTrack. Set goals, earn badges, complete challenges, and stay motivated.',
+    images: [
+      {
+        url: '/icon-512.png',
+        width: 512,
+        height: 512,
+        alt: 'SportTrack Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SportTrack - Fitness Activity Tracker',
+    description:
+      'Track your daily fitness activities with SportTrack. Set goals, earn badges, complete challenges, and stay motivated.',
+    images: ['/icon-512.png'],
+    creator: '@sporttrack',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -50,6 +113,36 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Preconnect to external domains for faster loading */}
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Structured Data (JSON-LD) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: 'SportTrack',
+              description:
+                'Track your daily fitness activities with SportTrack. Set goals, earn badges, complete challenges, and stay motivated on your fitness journey.',
+              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://sporttrack.app',
+              applicationCategory: 'HealthApplication',
+              operatingSystem: 'Web',
+              offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'USD',
+              },
+              featureList: [
+                'Activity Tracking',
+                'Goal Setting',
+                'Badge System',
+                'Challenge System',
+                'Statistics & Analytics',
+                'Offline Support',
+                'PWA Support',
+              ],
+            }),
+          }}
+        />
         {/* Prevent layout shift by setting initial dimensions */}
         <style
           dangerouslySetInnerHTML={{

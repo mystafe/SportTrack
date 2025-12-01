@@ -109,14 +109,14 @@ export function CompatibilityModeProgressDialog({
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10061] flex items-center justify-center bg-black/60 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom p-4`}
+      className={`fixed inset-0 z-[10061] flex items-center justify-center bg-black/40 dark:bg-black/60 ${isMobile ? '' : 'backdrop-blur-md'} animate-fade-in safe-bottom p-4`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="compatibility-progress-title"
       aria-busy={step !== 'completed' && step !== 'error'}
     >
       <div
-        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-lg w-full mx-4'} border-2 ${error ? 'border-red-300 dark:border-red-700' : step === 'completed' ? 'border-green-300 dark:border-green-700' : 'border-gray-200 dark:border-gray-700'} animate-scale-in`}
+        className={`glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.01] max-w-lg w-full mx-4'} border-2 ${error ? 'border-red-300/50 dark:border-red-700/50' : step === 'completed' ? 'border-green-300/50 dark:border-green-700/50' : 'border-white/20 dark:border-gray-700/50'} animate-scale-in`}
       >
         <div className={`${isMobile ? 'p-4' : 'p-6'}`}>
           {/* Header */}
@@ -153,7 +153,7 @@ export function CompatibilityModeProgressDialog({
                   {step === 'completed' ? '100%' : `${Math.round(percentage)}%`}
                 </span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+              <div className="w-full glass-effect bg-gray-200/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-full h-3 overflow-hidden border border-white/10 dark:border-gray-700/30">
                 <div
                   className={`h-full transition-all duration-300 ease-out rounded-full ${
                     step === 'completed'

@@ -75,7 +75,7 @@ export const PeriodComparison = memo(function PeriodComparison() {
 
       {/* Weekly Comparison */}
       {weekComparison && (
-        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+        <div className="card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.01]">
           <h3 className="text-heading-3 text-gray-900 dark:text-white mb-4">
             {t('comparison.weekly')}
           </h3>
@@ -83,7 +83,7 @@ export const PeriodComparison = memo(function PeriodComparison() {
           <div className="space-y-4">
             {/* Summary Cards */}
             <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-4'} gap-3`}>
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+              <div className="rounded-lg glass-effect border-2 border-white/20 dark:border-gray-700/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl p-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                   {t('comparison.totalPoints')}
                 </div>
@@ -101,7 +101,7 @@ export const PeriodComparison = memo(function PeriodComparison() {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+              <div className="rounded-lg glass-effect border-2 border-white/20 dark:border-gray-700/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl p-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                   {t('comparison.totalActivities')}
                 </div>
@@ -117,7 +117,7 @@ export const PeriodComparison = memo(function PeriodComparison() {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+              <div className="rounded-lg glass-effect border-2 border-white/20 dark:border-gray-700/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl p-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                   {t('comparison.avgDaily')}
                 </div>
@@ -135,7 +135,7 @@ export const PeriodComparison = memo(function PeriodComparison() {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+              <div className="rounded-lg glass-effect border-2 border-white/20 dark:border-gray-700/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl p-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                   {t('comparison.completionRate')}
                 </div>
@@ -183,9 +183,13 @@ export const PeriodComparison = memo(function PeriodComparison() {
                     ]}
                     labelStyle={{ color: '#374151' }}
                     contentStyle={{
-                      backgroundColor: '#fff',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '0.75rem',
+                      boxShadow:
+                        '0 8px 16px -4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
                     }}
                   />
                   <Bar dataKey="points" fill="#3b82f6" name={t('comparison.points')} />
@@ -199,7 +203,7 @@ export const PeriodComparison = memo(function PeriodComparison() {
 
       {/* Monthly Comparison */}
       {monthComparison && (
-        <div className="card-entrance rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 p-4 sm:p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+        <div className="card-entrance glass-effect card-3d rounded-xl border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.01]">
           <h3 className="text-heading-3 text-gray-900 dark:text-white mb-4">
             {t('comparison.monthly')}
           </h3>
@@ -207,7 +211,7 @@ export const PeriodComparison = memo(function PeriodComparison() {
           <div className="space-y-4">
             {/* Summary Cards */}
             <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-4'} gap-3`}>
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+              <div className="rounded-lg glass-effect border-2 border-white/20 dark:border-gray-700/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl p-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                   {t('comparison.totalPoints')}
                 </div>
@@ -225,7 +229,7 @@ export const PeriodComparison = memo(function PeriodComparison() {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+              <div className="rounded-lg glass-effect border-2 border-white/20 dark:border-gray-700/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl p-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                   {t('comparison.totalActivities')}
                 </div>
@@ -241,7 +245,7 @@ export const PeriodComparison = memo(function PeriodComparison() {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+              <div className="rounded-lg glass-effect border-2 border-white/20 dark:border-gray-700/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl p-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                   {t('comparison.avgDaily')}
                 </div>
@@ -259,7 +263,7 @@ export const PeriodComparison = memo(function PeriodComparison() {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+              <div className="rounded-lg glass-effect border-2 border-white/20 dark:border-gray-700/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl p-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                   {t('comparison.completionRate')}
                 </div>
@@ -307,9 +311,13 @@ export const PeriodComparison = memo(function PeriodComparison() {
                     ]}
                     labelStyle={{ color: '#374151' }}
                     contentStyle={{
-                      backgroundColor: '#fff',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '0.75rem',
+                      boxShadow:
+                        '0 8px 16px -4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
                     }}
                   />
                   <Bar dataKey="points" fill="#3b82f6" name={t('comparison.points')} />

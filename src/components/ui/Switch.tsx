@@ -96,7 +96,7 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
       focus:ring-offset-2
       ${hasError ? 'focus:ring-error/20' : 'focus:ring-brand/20'}
       focus:ring-offset-white dark:focus:ring-offset-gray-900
-      ${checked ? (hasError ? 'bg-error' : 'bg-brand') : 'bg-gray-300 dark:bg-gray-600'}
+      ${checked ? (hasError ? 'bg-error shadow-lg shadow-error/30' : 'bg-brand shadow-lg shadow-brand/30') : 'bg-gray-300/90 dark:bg-gray-600/90 backdrop-blur-sm'}
       ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
       ${className}
     `

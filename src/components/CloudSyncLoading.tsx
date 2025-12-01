@@ -64,8 +64,8 @@ export function CloudSyncLoading() {
   if (!showLoading) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-4 rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-800">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-md">
+      <div className="glass-effect card-3d flex flex-col items-center gap-4 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-8 shadow-2xl border-2 border-white/20 dark:border-gray-700/50">
         <div className="relative h-16 w-16">
           <div className="absolute inset-0 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700"></div>
           <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-blue-600 dark:border-t-blue-400"></div>

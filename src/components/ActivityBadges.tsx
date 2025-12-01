@@ -64,7 +64,7 @@ export function ActivityBadges() {
       variant="default"
       size="md"
       hoverable
-      className="card-entrance"
+      className="card-entrance glass-effect card-3d"
       header={
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -78,7 +78,7 @@ export function ActivityBadges() {
     >
       <div className="space-y-4">
         {/* Progress Summary */}
-        <div className="p-3 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
+        <div className="p-3 rounded-lg glass-effect bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-2 border-white/20 dark:border-gray-700/50 shadow-lg">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-gray-950 dark:text-white">
               {lang === 'tr' ? 'İlerleme' : 'Progress'}
@@ -87,11 +87,15 @@ export function ActivityBadges() {
               {unlockedCount} / {totalBadges}
             </span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden shadow-inner relative progress-glow">
             <div
-              className="h-full bg-gradient-to-r from-brand to-brand-dark transition-all duration-500"
+              className="h-full bg-gradient-to-r from-brand via-brand-light to-brand-dark transition-all duration-500 animate-gradient shadow-sm"
               style={{ width: `${progress}%` }}
-            />
+            >
+              {progress > 0 && (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer rounded-full" />
+              )}
+            </div>
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
             {progress}% {lang === 'tr' ? 'tamamlandı' : 'completed'}
@@ -107,7 +111,7 @@ export function ActivityBadges() {
             return (
               <div
                 key={activityKey}
-                className="p-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                className="p-3 rounded-lg glass-effect card-3d border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xl">{firstBadge.activityIcon}</span>
@@ -131,11 +135,11 @@ export function ActivityBadges() {
                     return (
                       <div
                         key={badge.id}
-                        className={`p-2 rounded-lg border-2 text-center transition-all duration-200 ${
+                        className={`p-2 rounded-lg glass-effect card-3d border-2 text-center transition-all duration-300 ${
                           isUnlocked
-                            ? getRarityColor(badge.rarity)
-                            : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 opacity-50'
-                        } ${isUnlocked ? 'hover:scale-105 cursor-pointer' : ''}`}
+                            ? `${getRarityColor(badge.rarity)} backdrop-blur-xl shadow-md hover:shadow-lg`
+                            : 'border-white/20 dark:border-gray-700/50 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-xl opacity-50'
+                        } ${isUnlocked ? 'hover:scale-110 cursor-pointer pulse-glow' : ''}`}
                         title={
                           isUnlocked
                             ? `${badge.name[lang]} - ${badge.description[lang]}`

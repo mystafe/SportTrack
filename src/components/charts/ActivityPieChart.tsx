@@ -92,10 +92,12 @@ export function ActivityPieChart({ activities }: ActivityPieChartProps) {
         </Pie>
         <Tooltip
           contentStyle={{
-            backgroundColor: 'var(--tw-bg-white)',
-            border: '1px solid var(--tw-border-gray-200)',
-            borderRadius: '0.5rem',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '0.75rem',
+            boxShadow: '0 8px 16px -4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05)',
             transition: 'all 0.2s ease-in-out',
           }}
           labelStyle={{ color: 'var(--tw-text-gray-900)', fontWeight: '600' }}

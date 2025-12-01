@@ -14,6 +14,8 @@ import { BadgeUnlockNotification } from '@/components/BadgeUnlockNotification';
 import { ChallengeCompletionNotification } from '@/components/ChallengeCompletionNotification';
 import { ActivityGoalCompletionNotification } from '@/components/ActivityGoalCompletionNotification';
 import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
+import { OfflineIndicator } from '@/components/OfflineIndicator';
+import { ServiceWorkerUpdatePrompt } from '@/components/ServiceWorkerUpdatePrompt';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AutoSyncProvider } from '@/components/AutoSyncProvider';
 import { NameDialog } from '@/components/NameDialog';
@@ -44,6 +46,11 @@ const ConflictResolutionManager = lazy(() =>
 const WelcomeToast = lazy(() =>
   import('@/components/WelcomeToast').then((m) => ({
     default: m.WelcomeToast,
+  }))
+);
+const EasterEggDetector = lazy(() =>
+  import('@/components/EasterEggDetector').then((m) => ({
+    default: m.EasterEggDetector,
   }))
 );
 
@@ -101,6 +108,8 @@ export function Providers({ children }: { children: ReactNode }) {
                               <ChallengeCompletionNotification />
                               <ActivityGoalCompletionNotification />
                               <OnlineStatusIndicator />
+                              <OfflineIndicator />
+                              <ServiceWorkerUpdatePrompt />
                               <NameDialog />
                               <Suspense fallback={null}>
                                 <ConflictResolutionManager />
@@ -111,7 +120,9 @@ export function Providers({ children }: { children: ReactNode }) {
                               <Suspense fallback={null}>
                                 <GlobalDialogs />
                               </Suspense>
-                              {children}
+                              <Suspense fallback={null}>
+                                <EasterEggDetector>{children}</EasterEggDetector>
+                              </Suspense>
                             </AutoSyncProvider>
                           </ToasterProvider>
                         </BadgeProvider>

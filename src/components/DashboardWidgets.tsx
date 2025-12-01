@@ -198,7 +198,7 @@ export const DashboardWidgets = memo(function DashboardWidgets() {
             variant="default"
             size="sm"
             hoverable
-            className={`card-entrance bg-gradient-to-br ${widget.color} text-white border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 relative overflow-hidden group`}
+            className={`card-entrance glass-effect card-3d bg-gradient-to-br ${widget.color} text-white border-0 shadow-lg hover:shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 relative overflow-hidden group`}
           >
             {/* Hover glow effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/0 to-white/0 group-hover:from-white/10 group-hover:via-white/5 group-hover:to-white/10 transition-all duration-300 pointer-events-none"></div>

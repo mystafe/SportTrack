@@ -202,7 +202,7 @@ export const ActivityFilters = memo(function ActivityFilters({
               sortBy: 'date-desc',
             })
           }
-          className={`w-full ${isMobile ? 'px-1 py-0.5 text-[7px]' : 'px-1.5 py-0.5 text-[9px]'} rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 font-semibold`}
+          className={`glass-effect card-3d w-full ${isMobile ? 'px-1 py-0.5 text-[7px]' : 'px-1.5 py-0.5 text-[9px]'} rounded-lg border-2 border-white/20 dark:border-gray-700/50 bg-gradient-to-r from-gray-50/95 to-white/95 dark:from-gray-800/95 dark:to-gray-700/95 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:scale-[1.02] transition-all duration-200 font-semibold shadow-sm`}
         >
           {t('filters.clear')}
         </button>

@@ -107,7 +107,7 @@ export function WelcomeToast() {
       <div
         className={`${
           isMobile ? 'px-4 py-3 text-sm' : 'px-6 py-4 text-base'
-        } bg-gradient-to-r from-brand via-brand-dark to-brand text-white rounded-xl shadow-2xl backdrop-blur-sm border-2 border-white/20 animate-pulse-subtle`}
+        } glass-effect card-3d bg-gradient-to-r from-brand/95 via-brand-dark/95 to-brand/95 text-white rounded-xl shadow-2xl backdrop-blur-xl border-2 border-white/30 dark:border-white/20 animate-pulse-subtle hover:scale-[1.02] transition-all duration-300`}
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl sm:text-3xl animate-bounce">👋</span>

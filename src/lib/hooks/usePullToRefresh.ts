@@ -116,7 +116,7 @@ export function usePullToRefresh({
 
   return {
     ...state,
-    elementRef,
+    elementRef: elementRef as React.RefObject<HTMLElement>,
     progress: Math.min(state.pullDistance / threshold, 1),
   };
 }

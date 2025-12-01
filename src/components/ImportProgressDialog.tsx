@@ -57,14 +57,14 @@ export function ImportProgressDialog({
 
   const dialog = (
     <div
-      className={`fixed inset-0 z-[10012] flex items-center justify-center bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} animate-fade-in safe-bottom p-4`}
+      className={`fixed inset-0 z-[10012] flex items-center justify-center bg-black/40 dark:bg-black/60 ${isMobile ? '' : 'backdrop-blur-md'} animate-fade-in safe-bottom p-4`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="import-progress-title"
       aria-busy={percentage < 100}
     >
       <div
-        className={`bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-md w-full mx-4'} border-2 border-gray-200 dark:border-gray-700 animate-scale-in`}
+        className={`glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'rounded-t-xl w-full max-h-[90vh] overflow-y-auto' : 'rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.01] max-w-md w-full mx-4'} border-2 border-white/20 dark:border-gray-700/50 animate-scale-in`}
       >
         <div className={`${isMobile ? 'p-4' : 'p-6'}`}>
           {/* Header */}

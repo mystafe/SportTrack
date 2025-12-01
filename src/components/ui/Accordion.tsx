@@ -82,7 +82,7 @@ export function Accordion({
 
   return (
     <div
-      className={`rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden transition-all duration-300 hover:border-brand/50 dark:hover:border-brand/50 hover:shadow-lg relative z-0 ${className}`}
+      className={`rounded-xl glass-effect card-3d border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl overflow-hidden transition-all duration-300 hover:border-brand/50 dark:hover:border-brand/50 hover:shadow-xl hover:scale-[1.01] relative z-0 ${className}`}
     >
       <button
         type="button"
@@ -100,9 +100,9 @@ export function Accordion({
         }}
         className={`w-full flex items-center justify-between ${variant === 'compact' ? (isMobile ? 'p-3' : 'p-3 sm:p-4') : isMobile ? 'p-4' : 'p-4 sm:p-5'} text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-800 ${
           isOpen
-            ? 'bg-gradient-to-r from-brand/10 to-brand/5 dark:from-brand/20 dark:to-brand/10'
-            : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
-        } ${isMobile ? 'touch-feedback active:bg-gray-100 dark:active:bg-gray-700' : ''}`}
+            ? 'bg-gradient-to-r from-brand/15 via-brand/10 to-brand/5 dark:from-brand/25 dark:via-brand/20 dark:to-brand/10 backdrop-blur-sm'
+            : 'hover:bg-white/50 dark:hover:bg-gray-800/50'
+        } ${isMobile ? 'touch-feedback active:bg-white/70 dark:active:bg-gray-800/70' : ''}`}
         aria-expanded={isOpen}
         aria-controls={`accordion-content-${typeof title === 'string' ? title.replace(/\s+/g, '-').toLowerCase() : 'accordion'}`}
         id={`accordion-button-${typeof title === 'string' ? title.replace(/\s+/g, '-').toLowerCase() : 'accordion'}`}
@@ -138,9 +138,9 @@ export function Accordion({
         aria-labelledby={`accordion-button-${typeof title === 'string' ? title.replace(/\s+/g, '-').toLowerCase() : 'accordion'}`}
         aria-hidden={!isOpen}
         className={`transition-all duration-300 ease-in-out ${
-          isOpen ? 'h-auto opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+          isOpen ? 'h-auto opacity-100 max-h-[9999px]' : 'max-h-0 opacity-0 overflow-hidden'
         }`}
-        style={!isOpen ? { pointerEvents: 'none' } : undefined}
+        style={!isOpen ? { pointerEvents: 'none', display: 'none' } : { display: 'block' }}
         ref={contentRef}
       >
         <div

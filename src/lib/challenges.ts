@@ -25,7 +25,7 @@ let challengeIdCounter = 0;
 /**
  * Generate a unique ID for challenges
  */
-function generateChallengeId(prefix: string): string {
+export function generateChallengeId(prefix: string): string {
   challengeIdCounter++;
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 11); // Longer random string

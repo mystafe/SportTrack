@@ -264,10 +264,10 @@ export function getActivitySuggestions(
 export function getSuggestionPriorityColor(priority: ActivitySuggestion['priority']): string {
   switch (priority) {
     case 'high':
-      return 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20';
+      return 'border-2 border-red-300/50 dark:border-red-600/50 bg-red-50/95 dark:bg-red-900/30';
     case 'medium':
-      return 'border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/20';
+      return 'border-2 border-blue-300/50 dark:border-blue-600/50 bg-blue-50/95 dark:bg-blue-900/30';
     case 'low':
-      return 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800';
+      return 'border-2 border-gray-300/50 dark:border-gray-600/50 bg-gray-50/95 dark:bg-gray-800/95';
   }
 }

@@ -9,15 +9,23 @@ import { useI18n } from '@/lib/i18n';
  * WCAG 2.1 AA compliance requirement
  */
 export function SkipLink() {
-  const { t } = useI18n();
+  const { lang } = useI18n();
 
   return (
     <Link
       href="#main-content"
-      className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-brand focus:text-white focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2"
-      aria-label="Skip to main content"
+      className="absolute -left-[9999px] w-px h-px overflow-hidden focus:left-4 focus:top-4 focus:w-auto focus:h-auto focus:z-[9999] focus:px-4 focus:py-2 glass-effect card-3d focus:bg-brand/95 focus:text-white focus:rounded-lg focus:shadow-xl focus:backdrop-blur-xl focus:border-2 focus:border-white/20 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:font-semibold transition-all duration-200 focus:hover:scale-105"
+      aria-label={lang === 'tr' ? 'Ana içeriğe geç' : 'Skip to main content'}
+      onClick={(e) => {
+        e.preventDefault();
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+          mainContent.focus();
+          mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }}
     >
-      <span className="sr-only">Skip to main content</span>
+      {lang === 'tr' ? 'Ana içeriğe geç' : 'Skip to main content'}
     </Link>
   );
 }

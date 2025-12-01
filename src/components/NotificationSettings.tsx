@@ -125,7 +125,7 @@ export function NotificationSettings() {
 
       {permission === 'granted' && notificationSettings.enabled && (
         <div
-          className={`${isMobile ? 'space-y-2 pl-2 py-1.5' : 'space-y-2.5 pl-3 py-2'} border-l-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50/30 to-transparent dark:from-gray-800/30 dark:to-transparent rounded-r-lg`}
+          className={`glass-effect card-3d ${isMobile ? 'space-y-2 pl-2 py-1.5' : 'space-y-2.5 pl-3 py-2'} border-l-2 border-white/20 dark:border-gray-700/50 bg-gradient-to-r from-gray-50/40 to-transparent dark:from-gray-800/40 dark:to-transparent backdrop-blur-sm rounded-r-lg shadow-sm`}
         >
           {/* Daily Reminder */}
           <div className={`${isMobile ? 'space-y-1.5' : 'space-y-2'}`}>

@@ -84,7 +84,7 @@ export const QuickStats = memo(function QuickStats() {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
       {/* Today's Points */}
-      <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 dark:from-blue-500/20 dark:to-blue-600/10 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+      <div className="glass-effect card-3d bg-gradient-to-br from-blue-500/10 to-blue-600/5 dark:from-blue-500/20 dark:to-blue-600/10 rounded-lg p-3 border-2 border-white/20 dark:border-blue-800/50 backdrop-blur-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
         <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
           {lang === 'tr' ? 'Bugün' : 'Today'}
         </div>

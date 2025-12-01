@@ -20,11 +20,31 @@ interface HapticFeedback {
   selection?: () => void;
 }
 
+// Track if user has interacted with the page
+let hasUserInteracted = false;
+
+if (typeof window !== 'undefined') {
+  // Listen for any user interaction
+  const interactionEvents = ['touchstart', 'mousedown', 'keydown', 'click'];
+  const enableHaptics = () => {
+    hasUserInteracted = true;
+    interactionEvents.forEach((event) => {
+      window.removeEventListener(event, enableHaptics);
+    });
+  };
+  interactionEvents.forEach((event) => {
+    window.addEventListener(event, enableHaptics, { once: true, passive: true });
+  });
+}
+
 export function useHapticFeedback() {
   const isMobile = useIsMobile();
 
   const triggerHaptic = (type: HapticType = 'light') => {
     if (!isMobile || typeof window === 'undefined') return;
+
+    // Only allow haptic feedback after user interaction
+    if (!hasUserInteracted) return;
 
     // iOS Haptics API (preferred method for iOS devices)
     const hapticFeedback = getHapticFeedback();
@@ -100,8 +120,20 @@ function getHapticFeedback(): HapticFeedback | null {
   if (typeof window === 'undefined') return null;
 
   // Check for iOS Haptics API (available in standalone mode)
-  // @ts-ignore - iOS Haptics API is not in TypeScript definitions
-  const haptic = (window.navigator as any)?.vibrate ? null : (window.navigator as any)?.haptics;
+  // iOS Haptics API is not in TypeScript definitions, so we need to check dynamically
+  interface NavigatorWithHaptics extends Navigator {
+    haptics?: {
+      impactFeedback?: (style: 'light' | 'medium' | 'heavy') => void;
+      notificationFeedback?: (type: 'success' | 'warning' | 'error') => void;
+      selectionFeedback?: () => void;
+      impact?: (style: 'light' | 'medium' | 'heavy') => void;
+      notification?: (type: 'success' | 'warning' | 'error') => void;
+      selection?: () => void;
+    };
+  }
+
+  const nav = window.navigator as NavigatorWithHaptics;
+  const haptic = typeof nav.vibrate === 'function' ? null : nav.haptics;
 
   if (haptic && typeof haptic === 'object') {
     return {

@@ -207,9 +207,9 @@ export const Tooltip: React.FC<TooltipProps> = ({
     text-xs
     font-medium
     text-white dark:text-gray-900
-    bg-gray-900 dark:bg-gray-100
+    bg-gray-900/95 dark:bg-gray-100/95 backdrop-blur-xl
     rounded-lg
-    shadow-lg
+    shadow-xl border border-white/10 dark:border-gray-900/10
     pointer-events-none
     whitespace-nowrap
     transition-opacity

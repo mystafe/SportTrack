@@ -136,7 +136,7 @@ export function ActivityGoalCompletionNotification() {
     <>
       <Confetti active={showConfetti} color={colors.confetti} particleCount={50} />
       <div
-        className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-auto bg-black/30 dark:bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-auto bg-black/40 dark:bg-black/60 backdrop-blur-md"
         onClick={handleBackdropClick}
       >
         <div

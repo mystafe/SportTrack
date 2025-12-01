@@ -9,6 +9,7 @@ import { getActivityLabel, getActivityUnit, getActivityDescription } from '@/lib
 import { useToaster } from '@/components/Toaster';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useHapticFeedback } from '@/lib/hooks/useHapticFeedback';
+import { useScreenReaderAnnouncement } from '@/lib/hooks/useScreenReaderAnnouncement';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/Button';
@@ -108,6 +109,8 @@ export const ActivityForm = memo(function ActivityForm({
   const { checkLevelUp: checkLevelUpCallback } = useLevel();
   const { checkCompletedChallenges } = useChallenges();
   const { settings } = useSettings();
+  const [announcement, setAnnouncement] = useState<string | null>(null);
+  useScreenReaderAnnouncement(announcement);
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US'),
     [lang]
@@ -129,6 +132,10 @@ export const ActivityForm = memo(function ActivityForm({
   const [activitySelectionOpen, setActivitySelectionOpen] = useState(true);
   const [activityDetailsOpen, setActivityDetailsOpen] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
+  const [errors, setErrors] = useState<{
+    amount?: string;
+    performedAt?: string;
+  }>({});
 
   const definition =
     definitionMap[activityKey] ??
@@ -144,6 +151,37 @@ export const ActivityForm = memo(function ActivityForm({
   const pointsNumeric = Math.max(0, Math.round(amountNumeric * definition.multiplier));
   const pointsDisplay = numberFormatter.format(pointsNumeric);
   const isEditing = Boolean(initial?.id);
+
+  // Real-time validation
+  useEffect(() => {
+    const newErrors: typeof errors = {};
+
+    // Validate amount
+    if (amount && (isNaN(amountNumeric) || amountNumeric <= 0)) {
+      newErrors.amount =
+        lang === 'tr'
+          ? "Miktar 0'dan büyük bir sayı olmalıdır."
+          : 'Amount must be a number greater than 0.';
+    } else if (amountNumeric > 1000000) {
+      newErrors.amount =
+        lang === 'tr'
+          ? 'Miktar çok büyük. Lütfen daha küçük bir değer girin.'
+          : 'Amount is too large. Please enter a smaller value.';
+    }
+
+    // Validate date
+    if (performedAt) {
+      const date = new Date(performedAt);
+      if (isNaN(date.getTime())) {
+        newErrors.performedAt = lang === 'tr' ? 'Geçersiz tarih formatı.' : 'Invalid date format.';
+      } else if (date > new Date()) {
+        newErrors.performedAt =
+          lang === 'tr' ? 'Gelecek bir tarih seçilemez.' : 'Cannot select a future date.';
+      }
+    }
+
+    setErrors(newErrors);
+  }, [amount, amountNumeric, performedAt, lang]);
 
   useEffect(() => {
     if (initial) {
@@ -174,6 +212,16 @@ export const ActivityForm = memo(function ActivityForm({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+
+    // Validate before submitting
+    if (Object.keys(errors).length > 0) {
+      const firstError = Object.values(errors)[0];
+      if (firstError) {
+        showToast(firstError, 'error');
+      }
+      return;
+    }
+
     setLoading(true);
     const performedAtISO = performedAt
       ? new Date(performedAt).toISOString()
@@ -187,14 +235,43 @@ export const ActivityForm = memo(function ActivityForm({
         return;
       }
       const amountValue = Number(amount) || 0;
-      if (amountValue <= 0) {
+      if (amountValue <= 0 || isNaN(amountValue)) {
         const errorMsg =
           lang === 'tr'
             ? "Miktar 0'dan büyük bir sayı olmalıdır."
             : 'Amount must be a number greater than 0.';
         showToast(errorMsg, 'error');
+        setErrors({ amount: errorMsg });
         setLoading(false);
         return;
+      }
+      if (amountValue > 1000000) {
+        const errorMsg =
+          lang === 'tr'
+            ? 'Miktar çok büyük. Lütfen daha küçük bir değer girin.'
+            : 'Amount is too large. Please enter a smaller value.';
+        showToast(errorMsg, 'error');
+        setErrors({ amount: errorMsg });
+        setLoading(false);
+        return;
+      }
+      if (performedAt) {
+        const date = new Date(performedAt);
+        if (isNaN(date.getTime())) {
+          const errorMsg = lang === 'tr' ? 'Geçersiz tarih formatı.' : 'Invalid date format.';
+          showToast(errorMsg, 'error');
+          setErrors({ performedAt: errorMsg });
+          setLoading(false);
+          return;
+        }
+        if (date > new Date()) {
+          const errorMsg =
+            lang === 'tr' ? 'Gelecek bir tarih seçilemez.' : 'Cannot select a future date.';
+          showToast(errorMsg, 'error');
+          setErrors({ performedAt: errorMsg });
+          setLoading(false);
+          return;
+        }
       }
       if (initial?.id) {
         updateActivity(initial.id, {
@@ -203,7 +280,9 @@ export const ActivityForm = memo(function ActivityForm({
           note: note || undefined,
           performedAt: performedAtISO,
         });
-        showToast(t('toast.activityUpdated'), 'success');
+        const updateMsg = t('toast.activityUpdated');
+        showToast(updateMsg, 'success');
+        setAnnouncement(updateMsg);
         onSaved?.();
         onCancel?.();
       } else {
@@ -214,7 +293,9 @@ export const ActivityForm = memo(function ActivityForm({
           note: note || undefined,
           performedAt: performedAtISO,
         });
-        showToast(t('toast.activityAdded'), 'success');
+        const addMsg = t('toast.activityAdded');
+        showToast(addMsg, 'success');
+        setAnnouncement(addMsg);
 
         // Check for new badges and level up
         setTimeout(() => {
@@ -257,6 +338,7 @@ export const ActivityForm = memo(function ActivityForm({
         setAmount(String(definition.defaultAmount));
         setNote('');
         setPerformedAt(toLocalInputValue(new Date()));
+        setErrors({});
         onCreated?.();
         // Stay on the same page - no redirect
       }
@@ -275,7 +357,7 @@ export const ActivityForm = memo(function ActivityForm({
     >
       {/* Activity Selection - Accordion */}
       <Accordion
-        title={activityKey ? getActivityLabel(definition, lang) : t('form.selectActivity')}
+        title={t('form.selectActivity')}
         icon="🏃"
         defaultOpen={true}
         variant="compact"
@@ -306,7 +388,7 @@ export const ActivityForm = memo(function ActivityForm({
                 }}
                 className={`activity-select-btn stagger-item ripple-effect magnetic-hover gpu-accelerated text-left ${isMobile ? 'rounded-lg' : 'rounded-xl'} ${isMobile ? 'px-1.5 py-1 min-h-[40px]' : 'px-2 py-1.5'} shadow-md hover:shadow-xl transition-all duration-300 ${
                   active
-                    ? 'active ring-2 ring-brand/30 dark:ring-brand/20 scale-105'
+                    ? 'active ring-2 ring-brand/50 dark:ring-brand/40 scale-[1.02] bg-gradient-to-br from-brand/10 via-brand/5 to-transparent dark:from-brand/20 dark:via-brand/10 dark:to-transparent'
                     : 'scale-on-interact'
                 }`}
                 aria-pressed={active}
@@ -323,7 +405,7 @@ export const ActivityForm = memo(function ActivityForm({
               >
                 <div className="flex items-center justify-between">
                   <div
-                    className={`${isMobile ? 'text-sm' : 'text-base'} transition-transform duration-300 ${active ? 'activity-icon-pulse' : ''}`}
+                    className={`${isMobile ? 'text-sm' : 'text-base'} transition-transform duration-300 ${active ? 'activity-icon-pulse icon-bounce' : ''}`}
                   >
                     {def.icon}
                   </div>
@@ -367,7 +449,7 @@ export const ActivityForm = memo(function ActivityForm({
       >
         <div className={isMobile ? 'space-y-1.5' : 'space-y-2'}>
           {/* Amount Input and Calculation Fields - Side by Side */}
-          <div className={`grid ${isMobile ? 'grid-cols-1 gap-1.5' : 'grid-cols-2 gap-2'}`}>
+          <div className={`grid grid-cols-2 gap-2`}>
             <label className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} block`}>
               <div
                 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-800 dark:text-gray-200`}
@@ -378,49 +460,59 @@ export const ActivityForm = memo(function ActivityForm({
                 type="number"
                 min={1}
                 step={1}
+                max={1000000}
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  if (errors.amount) {
+                    setErrors((prev) => ({ ...prev, amount: undefined }));
+                  }
+                }}
                 size={isMobile ? 'md' : 'md'}
-                variant="default"
+                error={errors.amount}
                 required
                 autoComplete="off"
                 data-form-type="other"
+                aria-invalid={!!errors.amount}
+                aria-describedby={
+                  errors.amount
+                    ? 'amount-error'
+                    : getActivityDescription(definition, lang)
+                      ? 'amount-description'
+                      : undefined
+                }
                 data-lpignore="true"
                 data-1p-ignore="true"
                 aria-autocomplete="none"
                 role="spinbutton"
                 aria-label={`${t('form.amount')} (${getActivityUnit(definition, lang)})`}
-                aria-describedby={
-                  getActivityDescription(definition, lang) ? 'amount-description' : undefined
-                }
                 name=""
                 inputMode="decimal"
               />
+              {errors.amount && (
+                <div
+                  id="amount-error"
+                  className={`${isMobile ? 'text-xs' : 'text-sm'} text-red-600 dark:text-red-400 mt-1`}
+                  role="alert"
+                >
+                  {errors.amount}
+                </div>
+              )}
             </label>
-            {/* Calculation Fields - Only show on desktop, hide on mobile */}
-            {!isMobile && (
-              <div className={`space-y-1 flex flex-col justify-end`}>
-                <div className={`text-sm text-gray-500 dark:text-gray-400`}>
-                  {lang === 'tr' ? 'Hesaplama' : 'Calculation'}
-                </div>
-                <div className={`text-sm text-gray-600 dark:text-gray-300 font-medium`}>
-                  {definition.multiplier}x · {t('form.points')}: {pointsDisplay}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Calculation Fields - Show below amount on mobile */}
-          {isMobile && (
-            <div className={`space-y-0.5`}>
-              <div className={`text-xs text-gray-500 dark:text-gray-400`}>
+            {/* Calculation Fields - Show on same row */}
+            <div className={`${isMobile ? 'space-y-0.5' : 'space-y-1'} flex flex-col justify-end`}>
+              <div
+                className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 dark:text-gray-400`}
+              >
                 {lang === 'tr' ? 'Hesaplama' : 'Calculation'}
               </div>
-              <div className={`text-xs text-gray-600 dark:text-gray-300 font-medium`}>
+              <div
+                className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-300 font-medium`}
+              >
                 {definition.multiplier}x · {t('form.points')}: {pointsDisplay}
               </div>
             </div>
-          )}
+          </div>
 
           {/* Description - Full Width */}
           {getActivityDescription(definition, lang) ? (
@@ -446,8 +538,13 @@ export const ActivityForm = memo(function ActivityForm({
               <input
                 type="datetime-local"
                 value={performedAt}
-                onChange={(e) => setPerformedAt(e.target.value)}
-                className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2.5 py-1.5 min-h-[40px] text-sm' : 'rounded-lg px-3 py-2 min-h-[40px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-200`}
+                onChange={(e) => {
+                  setPerformedAt(e.target.value);
+                  if (errors.performedAt) {
+                    setErrors((prev) => ({ ...prev, performedAt: undefined }));
+                  }
+                }}
+                className={`input-enhanced w-full border-2 ${isMobile ? 'rounded-lg px-2.5 py-1.5 min-h-[40px] text-sm' : 'rounded-lg px-3 py-2 min-h-[40px] text-sm'} bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 ${errors.performedAt ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'} transition-all duration-200`}
                 required
                 autoComplete="off"
                 data-form-type="other"
@@ -456,9 +553,20 @@ export const ActivityForm = memo(function ActivityForm({
                 aria-autocomplete="none"
                 aria-label={t('form.datetime')}
                 aria-required="true"
+                aria-invalid={!!errors.performedAt}
+                aria-describedby={errors.performedAt ? 'datetime-error' : undefined}
                 name=""
                 inputMode="none"
               />
+              {errors.performedAt && (
+                <div
+                  id="datetime-error"
+                  className={`${isMobile ? 'text-xs' : 'text-sm'} text-red-600 dark:text-red-400 mt-1`}
+                  role="alert"
+                >
+                  {errors.performedAt}
+                </div>
+              )}
             </label>
             {/* Next Button to open Note accordion */}
             <Button
@@ -530,9 +638,9 @@ export const ActivityForm = memo(function ActivityForm({
           variant="primary"
           size={isMobile ? 'sm' : 'md'}
           fullWidth={isMobile && !isEditing}
-          disabled={loading}
+          disabled={loading || Object.keys(errors).length > 0 || !amount || amountNumeric <= 0}
           loading={loading}
-          className="card-entrance"
+          className="card-entrance animate-gradient hover:scale-105 active:scale-95 transition-transform duration-200"
           aria-label={loading ? t('form.loading') : isEditing ? t('form.save') : t('form.add')}
         >
           {isEditing ? t('form.save') : t('form.add')}

@@ -109,9 +109,10 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
           py-12 sm:py-16
           px-4 sm:px-6
           animate-fade-in-scale
-          bg-gradient-to-br from-white via-gray-50/50 to-white dark:from-gray-900/95 dark:via-gray-800/50 dark:to-gray-900/95
-          border-2 border-gray-200/60 dark:border-gray-700/60
-          shadow-lg hover:shadow-xl transition-shadow duration-300
+          glass-effect card-3d
+          bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
+          border-2 border-white/20 dark:border-gray-700/50
+          shadow-2xl hover:shadow-3xl transition-all duration-300
           ${className}
         `
           .trim()
@@ -121,8 +122,8 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
           className={`
             relative text-6xl sm:text-7xl mb-4 sm:mb-6
             ${variant === 'error' ? 'animate-shake' : ''}
-            ${variant === 'success' ? 'animate-scale-bounce' : ''}
-            ${variant === 'default' || variant === 'activities' || variant === 'badges' || variant === 'challenges' ? 'animate-pulse-subtle' : ''}
+            ${variant === 'success' ? 'animate-scale-bounce icon-bounce' : ''}
+            ${variant === 'default' || variant === 'activities' || variant === 'badges' || variant === 'challenges' ? 'animate-pulse-subtle icon-bounce' : ''}
             filter drop-shadow-lg
           `
             .trim()
@@ -130,9 +131,10 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
           role="img"
           aria-hidden="true"
         >
-          {/* Decorative glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-brand/20 via-transparent to-brand/20 blur-2xl opacity-50 -z-10"></div>
-          {displayIcon}
+          {/* Enhanced decorative glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-brand/30 via-brand/20 via-transparent to-brand/30 blur-3xl opacity-60 -z-10 animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-brand/20 via-transparent to-brand/20 blur-2xl opacity-40 -z-10"></div>
+          <div className="relative z-10 sparkle">{displayIcon}</div>
         </div>
         <h2
           className={`
@@ -140,6 +142,7 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
             text-gray-950 dark:text-gray-100
             mb-2 sm:mb-3
             leading-tight
+            neon-glow-brand
           `
             .trim()
             .replace(/\s+/g, ' ')}
@@ -178,7 +181,7 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
                 variant={action.variant || 'primary'}
                 size={isMobile ? 'md' : 'md'}
                 onClick={action.onClick}
-                className="w-full sm:w-auto"
+                className={`w-full sm:w-auto btn-enhanced animate-gradient hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl transition-all duration-300 ${action.variant === 'primary' ? 'shadow-brand/30' : ''}`}
               >
                 {action.label}
               </Button>
@@ -188,7 +191,7 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
                 variant={secondaryAction.variant || 'outline'}
                 size={isMobile ? 'md' : 'md'}
                 onClick={secondaryAction.onClick}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto btn-enhanced hover:scale-105 active:scale-95 transition-all duration-300"
               >
                 {secondaryAction.label}
               </Button>

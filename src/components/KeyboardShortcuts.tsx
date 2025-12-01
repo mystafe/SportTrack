@@ -208,11 +208,11 @@ export function KeyboardShortcuts() {
   return (
     <KeyboardShortcutsContext.Provider value={contextValue}>
       <div
-        className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
+        className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-md animate-fade-in"
         onClick={() => setShowHelp(false)}
       >
         <div
-          className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 max-w-2xl w-full mx-4 p-6 animate-scale-in"
+          className="glass-effect card-3d bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-xl shadow-2xl border-2 border-white/20 dark:border-gray-700/50 max-w-2xl w-full mx-4 p-6 animate-scale-in hover:scale-[1.01] transition-all duration-300"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-6">

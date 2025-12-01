@@ -49,11 +49,11 @@ const sizeStyles: Record<SpinnerSize, { width: string; height: string; borderWid
 };
 
 const variantStyles: Record<SpinnerVariant, string> = {
-  primary: 'border-brand border-t-transparent',
-  secondary: 'border-gray-400 border-t-transparent dark:border-gray-500',
-  success: 'border-success border-t-transparent',
-  warning: 'border-warning border-t-transparent',
-  error: 'border-error border-t-transparent',
+  primary: 'border-brand border-t-transparent shadow-lg shadow-brand/20',
+  secondary: 'border-gray-400 border-t-transparent dark:border-gray-500 shadow-md',
+  success: 'border-success border-t-transparent shadow-lg shadow-success/20',
+  warning: 'border-warning border-t-transparent shadow-lg shadow-warning/20',
+  error: 'border-error border-t-transparent shadow-lg shadow-error/20',
 };
 
 /**

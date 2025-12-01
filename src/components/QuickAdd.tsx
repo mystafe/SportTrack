@@ -228,7 +228,13 @@ export const QuickAdd = memo(function QuickAdd() {
   };
 
   return (
-    <Card variant="default" size="sm" hoverable className="card-entrance" header={renderHeader()}>
+    <Card
+      variant="default"
+      size="sm"
+      hoverable
+      className="card-entrance glass-effect card-3d"
+      header={renderHeader()}
+    >
       {isOpen && (
         <div id="quick-add" className="space-y-2">
           <div
@@ -276,8 +282,8 @@ export const QuickAdd = memo(function QuickAdd() {
                 ${isMobile ? 'touch-manipulation' : ''}
                 ${
                   isAddingThis
-                    ? 'border-brand dark:border-brand/60 bg-gradient-to-br from-brand/20 to-brand/10 dark:from-brand/25 dark:to-brand/15 cursor-wait shadow-lg shadow-brand/20 dark:shadow-brand/30 pulse-glow-mobile'
-                    : 'border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 hover:border-brand dark:hover:border-brand/60 hover:bg-gradient-to-br hover:from-brand/5 hover:via-brand/3 hover:to-brand/5 dark:hover:from-brand/10 dark:hover:via-brand/8 dark:hover:to-brand/10 hover:shadow-xl hover:shadow-brand/20 dark:hover:shadow-brand/30 scale-on-interact active:scale-95'
+                    ? 'border-brand dark:border-brand/60 glass-effect bg-gradient-to-br from-brand/20 to-brand/10 dark:from-brand/25 dark:to-brand/15 cursor-wait shadow-lg shadow-brand/20 dark:shadow-brand/30 pulse-glow-mobile backdrop-blur-xl'
+                    : 'border-white/20 dark:border-gray-700/50 glass-effect bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl hover:border-brand/50 dark:hover:border-brand/60 hover:bg-gradient-to-br hover:from-brand/10 hover:via-brand/5 hover:to-brand/10 dark:hover:from-brand/20 dark:hover:via-brand/10 dark:hover:to-brand/20 hover:shadow-xl hover:shadow-brand/30 dark:hover:shadow-brand/40 scale-on-interact active:scale-95'
                 }
                 disabled:opacity-50 disabled:cursor-not-allowed group
               `}
@@ -296,19 +302,19 @@ export const QuickAdd = memo(function QuickAdd() {
                   }}
                 >
                   <div
-                    className={`text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300 ${isAddingThis ? 'icon-wiggle-mobile' : ''}`}
+                    className={`text-3xl sm:text-4xl transform group-hover:scale-110 transition-transform duration-300 ${isAddingThis ? 'icon-wiggle-mobile' : 'icon-bounce'}`}
                   >
                     {definition.icon}
                   </div>
-                  <div className="text-xs sm:text-sm font-bold text-center text-gray-950 dark:text-gray-100 line-clamp-2 group-hover:text-brand transition-colors">
+                  <div className="text-xs sm:text-sm font-bold text-center text-gray-950 dark:text-gray-100 line-clamp-2 group-hover:text-brand transition-colors shimmer-text">
                     {getActivityLabel(definition, lang)}
                   </div>
                   <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-semibold">
                     {displayAmount} {getActivityUnit(definition, lang)}
                   </div>
                   {isAddingThis && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-xl ">
-                      <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent"></div>
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl z-10">
+                      <div className="animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent pulse-glow"></div>
                     </div>
                   )}
                 </Button>

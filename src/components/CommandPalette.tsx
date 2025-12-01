@@ -4,6 +4,10 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useActivities } from '@/lib/activityStore';
+import { getActivityLabel } from '@/lib/activityUtils';
+import { format, parseISO } from 'date-fns';
+import { tr, enUS } from 'date-fns/locale';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -16,7 +20,12 @@ export interface Command {
   icon?: string;
   keywords?: string[];
   action: () => void;
-  category: 'navigation' | 'actions' | 'settings' | 'general';
+  category: 'navigation' | 'actions' | 'settings' | 'general' | 'activities';
+  metadata?: {
+    activityId?: string;
+    date?: string;
+    points?: number;
+  };
 }
 
 interface CommandPaletteProps {
@@ -53,6 +62,7 @@ export function CommandPalette({
   const router = useRouter();
   const { t, lang } = useI18n();
   const isMobile = useIsMobile();
+  const { activities } = useActivities();
   const [open, setOpen] = useState(controlledOpen ?? false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -131,7 +141,46 @@ export function CommandPalette({
     [router]
   );
 
-  const allCommands = useMemo(() => [...defaultCommands, ...commands], [defaultCommands, commands]);
+  // Activity search commands
+  const activityCommands = useMemo(() => {
+    if (!searchQuery.trim() || searchQuery.length < 2) return [];
+
+    const query = searchQuery.toLowerCase();
+    const matched = activities
+      .filter((activity) => {
+        const label = getActivityLabel(activity, lang);
+        const labelMatch = label.toLowerCase().includes(query);
+        const noteMatch = activity.note?.toLowerCase().includes(query);
+        return labelMatch || noteMatch;
+      })
+      .slice(0, 5) // Limit to 5 results
+      .map((activity) => ({
+        id: `activity-${activity.id}`,
+        label: `${getActivityLabel(activity, lang)} - ${format(parseISO(activity.performedAt), 'dd MMM yyyy', { locale: lang === 'tr' ? tr : enUS })}`,
+        labelEn: `${getActivityLabel(activity, 'en')} - ${format(parseISO(activity.performedAt), 'dd MMM yyyy', { locale: enUS })}`,
+        icon: activity.icon,
+        keywords: [getActivityLabel(activity, lang), activity.note].filter(
+          (kw): kw is string => typeof kw === 'string' && kw.length > 0
+        ),
+        action: () => {
+          router.push(`/activities`);
+          // Scroll to activity (would need to implement scroll-to-element)
+        },
+        category: 'activities' as const,
+        metadata: {
+          activityId: activity.id,
+          date: activity.performedAt,
+          points: activity.points,
+        },
+      }));
+
+    return matched;
+  }, [activities, searchQuery, lang, router]);
+
+  const allCommands = useMemo(
+    () => [...defaultCommands, ...activityCommands, ...commands],
+    [defaultCommands, activityCommands, commands]
+  );
 
   const filteredCommands = useMemo(() => {
     if (!searchQuery.trim()) return allCommands;
@@ -140,7 +189,7 @@ export function CommandPalette({
     return allCommands.filter((cmd) => {
       const label = lang === 'tr' ? cmd.label : cmd.labelEn || cmd.label;
       const labelMatch = label.toLowerCase().includes(query);
-      const keywordMatch = cmd.keywords?.some((kw) => kw.toLowerCase().includes(query));
+      const keywordMatch = cmd.keywords?.some((kw) => kw?.toLowerCase().includes(query));
       return labelMatch || keywordMatch;
     });
   }, [allCommands, searchQuery, lang]);
@@ -228,6 +277,7 @@ export function CommandPalette({
     actions: lang === 'tr' ? 'İşlemler' : 'Actions',
     settings: lang === 'tr' ? 'Ayarlar' : 'Settings',
     general: lang === 'tr' ? 'Genel' : 'General',
+    activities: lang === 'tr' ? 'Aktiviteler' : 'Activities',
   };
 
   const groupedCommands = useMemo(() => {
@@ -243,11 +293,15 @@ export function CommandPalette({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[10001] flex items-start justify-center pt-[20vh] px-4"
+      className="fixed inset-0 z-[10001] flex items-start justify-center pt-[20vh] px-4 bg-black/40 dark:bg-black/60 backdrop-blur-md"
       onClick={handleClose}
     >
       <div className="w-full max-w-2xl animate-fade-in-scale" onClick={(e) => e.stopPropagation()}>
-        <Card variant="elevated" size="lg" className="shadow-2xl">
+        <Card
+          variant="elevated"
+          size="lg"
+          className="glass-effect card-3d shadow-2xl hover:scale-[1.01] transition-all duration-300"
+        >
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <Input
               ref={inputRef}

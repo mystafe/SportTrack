@@ -80,7 +80,7 @@ export const QuickActions = memo(function QuickActions() {
               handleClick(action);
             }
           }}
-          className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${action.color} text-white p-3 sm:p-4 shadow-md hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${isMobile ? 'touch-feedback mobile-press' : ''}`}
+          className={`group relative overflow-hidden rounded-xl glass-effect card-3d bg-gradient-to-br ${action.color} text-white p-3 sm:p-4 shadow-lg hover:shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${isMobile ? 'touch-feedback mobile-press' : ''}`}
           aria-label={action.label[lang]}
         >
           {/* Animated background gradient */}

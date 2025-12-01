@@ -92,7 +92,7 @@ export function NameDialog() {
 
   const dialog = open ? (
     <div
-      className={`fixed inset-0 z-[10001] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/50 ${isMobile ? '' : 'backdrop-blur-sm'} px-4 py-4 overflow-y-auto safe-top safe-bottom safe-left safe-right`}
+      className={`fixed inset-0 z-[10001] flex ${isMobile ? 'items-end' : 'items-center justify-center'} bg-black/40 dark:bg-black/60 ${isMobile ? '' : 'backdrop-blur-md'} px-4 py-4 overflow-y-auto safe-top safe-bottom safe-left safe-right`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           // Don't allow closing by clicking outside - user must enter name

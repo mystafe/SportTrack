@@ -55,23 +55,35 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
                 : undefined
             }
           >
-            {toasts.map((toast) => (
+            {toasts.map((toast, index) => (
               <div
                 key={toast.id}
-                className={`${isMobile ? 'w-full max-w-sm' : 'max-w-md'} ${isMobile ? 'px-4 py-4 text-base' : 'px-4 py-3 text-sm'} rounded-lg shadow-lg font-medium animate-slide-in-right transition-all duration-300 whitespace-pre-line ${
+                className={`${isMobile ? 'w-full max-w-sm' : 'max-w-md'} ${isMobile ? 'px-4 py-4 text-base' : 'px-4 py-3 text-sm'} rounded-xl shadow-xl font-medium animate-slide-in-right transition-all duration-300 whitespace-pre-line backdrop-blur-sm border-2 ${
                   toast.type === 'success'
-                    ? 'bg-green-500 text-white'
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white border-green-400/30 shadow-green-500/20'
                     : toast.type === 'error'
-                      ? 'bg-red-500 text-white'
+                      ? 'bg-gradient-to-r from-red-500 to-red-600 text-white border-red-400/30 shadow-red-500/20'
                       : toast.type === 'warning'
-                        ? 'bg-yellow-500 text-white'
-                        : 'bg-blue-500 text-white'
+                        ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-yellow-400/30 shadow-yellow-500/20'
+                        : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-400/30 shadow-blue-500/20'
                 }`}
                 role="alert"
                 aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
                 aria-atomic="true"
+                style={{
+                  animationDelay: `${index * 50}ms`,
+                  transform: `translateY(${index * -8}px)`,
+                }}
               >
-                {toast.message}
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-xl">
+                    {toast.type === 'success' && '✓'}
+                    {toast.type === 'error' && '✕'}
+                    {toast.type === 'warning' && '⚠'}
+                    {toast.type === 'info' && 'ℹ'}
+                  </div>
+                  <div className="flex-1">{toast.message}</div>
+                </div>
               </div>
             ))}
           </div>,

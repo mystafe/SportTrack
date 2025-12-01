@@ -9,6 +9,7 @@ import { format, parseISO } from 'date-fns';
 import { enUS, tr } from 'date-fns/locale';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { PRESET_CHALLENGES } from '@/lib/presetChallenges';
+import { ChallengeShareButton } from '@/components/ChallengeShareButton';
 
 interface ChallengeCardProps {
   challenge: Challenge;
@@ -122,19 +123,19 @@ export const ChallengeCard = memo(function ChallengeCard({
 
   return (
     <div
-      className={`card-entrance stagger-item rounded-xl border-2 ${isMobile ? 'p-3' : 'p-4'} ${getStatusColor()} transition-all duration-300 hover:shadow-xl hover:scale-[1.02] shadow-md bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 ${isMobile ? 'mobile-card-lift touch-feedback' : 'magnetic-hover'} gpu-accelerated`}
+      className={`card-entrance stagger-item glass-effect rounded-xl border-2 ${isMobile ? 'p-3' : 'p-4'} ${getStatusColor()} transition-all duration-300 hover:shadow-xl hover:scale-[1.02] shadow-lg bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ${isMobile ? 'mobile-card-lift touch-feedback' : 'magnetic-hover'} gpu-accelerated card-3d ${challenge.status === 'completed' ? 'pulse-glow' : ''}`}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <span
-            className={`${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'} emoji-bounce flex-shrink-0`}
+            className={`${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'} ${challenge.status === 'completed' ? 'icon-bounce' : 'emoji-bounce'} flex-shrink-0 ${challenge.status === 'completed' ? 'sparkle' : ''}`}
           >
             {getStatusIcon()}
           </span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h3
-                className={`text-heading-3 text-gray-950 dark:text-white ${isMobile ? 'text-sm' : ''} break-words`}
+                className={`text-heading-3 text-gray-950 dark:text-white ${isMobile ? 'text-sm' : ''} break-words font-bold shimmer-text`}
               >
                 {challenge.name[lang]}
               </h3>
@@ -153,6 +154,9 @@ export const ChallengeCard = memo(function ChallengeCard({
           </div>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
+          {/* Share button - available for all challenges */}
+          <ChallengeShareButton challenge={challenge} variant="icon" />
+
           {/* Only show edit/delete buttons for custom challenges (user-created) */}
           {/* Hide for: preset challenges, daily/weekly/yearly challenges (auto-generated) */}
           {challenge.category === 'custom' &&
@@ -201,15 +205,15 @@ export const ChallengeCard = memo(function ChallengeCard({
         </div>
 
         <div
-          className={`w-full ${isMobile ? 'h-2.5' : 'h-3'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner relative group/progress`}
+          className={`w-full ${isMobile ? 'h-2.5' : 'h-3'} bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner relative group/progress progress-glow`}
         >
           <div
-            className={`h-full transition-all duration-1000 ease-out shadow-sm progress-bar-fill relative ${
+            className={`h-full transition-all duration-1000 ease-out shadow-sm progress-bar-fill relative progress-glow ${
               challenge.status === 'completed'
-                ? 'bg-gradient-to-r from-green-500 via-emerald-500 to-green-600'
+                ? 'bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 animate-gradient'
                 : challenge.status === 'expired' || challenge.status === 'failed'
                   ? 'bg-gradient-to-r from-red-500 via-rose-500 to-red-600'
-                  : 'bg-gradient-to-r from-brand via-brand-light to-brand-dark'
+                  : 'bg-gradient-to-r from-brand via-brand-light to-brand-dark animate-gradient'
             }`}
             style={{ width: `${Math.min(100, progress.percentage)}%` }}
           >
@@ -221,10 +225,14 @@ export const ChallengeCard = memo(function ChallengeCard({
             {progress.percentage >= 90 && progress.percentage < 100 && (
               <div className="absolute inset-0 bg-white/20 animate-pulse rounded-full" />
             )}
+            {/* Completion shimmer */}
+            {progress.percentage === 100 && (
+              <div className="absolute inset-0 shimmer rounded-full" />
+            )}
           </div>
           {/* Completion glow effect */}
-          {progress.percentage === 100 && (
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer rounded-full" />
+          {progress.percentage === 100 && challenge.status === 'completed' && (
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer rounded-full pulse-glow" />
           )}
         </div>
 

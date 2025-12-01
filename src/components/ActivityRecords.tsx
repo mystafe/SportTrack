@@ -116,11 +116,11 @@ export function ActivityRecords() {
       variant="default"
       size="md"
       hoverable
-      className="card-entrance"
+      className="card-entrance glass-effect card-3d"
       header={
         <div className="flex items-center gap-2">
-          <span className="text-xl">🏆</span>
-          <h2 className="text-lg sm:text-xl font-bold text-gray-950 dark:text-white">
+          <span className="text-xl icon-bounce">🏆</span>
+          <h2 className="text-lg sm:text-xl font-bold shimmer-text text-gray-950 dark:text-white">
             {lang === 'tr' ? 'Aktivite Rekorları' : 'Activity Records'}
           </h2>
         </div>
@@ -130,15 +130,15 @@ export function ActivityRecords() {
         {activityRecords.slice(0, 10).map((record) => (
           <div
             key={record.activityKey}
-            className="p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 hover:shadow-md transition-all duration-300"
+            className="p-4 rounded-xl border-2 border-white/30 dark:border-gray-700/50 glass-effect bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl hover:shadow-xl hover:scale-[1.02] transition-all duration-300 card-3d"
           >
             <div className="flex items-start gap-3 mb-3">
-              <span className="text-3xl flex-shrink-0">{record.icon}</span>
+              <span className="text-3xl flex-shrink-0 icon-bounce">{record.icon}</span>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base sm:text-lg font-bold text-gray-950 dark:text-white mb-1">
+                <h3 className="text-base sm:text-lg font-bold shimmer-text text-gray-950 dark:text-white mb-1">
                   {lang === 'tr' ? record.label : record.labelEn || record.label}
                 </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
                   {record.totalCount} {lang === 'tr' ? 'toplam aktivite' : 'total activities'} •{' '}
                   {numberFormatter.format(record.totalPoints)}{' '}
                   {lang === 'tr' ? 'toplam puan' : 'total points'}
@@ -148,36 +148,36 @@ export function ActivityRecords() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {record.bestPoints && (
-                <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                <div className="p-2 rounded-xl glass-effect bg-blue-50/80 dark:bg-blue-900/30 backdrop-blur-sm border border-blue-200/50 dark:border-blue-800/50 hover:shadow-lg hover:scale-[1.05] transition-all duration-200">
+                  <p className="text-xs text-gray-700 dark:text-gray-300 mb-1 font-medium">
                     {lang === 'tr' ? 'En Yüksek Puan' : 'Best Points'}
                   </p>
-                  <p className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                  <p className="text-sm font-bold text-blue-600 dark:text-blue-400 pulse-glow">
                     {numberFormatter.format(record.bestPoints.value)}
                   </p>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-1">
+                  <p className="text-[10px] text-gray-600 dark:text-gray-400 mt-1">
                     {format(record.bestPoints.date, 'dd MMM yyyy', { locale: dateLocale })}
                   </p>
                 </div>
               )}
 
               {record.bestAmount && (
-                <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                <div className="p-2 rounded-xl glass-effect bg-green-50/80 dark:bg-green-900/30 backdrop-blur-sm border border-green-200/50 dark:border-green-800/50 hover:shadow-lg hover:scale-[1.05] transition-all duration-200">
+                  <p className="text-xs text-gray-700 dark:text-gray-300 mb-1 font-medium">
                     {lang === 'tr' ? 'En Yüksek Miktar' : 'Best Amount'}
                   </p>
-                  <p className="text-sm font-bold text-green-600 dark:text-green-400">
+                  <p className="text-sm font-bold text-green-600 dark:text-green-400 pulse-glow">
                     {numberFormatter.format(Math.round(record.bestAmount.value))}{' '}
                     {lang === 'tr' ? record.unit : record.unitEn || record.unit}
                   </p>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-1">
+                  <p className="text-[10px] text-gray-600 dark:text-gray-400 mt-1">
                     {format(record.bestAmount.date, 'dd MMM yyyy', { locale: dateLocale })}
                   </p>
                 </div>
               )}
 
-              <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <div className="p-2 rounded-xl glass-effect bg-purple-50/80 dark:bg-purple-900/30 backdrop-blur-sm border border-purple-200/50 dark:border-purple-800/50 hover:shadow-lg hover:scale-[1.05] transition-all duration-200">
+                <p className="text-xs text-gray-700 dark:text-gray-300 mb-1 font-medium">
                   {lang === 'tr' ? 'Ortalama Puan' : 'Avg Points'}
                 </p>
                 <p className="text-sm font-bold text-purple-600 dark:text-purple-400">
@@ -185,8 +185,8 @@ export function ActivityRecords() {
                 </p>
               </div>
 
-              <div className="p-2 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <div className="p-2 rounded-xl glass-effect bg-orange-50/80 dark:bg-orange-900/30 backdrop-blur-sm border border-orange-200/50 dark:border-orange-800/50 hover:shadow-lg hover:scale-[1.05] transition-all duration-200">
+                <p className="text-xs text-gray-700 dark:text-gray-300 mb-1 font-medium">
                   {lang === 'tr' ? 'Ortalama Miktar' : 'Avg Amount'}
                 </p>
                 <p className="text-sm font-bold text-orange-600 dark:text-orange-400">
@@ -197,23 +197,23 @@ export function ActivityRecords() {
             </div>
 
             {(record.firstPerformed || record.lastPerformed) && (
-              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between text-xs">
+              <div className="mt-3 pt-3 border-t border-white/20 dark:border-gray-700/50 flex items-center justify-between text-xs flex-wrap gap-2">
                 {record.firstPerformed && (
-                  <div>
-                    <span className="text-gray-600 dark:text-gray-400">
+                  <div className="glass-effect bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-lg px-2 py-1 border border-white/20 dark:border-gray-700/30">
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">
                       {lang === 'tr' ? 'İlk Yapılan' : 'First Performed'}:
                     </span>{' '}
-                    <span className="font-semibold text-gray-950 dark:text-white">
+                    <span className="font-bold text-gray-950 dark:text-white">
                       {format(record.firstPerformed, 'dd MMM yyyy', { locale: dateLocale })}
                     </span>
                   </div>
                 )}
                 {record.lastPerformed && (
-                  <div>
-                    <span className="text-gray-600 dark:text-gray-400">
+                  <div className="glass-effect bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-lg px-2 py-1 border border-white/20 dark:border-gray-700/30">
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">
                       {lang === 'tr' ? 'Son Yapılan' : 'Last Performed'}:
                     </span>{' '}
-                    <span className="font-semibold text-gray-950 dark:text-white">
+                    <span className="font-bold text-gray-950 dark:text-white">
                       {format(record.lastPerformed, 'dd MMM yyyy', { locale: dateLocale })}
                     </span>
                   </div>

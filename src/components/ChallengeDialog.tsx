@@ -196,7 +196,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
 
   const dialog = (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-4 overflow-y-auto"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-md px-4 py-4 overflow-y-auto"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -204,7 +204,7 @@ export function ChallengeDialog({ open, challenge, onClose, onSave }: ChallengeD
       }}
     >
       <div
-        className={`relative w-full ${isMobile ? 'max-w-full max-h-[90vh] rounded-xl' : 'max-w-md rounded-xl'} border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900/95 dark:via-gray-800/95 dark:to-gray-900/95 shadow-2xl hover:shadow-3xl transition-shadow duration-300 p-4 sm:p-6 flex flex-col ${isMobile ? 'my-auto' : 'my-auto'}`}
+        className={`relative w-full ${isMobile ? 'max-w-full max-h-[90vh] rounded-xl' : 'max-w-md rounded-xl'} glass-effect card-3d border-2 border-white/20 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.01] p-4 sm:p-6 flex flex-col ${isMobile ? 'my-auto' : 'my-auto'}`}
       >
         <div className="mb-4">
           <h2 className="text-lg font-bold text-gray-950 dark:text-white">

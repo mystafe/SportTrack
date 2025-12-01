@@ -43,6 +43,7 @@ import { CompatibilityModeProgressDialog } from '@/components/CompatibilityModeP
 import { DummyDataSummaryDialog } from '@/components/DummyDataSummaryDialog';
 import type { Badge } from '@/lib/badges';
 import type { Challenge } from '@/lib/challenges';
+import { generateDummyData } from '@/lib/generateDummyData';
 
 // Lazy load heavy components that are not always visible
 const DataExportImport = lazy(() =>
@@ -921,7 +922,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
     }
     return (
       <div
-        className={`fixed inset-0 z-[9999] flex items-start justify-center pt-16 sm:pt-20 bg-black/40 dark:bg-black/50 backdrop-blur-sm px-4 py-4 overflow-y-auto safe-top safe-left safe-right transition-opacity duration-300 ${open ? 'pointer-events-auto' : 'pointer-events-none opacity-0'}`}
+        className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 dark:bg-black/40 backdrop-blur-md px-4 py-4 overflow-y-auto safe-top safe-left safe-right transition-opacity duration-300 ${open ? 'pointer-events-auto' : 'pointer-events-none opacity-0'}`}
         onClick={(e) => {
           // Close when clicking on backdrop (not on dialog content)
           if (e.target === e.currentTarget) {
@@ -935,7 +936,10 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         }}
       >
         <div
-          className={`relative w-full ${isMobile ? 'max-w-[95vw] sm:max-w-md' : 'max-w-lg'} rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl animate-in slide-in-from-top-10 duration-500 ease-in-out ${isMobile ? 'p-4' : 'p-5 sm:p-6'} ${!isAuthenticated ? (isMobile ? 'p-3' : 'p-4') : ''} max-h-[85vh] overflow-y-auto pointer-events-auto`}
+          className={`relative w-full ${isMobile ? 'max-w-[95vw] sm:max-w-md' : 'max-w-lg'} rounded-2xl border-2 border-gray-200/80 dark:border-gray-700/80 bg-white/95 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-in slide-in-from-top-10 duration-500 ease-in-out ${isMobile ? 'p-4' : 'p-5 sm:p-6'} ${!isAuthenticated ? (isMobile ? 'p-3' : 'p-4') : ''} max-h-[90vh] overflow-y-auto pointer-events-auto`}
+          style={{
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          }}
           onClick={(e) => {
             // Prevent closing when clicking inside the dialog
             e.stopPropagation();
@@ -943,7 +947,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
         >
           {/* Header */}
           <div
-            className={`${!isAuthenticated ? (isMobile ? 'mb-2 pb-1.5' : 'mb-2 pb-2') : isMobile ? 'mb-2.5 pb-2' : 'mb-3 pb-2.5'} border-b border-gray-200 dark:border-gray-700`}
+            className={`${!isAuthenticated ? (isMobile ? 'mb-2 pb-1.5' : 'mb-2 pb-2') : isMobile ? 'mb-2.5 pb-2' : 'mb-3 pb-2.5'} border-b border-gray-200/60 dark:border-gray-700/60`}
           >
             <div
               className={`flex items-center justify-between gap-2 ${!isAuthenticated ? 'flex-nowrap' : 'flex-wrap'}`}
@@ -954,8 +958,14 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 <h2
                   className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} font-bold text-gray-950 dark:text-white flex items-center gap-1.5 ${!isAuthenticated ? 'flex-shrink-0' : ''}`}
                 >
-                  <span className={isMobile ? 'text-xs' : 'text-sm'}>⚙️</span>
-                  {isAuthenticated ? (lang === 'tr' ? 'Ayarlar' : 'Settings') : t('settings.title')}
+                  <span className={`${isMobile ? 'text-xs' : 'text-sm'} icon-bounce`}>⚙️</span>
+                  <span className="neon-glow-brand">
+                    {isAuthenticated
+                      ? lang === 'tr'
+                        ? 'Ayarlar'
+                        : 'Settings'
+                      : t('settings.title')}
+                  </span>
                 </h2>
                 {isAuthenticated && (
                   <span
@@ -1029,7 +1039,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     <button
                       type="button"
                       onClick={handleLoginClick}
-                      className={`w-full ${isMobile ? 'px-3 py-2 text-xs' : 'px-4 py-2.5 text-xs sm:text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300`}
+                      className={`w-full ${isMobile ? 'px-3 py-2 text-xs' : 'px-4 py-2.5 text-xs sm:text-sm'} rounded-lg bg-gradient-to-r from-brand to-brand-dark text-white hover:from-brand-dark hover:to-brand font-semibold shadow-md hover:shadow-xl transition-all duration-300 animate-gradient hover:scale-105 active:scale-95`}
                     >
                       {t('nav.login') || 'Login'} / {t('auth.signUp') || 'Sign Up'}
                     </button>
@@ -1047,7 +1057,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className={`input-enhanced w-full border-2 border-gray-200 dark:border-gray-700 rounded-lg ${isMobile ? 'px-3 py-2.5 text-sm min-h-[44px]' : 'px-3 py-2 text-xs sm:px-4 sm:py-2.5 sm:text-sm min-h-[44px]'} bg-white dark:bg-gray-800 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all`}
+                    className={`input-enhanced w-full border-2 border-gray-200/80 dark:border-gray-700/80 rounded-lg ${isMobile ? 'px-3 py-2.5 text-sm min-h-[44px]' : 'px-3 py-2 text-xs sm:px-4 sm:py-2.5 sm:text-sm min-h-[44px]'} bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm focus:border-brand dark:focus:border-brand-light focus:ring-2 focus:ring-brand/20 dark:focus:ring-brand-light/20 transition-all`}
                     placeholder={lang === 'tr' ? 'İsminiz' : 'Your name'}
                     autoComplete="off"
                     data-form-type="other"
@@ -1104,7 +1114,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 {/* Export/Import - Only show if authenticated */}
                 {isAuthenticated && (
                   <div
-                    className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700`}
+                    className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200/60 dark:border-gray-700/60`}
                   >
                     <span
                       className={`${isMobile ? 'text-xs' : 'text-[10px] sm:text-xs'} font-medium text-gray-600 dark:text-gray-300 block ${isMobile ? 'mb-1.5' : 'mb-2'}`}
@@ -1123,7 +1133,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                 {/* Language & Theme & Reduce Animations */}
                 <div
-                  className={`${isMobile ? 'pt-1' : 'pt-1.5'} border-t border-gray-200 dark:border-gray-700`}
+                  className={`${isMobile ? 'pt-1' : 'pt-1.5'} border-t border-gray-200/60 dark:border-gray-700/60`}
                 >
                   <div
                     className={`flex items-center justify-between gap-2 ${isMobile ? 'mb-1' : 'mb-1.5'}`}
@@ -1185,305 +1195,64 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             createMonthlyChallenge,
                           } = await import('@/lib/challenges');
 
-                          // Helper function to compute points
-                          const computePoints = (multiplier: number, amount: number): number => {
-                            return Math.max(0, Math.round(amount * multiplier));
-                          };
-
-                          // Helper function to round numbers nicely
-                          const roundAmount = (
-                            amount: number,
-                            activity: ActivityDefinition
-                          ): number => {
-                            if (activity.unit.includes('adım') || activity.unit.includes('steps')) {
-                              return Math.round(amount / 100) * 100; // Round to nearest 100 for steps
-                            } else if (
-                              activity.unit.includes('dakika') ||
-                              activity.unit.includes('minutes')
-                            ) {
-                              return Math.round(amount / 5) * 5; // Round to nearest 5 for minutes
-                            } else if (
-                              activity.unit.includes('tekrar') ||
-                              activity.unit.includes('reps')
-                            ) {
-                              return Math.round(amount / 5) * 5; // Round to nearest 5 for reps
-                            } else if (activity.unit.includes('basamak')) {
-                              return Math.round(amount / 10) * 10; // Round to nearest 10 for stairs
-                            }
-                            return Math.round(amount);
-                          };
-
-                          // Generate dummy activities for the last 240 days (8 months) - optimized for performance
-                          const now = new Date();
-                          const activitiesToAdd: Parameters<typeof addActivity>[0][] = [];
+                          // Generate realistic dummy activities for the last 240 days (8 months)
                           const totalDays = 240; // Increased to generate more badges
-                          const currentSettings = settings || { dailyTarget: DEFAULT_DAILY_TARGET };
+                          const currentSettings = settings || {
+                            name: 'User',
+                            dailyTarget: DEFAULT_DAILY_TARGET,
+                            customActivities: [],
+                          };
+                          const activitiesToAdd = generateDummyData(
+                            totalDays,
+                            currentSettings,
+                            BASE_ACTIVITY_DEFINITIONS
+                          );
 
-                          for (let dayOffset = 0; dayOffset < totalDays; dayOffset++) {
-                            const baseDate = new Date(now);
-                            baseDate.setDate(baseDate.getDate() - dayOffset);
-                            baseDate.setHours(0, 0, 0, 0);
-                            const dayOfWeek = baseDate.getDay(); // 0 = Sunday, 6 = Saturday
+                          console.log(`📊 Generated ${activitiesToAdd.length} dummy activities`);
+                          if (activitiesToAdd.length === 0) {
+                            throw new Error(
+                              'No activities generated! Check generateDummyData function.'
+                            );
+                          }
+                          console.log('Sample activity:', activitiesToAdd[0]);
 
-                            // Different activity patterns for different days
-                            // Ensure daily target is met for streak badges
-                            const dailyTarget = currentSettings.dailyTarget || DEFAULT_DAILY_TARGET;
-                            let dailyPoints = 0;
-
-                            if (dayOfWeek === 0) {
-                              // Sunday - Rest day but still meet target, 2-3 activities
-                              const numActivities = Math.random() > 0.4 ? 2 : 3;
-                              for (let i = 0; i < numActivities; i++) {
-                                const activityDate = new Date(baseDate);
-                                activityDate.setHours(
-                                  10 + Math.floor(Math.random() * 4),
-                                  Math.floor(Math.random() * 60),
-                                  0,
-                                  0
-                                );
-                                // More varied activities on Sunday
-                                const sundayActivities = [
-                                  'WALKING',
-                                  'CRUNCH',
-                                  'SWIMMING',
-                                  'STAIRS',
-                                ];
-                                const activityKey =
-                                  sundayActivities[
-                                    Math.floor(Math.random() * sundayActivities.length)
-                                  ];
-                                const activity = BASE_ACTIVITY_DEFINITIONS.find(
-                                  (a) => a.key === activityKey
-                                );
-                                if (!activity) continue; // Skip if activity not found
-                                let amount: number;
-                                if (activity.key === 'WALKING') {
-                                  amount = roundAmount(4000 + Math.random() * 4000, activity);
-                                } else if (activity.key === 'STAIRS') {
-                                  amount = roundAmount(20 + Math.random() * 30, activity);
-                                } else if (
-                                  activity.key === 'CRUNCH' ||
-                                  activity.key === 'SWIMMING'
-                                ) {
-                                  amount = roundAmount(25 + Math.random() * 35, activity);
-                                } else {
-                                  amount = roundAmount(
-                                    activity.defaultAmount * (0.8 + Math.random() * 0.4),
-                                    activity
-                                  );
-                                }
-                                const points = computePoints(activity.multiplier, amount);
-                                dailyPoints += points;
-                                activitiesToAdd.push({
-                                  definition: activity,
-                                  amount,
-                                  performedAt: activityDate.toISOString(),
+                          // Add all activities in batches to avoid performance issues
+                          const batchSize = 50;
+                          let addedCount = 0;
+                          for (let i = 0; i < activitiesToAdd.length; i += batchSize) {
+                            const batch = activitiesToAdd.slice(i, i + batchSize);
+                            batch.forEach((activity) => {
+                              try {
+                                addActivity({
+                                  definition: activity.definition,
+                                  amount: activity.amount,
+                                  performedAt: activity.performedAt,
                                 });
+                                addedCount++;
+                              } catch (error) {
+                                console.error('Failed to add activity:', error, activity);
                               }
-
-                              // Ensure daily target is met
-                              if (dailyPoints < dailyTarget) {
-                                const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
-                                  (a) => a.key === 'WALKING'
-                                )!;
-                                const extraAmount = roundAmount(
-                                  (dailyTarget - dailyPoints) / extraActivity.multiplier + 1000,
-                                  extraActivity
-                                );
-                                const extraDate = new Date(baseDate);
-                                extraDate.setHours(
-                                  16 + Math.floor(Math.random() * 2),
-                                  Math.floor(Math.random() * 60),
-                                  0,
-                                  0
-                                );
-                                activitiesToAdd.push({
-                                  definition: extraActivity,
-                                  amount: extraAmount,
-                                  performedAt: extraDate.toISOString(),
-                                });
-                              }
-                            } else if (dayOfWeek === 6) {
-                              // Saturday - Active day, 4-5 activities with high points
-                              const numActivities = Math.random() > 0.3 ? 4 : 5;
-                              const activityTypes = [
-                                'RUNNING',
-                                'SWIMMING',
-                                'WEIGHT_LIFTING',
-                                'PUSH_UP',
-                                'SIT_UP',
-                                'STAIRS',
-                                'WALKING',
-                                'CRUNCH',
-                              ];
-                              for (let i = 0; i < numActivities; i++) {
-                                const activityKey =
-                                  activityTypes[Math.floor(Math.random() * activityTypes.length)];
-                                const activity = BASE_ACTIVITY_DEFINITIONS.find(
-                                  (a) => a.key === activityKey
-                                )!;
-                                const activityDate = new Date(baseDate);
-                                const hour =
-                                  i === 0
-                                    ? 7 + Math.floor(Math.random() * 2)
-                                    : i === 1
-                                      ? 10 + Math.floor(Math.random() * 2)
-                                      : i === 2
-                                        ? 15 + Math.floor(Math.random() * 2)
-                                        : i === 3
-                                          ? 18 + Math.floor(Math.random() * 2)
-                                          : 20 + Math.floor(Math.random() * 2);
-                                activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
-
-                                let amount: number;
-                                if (activity.key === 'RUNNING') {
-                                  amount = roundAmount(5000 + Math.random() * 5000, activity);
-                                } else if (activity.key === 'SWIMMING') {
-                                  amount = roundAmount(30 + Math.random() * 60, activity);
-                                } else if (activity.key === 'WEIGHT_LIFTING') {
-                                  amount = roundAmount(50 + Math.random() * 100, activity);
-                                } else if (activity.key === 'STAIRS') {
-                                  amount = roundAmount(30 + Math.random() * 50, activity);
-                                } else if (activity.key === 'STAIRS') {
-                                  amount = roundAmount(40 + Math.random() * 60, activity);
-                                } else if (activity.key === 'WALKING') {
-                                  amount = roundAmount(8000 + Math.random() * 8000, activity);
-                                } else {
-                                  amount = roundAmount(
-                                    activity.defaultAmount * (0.8 + Math.random() * 1.2),
-                                    activity
-                                  );
-                                }
-                                const points = computePoints(activity.multiplier, amount);
-                                dailyPoints += points;
-
-                                activitiesToAdd.push({
-                                  definition: activity,
-                                  amount,
-                                  performedAt: activityDate.toISOString(),
-                                });
-                              }
-
-                              // Ensure daily target is exceeded for weekend warrior badge
-                              if (dailyPoints < dailyTarget * 1.5) {
-                                const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
-                                  (a) => a.key === 'RUNNING'
-                                )!;
-                                const extraAmount = roundAmount(
-                                  (dailyTarget * 1.5 - dailyPoints) / extraActivity.multiplier +
-                                    2000,
-                                  extraActivity
-                                );
-                                const extraDate = new Date(baseDate);
-                                extraDate.setHours(
-                                  19 + Math.floor(Math.random() * 2),
-                                  Math.floor(Math.random() * 60),
-                                  0,
-                                  0
-                                );
-                                activitiesToAdd.push({
-                                  definition: extraActivity,
-                                  amount: extraAmount,
-                                  performedAt: extraDate.toISOString(),
-                                });
-                              }
-                            } else {
-                              // Weekdays - Regular activity, 3-5 activities with variety
-                              const numActivities =
-                                Math.random() > 0.3 ? (Math.random() > 0.5 ? 3 : 4) : 5;
-
-                              // Use different activities each day for variety_seeker badge
-                              const availableActivities = BASE_ACTIVITY_DEFINITIONS;
-
-                              for (let i = 0; i < numActivities; i++) {
-                                const activity =
-                                  availableActivities[
-                                    Math.floor(Math.random() * availableActivities.length)
-                                  ];
-                                const activityDate = new Date(baseDate);
-                                // Vary hours for early_bird, noon_warrior, night_owl badges
-                                const hour =
-                                  i === 0
-                                    ? 6 + Math.floor(Math.random() * 3) // Early bird (6-9)
-                                    : i === 1
-                                      ? 12 + Math.floor(Math.random() * 2) // Noon warrior (12-14)
-                                      : i === 2
-                                        ? 17 + Math.floor(Math.random() * 2)
-                                        : i === 3
-                                          ? 20 + Math.floor(Math.random() * 2)
-                                          : 22 + Math.floor(Math.random() * 2); // Night owl (21-24)
-                                activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
-
-                                let amount: number;
-                                if (activity.key === 'WALKING') {
-                                  amount = roundAmount(7000 + Math.random() * 7000, activity);
-                                } else if (activity.key === 'RUNNING') {
-                                  amount = roundAmount(4000 + Math.random() * 5000, activity);
-                                } else if (activity.key === 'SWIMMING') {
-                                  amount = roundAmount(25 + Math.random() * 45, activity);
-                                } else if (activity.key === 'WEIGHT_LIFTING') {
-                                  amount = roundAmount(35 + Math.random() * 70, activity);
-                                } else if (activity.key === 'STAIRS') {
-                                  amount = roundAmount(30 + Math.random() * 50, activity);
-                                } else if (activity.key === 'STAIRS') {
-                                  amount = roundAmount(30 + Math.random() * 50, activity);
-                                } else if (activity.key === 'CRUNCH') {
-                                  amount = roundAmount(20 + Math.random() * 40, activity);
-                                } else if (
-                                  activity.key === 'PUSH_UP' ||
-                                  activity.key === 'SIT_UP'
-                                ) {
-                                  amount = roundAmount(20 + Math.random() * 40, activity);
-                                } else {
-                                  amount = roundAmount(
-                                    activity.defaultAmount * (0.8 + Math.random() * 1.0),
-                                    activity
-                                  );
-                                }
-                                const points = computePoints(activity.multiplier, amount);
-                                dailyPoints += points;
-
-                                activitiesToAdd.push({
-                                  definition: activity,
-                                  amount,
-                                  performedAt: activityDate.toISOString(),
-                                });
-                              }
-
-                              // Ensure daily target is met for streak badges
-                              if (dailyPoints < dailyTarget) {
-                                const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
-                                  (a) => a.key === 'WALKING'
-                                )!;
-                                const extraAmount = roundAmount(
-                                  (dailyTarget - dailyPoints) / extraActivity.multiplier + 1000,
-                                  extraActivity
-                                );
-                                const extraDate = new Date(baseDate);
-                                extraDate.setHours(
-                                  18 + Math.floor(Math.random() * 2),
-                                  Math.floor(Math.random() * 60),
-                                  0,
-                                  0
-                                );
-                                activitiesToAdd.push({
-                                  definition: extraActivity,
-                                  amount: extraAmount,
-                                  performedAt: extraDate.toISOString(),
-                                });
-                              }
+                            });
+                            // Wait for debounce delay (500ms) + extra buffer between batches
+                            // This ensures each batch is saved to localStorage before next batch
+                            if (i + batchSize < activitiesToAdd.length) {
+                              await new Promise((resolve) => setTimeout(resolve, 600));
                             }
                           }
 
-                          // Add all activities
-                          activitiesToAdd.forEach((activity) => {
-                            addActivity(activity);
-                          });
+                          console.log(
+                            `✅ Added ${addedCount} activities out of ${activitiesToAdd.length}`
+                          );
 
-                          // Wait a bit for activities to be processed and saved to localStorage
-                          await new Promise((resolve) => setTimeout(resolve, 2000));
+                          // Wait longer for activities to be processed and saved to localStorage
+                          // Debounce delay (500ms) + extra buffer for final batch save
+                          await new Promise((resolve) => setTimeout(resolve, 1000));
 
                           // Force reload activities from storage to ensure badge check has latest data
+                          reloadActivities();
+                          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                          // Double-check: reload again to ensure all data is synced
                           reloadActivities();
                           await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -1507,10 +1276,23 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                           reloadBadges();
                           await new Promise((resolve) => setTimeout(resolve, 300));
 
-                          // Get final counts from localStorage
-                          const finalActivities = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
-                          const finalBadges = localStorage.getItem(STORAGE_KEYS.BADGES);
-                          const finalChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+                          // Get final counts from localStorage (read multiple times to ensure we get latest)
+                          let finalActivities = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+                          let finalBadges = localStorage.getItem(STORAGE_KEYS.BADGES);
+                          let finalChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+
+                          // If activities are still empty, wait a bit more and retry
+                          if (!finalActivities || JSON.parse(finalActivities).length === 0) {
+                            console.warn(
+                              '⚠️ Activities not found in localStorage, waiting and retrying...'
+                            );
+                            await new Promise((resolve) => setTimeout(resolve, 1000));
+                            reloadActivities();
+                            await new Promise((resolve) => setTimeout(resolve, 500));
+                            finalActivities = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+                            finalBadges = localStorage.getItem(STORAGE_KEYS.BADGES);
+                            finalChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+                          }
 
                           const activitiesArray = finalActivities
                             ? JSON.parse(finalActivities)
@@ -1520,24 +1302,66 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             ? JSON.parse(finalChallenges)
                             : [];
 
+                          console.log(
+                            `📊 Final counts - Activities: ${activitiesArray.length}, Badges: ${badgesArray.length}, Challenges: ${challengesArray.length}`
+                          );
+
                           // Calculate total points
                           const totalPoints = activitiesArray.reduce(
                             (sum: number, act: any) => sum + (act.points || 0),
                             0
                           );
 
-                          // Calculate date range
-                          const activityDates = activitiesArray.map(
-                            (act: any) => new Date(act.performedAt)
-                          );
-                          const startDate =
-                            activityDates.length > 0
-                              ? new Date(Math.min(...activityDates.map((d: Date) => d.getTime())))
-                              : new Date();
-                          const endDate =
-                            activityDates.length > 0
-                              ? new Date(Math.max(...activityDates.map((d: Date) => d.getTime())))
-                              : new Date();
+                          // Calculate date range from generated activities if localStorage is empty
+                          let startDate: Date;
+                          let endDate: Date;
+
+                          if (activitiesArray.length > 0) {
+                            const activityDates = activitiesArray
+                              .map((act: any) => {
+                                try {
+                                  return new Date(act.performedAt);
+                                } catch {
+                                  return null;
+                                }
+                              })
+                              .filter(
+                                (d: Date | null): d is Date => d !== null && !isNaN(d.getTime())
+                              );
+
+                            if (activityDates.length > 0) {
+                              startDate = new Date(
+                                Math.min(...activityDates.map((d: Date) => d.getTime()))
+                              );
+                              endDate = new Date(
+                                Math.max(...activityDates.map((d: Date) => d.getTime()))
+                              );
+                            } else {
+                              // Fallback: use generated activities date range
+                              const generatedDates = activitiesToAdd.map(
+                                (a) => new Date(a.performedAt)
+                              );
+                              startDate = new Date(
+                                Math.min(...generatedDates.map((d) => d.getTime()))
+                              );
+                              endDate = new Date(
+                                Math.max(...generatedDates.map((d) => d.getTime()))
+                              );
+                            }
+                          } else {
+                            // Fallback: use generated activities date range
+                            const generatedDates = activitiesToAdd.map(
+                              (a) => new Date(a.performedAt)
+                            );
+                            startDate =
+                              generatedDates.length > 0
+                                ? new Date(Math.min(...generatedDates.map((d) => d.getTime())))
+                                : new Date();
+                            endDate =
+                              generatedDates.length > 0
+                                ? new Date(Math.max(...generatedDates.map((d) => d.getTime())))
+                                : new Date();
+                          }
 
                           // Create challenges only if they don't already exist
                           const existingChallengeIds = new Set(challenges.map((c) => c.id));
@@ -1587,6 +1411,12 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             }
                           }
 
+                          // Close loading overlay first
+                          setIsLoadingDummyData(false);
+
+                          // Small delay to ensure loading overlay is closed
+                          await new Promise((resolve) => setTimeout(resolve, 300));
+
                           // Show summary dialog
                           setDummySummaryStats({
                             activitiesCount: activitiesArray.length,
@@ -1607,12 +1437,17 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               : 'Failed to load dummy data',
                             'error'
                           );
+                          setIsLoadingDummyData(false);
                         } finally {
                           // Clear flag to re-enable badge notifications
                           if (typeof window !== 'undefined') {
                             localStorage.removeItem('sporttrack.dummy_data_loading');
                           }
-                          setIsLoadingDummyData(false);
+                          // Don't set isLoadingDummyData to false here if summary dialog is showing
+                          // It will be set to false before showing summary dialog
+                          if (!showDummySummary) {
+                            setIsLoadingDummyData(false);
+                          }
                         }
                       }}
                       disabled={isLoadingDummyData}
@@ -1718,7 +1553,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                 {/* User Info Display */}
                 {(user?.displayName || settings?.name) && (
                   <div
-                    className={`${isMobile ? 'mb-2 pb-1.5' : 'mb-2.5 pb-2'} border-b border-gray-200 dark:border-gray-700`}
+                    className={`${isMobile ? 'mb-2 pb-1.5' : 'mb-2.5 pb-2'} border-b border-gray-200/60 dark:border-gray-700/60`}
                   >
                     <div className="flex items-center gap-1.5">
                       <span className={isMobile ? 'text-xs' : 'text-sm'}>👤</span>
@@ -1779,14 +1614,14 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
 
                 {/* Level Display */}
                 <div
-                  className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200 dark:border-gray-700`}
+                  className={`${isMobile ? 'pt-1.5' : 'pt-2'} border-t border-gray-200/60 dark:border-gray-700/60`}
                 >
                   <LevelDisplay />
                 </div>
 
                 {/* App Settings Section */}
                 <div
-                  className={`${isMobile ? 'pt-1.5 space-y-1' : 'pt-2 space-y-1.5'} border-t border-gray-200 dark:border-gray-700`}
+                  className={`${isMobile ? 'pt-1.5 space-y-1' : 'pt-2 space-y-1.5'} border-t border-gray-200/60 dark:border-gray-700/60`}
                 >
                   <div>
                     <span
@@ -1901,311 +1736,65 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               createMonthlyChallenge,
                             } = await import('@/lib/challenges');
 
-                            // Helper function to compute points
-                            const computePoints = (multiplier: number, amount: number): number => {
-                              return Math.max(0, Math.round(amount * multiplier));
-                            };
-
-                            // Helper function to round numbers nicely
-                            const roundAmount = (
-                              amount: number,
-                              activity: ActivityDefinition
-                            ): number => {
-                              if (
-                                activity.unit.includes('adım') ||
-                                activity.unit.includes('steps')
-                              ) {
-                                return Math.round(amount / 100) * 100; // Round to nearest 100 for steps
-                              } else if (
-                                activity.unit.includes('dakika') ||
-                                activity.unit.includes('minutes')
-                              ) {
-                                return Math.round(amount / 5) * 5; // Round to nearest 5 for minutes
-                              } else if (
-                                activity.unit.includes('tekrar') ||
-                                activity.unit.includes('reps')
-                              ) {
-                                return Math.round(amount / 5) * 5; // Round to nearest 5 for reps
-                              } else if (activity.unit.includes('basamak')) {
-                                return Math.round(amount / 10) * 10; // Round to nearest 10 for stairs
-                              }
-                              return Math.round(amount);
-                            };
-
-                            // Generate dummy activities for the last 240 days (8 months) - optimized for performance
+                            // Generate realistic dummy activities for the last 240 days (8 months)
                             const now = new Date();
-                            const activitiesToAdd: Parameters<typeof addActivity>[0][] = [];
                             const totalDays = 240; // Increased to generate more badges
                             const currentSettings = settings || {
+                              name: 'User',
                               dailyTarget: DEFAULT_DAILY_TARGET,
+                              customActivities: [],
                             };
-                            const dailyTarget = currentSettings.dailyTarget || DEFAULT_DAILY_TARGET;
+                            const activitiesToAdd = generateDummyData(
+                              totalDays,
+                              currentSettings,
+                              BASE_ACTIVITY_DEFINITIONS
+                            );
 
-                            for (let dayOffset = 0; dayOffset < totalDays; dayOffset++) {
-                              const baseDate = new Date(now);
-                              baseDate.setDate(baseDate.getDate() - dayOffset);
-                              baseDate.setHours(0, 0, 0, 0);
-                              const dayOfWeek = baseDate.getDay(); // 0 = Sunday, 6 = Saturday
+                            console.log(`📊 Generated ${activitiesToAdd.length} dummy activities`);
+                            if (activitiesToAdd.length === 0) {
+                              throw new Error(
+                                'No activities generated! Check generateDummyData function.'
+                              );
+                            }
+                            console.log('Sample activity:', activitiesToAdd[0]);
 
-                              // Different activity patterns for different days
-                              // Ensure daily target is met for streak badges
-                              let dailyPoints = 0;
-
-                              if (dayOfWeek === 0) {
-                                // Sunday - Rest day but still meet target, 2-3 activities
-                                const numActivities = Math.random() > 0.4 ? 2 : 3;
-                                for (let i = 0; i < numActivities; i++) {
-                                  const activityDate = new Date(baseDate);
-                                  activityDate.setHours(
-                                    10 + Math.floor(Math.random() * 4),
-                                    Math.floor(Math.random() * 60),
-                                    0,
-                                    0
-                                  );
-                                  // More varied activities on Sunday
-                                  const sundayActivities = [
-                                    'WALKING',
-                                    'CRUNCH',
-                                    'SWIMMING',
-                                    'STAIRS',
-                                  ];
-                                  const activityKey =
-                                    sundayActivities[
-                                      Math.floor(Math.random() * sundayActivities.length)
-                                    ];
-                                  const activity = BASE_ACTIVITY_DEFINITIONS.find(
-                                    (a) => a.key === activityKey
-                                  );
-                                  if (!activity) continue; // Skip if activity not found
-                                  let amount: number;
-                                  if (activity.key === 'WALKING') {
-                                    amount = roundAmount(4000 + Math.random() * 4000, activity);
-                                  } else if (activity.key === 'STAIRS') {
-                                    amount = roundAmount(20 + Math.random() * 30, activity);
-                                  } else if (
-                                    activity.key === 'CRUNCH' ||
-                                    activity.key === 'SWIMMING'
-                                  ) {
-                                    amount = roundAmount(25 + Math.random() * 35, activity);
-                                  } else {
-                                    amount = roundAmount(
-                                      activity.defaultAmount * (0.8 + Math.random() * 0.4),
-                                      activity
-                                    );
-                                  }
-                                  const points = computePoints(activity.multiplier, amount);
-                                  dailyPoints += points;
-                                  activitiesToAdd.push({
-                                    definition: activity,
-                                    amount,
-                                    performedAt: activityDate.toISOString(),
+                            // Add all activities in batches to avoid performance issues
+                            const batchSize = 50;
+                            let addedCount = 0;
+                            for (let i = 0; i < activitiesToAdd.length; i += batchSize) {
+                              const batch = activitiesToAdd.slice(i, i + batchSize);
+                              batch.forEach((activity) => {
+                                try {
+                                  addActivity({
+                                    definition: activity.definition,
+                                    amount: activity.amount,
+                                    performedAt: activity.performedAt,
                                   });
+                                  addedCount++;
+                                } catch (error) {
+                                  console.error('Failed to add activity:', error, activity);
                                 }
-
-                                // Ensure daily target is met
-                                if (dailyPoints < dailyTarget) {
-                                  const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
-                                    (a) => a.key === 'WALKING'
-                                  )!;
-                                  const extraAmount = roundAmount(
-                                    (dailyTarget - dailyPoints) / extraActivity.multiplier + 1000,
-                                    extraActivity
-                                  );
-                                  const extraDate = new Date(baseDate);
-                                  extraDate.setHours(
-                                    16 + Math.floor(Math.random() * 2),
-                                    Math.floor(Math.random() * 60),
-                                    0,
-                                    0
-                                  );
-                                  activitiesToAdd.push({
-                                    definition: extraActivity,
-                                    amount: extraAmount,
-                                    performedAt: extraDate.toISOString(),
-                                  });
-                                }
-                              } else if (dayOfWeek === 6) {
-                                // Saturday - Active day, 4-5 activities with high points
-                                const numActivities = Math.random() > 0.3 ? 4 : 5;
-                                const activityTypes = [
-                                  'RUNNING',
-                                  'SWIMMING',
-                                  'WEIGHT_LIFTING',
-                                  'PUSH_UP',
-                                  'SIT_UP',
-                                  'STAIRS',
-                                  'WALKING',
-                                  'CRUNCH',
-                                ];
-                                for (let i = 0; i < numActivities; i++) {
-                                  const activityKey =
-                                    activityTypes[Math.floor(Math.random() * activityTypes.length)];
-                                  const activity = BASE_ACTIVITY_DEFINITIONS.find(
-                                    (a) => a.key === activityKey
-                                  );
-                                  if (!activity) continue; // Skip if activity not found
-                                  const activityDate = new Date(baseDate);
-                                  const hour =
-                                    i === 0
-                                      ? 7 + Math.floor(Math.random() * 2)
-                                      : i === 1
-                                        ? 10 + Math.floor(Math.random() * 2)
-                                        : i === 2
-                                          ? 15 + Math.floor(Math.random() * 2)
-                                          : i === 3
-                                            ? 18 + Math.floor(Math.random() * 2)
-                                            : 20 + Math.floor(Math.random() * 2);
-                                  activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
-
-                                  let amount: number;
-                                  if (activity.key === 'RUNNING') {
-                                    amount = roundAmount(5000 + Math.random() * 5000, activity);
-                                  } else if (activity.key === 'SWIMMING') {
-                                    amount = roundAmount(30 + Math.random() * 60, activity);
-                                  } else if (activity.key === 'WEIGHT_LIFTING') {
-                                    amount = roundAmount(50 + Math.random() * 100, activity);
-                                  } else if (activity.key === 'STAIRS') {
-                                    amount = roundAmount(30 + Math.random() * 50, activity);
-                                  } else if (activity.key === 'STAIRS') {
-                                    amount = roundAmount(40 + Math.random() * 60, activity);
-                                  } else if (activity.key === 'WALKING') {
-                                    amount = roundAmount(8000 + Math.random() * 8000, activity);
-                                  } else {
-                                    amount = roundAmount(
-                                      activity.defaultAmount * (0.8 + Math.random() * 1.2),
-                                      activity
-                                    );
-                                  }
-                                  const points = computePoints(activity.multiplier, amount);
-                                  dailyPoints += points;
-
-                                  activitiesToAdd.push({
-                                    definition: activity,
-                                    amount,
-                                    performedAt: activityDate.toISOString(),
-                                  });
-                                }
-
-                                // Ensure daily target is exceeded for weekend warrior badge
-                                if (dailyPoints < dailyTarget * 1.5) {
-                                  const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
-                                    (a) => a.key === 'RUNNING'
-                                  )!;
-                                  const extraAmount = roundAmount(
-                                    (dailyTarget * 1.5 - dailyPoints) / extraActivity.multiplier +
-                                      2000,
-                                    extraActivity
-                                  );
-                                  const extraDate = new Date(baseDate);
-                                  extraDate.setHours(
-                                    19 + Math.floor(Math.random() * 2),
-                                    Math.floor(Math.random() * 60),
-                                    0,
-                                    0
-                                  );
-                                  activitiesToAdd.push({
-                                    definition: extraActivity,
-                                    amount: extraAmount,
-                                    performedAt: extraDate.toISOString(),
-                                  });
-                                }
-                              } else {
-                                // Weekdays - Regular activity, 3-5 activities with variety
-                                const numActivities =
-                                  Math.random() > 0.3 ? (Math.random() > 0.5 ? 3 : 4) : 5;
-
-                                // Use different activities each day for variety_seeker badge
-                                const availableActivities = BASE_ACTIVITY_DEFINITIONS;
-
-                                for (let i = 0; i < numActivities; i++) {
-                                  const activity =
-                                    availableActivities[
-                                      Math.floor(Math.random() * availableActivities.length)
-                                    ];
-                                  const activityDate = new Date(baseDate);
-                                  // Vary hours for early_bird, noon_warrior, night_owl badges
-                                  const hour =
-                                    i === 0
-                                      ? 6 + Math.floor(Math.random() * 3) // Early bird (6-9)
-                                      : i === 1
-                                        ? 12 + Math.floor(Math.random() * 2) // Noon warrior (12-14)
-                                        : i === 2
-                                          ? 17 + Math.floor(Math.random() * 2)
-                                          : i === 3
-                                            ? 20 + Math.floor(Math.random() * 2)
-                                            : 22 + Math.floor(Math.random() * 2); // Night owl (21-24)
-                                  activityDate.setHours(hour, Math.floor(Math.random() * 60), 0, 0);
-
-                                  let amount: number;
-                                  if (activity.key === 'WALKING') {
-                                    amount = roundAmount(7000 + Math.random() * 7000, activity);
-                                  } else if (activity.key === 'RUNNING') {
-                                    amount = roundAmount(4000 + Math.random() * 5000, activity);
-                                  } else if (activity.key === 'SWIMMING') {
-                                    amount = roundAmount(25 + Math.random() * 45, activity);
-                                  } else if (activity.key === 'WEIGHT_LIFTING') {
-                                    amount = roundAmount(35 + Math.random() * 70, activity);
-                                  } else if (activity.key === 'STAIRS') {
-                                    amount = roundAmount(30 + Math.random() * 50, activity);
-                                  } else if (activity.key === 'STAIRS') {
-                                    amount = roundAmount(30 + Math.random() * 50, activity);
-                                  } else if (activity.key === 'CRUNCH') {
-                                    amount = roundAmount(20 + Math.random() * 40, activity);
-                                  } else if (
-                                    activity.key === 'PUSH_UP' ||
-                                    activity.key === 'SIT_UP'
-                                  ) {
-                                    amount = roundAmount(20 + Math.random() * 40, activity);
-                                  } else {
-                                    amount = roundAmount(
-                                      activity.defaultAmount * (0.8 + Math.random() * 1.0),
-                                      activity
-                                    );
-                                  }
-                                  const points = computePoints(activity.multiplier, amount);
-                                  dailyPoints += points;
-
-                                  activitiesToAdd.push({
-                                    definition: activity,
-                                    amount,
-                                    performedAt: activityDate.toISOString(),
-                                  });
-                                }
-
-                                // Ensure daily target is met for streak badges
-                                if (dailyPoints < dailyTarget) {
-                                  const extraActivity = BASE_ACTIVITY_DEFINITIONS.find(
-                                    (a) => a.key === 'WALKING'
-                                  )!;
-                                  const extraAmount = roundAmount(
-                                    (dailyTarget - dailyPoints) / extraActivity.multiplier + 1000,
-                                    extraActivity
-                                  );
-                                  const extraDate = new Date(baseDate);
-                                  extraDate.setHours(
-                                    18 + Math.floor(Math.random() * 2),
-                                    Math.floor(Math.random() * 60),
-                                    0,
-                                    0
-                                  );
-                                  activitiesToAdd.push({
-                                    definition: extraActivity,
-                                    amount: extraAmount,
-                                    performedAt: extraDate.toISOString(),
-                                  });
-                                }
+                              });
+                              // Wait for debounce delay (500ms) + extra buffer between batches
+                              // This ensures each batch is saved to localStorage before next batch
+                              if (i + batchSize < activitiesToAdd.length) {
+                                await new Promise((resolve) => setTimeout(resolve, 600));
                               }
                             }
 
-                            // Add all activities
-                            activitiesToAdd.forEach((activity) => {
-                              addActivity(activity);
-                            });
+                            console.log(
+                              `✅ Added ${addedCount} activities out of ${activitiesToAdd.length}`
+                            );
 
-                            // Wait a bit for activities to be processed and saved to localStorage
-                            await new Promise((resolve) => setTimeout(resolve, 2000));
+                            // Wait longer for activities to be processed and saved to localStorage
+                            // Debounce delay (500ms) + extra buffer for final batch save
+                            await new Promise((resolve) => setTimeout(resolve, 1000));
 
                             // Force reload activities from storage to ensure badge check has latest data
+                            reloadActivities();
+                            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                            // Double-check: reload again to ensure all data is synced
                             reloadActivities();
                             await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -2229,10 +1818,23 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                             reloadBadges();
                             await new Promise((resolve) => setTimeout(resolve, 300));
 
-                            // Get final counts from localStorage
-                            const finalActivities = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
-                            const finalBadges = localStorage.getItem(STORAGE_KEYS.BADGES);
-                            const finalChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+                            // Get final counts from localStorage (read multiple times to ensure we get latest)
+                            let finalActivities = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+                            let finalBadges = localStorage.getItem(STORAGE_KEYS.BADGES);
+                            let finalChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+
+                            // If activities are still empty, wait a bit more and retry
+                            if (!finalActivities || JSON.parse(finalActivities).length === 0) {
+                              console.warn(
+                                '⚠️ Activities not found in localStorage, waiting and retrying...'
+                              );
+                              await new Promise((resolve) => setTimeout(resolve, 1000));
+                              reloadActivities();
+                              await new Promise((resolve) => setTimeout(resolve, 500));
+                              finalActivities = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
+                              finalBadges = localStorage.getItem(STORAGE_KEYS.BADGES);
+                              finalChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+                            }
 
                             const activitiesArray = finalActivities
                               ? JSON.parse(finalActivities)
@@ -2242,24 +1844,66 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               ? JSON.parse(finalChallenges)
                               : [];
 
+                            console.log(
+                              `📊 Final counts - Activities: ${activitiesArray.length}, Badges: ${badgesArray.length}, Challenges: ${challengesArray.length}`
+                            );
+
                             // Calculate total points
                             const totalPoints = activitiesArray.reduce(
                               (sum: number, act: any) => sum + (act.points || 0),
                               0
                             );
 
-                            // Calculate date range
-                            const activityDates = activitiesArray.map(
-                              (act: any) => new Date(act.performedAt)
-                            );
-                            const startDate =
-                              activityDates.length > 0
-                                ? new Date(Math.min(...activityDates.map((d: Date) => d.getTime())))
-                                : new Date();
-                            const endDate =
-                              activityDates.length > 0
-                                ? new Date(Math.max(...activityDates.map((d: Date) => d.getTime())))
-                                : new Date();
+                            // Calculate date range from generated activities if localStorage is empty
+                            let startDate: Date;
+                            let endDate: Date;
+
+                            if (activitiesArray.length > 0) {
+                              const activityDates = activitiesArray
+                                .map((act: any) => {
+                                  try {
+                                    return new Date(act.performedAt);
+                                  } catch {
+                                    return null;
+                                  }
+                                })
+                                .filter(
+                                  (d: Date | null): d is Date => d !== null && !isNaN(d.getTime())
+                                );
+
+                              if (activityDates.length > 0) {
+                                startDate = new Date(
+                                  Math.min(...activityDates.map((d: Date) => d.getTime()))
+                                );
+                                endDate = new Date(
+                                  Math.max(...activityDates.map((d: Date) => d.getTime()))
+                                );
+                              } else {
+                                // Fallback: use generated activities date range
+                                const generatedDates = activitiesToAdd.map(
+                                  (a) => new Date(a.performedAt)
+                                );
+                                startDate = new Date(
+                                  Math.min(...generatedDates.map((d) => d.getTime()))
+                                );
+                                endDate = new Date(
+                                  Math.max(...generatedDates.map((d) => d.getTime()))
+                                );
+                              }
+                            } else {
+                              // Fallback: use generated activities date range
+                              const generatedDates = activitiesToAdd.map(
+                                (a) => new Date(a.performedAt)
+                              );
+                              startDate =
+                                generatedDates.length > 0
+                                  ? new Date(Math.min(...generatedDates.map((d) => d.getTime())))
+                                  : new Date();
+                              endDate =
+                                generatedDates.length > 0
+                                  ? new Date(Math.max(...generatedDates.map((d) => d.getTime())))
+                                  : new Date();
+                            }
 
                             // Create challenges only if they don't already exist
                             const existingChallengeIds = new Set(challenges.map((c) => c.id));
@@ -2376,6 +2020,12 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                               addChallenge(strengthChallenge);
                             }
 
+                            // Close loading overlay first
+                            setIsLoadingDummyData(false);
+
+                            // Small delay to ensure loading overlay is closed
+                            await new Promise((resolve) => setTimeout(resolve, 300));
+
                             // Show summary dialog
                             setDummySummaryStats({
                               activitiesCount: activitiesArray.length,
@@ -2396,12 +2046,17 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
                                 : 'Failed to load dummy data',
                               'error'
                             );
+                            setIsLoadingDummyData(false);
                           } finally {
                             // Clear flag to re-enable badge notifications
                             if (typeof window !== 'undefined') {
                               localStorage.removeItem('sporttrack.dummy_data_loading');
                             }
-                            setIsLoadingDummyData(false);
+                            // Don't set isLoadingDummyData to false here if summary dialog is showing
+                            // It will be set to false before showing summary dialog
+                            if (!showDummySummary) {
+                              setIsLoadingDummyData(false);
+                            }
                           }
                         }}
                         disabled={isLoadingDummyData}
@@ -2839,7 +2494,7 @@ export function SettingsDialog({ triggerButton }: SettingsDialogProps = {}) {
       )}
 
       {/* Dummy Data Loading Overlay - Shows while loading dummy data */}
-      {isLoadingDummyData && (
+      {isLoadingDummyData && !showDummySummary && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md">
           <div className="flex flex-col items-center gap-6 rounded-3xl bg-white p-10 shadow-2xl dark:bg-gray-800 animate-in fade-in zoom-in duration-300">
             {/* Loading Spinner */}

@@ -11,6 +11,16 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+
+  /* Exception: Keep QuoteTicker animation running even with reduced motion */
+  .quote-ticker-content,
+  .quote-ticker-content * {
+    animation-duration: 120s !important;
+    animation-iteration-count: infinite !important;
+    animation-play-state: running !important;
+    animation-name: quoteMarquee !important;
+    animation-timing-function: linear !important;
+  }
 }
 
 /* Custom class for reduced animations - more aggressive */
@@ -22,6 +32,16 @@
   transition-duration: 0ms !important;
   transition-delay: 0ms !important;
   animation-delay: 0ms !important;
+}
+
+/* Exception: Keep QuoteTicker animation running even with reduce-motion class */
+.reduce-motion .quote-ticker-content,
+.reduce-motion .quote-ticker-content * {
+  animation-duration: 120s !important;
+  animation-iteration-count: infinite !important;
+  animation-play-state: running !important;
+  animation-name: quoteMarquee !important;
+  animation-timing-function: linear !important;
 }
 
 /* Disable page transitions when animations reduced */
@@ -1245,6 +1265,8 @@ body {
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .btn-enhanced::before {
@@ -1260,6 +1282,7 @@ body {
   transition:
     width 0.6s,
     height 0.6s;
+  pointer-events: none;
 }
 
 .btn-enhanced:hover::before {
@@ -1268,7 +1291,35 @@ body {
 }
 
 .btn-enhanced:active {
-  transform: scale(0.98);
+  transform: scale(0.98) translateZ(0);
+}
+
+.btn-enhanced:focus-visible {
+  outline: 2px solid rgba(14, 165, 233, 0.5);
+  outline-offset: 2px;
+}
+
+/* Touch feedback for mobile */
+@media (max-width: 768px) {
+  .btn-enhanced:active {
+    transform: scale(0.95) translateZ(0);
+    transition: transform 0.1s ease;
+  }
+
+  .btn-enhanced::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+
+  .btn-enhanced:active::after {
+    opacity: 1;
+  }
 }
 
 /* Glass morphism effect */
@@ -1289,6 +1340,28 @@ html {
   scroll-behavior: smooth;
   /* Smooth scrolling for all browsers */
   -webkit-overflow-scrolling: touch;
+  /* Optimize scroll performance */
+  scroll-padding-top: 80px; /* Account for fixed header */
+}
+
+/* Optimize scroll performance */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(14, 165, 233, 0.3) transparent;
+}
+
+/* Improve scroll performance on mobile */
+@media (max-width: 768px) {
+  * {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Optimize repaints during scroll */
+  body {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
 }
 
 /* Custom scrollbar styling */
@@ -1588,11 +1661,29 @@ html {
   }
 
   header {
+    overscroll-behavior: none !important;
+    overscroll-behavior-y: none !important;
+    -webkit-overscroll-behavior: none !important;
+    -webkit-overscroll-behavior-y: none !important;
+    touch-action: pan-x !important;
+    -webkit-touch-callout: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
     position: fixed !important;
     top: 0;
     left: 0;
     right: 0;
     z-index: 40;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+  }
+
+  header * {
+    touch-action: pan-x !important;
+    overscroll-behavior-y: none !important;
+    -webkit-overscroll-behavior-y: none !important;
   }
 }
 
@@ -3264,6 +3355,15 @@ html {
   }
 }
 
+@-webkit-keyframes quoteMarquee {
+  0% {
+    -webkit-transform: translateX(0);
+  }
+  100% {
+    -webkit-transform: translateX(-33.333%);
+  }
+}
+
 .quote-ticker-marquee {
   position: relative;
   width: 100%;
@@ -3276,34 +3376,50 @@ html {
 }
 
 .quote-ticker-content {
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-  animation: quoteMarquee 120s linear infinite;
-  will-change: transform;
-  gap: 0;
-  vertical-align: middle;
-  line-height: 1;
-  height: 100%;
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  animation: quoteMarquee 120s linear infinite !important;
+  -webkit-animation: quoteMarquee 120s linear infinite !important;
+  -moz-animation: quoteMarquee 120s linear infinite !important;
+  -o-animation: quoteMarquee 120s linear infinite !important;
+  -ms-animation: quoteMarquee 120s linear infinite !important;
+  will-change: transform !important;
+  gap: 0 !important;
+  vertical-align: middle !important;
+  line-height: 1 !important;
+  height: 100% !important;
   animation-play-state: running !important;
-  backface-visibility: hidden;
-  -webkit-font-smoothing: antialiased;
-  transform: translateZ(0);
-  text-rendering: optimizeLegibility;
-  animation-fill-mode: both;
-  /* Force hardware acceleration */
-  -webkit-transform: translateZ(0);
-  -moz-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  -o-transform: translateZ(0);
-  /* Prevent animation interruption */
-  animation-timing-function: linear;
-  /* Ensure continuous animation */
-  animation-iteration-count: infinite;
+  -webkit-animation-play-state: running !important;
+  -moz-animation-play-state: running !important;
+  -o-animation-play-state: running !important;
+  -ms-animation-play-state: running !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  -webkit-font-smoothing: antialiased !important;
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  -moz-transform: translateZ(0) !important;
+  -ms-transform: translateZ(0) !important;
+  -o-transform: translateZ(0) !important;
+  text-rendering: optimizeLegibility !important;
+  animation-fill-mode: both !important;
+  animation-timing-function: linear !important;
+  -webkit-animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  -webkit-animation-iteration-count: infinite !important;
+  animation-duration: 120s !important;
+  -webkit-animation-duration: 120s !important;
+  animation-name: quoteMarquee !important;
+  -webkit-animation-name: quoteMarquee !important;
+  pointer-events: none !important;
+  /* Force GPU acceleration */
+  transform-style: preserve-3d !important;
+  -webkit-transform-style: preserve-3d !important;
 }
 
 .quote-ticker-content:hover {
-  animation-play-state: paused;
+  animation-play-state: running !important; /* Keep animation running even on hover */
 }
 
 .quote-ticker-glow {
@@ -5236,4 +5352,283 @@ aside[role='complementary'] {
   display: none; /* Chrome, Safari, Opera */
   width: 0;
   height: 0;
+}
+
+/* ============================================
+   SPRINT 1: GÖRSEL İYİLEŞTİRMELER
+   ============================================ */
+
+/* Enhanced gradient animations */
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Glassmorphism effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-effect {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Floating animation enhancement */
+@keyframes float-enhanced {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+  66% {
+    transform: translateY(-5px) rotate(-2deg);
+  }
+}
+
+.float-enhanced {
+  animation: float-enhanced 3s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Pulse glow effect */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(14, 165, 233, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(14, 165, 233, 0.6),
+      0 0 30px rgba(14, 165, 233, 0.4);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Icon bounce animation */
+@keyframes icon-bounce {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+.icon-bounce {
+  animation: icon-bounce 0.6s ease-in-out;
+  display: inline-block;
+}
+
+/* Sparkle effect */
+@keyframes sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+.sparkle {
+  position: relative;
+}
+
+.sparkle::before,
+.sparkle::after {
+  content: '✨';
+  position: absolute;
+  animation: sparkle 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.sparkle::before {
+  top: -10px;
+  left: -10px;
+  animation-delay: 0s;
+}
+
+.sparkle::after {
+  bottom: -10px;
+  right: -10px;
+  animation-delay: 0.75s;
+}
+
+/* Neon glow effect */
+.neon-glow {
+  text-shadow:
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor,
+    0 0 20px currentColor;
+}
+
+.neon-glow-brand {
+  text-shadow:
+    0 0 5px rgba(14, 165, 233, 0.8),
+    0 0 10px rgba(14, 165, 233, 0.6),
+    0 0 15px rgba(14, 165, 233, 0.4);
+}
+
+.neon-glow-red {
+  text-shadow:
+    0 0 5px rgba(239, 68, 68, 0.8),
+    0 0 10px rgba(239, 68, 68, 0.6),
+    0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+/* 3D card effect */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(5deg) scale(1.02);
+}
+
+/* Liquid effect */
+@keyframes liquid {
+  0%,
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  50% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+}
+
+.liquid-effect {
+  animation: liquid 8s ease-in-out infinite;
+}
+
+/* Progress bar glow */
+.progress-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-glow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: progress-shine 2s infinite;
+}
+
+@keyframes progress-shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Prevent overscroll on BottomNavigation */
+@media (max-width: 768px) {
+  /* Prevent rubber-band effect on iOS Safari - only prevent overscroll bounce */
+  html {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* BottomNavigation should never move or bounce */
+  [class*='BottomNavigation'],
+  [class*='bottom-navigation'] {
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto !important;
+    touch-action: pan-x pan-up !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    will-change: transform !important;
+  }
+
+  /* QuoteTicker should also stay fixed - prevent vertical drag but allow animation */
+  [class*='QuoteTicker'],
+  [class*='quote-ticker'] {
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto !important;
+    touch-action: pan-x !important; /* Allow horizontal pan, prevent vertical drag */
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    pointer-events: auto !important;
+    position: fixed !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    will-change: transform !important;
+  }
+
+  /* Ensure animation continues */
+  .quote-ticker-content {
+    animation-play-state: running !important;
+    pointer-events: none !important; /* Don't interfere with touch events */
+  }
+
+  /* Floating buttons should stay fixed */
+  [class*='FloatingAddButton'],
+  [class*='ScrollToTop'] {
+    overscroll-behavior: none !important;
+    touch-action: pan-x pan-up !important;
+    position: fixed !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+  }
 }

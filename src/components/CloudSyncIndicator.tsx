@@ -69,14 +69,16 @@ export function CloudSyncIndicator() {
 
   return (
     <div
-      className={`flex items-center gap-1.5 ${isMobile ? 'text-xs' : 'text-sm'} ${getStatusColor()}`}
+      className={`flex items-center gap-1.5 ${isMobile ? 'text-xs' : 'text-sm'} ${getStatusColor()} glass-effect px-2 py-1 rounded-lg backdrop-blur-sm bg-white/10 dark:bg-gray-900/20 border border-white/10 dark:border-gray-700/30 transition-all duration-300 hover:bg-white/20 dark:hover:bg-gray-900/30`}
       title={getStatusText()}
     >
-      <span className={syncState.status === 'syncing' ? 'animate-spin' : ''}>
+      <span
+        className={`${syncState.status === 'syncing' ? 'animate-spin' : ''} transition-transform duration-300`}
+      >
         {getStatusIcon()}
       </span>
       {!isMobile && syncState.status === 'synced' && syncState.lastSyncAt && (
-        <span className="text-gray-500 dark:text-gray-400">
+        <span className="text-gray-500 dark:text-gray-400 font-medium">
           {format(syncState.lastSyncAt, 'HH:mm', { locale: dateLocale })}
         </span>
       )}
